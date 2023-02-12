@@ -39,8 +39,7 @@ function love.keypressed(key, scancode, isrepeat)
   guy:move(key)
 end
 
-function love.draw()
-  love.graphics.scale(3)
+local function drawWorld()
   love.graphics.translate(320/2 - 8, 200/2 - 16)
   love.graphics.translate(-guy.x * 16, -guy.y * 16)
   for i = 1, 20 do
@@ -50,4 +49,12 @@ function love.draw()
   end
   love.graphics.draw(grassImage, 0, 0)
   love.graphics.draw(guy.image, guy.x * 16, guy.y * 16)
+end
+
+function love.draw()
+  love.graphics.scale(3)
+  love.graphics.push()
+  drawWorld()
+  love.graphics.pop()
+  love.graphics.print('Units: 1', 0, 0)
 end
