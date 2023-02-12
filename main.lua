@@ -44,6 +44,18 @@ end
 ---@type World
 local map
 
+local function drawWorld()
+  love.graphics.translate(320/2 - 8, 200/2 - 16)
+  love.graphics.translate(-guy.x * 16, -guy.y * 16)
+  map:draw()
+  love.graphics.draw(otherGuy.image, otherGuy.x * 16, otherGuy.y * 16)
+  love.graphics.draw(guy.image, guy.x * 16, guy.y * 16)
+end
+
+local function drawHud()
+  love.graphics.print('Units: 2', 0, 0)
+end
+
 function love.load()
   love.window.setMode(320 * 3, 200 * 3)
   love.graphics.setDefaultFilter("nearest", "nearest")
@@ -65,18 +77,10 @@ function love.keypressed(key, scancode, isrepeat)
   guy:move(key)
 end
 
-local function drawWorld()
-  love.graphics.translate(320/2 - 8, 200/2 - 16)
-  love.graphics.translate(-guy.x * 16, -guy.y * 16)
-  map:draw()
-  love.graphics.draw(otherGuy.image, otherGuy.x * 16, otherGuy.y * 16)
-  love.graphics.draw(guy.image, guy.x * 16, guy.y * 16)
-end
-
 function love.draw()
   love.graphics.scale(3)
   love.graphics.push()
   drawWorld()
   love.graphics.pop()
-  love.graphics.print('Units: 2', 0, 0)
+  drawHud()
 end
