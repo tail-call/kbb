@@ -3,8 +3,8 @@
 local images = require('./images')
 
 local guy = {
-  x = 0,
-  y = 0,
+  x = 10,
+  y = 6,
   ---@type love.Image
   image = nil,
 
@@ -24,13 +24,16 @@ local guy = {
 
 ---@type love.Image
 local grassImage
+---@type love.Image
+local rockImage
 
 function love.load()
   love.window.setMode(320 * 3, 200 * 3)
   love.graphics.setDefaultFilter("nearest", "nearest")
-  local images = images.load()
-  guy.image = love.graphics.newImage(images.guy)
-  grassImage = love.graphics.newImage(images.grass)
+  local pics = images.load()
+  guy.image = love.graphics.newImage(pics.guy)
+  grassImage = love.graphics.newImage(pics.grass)
+  rockImage = love.graphics.newImage(pics.rock)
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -44,10 +47,13 @@ local function drawWorld()
   love.graphics.translate(-guy.x * 16, -guy.y * 16)
   for i = 1, 20 do
     for j = 1, 13 do
-      love.graphics.draw(grassImage, (i - 1) * 16, (j - 1) * 16)
+      if i == 1 then
+        love.graphics.draw(rockImage, (i - 1) * 16, (j - 1) * 16)
+      else
+        love.graphics.draw(grassImage, (i - 1) * 16, (j - 1) * 16)
+      end
     end
   end
-  love.graphics.draw(grassImage, 0, 0)
   love.graphics.draw(guy.image, guy.x * 16, guy.y * 16)
 end
 

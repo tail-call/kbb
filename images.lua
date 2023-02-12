@@ -34,6 +34,24 @@ local grass = ''
   .. '   #            '
   .. '                '
 
+local rock = ''
+  .. '   #     #      '
+  .. '# # #   # #   # '
+  .. ' #   # #   # # #'
+  .. '   #     #      '
+  .. '# # #   # #   # '
+  .. ' #   # #   # # #'
+  .. '   #     #      '
+  .. '# # #   # #   # '
+  .. ' #   # #   # # #'
+  .. '   #     #      '
+  .. '# # #   # #   # '
+  .. ' #   # #   # # #'
+  .. '   #     #      '
+  .. '# # #   # #   # '
+  .. ' #   # #   # # #'
+  .. '################'
+
 ---@param text string
 ---@param r number
 ---@param g number
@@ -55,6 +73,7 @@ local function load()
   return {
     guy = guyToImageData(guy, 255, 255, 255),
     grass = guyToImageData(grass, 0, 128, 0),
+    rock = guyToImageData(rock, 128, 128, 128),
   }
 end
 
