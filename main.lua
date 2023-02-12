@@ -33,6 +33,8 @@ end
 
 function love.draw()
   love.graphics.scale(3)
+  love.graphics.translate(320/2 - 8, 200/2 - 16)
+  love.graphics.translate(-guyX * 16, -guyY * 16)
   for i = 1, 20 do
     for j = 1, 13 do
       love.graphics.draw(grassImage, (i - 1) * 16, (j - 1) * 16)
