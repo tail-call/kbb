@@ -1,6 +1,7 @@
 -- <https://github.com/LuaLS/lua-language-server/wiki/Annotations>
 
 local images = require('./images')
+local world = require('./world')
 
 local guy = {
   x = 10,
@@ -22,18 +23,18 @@ local guy = {
   end
 }
 
----@type love.Image
-local grassImage
----@type love.Image
-local rockImage
+---@type World
+local map
 
 function love.load()
   love.window.setMode(320 * 3, 200 * 3)
   love.graphics.setDefaultFilter("nearest", "nearest")
   local pics = images.load()
   guy.image = love.graphics.newImage(pics.guy)
-  grassImage = love.graphics.newImage(pics.grass)
-  rockImage = love.graphics.newImage(pics.rock)
+  map = world.World.new({
+    love.graphics.newImage(pics.rock),
+    love.graphics.newImage(pics.grass),
+  })
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -45,15 +46,7 @@ end
 local function drawWorld()
   love.graphics.translate(320/2 - 8, 200/2 - 16)
   love.graphics.translate(-guy.x * 16, -guy.y * 16)
-  for i = 1, 20 do
-    for j = 1, 13 do
-      if i == 1 then
-        love.graphics.draw(rockImage, (i - 1) * 16, (j - 1) * 16)
-      else
-        love.graphics.draw(grassImage, (i - 1) * 16, (j - 1) * 16)
-      end
-    end
-  end
+  map:draw()
   love.graphics.draw(guy.image, guy.x * 16, guy.y * 16)
 end
 
