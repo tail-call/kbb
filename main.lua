@@ -1,33 +1,8 @@
 -- <https://github.com/LuaLS/lua-language-server/wiki/Annotations>
 
-local images = require('./images')
-local world = require('./world')
-
-local Guy = {
-  x = 10,
-  y = 6,
-  ---@type love.Image
-  image = nil,
-
-  ---@param key 'up' | 'down' | 'left' | 'right'
-  move = function (self, key)
-    if key == 'up' then
-      self.y = self.y - 1
-    elseif key == 'down' then
-      self.y = self.y + 1
-    elseif key == 'left' then
-      self.x = self.x - 1
-    elseif key == 'right' then
-      self.x = self.x + 1
-    end
-  end
-}
-
-function Guy.new()
-  local guy = {}
-  setmetatable(guy, { __index = Guy })
-  return guy
-end
+local loadImages = require('./images').load
+local World = require('./world').World
+local Guy = require('./guy').Guy
 
 local guy = Guy.new()
 
@@ -42,12 +17,12 @@ function otherGuy:update(dt)
 end
 
 ---@type World
-local map
+local world
 
 local function drawWorld()
   love.graphics.translate(320/2 - 8, 200/2 - 16)
   love.graphics.translate(-guy.x * 16, -guy.y * 16)
-  map:draw()
+  world:draw()
   love.graphics.draw(otherGuy.image, otherGuy.x * 16, otherGuy.y * 16)
   love.graphics.draw(guy.image, guy.x * 16, guy.y * 16)
 end
@@ -59,11 +34,11 @@ end
 function love.load()
   love.window.setMode(320 * 3, 200 * 3)
   love.graphics.setDefaultFilter("nearest", "nearest")
-  local pics = images.load()
-  Guy.image = love.graphics.newImage(pics.guy)
-  map = world.World.new({
-    love.graphics.newImage(pics.rock),
-    love.graphics.newImage(pics.grass),
+  local images = loadImages()
+  Guy.image = love.graphics.newImage(images.guy)
+  world = World.new({
+    love.graphics.newImage(images.rock),
+    love.graphics.newImage(images.grass),
   })
 end
 
