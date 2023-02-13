@@ -4,8 +4,9 @@ local loadImages = require('./images').load
 local World = require('./world').World
 local Guy = require('./guy').Guy
 
+---@type Guy[]
 local guys = {
-  Guy.new(),
+  Guy.new{ pos = { x = 5, y = 5 } },
   Guy.makeWanderingGuy(),
   Guy.makeWanderingGuy(),
   Guy.makeWanderingGuy(),
@@ -15,18 +16,18 @@ local player = guys[1]
 ---@type World
 local world
 
-local function centerCameraOn(unit)
+local function centerCameraOn(pos)
   love.graphics.translate(
-    320/2 - 8 - unit.x * 16,
-    200/2 - 16 - unit.y * 16
+    320/2 - 8 - pos.x * 16,
+    200/2 - 16 - pos.y * 16
   )
 end
 
 local function drawWorld()
-  centerCameraOn(player)
+  centerCameraOn(player.pos)
   world:draw()
   for _, guy in ipairs(guys) do
-    love.graphics.draw(guy.image, guy.x * 16, guy.y * 16)
+    love.graphics.draw(guy.image, guy.pos.x * 16, guy.pos.y * 16)
   end
 end
 

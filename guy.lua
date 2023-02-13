@@ -1,6 +1,14 @@
+---@alias position { x: integer, y: integer }
+
+---@class Guy
+---@field pos position
+---@field image love.Image
+---@field update fun(self: Guy, dt: number): nil
+---@field move fun(self: Guy, key: string): nil
+
 local Guy = {
-  x = 10,
-  y = 6,
+  ---@type position
+  pos = { x = 0, y = 0 },
   ---@type love.Image
   image = nil,
 
@@ -9,26 +17,32 @@ local Guy = {
 
   ---@param key 'up' | 'down' | 'left' | 'right'
   move = function (self, key)
+    local pos = { x = self.pos.x, y = self.pos.y }
+
     if key == 'up' then
-      self.y = self.y - 1
+      pos.y = pos.y - 1
     elseif key == 'down' then
-      self.y = self.y + 1
+      pos.y = pos.y + 1
     elseif key == 'left' then
-      self.x = self.x - 1
+      pos.x = pos.x - 1
     elseif key == 'right' then
-      self.x = self.x + 1
+      pos.x = pos.x + 1
     end
+
+    self.pos = pos
   end
 }
 
-function Guy.new()
+---@return Guy
+function Guy.new(props)
   local guy = {}
   setmetatable(guy, { __index = Guy })
+  guy.pos = props.pos or guy.pos
   return guy
 end
 
 function Guy.makeWanderingGuy()
-  local guy = Guy.new()
+  local guy = Guy.new{ pos = { x = 6, y = 6 } }
   guy.time = math.random()
   function guy:update(dt)
     self.time = self.time + dt
