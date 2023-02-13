@@ -4,31 +4,34 @@ local loadImages = require('./images').load
 local World = require('./world').World
 local Guy = require('./guy').Guy
 
-local guy = Guy.new()
-
-local otherGuy = Guy.new()
-otherGuy.time = 0.0
-function otherGuy:update(dt)
-  self.time = self.time + dt
-  while self.time > 0.25 do
-    self.time = self.time % 0.25
-    self:move(({ 'up', 'down', 'left', 'right' })[math.random(1, 4)])
-  end
-end
+local guys = {
+  Guy.new(),
+  Guy.makeWanderingGuy(),
+  Guy.makeWanderingGuy(),
+  Guy.makeWanderingGuy(),
+}
+local player = guys[1]
 
 ---@type World
 local world
 
+local function centerCameraOn(unit)
+  love.graphics.translate(
+    320/2 - 8 - unit.x * 16,
+    200/2 - 16 - unit.y * 16
+  )
+end
+
 local function drawWorld()
-  love.graphics.translate(320/2 - 8, 200/2 - 16)
-  love.graphics.translate(-guy.x * 16, -guy.y * 16)
+  centerCameraOn(player)
   world:draw()
-  love.graphics.draw(otherGuy.image, otherGuy.x * 16, otherGuy.y * 16)
-  love.graphics.draw(guy.image, guy.x * 16, guy.y * 16)
+  for _, guy in ipairs(guys) do
+    love.graphics.draw(guy.image, guy.x * 16, guy.y * 16)
+  end
 end
 
 local function drawHud()
-  love.graphics.print('Units: 2', 0, 0)
+  love.graphics.print('Units: ' .. #guys, 0, 0)
 end
 
 function love.load()
@@ -43,13 +46,15 @@ function love.load()
 end
 
 function love.update(dt)
-  otherGuy:update(dt)
+  for _, guy in ipairs(guys) do
+    guy:update(dt)
+  end
 end
 
 function love.keypressed(key, scancode, isrepeat)
   if isrepeat then return end
 
-  guy:move(key)
+  player:move(key)
 end
 
 function love.draw()
