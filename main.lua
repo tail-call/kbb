@@ -1,20 +1,26 @@
--- <https://github.com/LuaLS/lua-language-server/wiki/Annotations>
-
 local loadImages = require('./images').load
 local World = require('./world').World
 local Guy = require('./guy').Guy
+local tbl = require('./tbl')
+local vector = require('./vector')
+
+
+---@type World
+local world
+
+local function collider(v)
+  return world:isPassable(v)
+end
 
 ---@type Guy[]
 local guys = {
   Guy.new{ pos = { x = 5, y = 5 } },
-  Guy.makeWanderingGuy(),
-  Guy.makeWanderingGuy(),
-  Guy.makeWanderingGuy(),
+  Guy.makeWanderingGuy(collider),
+  Guy.makeWanderingGuy(collider),
+  Guy.makeWanderingGuy(collider),
 }
 local player = guys[1]
 
----@type World
-local world
 
 local function centerCameraOn(pos)
   love.graphics.translate(
@@ -46,16 +52,22 @@ function love.load()
   })
 end
 
+---@param dt number
 function love.update(dt)
   for _, guy in ipairs(guys) do
     guy:update(dt)
   end
 end
 
+---@param key love.KeyConstant
+---@param scancode love.Scancode
+---@param isrepeat boolean
 function love.keypressed(key, scancode, isrepeat)
   if isrepeat then return end
 
-  player:move(key)
+  if vector.dir[key] then
+    player:move(key, collider)
+  end
 end
 
 function love.draw()

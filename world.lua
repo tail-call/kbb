@@ -1,13 +1,16 @@
+local vector = require('./vector')
+
 ---@class World
 ---@field width integer
 ---@field height integer
 ---@field tiles integer[]
 ---@field tileset love.Image[]
 ---@field draw fun(self: World): nil
+---@field isPassable fun(self: World, v: Vector): nil
 
 local World = {
-  width = 20,
-  height = 13,
+  width = 40,
+  height = 26,
   tileset = { },
   tiles = { }
 }
@@ -16,10 +19,10 @@ local World = {
 function World:draw()
   for i = 1, self.width do
     for j = 1, self.height do
-      if i == 1 or j == 4 then
-        love.graphics.draw(self.tileset[1], (i - 1) * 16, (j - 1) * 16)
+      if self:isPassable{ x = i, y = j } then
+        love.graphics.draw(self.tileset[2], i * 16, j * 16)
       else
-        love.graphics.draw(self.tileset[2], (i - 1) * 16, (j - 1) * 16)
+        love.graphics.draw(self.tileset[1], i * 16, j * 16)
       end
     end
   end
@@ -32,6 +35,28 @@ function World.new(tileset)
   setmetatable(world, { __index = World })
   world.tileset = tileset
   return world
+end
+
+---@param v Vector
+function World:isPassable(v)
+  if vector.equal(v, { x = 4, y = 4 }) then
+    return true
+  end
+  if vector.equal(v, { x = 16, y = 16 }) then
+    return true
+  end
+  if
+    v.x == 1
+    or v.y == 4
+    or v.x == self.width
+    or v.y == 1
+    or v.y == 16
+    or v.y == self.height
+  then
+    return false
+  else
+    return true
+  end
 end
 
 return { World = World }

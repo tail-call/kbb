@@ -1,37 +1,32 @@
----@alias position { x: integer, y: integer }
+local vector = require('./vector')
+
+---@alias Collider fun(v: Vector): boolean
 
 ---@class Guy
----@field pos position
+---@field pos Vector
 ---@field image love.Image
 ---@field update fun(self: Guy, dt: number): nil
----@field move fun(self: Guy, key: string): nil
+---@field move fun(self: Guy, key: string, canMoveTo: Collider): boolean): nil
 
 local Guy = {
-  ---@type position
+  ---@type Vector
   pos = { x = 0, y = 0 },
   ---@type love.Image
   image = nil,
 
   update = function (dt)
   end,
-
-  ---@param key 'up' | 'down' | 'left' | 'right'
-  move = function (self, key)
-    local pos = { x = self.pos.x, y = self.pos.y }
-
-    if key == 'up' then
-      pos.y = pos.y - 1
-    elseif key == 'down' then
-      pos.y = pos.y + 1
-    elseif key == 'left' then
-      pos.x = pos.x - 1
-    elseif key == 'right' then
-      pos.x = pos.x + 1
-    end
-
-    self.pos = pos
-  end
 }
+
+---@param self Guy
+---@param key 'up' | 'down' | 'left' | 'right'
+---@param canMoveTo Collider
+function Guy:move (key, canMoveTo)
+  local newPos = vector.add(self.pos, vector.dir[key])
+  if canMoveTo(newPos) then
+    self.pos = newPos
+  end
+end
 
 ---@return Guy
 function Guy.new(props)
@@ -41,14 +36,15 @@ function Guy.new(props)
   return guy
 end
 
-function Guy.makeWanderingGuy()
+---@param collider Collider
+function Guy.makeWanderingGuy(collider)
   local guy = Guy.new{ pos = { x = 6, y = 6 } }
   guy.time = math.random()
   function guy:update(dt)
     self.time = self.time + dt
     while self.time > 0.25 do
       self.time = self.time % 0.25
-      self:move(({ 'up', 'down', 'left', 'right' })[math.random(1, 4)])
+      self:move(({ 'up', 'down', 'left', 'right' })[math.random(1, 4)], collider)
     end
   end
   return guy
