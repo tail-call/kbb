@@ -5,14 +5,12 @@ local draw = require('./draw')
 ---@field width integer
 ---@field height integer
 ---@field tiles integer[]
----@field tileset love.Image[]
 ---@field draw fun(self: World): nil
 ---@field isPassable fun(self: World, v: Vector): nil
 
 local World = {
   width = 40,
   height = 26,
-  tileset = { },
   tiles = { }
 }
 
@@ -22,12 +20,12 @@ function World:draw()
     for j = 1, self.height do
       if self:isPassable{ x = i, y = j } then
         draw.tile(
-          self.tileset[2],
+          'grass',
           { x = i, y = j }
         )
       else
         draw.tile(
-          self.tileset[1],
+          'rock',
           { x = i, y = j }
         )
       end

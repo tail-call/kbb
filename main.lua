@@ -25,7 +25,7 @@ local function drawWorld()
   draw.centerCameraOn(player.pos)
   world:draw()
   for _, guy in ipairs(guys) do
-    draw.guy(guy.image, guy.pos)
+    draw.guy(guy.pos)
   end
 end
 
@@ -33,10 +33,10 @@ function love.load()
   love.window.setMode(320 * 3, 200 * 3)
   love.graphics.setDefaultFilter("nearest", "nearest")
   local images = loadImages()
-  Guy.image = love.graphics.newImage(images.guy)
+  draw.setLibrary(images)
   world = World.new({
-    love.graphics.newImage(images.rock),
-    love.graphics.newImage(images.grass),
+    images.rock,
+    images.grass,
   })
 end
 

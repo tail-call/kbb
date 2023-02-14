@@ -1,3 +1,5 @@
+---@alias ImageLibrary { guy: love.Image, grass: love.Image, rock: love.Image }
+
 local guy = ''
   .. '                '
   .. '                '
@@ -56,8 +58,8 @@ local rock = ''
 ---@param r number
 ---@param g number
 ---@param b number
----@return love.ImageData
-local function guyToImageData(text, r, g, b)
+---@return love.Image
+local function guyToImage(text, r, g, b)
   local raw = ''
   for i = 1, text:len() do
     if text:byte(i) == 35 then
@@ -66,14 +68,17 @@ local function guyToImageData(text, r, g, b)
       raw = raw .. string.char(0, 0, 0, 0)
     end
   end
-  return love.image.newImageData(16, 16, "rgba8", raw)
+  return love.graphics.newImage(
+    love.image.newImageData(16, 16, "rgba8", raw)
+  )
 end
 
+---@return ImageLibrary
 local function load()
   return {
-    guy = guyToImageData(guy, 255, 255, 255),
-    grass = guyToImageData(grass, 0, 128, 0),
-    rock = guyToImageData(rock, 128, 128, 128),
+    guy = guyToImage(guy, 255, 255, 255),
+    grass = guyToImage(grass, 0, 128, 0),
+    rock = guyToImage(rock, 128, 128, 128),
   }
 end
 

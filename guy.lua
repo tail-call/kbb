@@ -4,15 +4,12 @@ local vector = require('./vector')
 
 ---@class Guy
 ---@field pos Vector
----@field image love.Image
 ---@field update fun(self: Guy, dt: number): nil
 ---@field move fun(self: Guy, key: string, canMoveTo: Collider): boolean): nil
 
 local Guy = {
   ---@type Vector
   pos = { x = 0, y = 0 },
-  ---@type love.Image
-  image = nil,
 
   update = function (dt)
   end,
