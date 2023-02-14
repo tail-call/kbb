@@ -1,4 +1,5 @@
 local vector = require('./vector')
+local draw = require('./draw')
 
 ---@class World
 ---@field width integer
@@ -17,12 +18,18 @@ local World = {
 
 ---@param self World
 function World:draw()
-  for i = 1, self.width do
+  for i= 1, self.width do
     for j = 1, self.height do
       if self:isPassable{ x = i, y = j } then
-        love.graphics.draw(self.tileset[2], i * 16, j * 16)
+        draw.tile(
+          self.tileset[2],
+          { x = i, y = j }
+        )
       else
-        love.graphics.draw(self.tileset[1], i * 16, j * 16)
+        draw.tile(
+          self.tileset[1],
+          { x = i, y = j }
+        )
       end
     end
   end
