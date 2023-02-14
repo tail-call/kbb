@@ -36,17 +36,23 @@ function Guy.new(props)
   return guy
 end
 
+---@param guy Guy
 ---@param collider Collider
-function Guy.makeWanderingGuy(collider)
-  local guy = Guy.new{ pos = { x = 6, y = 6 } }
-  guy.time = math.random()
+local function addWanderBehavior(guy, collider)
+  local time = math.random()
   function guy:update(dt)
-    self.time = self.time + dt
-    while self.time > 0.25 do
-      self.time = self.time % 0.25
+    time = time + dt
+    while time > 0.25 do
+      time = time % 0.25
       self:move(({ 'up', 'down', 'left', 'right' })[math.random(1, 4)], collider)
     end
   end
+end
+
+---@param collider Collider
+function Guy.makeWanderingGuy(collider)
+  local guy = Guy.new{ pos = { x = 6, y = 6 } }
+  addWanderBehavior(guy, collider)
   return guy
 end
 
