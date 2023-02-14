@@ -1,3 +1,4 @@
+local draw = require('./draw')
 local vector = require('./vector')
 
 ---@alias Collider fun(v: Vector): boolean
@@ -5,6 +6,7 @@ local vector = require('./vector')
 ---@class Guy
 ---@field pos Vector
 ---@field update fun(self: Guy, dt: number): nil
+---@field draw fun(self: Guy): nil
 ---@field move fun(self: Guy, key: string, canMoveTo: Collider): boolean): nil
 
 local Guy = {
@@ -18,11 +20,15 @@ local Guy = {
 ---@param self Guy
 ---@param key 'up' | 'down' | 'left' | 'right'
 ---@param canMoveTo Collider
-function Guy:move (key, canMoveTo)
+function Guy:move(key, canMoveTo)
   local newPos = vector.add(self.pos, vector.dir[key])
   if canMoveTo(newPos) then
     self.pos = newPos
   end
+end
+
+function Guy:draw()
+  draw.guy(self.pos)
 end
 
 ---@return Guy
@@ -46,10 +52,25 @@ local function addWanderBehavior(guy, collider)
   end
 end
 
+---@param guy Guy
+local function addEvilAppearance(guy)
+  function guy:draw()
+    draw.evilGuy(self.pos)
+  end
+end
+
 ---@param collider Collider
 function Guy.makeWanderingGuy(collider)
   local guy = Guy.new{ pos = { x = 6, y = 6 } }
   addWanderBehavior(guy, collider)
+  return guy
+end
+
+---@param collider Collider
+function Guy.makeEvilGuy(collider)
+  local guy = Guy.new{ pos = { x = 22, y = 6 } }
+  addWanderBehavior(guy, collider)
+  addEvilAppearance(guy)
   return guy
 end
 

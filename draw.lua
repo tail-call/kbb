@@ -19,6 +19,14 @@ local function guy(pos)
   love.graphics.draw(library.guy, pos.x * 16, pos.y * 16)
 end
 
+---@param pos Vector
+local function evilGuy(pos)
+  local r, g, b, a = love.graphics.getColor()
+  love.graphics.setColor(1, 0, 0, 1);
+  guy(pos)
+  love.graphics.setColor(r, g, b, a)
+end
+
 ---@param numberOfGuys integer
 local function hud(numberOfGuys)
   love.graphics.print('Units: ' .. numberOfGuys, 0, 0)
@@ -34,6 +42,7 @@ return {
   centerCameraOn = centerCameraOn,
   setLibrary = setLibrary,
   guy = guy,
+  evilGuy = evilGuy,
   hud = hud,
   tile = tile,
 }

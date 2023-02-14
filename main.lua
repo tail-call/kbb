@@ -17,6 +17,12 @@ local guys = {
   Guy.makeWanderingGuy(collider),
   Guy.makeWanderingGuy(collider),
   Guy.makeWanderingGuy(collider),
+  Guy.makeEvilGuy(collider),
+  Guy.makeEvilGuy(collider),
+  Guy.makeEvilGuy(collider),
+  Guy.makeEvilGuy(collider),
+  Guy.makeEvilGuy(collider),
+  Guy.makeEvilGuy(collider),
 }
 local player = guys[1]
 
@@ -25,7 +31,7 @@ local function drawWorld()
   draw.centerCameraOn(player.pos)
   world:draw()
   for _, guy in ipairs(guys) do
-    draw.guy(guy.pos)
+    guy:draw()
   end
 end
 
