@@ -11,12 +11,14 @@ local function collider(v)
   return world:isPassable(v)
 end
 
+local player = Guy.new{ pos = { x = 5, y = 5 } }
+
 ---@type Guy[]
 local guys = {
-  Guy.new{ pos = { x = 5, y = 5 } },
-  Guy.makeWanderingGuy(collider),
-  Guy.makeWanderingGuy(collider),
-  Guy.makeWanderingGuy(collider),
+  player,
+  Guy.makeGoodGuy(collider, player, 3),
+  Guy.makeGoodGuy(collider, player, 4),
+  Guy.makeGoodGuy(collider, player, 6),
   Guy.makeEvilGuy(collider),
   Guy.makeEvilGuy(collider),
   Guy.makeEvilGuy(collider),
@@ -24,7 +26,6 @@ local guys = {
   Guy.makeEvilGuy(collider),
   Guy.makeEvilGuy(collider),
 }
-local player = guys[1]
 
 
 local function drawWorld()

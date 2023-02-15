@@ -7,7 +7,8 @@ local vector = require('./vector')
 ---@field pos Vector
 ---@field update fun(self: Guy, dt: number): nil
 ---@field draw fun(self: Guy): nil
----@field move fun(self: Guy, key: string, canMoveTo: Collider): boolean): nil
+---@field move fun(self: Guy, key: string, canMoveTo: Collider): nil
+---@field moveVec fun(self: Guy, vec: Vector, canMoveTo: Collider): nil
 
 local Guy = {
   ---@type Vector
@@ -21,7 +22,13 @@ local Guy = {
 ---@param key 'up' | 'down' | 'left' | 'right'
 ---@param canMoveTo Collider
 function Guy:move(key, canMoveTo)
-  local newPos = vector.add(self.pos, vector.dir[key])
+  self:moveVec(vector.dir[key], canMoveTo)
+end
+
+---@param vec Vector
+---@param canMoveTo Collider
+function Guy:moveVec(vec, canMoveTo)
+  local newPos = vector.add(self.pos, vec)
   if canMoveTo(newPos) then
     self.pos = newPos
   end
@@ -53,6 +60,20 @@ local function addWanderBehavior(guy, collider)
 end
 
 ---@param guy Guy
+---@param target Guy
+---@param collider Collider
+local function addFollowBehavior(guy, target, collider)
+  local oldTargetPos = target.pos
+  function guy:update(dt)
+    if not vector.equal(oldTargetPos, target.pos) then
+      local delta = vector.sub(target.pos, oldTargetPos)
+      self:moveVec(delta, collider)
+    end
+    oldTargetPos = target.pos
+  end
+end
+
+---@param guy Guy
 local function addEvilAppearance(guy)
   function guy:draw()
     draw.evilGuy(self.pos)
@@ -60,9 +81,11 @@ local function addEvilAppearance(guy)
 end
 
 ---@param collider Collider
-function Guy.makeWanderingGuy(collider)
-  local guy = Guy.new{ pos = { x = 6, y = 6 } }
-  addWanderBehavior(guy, collider)
+---@param player Guy
+---@param coord integer
+function Guy.makeGoodGuy(collider, player, coord)
+  local guy = Guy.new{ pos = { x = coord, y = coord } }
+  addFollowBehavior(guy, player, collider)
   return guy
 end
 

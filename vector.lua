@@ -7,11 +7,20 @@ return {
   add = function(v1, v2)
     return { x = v1.x + v2.x, y = v1.y + v2.y }
   end,
+
+  ---@param v1 Vector
+  ---@param v2 Vector
+  ---@return Vector
+  sub = function(v1, v2)
+    return { x = v1.x - v2.x, y = v1.y - v2.y }
+  end,
+
   ---@param v Vector
   ---@return Vector
   neg = function(v)
     return { x = -v.x, y = -v.y }
   end,
+
   ---@param v1 Vector
   ---@param v2 Vector
   ---@return boolean

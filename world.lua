@@ -16,7 +16,7 @@ local World = {
 
 ---@param self World
 function World:draw()
-  for i= 1, self.width do
+  for i = 1, self.width do
     for j = 1, self.height do
       if self:isPassable{ x = i, y = j } then
         draw.tile(
