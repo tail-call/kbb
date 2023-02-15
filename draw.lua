@@ -3,7 +3,6 @@ local loadImages = require('./images').load
 ---@type ImageLibrary
 local library
 
----@param lib ImageLibrary
 local function init()
   love.window.setMode(320 * 3, 200 * 3)
   love.graphics.setDefaultFilter('nearest', 'nearest')
