@@ -6,15 +6,19 @@ local tbl = require('./tbl')
 
 ---@type World
 local world
+---@type Guy[]
+local guys = {}
 
 local function collider(v)
-  return world:isPassable(v)
+  local found = tbl.find(guys, function(guy)
+    return vector.equal(guy.pos, v)
+  end)
+  return not found and world:isPassable(v)
 end
 
 local player = Guy.new{ pos = { x = 5, y = 5 } }
 
----@type Guy[]
-local guys = {
+guys = {
   player,
   Guy.makeGoodGuy(collider, player, 3),
   Guy.makeGoodGuy(collider, player, 4),
