@@ -36,9 +36,14 @@ local squad = {
   guys[2], guys[3], guys[4]
 }
 
+local lerpVec = { x = 0, y = 0 }
 
 local function drawWorld()
-  draw.centerCameraOn(player.pos)
+  lerpVec = {
+    x = lerpVec.x + (player.pos.x - lerpVec.x) * 0.06,
+    y = lerpVec.y + (player.pos.y - lerpVec.y) * 0.06,
+  }
+  draw.centerCameraOn(lerpVec)
   world:draw()
   for _, guy in ipairs(guys) do
     guy:draw()
