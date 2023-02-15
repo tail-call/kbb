@@ -2,6 +2,7 @@ local World = require('./world').World
 local Guy = require('./guy').Guy
 local vector = require('./vector')
 local draw = require('./draw')
+local tbl = require('./tbl')
 
 ---@type World
 local world
@@ -53,13 +54,17 @@ end
 function love.keypressed(key, scancode, isrepeat)
   if isrepeat then return end
 
+  if tbl.has({ '1', '2', '3', '4' }, key) then
+    draw.setZoom(tonumber(key))
+  end
+
   if vector.dir[key] then
     player:move(key, collider)
   end
 end
 
 function love.draw()
-  love.graphics.scale(3)
+  draw.prepareFrame()
   love.graphics.push()
   drawWorld()
   love.graphics.pop()

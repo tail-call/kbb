@@ -1,10 +1,19 @@
 local loadImages = require('./images').load
 
+local screenWidth = 320
+local screenHeight = 200
+local zoom = 1
+
 ---@type ImageLibrary
 local library
 
+local function setZoom(z)
+  zoom = z
+  love.window.setMode(screenWidth * z, screenHeight * z)
+end
+
 local function init()
-  love.window.setMode(320 * 3, 200 * 3)
+  setZoom(3)
   love.graphics.setDefaultFilter('nearest', 'nearest')
   library = loadImages()
 end
@@ -12,8 +21,8 @@ end
 ---@param pos Vector
 local function centerCameraOn(pos)
   love.graphics.translate(
-    320/2 - 8 - pos.x * 16,
-    200/2 - 16 - pos.y * 16
+    screenWidth/2 - 8 - pos.x * 16,
+    screenHeight/2 - 16 - pos.y * 16
   )
 end
 
@@ -41,11 +50,17 @@ local function tile(name, pos)
   love.graphics.draw(library[name], pos.x * 16, pos.y * 16)
 end
 
+local function prepareFrame()
+  love.graphics.scale(zoom)
+end
+
 return {
   init = init,
+  setZoom = setZoom,
   centerCameraOn = centerCameraOn,
   guy = guy,
   evilGuy = evilGuy,
   hud = hud,
   tile = tile,
+  prepareFrame = prepareFrame,
 }
