@@ -76,8 +76,21 @@ end
 ---@param guy Guy
 local function addEvilAppearance(guy)
   function guy:draw()
-    draw.evilGuy(self.pos)
+    draw.guyWithColor(255, 0, 0, 1, self.pos)
   end
+end
+
+---@param guy Guy
+local function addLeaderAppearance(guy)
+  function guy:draw()
+    draw.guyWithColor(255, 255, 0, 1, self.pos)
+  end
+end
+
+function Guy.makeLeader()
+  local guy = Guy.new{ pos = { x = 5, y = 5 } }
+  addLeaderAppearance(guy)
+  return guy
 end
 
 ---@param collider Collider

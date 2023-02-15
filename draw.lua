@@ -38,9 +38,13 @@ local function withColor(r, g, b, a, cb)
   love.graphics.setColor(xr, xg, xb, xa)
 end
 
+---@param r number
+---@param g number
+---@param b number
+---@param a number
 ---@param pos Vector
-local function evilGuy(pos)
-  withColor(255, 0, 0, 1, function ()
+local function guyWithColor(r, g, b, a, pos)
+  withColor(r, g, b, a, function ()
     guy(pos)
   end)
 end
@@ -73,7 +77,7 @@ return {
   setZoom = setZoom,
   centerCameraOn = centerCameraOn,
   guy = guy,
-  evilGuy = evilGuy,
+  guyWithColor = guyWithColor,
   hud = hud,
   tile = tile,
   prepareFrame = prepareFrame,

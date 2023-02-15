@@ -16,7 +16,7 @@ local function collider(v)
   return not found and world:isPassable(v)
 end
 
-local player = Guy.new{ pos = { x = 5, y = 5 } }
+local player = Guy.makeLeader()
 
 guys = {
   player,
