@@ -28,26 +28,40 @@ end
 
 ---@param pos Vector
 local function guy(pos)
-  love.graphics.draw(library.guy, pos.x * 16, pos.y * 16)
+  love.graphics.draw(library.tiles, library.guy, pos.x * 16, pos.y * 16)
+end
+
+local function withColor(r, g, b, a, cb)
+  local xr, xg, xb, xa = love.graphics.getColor()
+  love.graphics.setColor(r, g, b, a)
+  cb()
+  love.graphics.setColor(xr, xg, xb, xa)
 end
 
 ---@param pos Vector
 local function evilGuy(pos)
-  local r, g, b, a = love.graphics.getColor()
-  love.graphics.setColor(1, 0, 0, 1);
-  guy(pos)
-  love.graphics.setColor(r, g, b, a)
+  withColor(255, 0, 0, 1, function ()
+    guy(pos)
+  end)
 end
 
 ---@param numberOfGuys integer
 local function hud(numberOfGuys)
+  withColor(0, 0, 0, 1, function ()
+    love.graphics.rectangle("fill", 0, 0, screenWidth, 16)
+  end)
   love.graphics.print('Units: ' .. numberOfGuys, 0, 0)
 end
 
 ---@param name string
 ---@param pos Vector
 local function tile(name, pos)
-  love.graphics.draw(library[name], pos.x * 16, pos.y * 16)
+  love.graphics.draw(
+    library.tiles,
+    library[name] --[[@as love.Quad]],
+    pos.x * 16,
+    pos.y * 16
+  )
 end
 
 local function prepareFrame()

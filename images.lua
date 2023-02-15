@@ -1,84 +1,12 @@
----@alias ImageLibrary { guy: love.Image, grass: love.Image, rock: love.Image }
+---@alias ImageLibrary { tiles: love.Image, guy: love.Quad, grass: love.Quad, rock: love.Quad }
 
-local guy = ''
-  .. '                '
-  .. '                '
-  .. '  ##        ##  '
-  .. ' ##   ###    ## '
-  .. ' ##  #####   ## '
-  .. ' ###   ###  ### '
-  .. '  ############  '
-  .. '     ######     '
-  .. '      ####      '
-  .. '      ####      '
-  .. '     ######     '
-  .. '     ######     '
-  .. '    ## ## ## #  '
-  .. '    ##  # ## ## '
-  .. '    ##    ##    '
-  .. '   ###    ###   '
-
-local grass = ''
-  .. '     #          '
-  .. '           #    '
-  .. ' #              '
-  .. '                '
-  .. '   #            '
-  .. '             #  '
-  .. '                '
-  .. '                '
-  .. '     #          '
-  .. '             #  '
-  .. '       #        '
-  .. '                '
-  .. '                '
-  .. '               #'
-  .. '   #            '
-  .. '                '
-
-local rock = ''
-  .. '   #     #      '
-  .. '# # #   # #   # '
-  .. ' #   # #   # # #'
-  .. '   #     #      '
-  .. '# # #   # #   # '
-  .. ' #   # #   # # #'
-  .. '   #     #      '
-  .. '# # #   # #   # '
-  .. ' #   # #   # # #'
-  .. '   #     #      '
-  .. '# # #   # #   # '
-  .. ' #   # #   # # #'
-  .. '   #     #      '
-  .. '# # #   # #   # '
-  .. ' #   # #   # # #'
-  .. '################'
-
----@param text string
----@param r number
----@param g number
----@param b number
----@return love.Image
-local function guyToImage(text, r, g, b)
-  local raw = ''
-  for i = 1, text:len() do
-    if text:byte(i) == 35 then
-      raw = raw .. string.char(r, g, b, 255)
-    else
-      raw = raw .. string.char(0, 0, 0, 0)
-    end
-  end
-  return love.graphics.newImage(
-    love.image.newImageData(16, 16, "rgba8", raw)
-  )
-end
-
----@return ImageLibrary
 local function load()
+  local tiles = love.graphics.newImage('tiles.png')
   return {
-    guy = guyToImage(guy, 255, 255, 255),
-    grass = guyToImage(grass, 0, 128, 0),
-    rock = guyToImage(rock, 128, 128, 128),
+    tiles = tiles,
+    guy = love.graphics.newQuad(0, 0, 16, 16, tiles:getWidth(), tiles:getHeight()),
+    grass = love.graphics.newQuad(16, 0, 16, 16, tiles:getWidth(), tiles:getHeight()),
+    rock = love.graphics.newQuad(32, 0, 16, 16, tiles:getWidth(), tiles:getHeight()),
   }
 end
 
