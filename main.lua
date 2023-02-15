@@ -20,15 +20,20 @@ local player = Guy.makeLeader()
 
 guys = {
   player,
-  Guy.makeGoodGuy(collider, player, 3),
-  Guy.makeGoodGuy(collider, player, 4),
-  Guy.makeGoodGuy(collider, player, 6),
+  Guy.makeGoodGuy(3),
+  Guy.makeGoodGuy(4),
+  Guy.makeGoodGuy(6),
   Guy.makeEvilGuy(collider),
   Guy.makeEvilGuy(collider),
   Guy.makeEvilGuy(collider),
   Guy.makeEvilGuy(collider),
   Guy.makeEvilGuy(collider),
   Guy.makeEvilGuy(collider),
+}
+
+local squad = {
+  leader = player,
+  guys[2], guys[3], guys[4]
 }
 
 
@@ -63,7 +68,10 @@ function love.keypressed(key, scancode, isrepeat)
   end
 
   if vector.dir[key] then
-    player:move(key, collider)
+    for _, guy in ipairs(squad) do
+      guy:move(key, collider)
+    end
+    squad.leader:move(key, collider)
   end
 end
 
@@ -72,5 +80,5 @@ function love.draw()
   love.graphics.push()
   drawWorld()
   love.graphics.pop()
-  draw.hud(#guys)
+  draw.hud(#squad)
 end

@@ -93,12 +93,9 @@ function Guy.makeLeader()
   return guy
 end
 
----@param collider Collider
----@param player Guy
 ---@param coord integer
-function Guy.makeGoodGuy(collider, player, coord)
+function Guy.makeGoodGuy(coord)
   local guy = Guy.new{ pos = { x = coord, y = coord } }
-  addFollowBehavior(guy, player, collider)
   return guy
 end
 
