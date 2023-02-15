@@ -19,26 +19,18 @@ function World:draw()
   for i = 1, self.width do
     for j = 1, self.height do
       if self:isPassable{ x = i, y = j } then
-        draw.tile(
-          'grass',
-          { x = i, y = j }
-        )
+        draw.tile('grass', { x = i, y = j })
       else
-        draw.tile(
-          'rock',
-          { x = i, y = j }
-        )
+        draw.tile('rock', { x = i, y = j })
       end
     end
   end
 end
 
----@param tileset love.Image[]
 ---@return World
-function World.new(tileset)
+function World.new()
   local world = {}
   setmetatable(world, { __index = World })
-  world.tileset = tileset
   return world
 end
 

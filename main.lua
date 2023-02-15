@@ -1,4 +1,3 @@
-local loadImages = require('./images').load
 local World = require('./world').World
 local Guy = require('./guy').Guy
 local vector = require('./vector')
@@ -37,14 +36,8 @@ local function drawWorld()
 end
 
 function love.load()
-  love.window.setMode(320 * 3, 200 * 3)
-  love.graphics.setDefaultFilter("nearest", "nearest")
-  local images = loadImages()
-  draw.setLibrary(images)
-  world = World.new({
-    images.rock,
-    images.grass,
-  })
+  draw.init()
+  world = World.new()
 end
 
 ---@param dt number
