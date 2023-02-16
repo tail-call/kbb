@@ -5,6 +5,8 @@ local vector = require('./vector')
 
 ---@class Guy
 ---@field pos Vector
+---@field spriteId SpriteId
+---@field color number[]
 ---@field update fun(self: Guy, dt: number): nil
 ---@field draw fun(self: Guy): nil
 ---@field move fun(self: Guy, key: string, canMoveTo: Collider): nil
@@ -13,6 +15,8 @@ local vector = require('./vector')
 local Guy = {
   ---@type Vector
   pos = { x = 0, y = 0 },
+  spriteId = -1,
+  color = { 1, 1, 1, 1 },
 
   update = function (dt)
   end,
@@ -23,6 +27,7 @@ local Guy = {
 ---@param canMoveTo Collider
 function Guy:move(key, canMoveTo)
   self:moveVec(vector.dir[key], canMoveTo)
+  draw.moveSprite(self.spriteId, 'guy', self.pos.x, self.pos.y, unpack(self.color))
 end
 
 ---@param vec Vector
@@ -34,15 +39,13 @@ function Guy:moveVec(vec, canMoveTo)
   end
 end
 
-function Guy:draw()
-  draw.guy(self.pos)
-end
-
 ---@return Guy
 function Guy.new(props)
   local guy = {}
   setmetatable(guy, { __index = Guy })
   guy.pos = props.pos or guy.pos
+  guy.color = props.color or guy.color
+  guy.spriteId = draw.addSprite('guy', guy.pos.x, guy.pos.y, unpack(guy.color))
   return guy
 end
 
@@ -59,37 +62,11 @@ local function addWanderBehavior(guy, collider)
   end
 end
 
----@param guy Guy
----@param target Guy
----@param collider Collider
-local function addFollowBehavior(guy, target, collider)
-  local oldTargetPos = target.pos
-  function guy:update(dt)
-    if not vector.equal(oldTargetPos, target.pos) then
-      local delta = vector.sub(target.pos, oldTargetPos)
-      self:moveVec(delta, collider)
-    end
-    oldTargetPos = target.pos
-  end
-end
-
----@param guy Guy
-local function addEvilAppearance(guy)
-  function guy:draw()
-    draw.guyWithColor(255, 0, 0, 1, self.pos)
-  end
-end
-
----@param guy Guy
-local function addLeaderAppearance(guy)
-  function guy:draw()
-    draw.guyWithColor(255, 255, 0, 1, self.pos)
-  end
-end
-
 function Guy.makeLeader()
-  local guy = Guy.new{ pos = { x = 5, y = 5 } }
-  addLeaderAppearance(guy)
+  local guy = Guy.new{
+    pos = { x = 5, y = 5 },
+    color = { 1, 1, 0, 1 },
+  }
   return guy
 end
 
@@ -101,9 +78,11 @@ end
 
 ---@param collider Collider
 function Guy.makeEvilGuy(collider)
-  local guy = Guy.new{ pos = { x = 22, y = 6 } }
+  local guy = Guy.new{
+    pos = { x = 22, y = 6 },
+    color = { 1, 0, 0, 1 },
+  }
   addWanderBehavior(guy, collider)
-  addEvilAppearance(guy)
   return guy
 end
 

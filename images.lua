@@ -1,4 +1,4 @@
----@alias ImageLibrary { tiles: love.Image, guy: love.Quad, grass: love.Quad, rock: love.Quad }
+---@alias Tileset { tiles: love.Image, guy: love.Quad, grass: love.Quad, rock: love.Quad }
 
 local function load()
   local tiles = love.graphics.newImage('tiles.png')

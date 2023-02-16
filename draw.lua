@@ -1,11 +1,19 @@
 local loadImages = require('./images').load
 
+---@alias SpriteId integer
+
 local screenWidth = 320
 local screenHeight = 200
 local zoom = 1
 
----@type ImageLibrary
-local library
+---@type Tileset
+local tileset
+---@type love.SpriteBatch
+local sprites
+
+local function getTileset()
+  return tileset
+end
 
 local function setZoom(z)
   zoom = z
@@ -15,7 +23,8 @@ end
 local function init()
   setZoom(3)
   love.graphics.setDefaultFilter('nearest', 'nearest')
-  library = loadImages()
+  tileset = loadImages()
+  sprites = love.graphics.newSpriteBatch(tileset.tiles)
 end
 
 ---@param pos Vector
@@ -28,7 +37,7 @@ end
 
 ---@param pos Vector
 local function guy(pos)
-  love.graphics.draw(library.tiles, library.guy, pos.x * 16, pos.y * 16)
+  love.graphics.draw(tileset.tiles, tileset.guy, pos.x * 16, pos.y * 16)
 end
 
 local function withColor(r, g, b, a, cb)
@@ -57,28 +66,52 @@ local function hud(numberOfGuys)
   love.graphics.print('Units: ' .. numberOfGuys, 0, 0)
 end
 
----@param name string
----@param pos Vector
-local function tile(name, pos)
-  love.graphics.draw(
-    library.tiles,
-    library[name] --[[@as love.Quad]],
-    pos.x * 16,
-    pos.y * 16
-  )
-end
-
 local function prepareFrame()
   love.graphics.scale(zoom)
 end
 
+---@param name string
+---@param x integer
+---@param y integer
+---@param r number
+---@param g number
+---@param b number
+---@param a number
+---@return SpriteId
+local function addSprite(name, x, y, r, g, b, a)
+  local aTile = tileset[name] --[[@as love.Quad]]
+  sprites:setColor(r, g, b, a)
+  return sprites:add(aTile, x * 16, y * 16)
+end
+
+---@param id SpriteId
+---@param name string
+---@param x integer
+---@param y integer
+---@param r number
+---@param g number
+---@param b number
+---@param a number
+local function moveSprite(id, name, x, y, r, g, b, a)
+  local aTile = tileset[name] --[[@as love.Quad]]
+  sprites:setColor(r, g, b, a)
+  sprites:set(id, aTile, x * 16, y * 16)
+end
+
+local function drawSprites()
+  love.graphics.draw(sprites)
+end
+
 return {
-  init = init,
-  setZoom = setZoom,
   centerCameraOn = centerCameraOn,
+  getTileset = getTileset,
   guy = guy,
   guyWithColor = guyWithColor,
   hud = hud,
-  tile = tile,
+  init = init,
   prepareFrame = prepareFrame,
+  setZoom = setZoom,
+  addSprite = addSprite,
+  moveSprite = moveSprite,
+  drawSprites = drawSprites,
 }

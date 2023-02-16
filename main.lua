@@ -8,6 +8,9 @@ local tbl = require('./tbl')
 local world
 ---@type Guy[]
 local guys = {}
+---@type Guy
+local player
+local squad
 
 local function collider(v)
   local found = tbl.find(guys, function(guy)
@@ -15,26 +18,6 @@ local function collider(v)
   end)
   return not found and world:isPassable(v)
 end
-
-local player = Guy.makeLeader()
-
-guys = {
-  player,
-  Guy.makeGoodGuy(3),
-  Guy.makeGoodGuy(4),
-  Guy.makeGoodGuy(6),
-  Guy.makeEvilGuy(collider),
-  Guy.makeEvilGuy(collider),
-  Guy.makeEvilGuy(collider),
-  Guy.makeEvilGuy(collider),
-  Guy.makeEvilGuy(collider),
-  Guy.makeEvilGuy(collider),
-}
-
-local squad = {
-  leader = player,
-  guys[2], guys[3], guys[4]
-}
 
 local lerpVec = { x = 0, y = 0 }
 
@@ -45,14 +28,29 @@ local function drawWorld()
   }
   draw.centerCameraOn(lerpVec)
   world:draw()
-  for _, guy in ipairs(guys) do
-    guy:draw()
-  end
+  draw.drawSprites()
 end
 
 function love.load()
   draw.init()
+  player = Guy.makeLeader()
+  guys = {
+    player,
+    Guy.makeGoodGuy(3),
+    Guy.makeGoodGuy(4),
+    Guy.makeGoodGuy(6),
+    Guy.makeEvilGuy(collider),
+    Guy.makeEvilGuy(collider),
+    Guy.makeEvilGuy(collider),
+    Guy.makeEvilGuy(collider),
+    Guy.makeEvilGuy(collider),
+    Guy.makeEvilGuy(collider),
+  }
   world = World.new()
+  squad = {
+    leader = player,
+    guys[2], guys[3], guys[4]
+  }
 end
 
 ---@param dt number

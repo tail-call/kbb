@@ -4,33 +4,43 @@ local draw = require('./draw')
 ---@class World
 ---@field width integer
 ---@field height integer
----@field tiles integer[]
+---@field tiles love.SpriteBatch
 ---@field draw fun(self: World): nil
 ---@field isPassable fun(self: World, v: Vector): nil
 
 local World = {
   width = 40,
   height = 26,
-  tiles = { }
+  tiles = nil,
 }
 
 ---@param self World
 function World:draw()
-  for i = 1, self.width do
-    for j = 1, self.height do
-      if self:isPassable{ x = i, y = j } then
-        draw.tile('grass', { x = i, y = j })
-      else
-        draw.tile('rock', { x = i, y = j })
-      end
-    end
-  end
+  love.graphics.draw(self.tiles)
 end
 
 ---@return World
 function World.new()
   local world = {}
   setmetatable(world, { __index = World })
+
+  local tileset = draw.getTileset()
+
+  world.tiles = love.graphics.newSpriteBatch(
+    tileset.tiles,
+    world.width * world.height
+  )
+
+  for x = 1, world.width do
+    for y = 1, world.height do
+      if world:isPassable{ x = x, y = y } then
+        world.tiles:add(tileset.grass, x * 16, y * 16)
+      else
+        world.tiles:add(tileset.rock, x * 16, y * 16)
+      end
+    end
+  end
+
   return world
 end
 
