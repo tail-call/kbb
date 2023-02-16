@@ -4,6 +4,8 @@ local loadImages = require('./images').load
 
 local screenWidth = 320
 local screenHeight = 200
+local tileHeight = 16
+local tileWidth = 16
 local zoom = 1
 
 ---@type Tileset
@@ -30,8 +32,8 @@ end
 ---@param pos Vector
 local function centerCameraOn(pos)
   love.graphics.translate(
-    screenWidth/2 - 8 - pos.x * 16,
-    screenHeight/2 - 16 - pos.y * 16
+    screenWidth/2 - 8 - pos.x * tileWidth,
+    screenHeight/2 - tileHeight - pos.y * tileHeight
   )
 end
 
@@ -81,7 +83,7 @@ end
 local function addSprite(name, x, y, r, g, b, a)
   local aTile = tileset[name] --[[@as love.Quad]]
   sprites:setColor(r, g, b, a)
-  return sprites:add(aTile, x * 16, y * 16)
+  return sprites:add(aTile, x * tileWidth, y * tileWidth)
 end
 
 ---@param id SpriteId
@@ -95,7 +97,7 @@ end
 local function moveSprite(id, name, x, y, r, g, b, a)
   local aTile = tileset[name] --[[@as love.Quad]]
   sprites:setColor(r, g, b, a)
-  sprites:set(id, aTile, x * 16, y * 16)
+  sprites:set(id, aTile, x * tileWidth, y * tileHeight)
 end
 
 local function drawSprites()
