@@ -89,15 +89,15 @@ end
 ---@param scancode love.Scancode
 ---@param isrepeat boolean
 function love.keypressed(key, scancode, isrepeat)
-  if tbl.has({ '1', '2', '3', '4' }, key) then
-    draw.setZoom(tonumber(key))
+  if tbl.has({ '1', '2', '3', '4' }, scancode) then
+    draw.setZoom(tonumber(scancode))
   end
 
-  if key == 'f' then
+  if scancode == 'f' then
     game.squad.shouldFollow = not game.squad.shouldFollow
   end
 
-  local vec = vector.dir[key]
+  local vec = vector.dir[scancode]
   if vec then
     if game.squad.shouldFollow then
       for _, guy in ipairs(game.squad.followers) do
