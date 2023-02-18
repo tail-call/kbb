@@ -1,4 +1,4 @@
-local loadImages = require('./images').load
+local loadTileset = require('./tileset').load
 local loadFont = require('./font').load
 local Pixie = require('./pixie')
 
@@ -26,7 +26,7 @@ local function init()
   setZoom(3)
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.graphics.setFont(loadFont('cga8.png', 8, 8))
-  tileset = loadImages()
+  tileset = loadTileset()
 end
 
 ---@param pos Vector
