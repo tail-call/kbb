@@ -80,6 +80,16 @@ function game:draw()
   draw.hud(#game.squad.followers, game.squad.shouldFollow)
 end
 
+---@param dt number
+function game:update(dt)
+  for _, guy in ipairs(self.guys) do
+    guy:update(dt)
+  end
+  if self.recruitCircle ~= nil then
+    self.recruitCircle = math.min(self.recruitCircle + dt * 6, 6)
+  end
+end
+
 -- Löve callbacks
 
 function love.load()
@@ -89,13 +99,8 @@ end
 
 ---@param dt number
 function love.update(dt)
-  for _, guy in ipairs(game.guys) do
-    guy:update(dt)
-  end
   draw.update(dt)
-  if game.recruitCircle ~= nil then
-    game.recruitCircle = math.min(game.recruitCircle + dt * 6, 6)
-  end
+  game:update(dt)
 end
 
 ---@param key love.KeyConstant
