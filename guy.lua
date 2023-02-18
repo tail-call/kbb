@@ -28,7 +28,7 @@ function Guy:move(vec, canMoveTo)
   if canMoveTo(newPos) then
     self.pos = newPos
   end
-  self.pixie.transform:setTransformation(self.pos.x * 16, self.pos.y * 16)
+  self.pixie:move(self.pos)
 end
 
 ---@return Guy
@@ -39,6 +39,7 @@ function Guy.new(props)
   guy.pos = props.pos or guy.pos
   guy.pixie = draw.makePixie('guy')
   guy.pixie.color = props.color or guy.pixie.color
+  guy.pixie:move(guy.pos)
   return guy
 end
 

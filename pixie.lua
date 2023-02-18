@@ -5,6 +5,7 @@
 ---@field quad love.Quad
 ---@field transform love.Transform
 ---@field color number[]
+---@field move fun(self: Pixie, pos: Vector): nil
 ---@field draw fun(self: Pixie): nil
 
 local Pixie = {}
@@ -19,6 +20,14 @@ function Pixie.new(texture, quad)
   }
   setmetatable(pixie, { __index = Pixie })
   return pixie
+end
+
+---@param self Pixie
+---@param pos Vector
+function Pixie:move(pos)
+  self.transform:setTransformation(
+    pos.x * 16, pos.y * 16
+  )
 end
 
 ---@param self Pixie
