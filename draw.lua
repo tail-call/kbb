@@ -33,7 +33,7 @@ end
 local function centerCameraOn(pos)
   love.graphics.translate(
     math.floor(screenWidth/2 - 8 - pos.x * tileWidth),
-    math.floor(screenHeight/2 - tileHeight - pos.y * tileHeight)
+    math.floor(screenHeight/2 - tileHeight/2- pos.y * tileHeight)
   )
 end
 

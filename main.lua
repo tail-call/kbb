@@ -15,7 +15,8 @@ local game = {
   player = nil,
   squad = {},
   ---@type Vector
-  lerpVec = { x = 0, y = 0 }
+  lerpVec = { x = 0, y = 0 },
+  recruitCircle = nil,
 }
 
 local function collider(v)
@@ -53,17 +54,26 @@ function game:draw()
 
   self.lerpVec = vector.lerp(self.lerpVec, self.player.pos, 0.04)
 
-
   draw.centerCameraOn(self.lerpVec)
   game.world:draw()
 
   love.graphics.printf(
-    "Move your troops with arrow keys.\n\nPress 1, 2, 3, 4 to change window scale.\n\nPress F to toggle follow mode.", 
-    love.math.newTransform(16 * 4, 16 * 8),
+    "Move your troops with arrow keys.\n\nPress 1, 2, 3, 4 to change window scale.\n\nPress F to toggle follow mode.\n\nG to dismiss squad.\n\nSpace to recruit units.", 
+    love.math.newTransform(16 * 3, 16 * 6),
     16 * 8
   )
+
   for _, guy in ipairs(self.guys) do
     guy:draw()
+  end
+
+  if self.recruitCircle then
+    love.graphics.circle(
+      'line',
+      self.player.pos.x * 16 + 8,
+      self.player.pos.y * 16 + 8,
+      self.recruitCircle * 16
+    )
   end
 
   love.graphics.pop()
@@ -83,6 +93,9 @@ function love.update(dt)
     guy:update(dt)
   end
   draw.update(dt)
+  if game.recruitCircle ~= nil then
+    game.recruitCircle = math.min(game.recruitCircle + dt * 6, 6)
+  end
 end
 
 ---@param key love.KeyConstant
@@ -97,6 +110,14 @@ function love.keypressed(key, scancode, isrepeat)
     game.squad.shouldFollow = not game.squad.shouldFollow
   end
 
+  if scancode == 'g' then
+    game.squad.followers = {}
+  end
+
+  if scancode == 'space' then
+    game.recruitCircle = 0
+  end
+
   local vec = vector.dir[scancode]
   if vec then
     if game.squad.shouldFollow then
@@ -105,6 +126,14 @@ function love.keypressed(key, scancode, isrepeat)
       end
     end
     game.squad.leader:move(vec, collider)
+  end
+end
+
+---@param key love.KeyConstant
+---@param scancode love.Scancode
+function love.keyreleased(key, scancode)
+  if scancode == 'space' then
+    game.recruitCircle = nil
   end
 end
 
