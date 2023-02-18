@@ -10,6 +10,7 @@
 ---@field color number[]
 ---@field move fun(self: Pixie, pos: Vector): nil
 ---@field draw fun(self: Pixie): nil
+---@field update fun(self: Pixie, dt: number): nil
 
 local Pixie = {}
 

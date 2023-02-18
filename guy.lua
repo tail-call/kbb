@@ -17,6 +17,8 @@ local Guy = {
   pixie = nil,
 }
 
+---@param self Guy
+---@param dt number
 function Guy:update(dt)
   self.pixie:update(dt)
 end
