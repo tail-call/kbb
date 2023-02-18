@@ -44,7 +44,6 @@ function game:init()
   }
 end
 
-
 function game:draw()
   self.lerpVec = {
     x = self.lerpVec.x + (self.player.pos.x - self.lerpVec.x) * 0.06,
