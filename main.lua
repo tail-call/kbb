@@ -3,10 +3,13 @@ local Guy = require('./guy').Guy
 local vector = require('./vector')
 local draw = require('./draw')
 local tbl = require('./tbl')
+local loadFont = require('./font').load
 
 -- Lerpable vector for smooth camera movement
 
 local lerpVec = { x = 0, y = 0 }
+
+local font = loadFont('cga8.png', 8, 8)
 
 function lerpVec:lerp(pos, factor)
   self.x = self.x + (pos.x - self.x) * factor
@@ -65,6 +68,7 @@ function game:draw()
   for _, guy in ipairs(self.guys) do
     guy:draw()
   end
+  love.graphics.draw(font, 0, 128)
 
   love.graphics.pop()
   draw.hud(#game.squad)
