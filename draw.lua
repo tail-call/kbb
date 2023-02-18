@@ -32,8 +32,8 @@ end
 ---@param pos Vector
 local function centerCameraOn(pos)
   love.graphics.translate(
-    screenWidth/2 - 8 - pos.x * tileWidth,
-    screenHeight/2 - tileHeight - pos.y * tileHeight
+    math.floor(screenWidth/2 - 8 - pos.x * tileWidth),
+    math.floor(screenHeight/2 - tileHeight - pos.y * tileHeight)
   )
 end
 

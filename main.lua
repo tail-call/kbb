@@ -58,7 +58,7 @@ function game:draw()
   draw.prepareFrame()
   love.graphics.push()
 
-  self.lerpVec:lerp(self.player.pos, 0.06)
+  self.lerpVec:lerp(self.player.pos, 0.04)
 
   draw.centerCameraOn(self.lerpVec)
   game.world:draw()
