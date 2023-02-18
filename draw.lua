@@ -1,4 +1,5 @@
 local loadImages = require('./images').load
+local loadFont = require('./font').load
 local Pixie = require('./pixie')
 
 ---@alias SpriteId integer
@@ -24,6 +25,7 @@ end
 local function init()
   setZoom(3)
   love.graphics.setDefaultFilter('nearest', 'nearest')
+  love.graphics.setFont(loadFont('cga8.png', 8, 8))
   tileset = loadImages()
 end
 
@@ -61,7 +63,7 @@ end
 ---@param numberOfGuys integer
 local function hud(numberOfGuys)
   withColor(0, 0, 0, 1, function ()
-    love.graphics.rectangle("fill", 0, 0, screenWidth, 16)
+    love.graphics.rectangle("fill", 0, 0, screenWidth, 8)
   end)
   love.graphics.print('Units: ' .. numberOfGuys, 0, 0)
 end

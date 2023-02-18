@@ -8,7 +8,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Guys don't step on one another
  - [x] Sprite batch for background
  - [x] Player looks less like everyone else
- - [ ] Read cga8.png bitmap font
+ - [x] Read cga8.png bitmap font
  - [ ] Sprites for movement animation
  - [ ] Building
  - [ ] Combat

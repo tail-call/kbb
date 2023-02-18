@@ -37,7 +37,7 @@ local function load(name, charWidth, charHeight)
 
   putSeparator(fontWidth - 1)
 
-  return love.graphics.newImage(output)
+  return love.graphics.newImageFont(output, characters)
 end
 
 return {
