@@ -15,10 +15,11 @@ local Guy = {
   ---@type Vector
   pos = { x = 0, y = 0 },
   pixie = nil,
-
-  update = function (dt)
-  end,
 }
+
+function Guy:update(dt)
+  self.pixie:update(dt)
+end
 
 ---@param self Guy
 ---@param vec Vector
@@ -47,7 +48,9 @@ end
 ---@param collider Collider
 local function addWanderBehavior(guy, collider)
   local time = math.random()
+  local super = guy.update
   function guy:update(dt)
+    super(guy, dt)
     time = time + dt
     while time > 0.25 do
       time = time % 0.25

@@ -9,7 +9,9 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Sprite batch for background
  - [x] Player looks less like everyone else
  - [x] Read cga8.png bitmap font
- - [ ] Sprites for movement animation
+ - [x] Sprites for movement animation
+ - [x] Sprite turning
+ - [ ] Sprite bumping
  - [ ] Building
  - [ ] Combat
  - [ ] Squad recruiting
