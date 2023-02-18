@@ -23,7 +23,26 @@ local function has(items, item)
   end)
 end
 
+---@generic T
+---@param items T[]
+local function ifilter(items, pred)
+  local i = 0
+
+  return function()
+    while true do
+      i = i + 1
+      local item = items[i]
+      if item == nil then
+        return nil
+      elseif pred(item) then
+        return i, item
+      end
+    end
+  end
+end
+
 return {
   find = find,
+  ifilter = ifilter,
   has = has,
 }

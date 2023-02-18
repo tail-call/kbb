@@ -102,4 +102,5 @@ return {
   setZoom = setZoom,
   makePixie = makePixie,
   update = update,
+  withColor = withColor,
 }

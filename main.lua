@@ -48,6 +48,30 @@ function game:init()
   }
 end
 
+function game:drawRecruitables()
+  if not self.recruitCircle then return end
+
+  for _, guy in tbl.ifilter(self.guys, function (guy)
+    if guy == self.player then return false end
+    return vector.dist(guy.pos, self.player.pos) < self.recruitCircle + 0.5
+  end) do
+    love.graphics.circle(
+      "line",
+      guy.pos.x * 16 + 8,
+      guy.pos.y * 16 + 8,
+      10
+    )
+    draw.withColor(1, 1, 1, 0.5, function ()
+      love.graphics.circle(
+        "fill",
+        guy.pos.x * 16 + 8,
+        guy.pos.y * 16 + 8,
+        10
+      )
+    end)
+  end
+end
+
 function game:draw()
   draw.prepareFrame()
   love.graphics.push()
@@ -66,6 +90,8 @@ function game:draw()
   for _, guy in ipairs(self.guys) do
     guy:draw()
   end
+
+  self:drawRecruitables()
 
   if self.recruitCircle then
     love.graphics.circle(
@@ -138,6 +164,7 @@ end
 ---@param scancode love.Scancode
 function love.keyreleased(key, scancode)
   if scancode == 'space' then
+    game:drawRecruitables()
     game.recruitCircle = nil
   end
 end

@@ -1,6 +1,8 @@
 ---@alias Vector { x: integer, y: integer }
 
-return {
+local vector
+
+vector = {
   ---@param v1 Vector
   ---@param v2 Vector
   ---@return Vector
@@ -38,6 +40,19 @@ return {
     }
   end,
 
+  ---@param v Vector
+  ---@return number
+  len = function(v)
+    return math.sqrt(v.x * v.x + v.y * v.y)
+  end,
+
+  ---@param v1 Vector
+  ---@param v2 Vector
+  ---@return number
+  dist = function(v1, v2)
+    return vector.len(vector.sub(v2, v1))
+  end,
+
   dir = {
     up    = { x =  0, y = -1 },
     down  = { x =  0, y =  1 },
@@ -45,3 +60,5 @@ return {
     right = { x =  1, y =  0 },
   },
 }
+
+return vector
