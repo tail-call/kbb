@@ -33,7 +33,9 @@ function World.new()
 
   for x = 1, world.width do
     for y = 1, world.height do
-      if world:isPassable{ x = x, y = y } then
+      if world:isWater{ x = x, y = y } then
+        world.tiles:add(tileset.water, x * 16, y * 16)
+      elseif world:isPassable{ x = x, y = y } then
         world.tiles:add(tileset.grass, x * 16, y * 16)
       else
         world.tiles:add(tileset.rock, x * 16, y * 16)
@@ -45,7 +47,17 @@ function World.new()
 end
 
 ---@param v Vector
+---@return boolean
+function World:isWater(v)
+  return v.x > 10 and v.x < 20 and v.y > 4 and v.y < 8
+end
+
+---@param v Vector
+---@return boolean
 function World:isPassable(v)
+  if self:isWater(v) then
+    return false
+  end
   if vector.equal(v, { x = 4, y = 4 }) then
     return true
   end
