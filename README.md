@@ -11,11 +11,11 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Read cga8.png bitmap font
  - [x] Sprites for movement animation
  - [x] Sprite turning
+ - [x] Use canvas for animated water
  - [ ] Sprite bumping
  - [ ] Building
  - [ ] Combat
  - [ ] Squad recruiting
- - [ ] Use canvas for animated water
 
 # Sources
 

@@ -82,6 +82,7 @@ function love.update(dt)
   for _, guy in ipairs(game.guys) do
     guy:update(dt)
   end
+  draw.update(dt)
 end
 
 ---@param key love.KeyConstant

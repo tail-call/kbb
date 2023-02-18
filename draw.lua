@@ -83,6 +83,10 @@ local function makePixie(name)
   return Pixie.new(tileset.tiles, tileset[name])
 end
 
+local function update(dt)
+  tileset:update(dt)
+end
+
 return {
   centerCameraOn = centerCameraOn,
   getTileset = getTileset,
@@ -93,4 +97,5 @@ return {
   prepareFrame = prepareFrame,
   setZoom = setZoom,
   makePixie = makePixie,
+  update = update,
 }
