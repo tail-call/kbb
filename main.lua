@@ -4,15 +4,6 @@ local vector = require('./vector')
 local draw = require('./draw')
 local tbl = require('./tbl')
 
--- Lerpable vector for smooth camera movement
-
-local lerpVec = { x = 0, y = 0 }
-
-function lerpVec:lerp(pos, factor)
-  self.x = self.x + (pos.x - self.x) * factor
-  self.y = self.y + (pos.y - self.y) * factor
-end
-
 -- Game state
 
 local game = {
@@ -23,7 +14,8 @@ local game = {
   ---@type Guy
   player = nil,
   squad = {},
-  lerpVec = lerpVec
+  ---@type Vector
+  lerpVec = { x = 0, y = 0 }
 }
 
 local function collider(v)
@@ -58,7 +50,7 @@ function game:draw()
   draw.prepareFrame()
   love.graphics.push()
 
-  self.lerpVec:lerp(self.player.pos, 0.04)
+  self.lerpVec = vector.lerp(self.lerpVec, self.player.pos, 0.04)
 
 
   draw.centerCameraOn(self.lerpVec)
