@@ -4,6 +4,17 @@ local vector = require('./vector')
 local draw = require('./draw')
 local tbl = require('./tbl')
 
+-- Lerpable vector for smooth camera movement
+
+local lerpVec = { x = 0, y = 0 }
+
+function lerpVec:lerp(pos, factor)
+  self.x = self.x + (pos.x - self.x) * factor
+  self.y = self.y + (pos.y - self.y) * factor
+end
+
+-- Game state
+
 local game = {
   ---@type World
   world = nil,
@@ -12,8 +23,7 @@ local game = {
   ---@type Guy
   player = nil,
   squad = {},
-  ---@type Vector
-  lerpVec = { x = 0, y = 0 }
+  lerpVec = lerpVec
 }
 
 local function collider(v)
@@ -45,14 +55,20 @@ function game:init()
 end
 
 function game:draw()
-  self.lerpVec = {
-    x = self.lerpVec.x + (self.player.pos.x - self.lerpVec.x) * 0.06,
-    y = self.lerpVec.y + (self.player.pos.y - self.lerpVec.y) * 0.06,
-  }
+  draw.prepareFrame()
+  love.graphics.push()
+
+  self.lerpVec:lerp(self.player.pos, 0.06)
+
   draw.centerCameraOn(self.lerpVec)
   game.world:draw()
   draw.drawSprites()
+
+  love.graphics.pop()
+  draw.hud(#game.squad)
 end
+
+-- Löve callbacks
 
 function love.load()
   draw.init()
@@ -70,8 +86,6 @@ end
 ---@param scancode love.Scancode
 ---@param isrepeat boolean
 function love.keypressed(key, scancode, isrepeat)
-  if isrepeat then return end
-
   if tbl.has({ '1', '2', '3', '4' }, key) then
     draw.setZoom(tonumber(key))
   end
@@ -85,9 +99,5 @@ function love.keypressed(key, scancode, isrepeat)
 end
 
 function love.draw()
-  draw.prepareFrame()
-  love.graphics.push()
   game:draw()
-  love.graphics.pop()
-  draw.hud(#game.squad)
 end
