@@ -4,38 +4,44 @@ local vector = require('./vector')
 local draw = require('./draw')
 local tbl = require('./tbl')
 
----@type World
-local world
----@type Guy[]
-local guys = {}
----@type Guy
-local player
-local squad
+
+local game = {
+  ---@type World
+  world = nil,
+  ---@type Guy[]
+  guys = {},
+  ---@type Guy
+  player = nil,
+  squad = {},
+}
+
+function game:init()
+end
 
 local function collider(v)
-  local found = tbl.find(guys, function(guy)
+  local found = tbl.find(game.guys, function(guy)
     return vector.equal(guy.pos, v)
   end)
-  return not found and world:isPassable(v)
+  return not found and game.world:isPassable(v)
 end
 
 local lerpVec = { x = 0, y = 0 }
 
 local function drawWorld()
   lerpVec = {
-    x = lerpVec.x + (player.pos.x - lerpVec.x) * 0.06,
-    y = lerpVec.y + (player.pos.y - lerpVec.y) * 0.06,
+    x = lerpVec.x + (game.player.pos.x - lerpVec.x) * 0.06,
+    y = lerpVec.y + (game.player.pos.y - lerpVec.y) * 0.06,
   }
   draw.centerCameraOn(lerpVec)
-  world:draw()
+  game.world:draw()
   draw.drawSprites()
 end
 
 function love.load()
   draw.init()
-  player = Guy.makeLeader()
-  guys = {
-    player,
+  game.player = Guy.makeLeader()
+  game.guys = {
+    game.player,
     Guy.makeGoodGuy(3),
     Guy.makeGoodGuy(4),
     Guy.makeGoodGuy(6),
@@ -46,16 +52,16 @@ function love.load()
     Guy.makeEvilGuy(collider),
     Guy.makeEvilGuy(collider),
   }
-  world = World.new()
-  squad = {
-    leader = player,
-    guys[2], guys[3], guys[4]
+  game.world = World.new()
+  game.squad = {
+    leader = game.player,
+    game.guys[2], game.guys[3], game.guys[4]
   }
 end
 
 ---@param dt number
 function love.update(dt)
-  for _, guy in ipairs(guys) do
+  for _, guy in ipairs(game.guys) do
     guy:update(dt)
   end
 end
@@ -71,10 +77,10 @@ function love.keypressed(key, scancode, isrepeat)
   end
 
   if vector.dir[key] then
-    for _, guy in ipairs(squad) do
+    for _, guy in ipairs(game.squad) do
       guy:move(key, collider)
     end
-    squad.leader:move(key, collider)
+    game.squad.leader:move(key, collider)
   end
 end
 
@@ -83,5 +89,5 @@ function love.draw()
   love.graphics.push()
   drawWorld()
   love.graphics.pop()
-  draw.hud(#squad)
+  draw.hud(#game.squad)
 end
