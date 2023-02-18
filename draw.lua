@@ -67,10 +67,14 @@ local function hud(numberOfGuys, isFollowMode)
     love.graphics.rectangle("fill", 0, 0, screenWidth, 8)
   end)
   local num = '' .. numberOfGuys
-  if not isFollowMode then
-    num = '(' .. num .. ')'
-  end
-  love.graphics.print('Units: ' .. num, 0, 0)
+  love.graphics.print(
+    {
+      { 1, 1, 1, 1 },
+      'Units: ',
+      isFollowMode and { 1, 1, 1, 1 } or { 0.5, 0.5, 0.5, 1 },
+      num,
+    },
+  0, 0)
 end
 
 local function prepareFrame()
