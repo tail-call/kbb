@@ -61,11 +61,16 @@ local function guyWithColor(r, g, b, a, pos)
 end
 
 ---@param numberOfGuys integer
-local function hud(numberOfGuys)
+---@param isFollowMode boolean
+local function hud(numberOfGuys, isFollowMode)
   withColor(0, 0, 0, 1, function ()
     love.graphics.rectangle("fill", 0, 0, screenWidth, 8)
   end)
-  love.graphics.print('Units: ' .. numberOfGuys, 0, 0)
+  local num = '' .. numberOfGuys
+  if not isFollowMode then
+    num = '(' .. num .. ')'
+  end
+  love.graphics.print('Units: ' .. num, 0, 0)
 end
 
 local function prepareFrame()

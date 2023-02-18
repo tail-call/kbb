@@ -42,7 +42,8 @@ function game:init()
   self.world = World.new()
   self.squad = {
     leader = self.player,
-    self.guys[2], self.guys[3], self.guys[4]
+    shouldFollow = true,
+    followers = { self.guys[2], self.guys[3], self.guys[4] },
   }
 end
 
@@ -57,7 +58,7 @@ function game:draw()
   game.world:draw()
 
   love.graphics.printf(
-    "Move your troops with arrow keys.\n\nPress 1, 2, 3, 4 to change window scale", 
+    "Move your troops with arrow keys.\n\nPress 1, 2, 3, 4 to change window scale.\n\nPress F to toggle follow mode.", 
     love.math.newTransform(16 * 4, 16 * 8),
     16 * 8
   )
@@ -66,7 +67,7 @@ function game:draw()
   end
 
   love.graphics.pop()
-  draw.hud(#game.squad)
+  draw.hud(#game.squad.followers, game.squad.shouldFollow)
 end
 
 -- Löve callbacks
@@ -91,10 +92,16 @@ function love.keypressed(key, scancode, isrepeat)
     draw.setZoom(tonumber(key))
   end
 
+  if key == 'f' then
+    game.squad.shouldFollow = not game.squad.shouldFollow
+  end
+
   local vec = vector.dir[key]
   if vec then
-    for _, guy in ipairs(game.squad) do
-      guy:move(vec, collider)
+    if game.squad.shouldFollow then
+      for _, guy in ipairs(game.squad.followers) do
+        guy:move(vec, collider)
+      end
     end
     game.squad.leader:move(vec, collider)
   end
