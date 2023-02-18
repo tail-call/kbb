@@ -90,11 +90,12 @@ function love.keypressed(key, scancode, isrepeat)
     draw.setZoom(tonumber(key))
   end
 
-  if vector.dir[key] then
+  local vec = vector.dir[key]
+  if vec then
     for _, guy in ipairs(game.squad) do
-      guy:move(key, collider)
+      guy:move(vec, collider)
     end
-    game.squad.leader:move(key, collider)
+    game.squad.leader:move(vec, collider)
   end
 end
 

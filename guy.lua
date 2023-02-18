@@ -9,8 +9,7 @@ local vector = require('./vector')
 ---@field color number[]
 ---@field update fun(self: Guy, dt: number): nil
 ---@field draw fun(self: Guy): nil
----@field move fun(self: Guy, key: string, canMoveTo: Collider): nil
----@field moveVec fun(self: Guy, vec: Vector, canMoveTo: Collider): nil
+---@field move fun(self: Guy, vec: Vector, canMoveTo: Collider): nil
 
 local Guy = {
   ---@type Vector
@@ -22,21 +21,14 @@ local Guy = {
   end,
 }
 
----@param self Guy
----@param key 'up' | 'down' | 'left' | 'right'
----@param canMoveTo Collider
-function Guy:move(key, canMoveTo)
-  self:moveVec(vector.dir[key], canMoveTo)
-  draw.moveSprite(self.spriteId, 'guy', self.pos.x, self.pos.y, unpack(self.color))
-end
-
 ---@param vec Vector
 ---@param canMoveTo Collider
-function Guy:moveVec(vec, canMoveTo)
+function Guy:move(vec, canMoveTo)
   local newPos = vector.add(self.pos, vec)
   if canMoveTo(newPos) then
     self.pos = newPos
   end
+  draw.moveSprite(self.spriteId, 'guy', self.pos.x, self.pos.y, unpack(self.color))
 end
 
 ---@return Guy
@@ -57,7 +49,12 @@ local function addWanderBehavior(guy, collider)
     time = time + dt
     while time > 0.25 do
       time = time % 0.25
-      self:move(({ 'up', 'down', 'left', 'right' })[math.random(1, 4)], collider)
+      self:move(({
+        vector.dir.up,
+        vector.dir.down,
+        vector.dir.left,
+        vector.dir.right,
+      })[math.random(1, 4)], collider)
     end
   end
 end
