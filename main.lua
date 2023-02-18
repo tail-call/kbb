@@ -4,7 +4,6 @@ local vector = require('./vector')
 local draw = require('./draw')
 local tbl = require('./tbl')
 
-
 local game = {
   ---@type World
   world = nil,
@@ -13,10 +12,9 @@ local game = {
   ---@type Guy
   player = nil,
   squad = {},
+  ---@type Vector
+  lerpVec = { x = 0, y = 0 }
 }
-
-function game:init()
-end
 
 local function collider(v)
   local found = tbl.find(game.guys, function(guy)
@@ -25,23 +23,10 @@ local function collider(v)
   return not found and game.world:isPassable(v)
 end
 
-local lerpVec = { x = 0, y = 0 }
-
-local function drawWorld()
-  lerpVec = {
-    x = lerpVec.x + (game.player.pos.x - lerpVec.x) * 0.06,
-    y = lerpVec.y + (game.player.pos.y - lerpVec.y) * 0.06,
-  }
-  draw.centerCameraOn(lerpVec)
-  game.world:draw()
-  draw.drawSprites()
-end
-
-function love.load()
-  draw.init()
-  game.player = Guy.makeLeader()
-  game.guys = {
-    game.player,
+function game:init()
+  self.player = Guy.makeLeader()
+  self.guys = {
+    self.player,
     Guy.makeGoodGuy(3),
     Guy.makeGoodGuy(4),
     Guy.makeGoodGuy(6),
@@ -52,11 +37,27 @@ function love.load()
     Guy.makeEvilGuy(collider),
     Guy.makeEvilGuy(collider),
   }
-  game.world = World.new()
-  game.squad = {
-    leader = game.player,
-    game.guys[2], game.guys[3], game.guys[4]
+  self.world = World.new()
+  self.squad = {
+    leader = self.player,
+    self.guys[2], self.guys[3], self.guys[4]
   }
+end
+
+
+function game:draw()
+  self.lerpVec = {
+    x = self.lerpVec.x + (self.player.pos.x - self.lerpVec.x) * 0.06,
+    y = self.lerpVec.y + (self.player.pos.y - self.lerpVec.y) * 0.06,
+  }
+  draw.centerCameraOn(self.lerpVec)
+  game.world:draw()
+  draw.drawSprites()
+end
+
+function love.load()
+  draw.init()
+  game:init()
 end
 
 ---@param dt number
@@ -87,7 +88,7 @@ end
 function love.draw()
   draw.prepareFrame()
   love.graphics.push()
-  drawWorld()
+  game:draw()
   love.graphics.pop()
   draw.hud(#game.squad)
 end
