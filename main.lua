@@ -62,7 +62,9 @@ function game:draw()
 
   draw.centerCameraOn(self.lerpVec)
   game.world:draw()
-  draw.drawSprites()
+  for _, guy in ipairs(self.guys) do
+    guy:draw()
+  end
 
   love.graphics.pop()
   draw.hud(#game.squad)

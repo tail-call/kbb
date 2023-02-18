@@ -1,4 +1,5 @@
 local loadImages = require('./images').load
+local Pixie = require('./pixie')
 
 ---@alias SpriteId integer
 
@@ -10,8 +11,6 @@ local zoom = 1
 
 ---@type Tileset
 local tileset
----@type love.SpriteBatch
-local sprites
 
 local function getTileset()
   return tileset
@@ -26,7 +25,6 @@ local function init()
   setZoom(3)
   love.graphics.setDefaultFilter('nearest', 'nearest')
   tileset = loadImages()
-  sprites = love.graphics.newSpriteBatch(tileset.tiles)
 end
 
 ---@param pos Vector
@@ -73,35 +71,9 @@ local function prepareFrame()
 end
 
 ---@param name string
----@param x integer
----@param y integer
----@param r number
----@param g number
----@param b number
----@param a number
----@return SpriteId
-local function addSprite(name, x, y, r, g, b, a)
-  local aTile = tileset[name] --[[@as love.Quad]]
-  sprites:setColor(r, g, b, a)
-  return sprites:add(aTile, x * tileWidth, y * tileWidth)
-end
-
----@param id SpriteId
----@param name string
----@param x integer
----@param y integer
----@param r number
----@param g number
----@param b number
----@param a number
-local function moveSprite(id, name, x, y, r, g, b, a)
-  local aTile = tileset[name] --[[@as love.Quad]]
-  sprites:setColor(r, g, b, a)
-  sprites:set(id, aTile, x * tileWidth, y * tileHeight)
-end
-
-local function drawSprites()
-  love.graphics.draw(sprites)
+---@return Pixie
+local function makePixie(name)
+  return Pixie.new(tileset.tiles, tileset[name])
 end
 
 return {
@@ -113,7 +85,5 @@ return {
   init = init,
   prepareFrame = prepareFrame,
   setZoom = setZoom,
-  addSprite = addSprite,
-  moveSprite = moveSprite,
-  drawSprites = drawSprites,
+  makePixie = makePixie,
 }

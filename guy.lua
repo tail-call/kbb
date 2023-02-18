@@ -5,7 +5,7 @@ local vector = require('./vector')
 
 ---@class Guy
 ---@field pos Vector
----@field spriteId SpriteId
+---@field pixie Pixie
 ---@field color number[]
 ---@field update fun(self: Guy, dt: number): nil
 ---@field draw fun(self: Guy): nil
@@ -14,13 +14,13 @@ local vector = require('./vector')
 local Guy = {
   ---@type Vector
   pos = { x = 0, y = 0 },
-  spriteId = -1,
-  color = { 1, 1, 1, 1 },
+  pixie = nil,
 
   update = function (dt)
   end,
 }
 
+---@param self Guy
 ---@param vec Vector
 ---@param canMoveTo Collider
 function Guy:move(vec, canMoveTo)
@@ -28,16 +28,17 @@ function Guy:move(vec, canMoveTo)
   if canMoveTo(newPos) then
     self.pos = newPos
   end
-  draw.moveSprite(self.spriteId, 'guy', self.pos.x, self.pos.y, unpack(self.color))
+  self.pixie.transform:setTransformation(self.pos.x * 16, self.pos.y * 16)
 end
 
 ---@return Guy
 function Guy.new(props)
+  ---@type Guy
   local guy = {}
   setmetatable(guy, { __index = Guy })
   guy.pos = props.pos or guy.pos
-  guy.color = props.color or guy.color
-  guy.spriteId = draw.addSprite('guy', guy.pos.x, guy.pos.y, unpack(guy.color))
+  guy.pixie = draw.makePixie('guy')
+  guy.pixie.color = props.color or guy.pixie.color
   return guy
 end
 
@@ -81,6 +82,11 @@ function Guy.makeEvilGuy(collider)
   }
   addWanderBehavior(guy, collider)
   return guy
+end
+
+---@param self Guy
+function Guy:draw()
+  self.pixie:draw()
 end
 
 
