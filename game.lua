@@ -4,6 +4,15 @@ local draw = require('./draw')
 local tbl = require('./tbl')
 local vector = require('./vector')
 
+local instructions = ''
+  .. 'Move your troops with arrow keys.'
+  .. '\n\n'
+  .. 'Press 1, 2, 3, 4 to change window scale.'
+  .. '\n\n'
+  .. 'Press F to toggle follow mode.'
+  .. '\n\n'
+  .. 'G to dismiss squad.\n\nSpace to recruit units.'
+
 local game = {
   ---@type World
   world = nil,
@@ -102,11 +111,11 @@ function game:draw()
   self.lerpVec = vector.lerp(self.lerpVec, self.player.pos, 0.04)
 
   draw.centerCameraOn(self.lerpVec)
-  game.world:draw()
+  self.world:draw()
 
   love.graphics.printf(
-    "Move your troops with arrow keys.\n\nPress 1, 2, 3, 4 to change window scale.\n\nPress F to toggle follow mode.\n\nG to dismiss squad.\n\nSpace to recruit units.", 
-    love.math.newTransform(16 * 3, 16 * 6),
+    instructions,
+    16 * 3, 16 * 6,
     16 * 8
   )
 
