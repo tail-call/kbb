@@ -1,3 +1,5 @@
+local withCanvas = require('./canvas').withCanvas
+
 ---@class Tileset
 ---@field tiles love.Texture
 ---@field guy love.Quad
@@ -8,15 +10,13 @@
 ---@field water2 love.Quad
 ---@field water3 love.Quad
 ---@field water4 love.Quad
----@field update fun(self: Tileset, dt: number)
+---@field update fun(self: Tileset, dt: number): nil
+---@field regenerate fun(): nil
 
 ---@return Tileset
 local function load()
   local tiles = love.graphics.newImage('tiles.png')
   local canvas = love.graphics.newCanvas(tiles:getWidth(), tiles:getHeight())
-  love.graphics.setCanvas(canvas)
-  love.graphics.draw(tiles)
-  love.graphics.setCanvas()
 
   local function tile(x, y)
     return love.graphics.newQuad(
@@ -47,6 +47,7 @@ local function load()
   }
   local waterFrame = 4
 
+
   function tileset:update(dt)
     timer = timer + dt
     if timer > timerCeil then
@@ -56,19 +57,22 @@ local function load()
         waterFrame = 1
       end
 
-      love.graphics.setCanvas(canvas)
-      love.graphics.push()
-      love.graphics.replaceTransform(love.math.newTransform())
-      do
+      withCanvas(canvas, function ()
         local quad = water[waterFrame]
         local x, y = tileset.water:getViewport()
         love.graphics.draw(tiles, quad, x, y)
-      end
-      love.graphics.pop()
-      love.graphics.setCanvas()
+      end)
     end
   end
 
+  --- Needs to be called on each window size change
+  function tileset:regenerate()
+    withCanvas(canvas, function ()
+      love.graphics.draw(tiles)
+    end)
+  end
+
+  tileset:regenerate()
   return tileset
 end
 

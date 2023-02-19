@@ -20,6 +20,9 @@ end
 local function setZoom(z)
   zoom = z
   love.window.setMode(screenWidth * z, screenHeight * z)
+  if tileset then
+    tileset:regenerate()
+  end
 end
 
 local function init()
