@@ -72,6 +72,31 @@ function game:drawRecruitables()
   end
 end
 
+function game:toggleFollow()
+  self.squad.shouldFollow = not self.squad.shouldFollow
+end
+
+function game:dismissSquad()
+  self.squad.followers = {}
+end
+
+function game:beginRecruiting()
+  self.recruitCircle = 0
+end
+
+function game:endRecruiting()
+  self.recruitCircle = nil
+end
+
+function game:orderMove(vec)
+  if self.squad.shouldFollow then
+    for _, guy in ipairs(self.squad.followers) do
+      guy:move(vec, collider)
+    end
+  end
+  self.squad.leader:move(vec, collider)
+end
+
 function game:draw()
   draw.prepareFrame()
   love.graphics.push()
@@ -138,25 +163,20 @@ function love.keypressed(key, scancode, isrepeat)
   end
 
   if scancode == 'f' then
-    game.squad.shouldFollow = not game.squad.shouldFollow
+    game:toggleFollow()
   end
 
   if scancode == 'g' then
-    game.squad.followers = {}
+    game:dismissSquad()
   end
 
   if scancode == 'space' then
-    game.recruitCircle = 0
+    game:beginRecruiting()
   end
 
   local vec = vector.dir[scancode]
   if vec then
-    if game.squad.shouldFollow then
-      for _, guy in ipairs(game.squad.followers) do
-        guy:move(vec, collider)
-      end
-    end
-    game.squad.leader:move(vec, collider)
+    game:orderMove(vec)
   end
 end
 
@@ -164,8 +184,7 @@ end
 ---@param scancode love.Scancode
 function love.keyreleased(key, scancode)
   if scancode == 'space' then
-    game:drawRecruitables()
-    game.recruitCircle = nil
+    game:endRecruiting()
   end
 end
 
