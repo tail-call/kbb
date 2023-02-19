@@ -119,7 +119,7 @@ function game:draw()
   end
 
   love.graphics.pop()
-  draw.hud(#game.squad.followers, game.squad.shouldFollow)
+  draw.hud(#self.squad.followers, self.squad.shouldFollow)
 end
 
 ---@param dt number
