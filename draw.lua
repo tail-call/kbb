@@ -41,27 +41,11 @@ local function centerCameraOn(pos)
   )
 end
 
----@param pos Vector
-local function guy(pos)
-  love.graphics.draw(tileset.tiles, tileset.guy, pos.x * 16, pos.y * 16)
-end
-
 local function withColor(r, g, b, a, cb)
   local xr, xg, xb, xa = love.graphics.getColor()
   love.graphics.setColor(r, g, b, a)
   cb()
   love.graphics.setColor(xr, xg, xb, xa)
-end
-
----@param r number
----@param g number
----@param b number
----@param a number
----@param pos Vector
-local function guyWithColor(r, g, b, a, pos)
-  withColor(r, g, b, a, function ()
-    guy(pos)
-  end)
 end
 
 ---@param numberOfGuys integer
@@ -81,6 +65,7 @@ local function hud(numberOfGuys, isFollowMode)
   0, 0)
 end
 
+--- Should be called whenever at the start of love.draw
 local function prepareFrame()
   love.graphics.scale(zoom)
 end
@@ -98,8 +83,6 @@ end
 return {
   centerCameraOn = centerCameraOn,
   getTileset = getTileset,
-  guy = guy,
-  guyWithColor = guyWithColor,
   hud = hud,
   init = init,
   prepareFrame = prepareFrame,
