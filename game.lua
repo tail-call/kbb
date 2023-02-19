@@ -97,7 +97,7 @@ end
 
 function game:draw()
   draw.prepareFrame()
-  love.graphics.push()
+  love.graphics.push('transform')
 
   self.lerpVec = vector.lerp(self.lerpVec, self.player.pos, 0.04)
 
