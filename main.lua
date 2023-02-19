@@ -49,5 +49,6 @@ function love.keyreleased(key, scancode)
 end
 
 function love.draw()
+  draw.prepareFrame()
   game:draw()
 end
