@@ -6,6 +6,7 @@ local Pixie = require('./pixie')
 
 local screenWidth = 320
 local screenHeight = 200
+local highlightCircleRadius = 10
 local tileHeight = 16
 local tileWidth = 16
 local zoom = 1
@@ -80,12 +81,36 @@ local function update(dt)
   tileset:update(dt)
 end
 
+---@param pos Vector
+local function recruitableHighlight(pos)
+  local x = pos.x * tileWidth + tileWidth / 2
+  local y = pos.y * tileHeight + tileHeight / 2
+  withColor(1, 1, 1, 1, function ()
+    love.graphics.circle('line', x, y, highlightCircleRadius)
+  end)
+  withColor(1, 1, 1, 0.5, function ()
+    love.graphics.circle('fill', x, y, highlightCircleRadius)
+  end)
+end
+
+---@param pos Vector
+local function recruitCircle(pos, radius)
+  love.graphics.circle(
+    'line',
+    pos.x * tileWidth + tileWidth / 2,
+    pos.y * tileHeight + tileHeight / 2,
+    radius * tileWidth
+  )
+end
+
 return {
   centerCameraOn = centerCameraOn,
   getTileset = getTileset,
   hud = hud,
   init = init,
   prepareFrame = prepareFrame,
+  recruitCircle = recruitCircle,
+  recruitableHighlight = recruitableHighlight,
   setZoom = setZoom,
   makePixie = makePixie,
   update = update,

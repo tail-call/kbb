@@ -4,6 +4,9 @@ local draw = require('./draw')
 local tbl = require('./tbl')
 local vector = require('./vector')
 
+local recruitCircleMaxRadius = 6
+local recruitCircleGrowthSpeed = 6
+
 local instructions = ''
   .. 'Move your troops with arrow keys.'
   .. '\n\n'
@@ -62,20 +65,7 @@ function game:drawRecruitables()
     if guy == self.player then return false end
     return vector.dist(guy.pos, self.player.pos) < self.recruitCircle + 0.5
   end) do
-    love.graphics.circle(
-      "line",
-      guy.pos.x * 16 + 8,
-      guy.pos.y * 16 + 8,
-      10
-    )
-    draw.withColor(1, 1, 1, 0.5, function ()
-      love.graphics.circle(
-        "fill",
-        guy.pos.x * 16 + 8,
-        guy.pos.y * 16 + 8,
-        10
-      )
-    end)
+    draw.recruitableHighlight(guy.pos)
   end
 end
 
@@ -126,12 +116,7 @@ function game:draw()
   self:drawRecruitables()
 
   if self.recruitCircle then
-    love.graphics.circle(
-      'line',
-      self.player.pos.x * 16 + 8,
-      self.player.pos.y * 16 + 8,
-      self.recruitCircle * 16
-    )
+    draw.recruitCircle(self.player.pos, self.recruitCircle)
   end
 
   love.graphics.pop()
@@ -144,7 +129,10 @@ function game:update(dt)
     guy:update(dt)
   end
   if self.recruitCircle ~= nil then
-    self.recruitCircle = math.min(self.recruitCircle + dt * 6, 6)
+    self.recruitCircle = math.min(
+      self.recruitCircle + dt * recruitCircleGrowthSpeed,
+      recruitCircleMaxRadius
+    )
   end
 end
 
