@@ -29,6 +29,7 @@ local function init()
   setZoom(3)
   love.graphics.setDefaultFilter('nearest', 'nearest')
   love.graphics.setFont(loadFont('cga8.png', 8, 8))
+  love.graphics.setLineStyle('rough')
   tileset = loadTileset()
 end
 
