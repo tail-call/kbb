@@ -5,8 +5,6 @@ local draw = require('./draw')
 ---@field width integer
 ---@field height integer
 ---@field tiles love.SpriteBatch
----@field draw fun(self: World): nil
----@field isPassable fun(self: World, v: Vector): nil
 
 local World = {
   width = 40,
@@ -14,10 +12,44 @@ local World = {
   tiles = nil,
 }
 
----@param self World
-function World:draw()
-  love.graphics.draw(self.tiles)
+---@param world World
+local function drawWorld(world)
+  love.graphics.draw(world.tiles)
 end
+
+---@param v Vector
+---@return boolean
+local function isWater(v)
+  return v.x > 10 and v.x < 20 and v.y > 4 and v.y < 8
+end
+
+---@param world World
+---@param v Vector
+---@return boolean
+local function isPassable(world, v)
+  if isWater(v) then
+    return false
+  end
+  if vector.equal(v, { x = 4, y = 4 }) then
+    return true
+  end
+  if vector.equal(v, { x = 16, y = 16 }) then
+    return true
+  end
+  if
+    v.x == 1
+    or v.y == 4
+    or v.x == world.width
+    or v.y == 1
+    or v.y == 16
+    or v.y == world.height
+  then
+    return false
+  else
+    return true
+  end
+end
+
 
 ---@return World
 function World.new()
@@ -33,9 +65,9 @@ function World.new()
 
   for x = 1, world.width do
     for y = 1, world.height do
-      if world:isWater{ x = x, y = y } then
+      if isWater{ x = x, y = y } then
         world.tiles:add(tileset.water, x * 16, y * 16)
-      elseif world:isPassable{ x = x, y = y } then
+      elseif isPassable(world, { x = x, y = y }) then
         world.tiles:add(tileset.grass, x * 16, y * 16)
       else
         world.tiles:add(tileset.rock, x * 16, y * 16)
@@ -46,36 +78,8 @@ function World.new()
   return world
 end
 
----@param v Vector
----@return boolean
-function World:isWater(v)
-  return v.x > 10 and v.x < 20 and v.y > 4 and v.y < 8
-end
-
----@param v Vector
----@return boolean
-function World:isPassable(v)
-  if self:isWater(v) then
-    return false
-  end
-  if vector.equal(v, { x = 4, y = 4 }) then
-    return true
-  end
-  if vector.equal(v, { x = 16, y = 16 }) then
-    return true
-  end
-  if
-    v.x == 1
-    or v.y == 4
-    or v.x == self.width
-    or v.y == 1
-    or v.y == 16
-    or v.y == self.height
-  then
-    return false
-  else
-    return true
-  end
-end
-
-return { World = World }
+return {
+  World = World,
+  drawWorld = drawWorld,
+  isPassable = isPassable,
+}

@@ -8,6 +8,7 @@ local vector = require('./vector')
 ---@field pixie Pixie
 ---@field color number[]
 ---@field update fun(self: Guy, dt: number): nil
+---@field canRecruit fun(self: Guy): boolean
 ---@field draw fun(self: Guy): nil
 ---@field move fun(self: Guy, vec: Vector, canMoveTo: Collider): nil
 
@@ -21,6 +22,12 @@ local Guy = {
 ---@param dt number
 function Guy:update(dt)
   self.pixie:update(dt)
+end
+
+---@param self Guy
+---@return boolean
+function Guy:canRecruit()
+  return false
 end
 
 ---@param self Guy
@@ -77,6 +84,9 @@ end
 ---@param coord integer
 function Guy.makeGoodGuy(coord)
   local guy = Guy.new{ pos = { x = coord, y = coord } }
+  function guy:canRecruit()
+    return true
+  end
   return guy
 end
 

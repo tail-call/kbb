@@ -25,6 +25,7 @@ end
 
 ---@generic T
 ---@param items T[]
+---@param pred fun(item: T): boolean
 local function ifilter(items, pred)
   local i = 0
 
