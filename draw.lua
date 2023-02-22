@@ -53,7 +53,8 @@ end
 
 ---@param numberOfGuys integer
 ---@param isFollowMode boolean
-local function hud(numberOfGuys, isFollowMode)
+---@param position Vector
+local function hud(numberOfGuys, isFollowMode, position)
   withColor(0, 0, 0, 1, function ()
     love.graphics.rectangle("fill", 0, 0, screenWidth, 8)
   end)
@@ -64,6 +65,8 @@ local function hud(numberOfGuys, isFollowMode)
       'Units: ',
       isFollowMode and { 1, 1, 1, 1 } or { 0.5, 0.5, 0.5, 1 },
       num,
+      { 1, 1, 1, 1 },
+      ' Coords: (' .. position.x .. ', ' .. position.y .. ')',
     },
   0, 0)
 end
