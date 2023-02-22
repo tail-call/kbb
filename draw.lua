@@ -1,4 +1,6 @@
 local loadTileset = require('./tileset').load
+local updateTileset = require('./tileset').update
+local regenerateTileset = require('./tileset').regenerate
 local loadFont = require('./font').load
 local Pixie = require('./pixie')
 
@@ -22,7 +24,7 @@ local function setZoom(z)
   zoom = z
   love.window.setMode(screenWidth * z, screenHeight * z)
   if tileset then
-    tileset:regenerate()
+    regenerateTileset(tileset)
   end
 end
 
@@ -78,7 +80,7 @@ local function makePixie(name)
 end
 
 local function update(dt)
-  tileset:update(dt)
+  updateTileset(tileset, dt)
 end
 
 ---@param pos Vector
