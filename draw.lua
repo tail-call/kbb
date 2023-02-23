@@ -66,7 +66,7 @@ local function hud(numberOfGuys, isFollowMode, position)
       isFollowMode and { 1, 1, 1, 1 } or { 0.5, 0.5, 0.5, 1 },
       num,
       { 1, 1, 1, 1 },
-      ' Coords: (' .. position.x .. ', ' .. position.y .. ')',
+      ' | Coords: (' .. position.x .. ', ' .. position.y .. ')',
     },
   0, 0)
 end
