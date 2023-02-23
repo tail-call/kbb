@@ -73,27 +73,29 @@ local function addWanderBehavior(guy, collider)
   end
 end
 
-function Guy.makeLeader()
+---@param pos Vector
+function Guy.makeLeader(pos)
   local guy = Guy.new{
-    pos = { x = 5, y = 5 },
+    pos = pos,
     color = { 1, 1, 0, 1 },
   }
   return guy
 end
 
----@param coord integer
-function Guy.makeGoodGuy(coord)
-  local guy = Guy.new{ pos = { x = coord, y = coord } }
+---@param pos Vector
+function Guy.makeGoodGuy(pos)
+  local guy = Guy.new{ pos = pos }
   function guy:canRecruit()
     return true
   end
   return guy
 end
 
+---@param pos Vector
 ---@param collider Collider
-function Guy.makeEvilGuy(collider)
+function Guy.makeEvilGuy(pos, collider)
   local guy = Guy.new{
-    pos = { x = 22, y = 6 },
+    pos = pos,
     color = { 1, 0, 0, 1 },
   }
   addWanderBehavior(guy, collider)

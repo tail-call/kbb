@@ -39,18 +39,22 @@ local function collider(v)
 end
 
 function game:init()
-  self.player = Guy.makeLeader()
+  self.player = Guy.makeLeader({ x = 10, y = 9 })
   self.guys = {
     self.player,
-    Guy.makeGoodGuy(3),
-    Guy.makeGoodGuy(4),
-    Guy.makeGoodGuy(6),
-    Guy.makeEvilGuy(collider),
-    Guy.makeEvilGuy(collider),
-    Guy.makeEvilGuy(collider),
-    Guy.makeEvilGuy(collider),
-    Guy.makeEvilGuy(collider),
-    Guy.makeEvilGuy(collider),
+    Guy.makeGoodGuy({ x = 11, y = 10 }),
+    Guy.makeGoodGuy({ x = 12, y = 10 }),
+    Guy.makeGoodGuy({ x = 11, y = 11 }),
+    Guy.makeGoodGuy({ x = 12, y = 11 }),
+    Guy.makeEvilGuy({ x = 20, y = 9 }, collider),
+    Guy.makeEvilGuy({ x = 21, y = 9 }, collider),
+    Guy.makeEvilGuy({ x = 22, y = 9 }, collider),
+    Guy.makeEvilGuy({ x = 20, y = 10 }, collider),
+    Guy.makeEvilGuy({ x = 21, y = 10 }, collider),
+    Guy.makeEvilGuy({ x = 22, y = 10 }, collider),
+    Guy.makeEvilGuy({ x = 20, y = 11 }, collider),
+    Guy.makeEvilGuy({ x = 21, y = 11 }, collider),
+    Guy.makeEvilGuy({ x = 22, y = 11 }, collider),
   }
   self.world = World.new()
   self.squad = {
