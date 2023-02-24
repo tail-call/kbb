@@ -36,7 +36,7 @@ end
 
 local function init()
   setZoom(3)
-  love.graphics.setDefaultFilter('nearest', 'nearest')
+  love.graphics.setDefaultFilter('linear', 'nearest')
   love.graphics.setFont(loadFont('cga8.png', 8, 8))
   love.graphics.setLineStyle('rough')
   tileset = loadTileset()
@@ -130,6 +130,15 @@ local function battle(pos)
   end)
 end
 
+---@param transform love.Transform
+---@param cb fun(): nil
+local function withTransform(transform, cb)
+  love.graphics.push('transform')
+  love.graphics.applyTransform(transform)
+  cb()
+  love.graphics.pop()
+end
+
 return {
   battle = battle,
   centerCameraOn = centerCameraOn,
@@ -143,4 +152,5 @@ return {
   makePixie = makePixie,
   update = update,
   withColor = withColor,
+  withTransform = withTransform,
 }

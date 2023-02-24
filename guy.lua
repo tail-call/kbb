@@ -92,8 +92,20 @@ local function canRecruitGuy(guy)
   return guy.team == 'good'
 end
 
+local small = love.math.newTransform():scale(1/2)
+
+---@param guy Guy
 local function drawGuy(guy)
   guy.pixie:draw()
+  draw.withTransform(
+    love.math.newTransform(
+      guy.pos.x * 16,
+      guy.pos.y * 16 - 4
+    ):apply(small),
+    function ()
+      love.graphics.print(guy.team)
+    end
+  )
 end
 
 return {
