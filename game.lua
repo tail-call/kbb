@@ -1,6 +1,5 @@
 local Guy = require('./guy').Guy
 local canRecruitGuy = require('./guy').canRecruitGuy
-local drawGuy = require('./guy').drawGuy
 local moveGuy = require('./guy').moveGuy
 local updateGuy = require('./guy').updateGuy
 local World = require('./world').World
@@ -133,7 +132,7 @@ function game:draw()
   )
 
   for _, guy in ipairs(self.guys) do
-    drawGuy(guy)
+    draw.drawGuy(guy)
   end
 
   self:drawRecruitables()
