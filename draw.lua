@@ -11,12 +11,14 @@ local screenWidth = 320
 local screenHeight = 200
 local tileHeight = 16
 local tileWidth = 16
+local whiteColor = { 1, 1, 1, 1 }
+local grayColor = { 0.5, 0.5, 0.5, 1 }
+local shrinkTransform = love.math.newTransform():scale(1/2)
 
 -- Variables
 
 local highlightCircleRadius = 10
 local zoom = 1
-
 local battleTimer = 0
 local battleTimerSpeed = 2
 
@@ -68,11 +70,11 @@ local function hud(numberOfGuys, isFollowMode, position)
   local num = '' .. numberOfGuys
   love.graphics.print(
     {
-      { 1, 1, 1, 1 },
+      whiteColor,
       'Units: ',
-      isFollowMode and { 1, 1, 1, 1 } or { 0.5, 0.5, 0.5, 1 },
+      isFollowMode and whiteColor or grayColor,
       num,
-      { 1, 1, 1, 1 },
+      whiteColor,
       ' | Coords: (' .. position.x .. ', ' .. position.y .. ')',
     },
   0, 0)
@@ -140,16 +142,14 @@ local function withTransform(transform, cb)
   love.graphics.pop()
 end
 
-local small = love.math.newTransform():scale(1/2)
-
 ---@param guy Guy
 local function drawGuy(guy)
   guy.pixie:draw()
   withTransform(
     love.math.newTransform(
       guy.pos.x * tileWidth,
-      guy.pos.y * tileHeight - 4
-    ):apply(small),
+      guy.pos.y * tileHeight - tileHeight / 4
+    ):apply(shrinkTransform),
     function ()
       love.graphics.print(guy.team)
     end
