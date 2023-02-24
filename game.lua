@@ -134,6 +134,8 @@ function game:draw()
 
   self:drawRecruitables()
 
+  draw.battle({ x = 4, y = 4 })
+
   if self.recruitCircle then
     draw.recruitCircle(self.player.pos, self.recruitCircle)
   end

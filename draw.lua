@@ -4,14 +4,20 @@ local regenerateTileset = require('./tileset').regenerate
 local loadFont = require('./font').load
 local Pixie = require('./pixie')
 
----@alias SpriteId integer
+-- Constants
 
 local screenWidth = 320
 local screenHeight = 200
-local highlightCircleRadius = 10
 local tileHeight = 16
 local tileWidth = 16
+
+-- Variables
+
+local highlightCircleRadius = 10
 local zoom = 1
+
+local battleTimer = 0
+local battleTimerSpeed = 2
 
 ---@type Tileset
 local tileset
@@ -83,6 +89,7 @@ local function makePixie(name)
 end
 
 local function update(dt)
+  battleTimer = (battleTimer + battleTimerSpeed * dt) % 1
   updateTileset(tileset, dt)
 end
 
@@ -108,7 +115,23 @@ local function recruitCircle(pos, radius)
   )
 end
 
+---@param pos Vector
+local function battle(pos)
+  if battleTimer % 1/4 < 1/16 then
+    return
+  end
+  withColor(0.5 + battleTimer / 2, 1 - battleTimer / 2, 0, 1, function ()
+    love.graphics.draw(
+      tileset.tiles,
+      tileset.battle,
+      pos.x * tileWidth,
+      pos.y * tileHeight
+    )
+  end)
+end
+
 return {
+  battle = battle,
   centerCameraOn = centerCameraOn,
   getTileset = getTileset,
   hud = hud,
