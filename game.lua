@@ -41,6 +41,10 @@ local function collider(v)
   return not found and isPassable(game.world, v)
 end
 
+local guyDelegate = {
+  collider = collider,
+}
+
 function game:init()
   self.player = Guy.makeLeader({ x = 10, y = 9 })
   self.guys = {
@@ -152,7 +156,7 @@ end
 ---@param dt number
 function game:update(dt)
   for _, guy in ipairs(self.guys) do
-    updateGuy(guy, dt, collider)
+    updateGuy(guy, dt, guyDelegate)
   end
   if self.recruitCircle ~= nil then
     self.recruitCircle = math.min(

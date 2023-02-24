@@ -10,6 +10,9 @@ local vector = require('./vector')
 ---@field behavior 'none' | 'wander'
 ---@field team 'good' | 'evil'
 
+---@class GuyDelegate
+---@field collider Collider
+
 ---@type Guy
 local Guy = {
   pos = { x = 0, y = 0 },
@@ -31,8 +34,8 @@ end
 
 ---@param guy Guy
 ---@param dt number
----@param canMoveTo Collider
-local function updateGuy(guy, dt, canMoveTo)
+---@param delegate GuyDelegate
+local function updateGuy(guy, dt, delegate)
   guy.pixie:update(dt)
   if guy.behavior == 'wander' then
     guy.time = guy.time + dt
@@ -43,7 +46,7 @@ local function updateGuy(guy, dt, canMoveTo)
         vector.dir.down,
         vector.dir.left,
         vector.dir.right,
-      })[math.random(1, 4)], canMoveTo)
+      })[math.random(1, 4)], delegate.collider)
     end
   end
 end
