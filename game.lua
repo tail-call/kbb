@@ -62,7 +62,6 @@ function game:init()
   }
   self.world = World.new()
   self.squad = {
-    leader = self.player,
     shouldFollow = true,
     ---@type Guy[]
     followers = { },
@@ -72,6 +71,7 @@ end
 ---@param guy Guy
 ---@return boolean
 function game:mayRecruit(guy)
+  if guy == self.player then return false end
   if tbl.has(self.squad.followers, guy) then return false end
   if not canRecruitGuy(guy) then return false end
   return vector.dist(guy.pos, self.player.pos) < self.recruitCircle + 0.5
@@ -115,7 +115,7 @@ function game:orderMove(vec)
       moveGuy(guy, vec, collider)
     end
   end
-  moveGuy(self.squad.leader, vec, collider)
+  moveGuy(self.player, vec, collider)
 end
 
 function game:draw()
@@ -148,7 +148,7 @@ function game:draw()
   draw.hud(
     #self.squad.followers,
     self.squad.shouldFollow,
-    self.squad.leader.pos
+    self.player.pos
   )
 end
 
