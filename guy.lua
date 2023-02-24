@@ -6,17 +6,16 @@ local vector = require('./vector')
 ---@class Guy
 ---@field pos Vector
 ---@field pixie Pixie
----@field color number[]
 ---@field canRecruit boolean
 ---@field time number
 ---@field behavior 'none' | 'wander'
 
+---@type Guy
 local Guy = {
-  ---@type Vector
   pos = { x = 0, y = 0 },
-  pixie = nil,
-  time = 0,
   canRecruit = false,
+  time = 0,
+  behavior = 'none',
 }
 
 ---@param guy Guy
@@ -62,8 +61,7 @@ function Guy.new(props)
 end
 
 ---@param guy Guy
----@param collider Collider
-local function addWanderBehavior(guy, collider)
+local function addWanderBehavior(guy)
   guy.time = math.random()
   guy.behavior = 'wander'
 end
@@ -85,13 +83,12 @@ function Guy.makeGoodGuy(pos)
 end
 
 ---@param pos Vector
----@param collider Collider
-function Guy.makeEvilGuy(pos, collider)
+function Guy.makeEvilGuy(pos)
   local guy = Guy.new{
     pos = pos,
     color = { 1, 0, 0, 1 },
   }
-  addWanderBehavior(guy, collider)
+  addWanderBehavior(guy)
   return guy
 end
 
