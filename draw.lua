@@ -3,6 +3,7 @@ local updateTileset = require('./tileset').update
 local regenerateTileset = require('./tileset').regenerate
 local loadFont = require('./font').load
 local Pixie = require('./pixie')
+local tbl = require('./tbl')
 
 -- Constants
 
@@ -155,10 +156,21 @@ local function drawGuy(guy)
   )
 end
 
+---@param guys Guy[]
+local function drawGuys(guys)
+  local guysClone = tbl.iclone(guys)
+  table.sort(guysClone, function (g1, g2)
+    return g1.pos.y < g2.pos.y
+  end)
+  for _, guy in ipairs(guysClone) do
+    drawGuy(guy)
+  end
+end
+
 return {
   battle = battle,
   centerCameraOn = centerCameraOn,
-  drawGuy = drawGuy,
+  drawGuys = drawGuys,
   getTileset = getTileset,
   hud = hud,
   init = init,

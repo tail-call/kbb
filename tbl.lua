@@ -42,8 +42,20 @@ local function ifilter(items, pred)
   end
 end
 
+---@generic T
+---@param items T[]
+---@return T[]
+local function iclone(items)
+  local result = {}
+  for _, v in ipairs(items) do
+    table.insert(result, v)
+  end
+  return result
+end
+
 return {
   find = find,
+  iclone = iclone,
   ifilter = ifilter,
   has = has,
 }

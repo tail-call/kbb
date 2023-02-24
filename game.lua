@@ -131,9 +131,7 @@ function game:draw()
     16 * 8
   )
 
-  for _, guy in ipairs(self.guys) do
-    draw.drawGuy(guy)
-  end
+  draw.drawGuys(self.guys)
 
   self:drawRecruitables()
 
