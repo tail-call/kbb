@@ -7,38 +7,46 @@ local vector = require('./vector')
 ---@field pos Vector
 ---@field pixie Pixie
 ---@field color number[]
----@field update fun(self: Guy, dt: number): nil
----@field canRecruit fun(self: Guy): boolean
----@field draw fun(self: Guy): nil
----@field move fun(self: Guy, vec: Vector, canMoveTo: Collider): nil
+---@field canRecruit boolean
+---@field time number
+---@field behavior 'none' | 'wander'
 
 local Guy = {
   ---@type Vector
   pos = { x = 0, y = 0 },
   pixie = nil,
+  time = 0,
+  canRecruit = false,
 }
 
----@param self Guy
----@param dt number
-function Guy:update(dt)
-  self.pixie:update(dt)
-end
-
----@param self Guy
----@return boolean
-function Guy:canRecruit()
-  return false
-end
-
----@param self Guy
+---@param guy Guy
 ---@param vec Vector
 ---@param canMoveTo Collider
-function Guy:move(vec, canMoveTo)
-  local newPos = vector.add(self.pos, vec)
+local function moveGuy(guy, vec, canMoveTo)
+  local newPos = vector.add(guy.pos, vec)
   if canMoveTo(newPos) then
-    self.pos = newPos
+    guy.pos = newPos
   end
-  self.pixie:move(self.pos)
+  guy.pixie:move(guy.pos)
+end
+
+---@param guy Guy
+---@param dt number
+---@param canMoveTo Collider
+local function updateGuy(guy, dt, canMoveTo)
+  guy.pixie:update(dt)
+  if guy.behavior == 'wander' then
+    guy.time = guy.time + dt
+    while guy.time > 0.25 do
+      guy.time = guy.time % 0.25
+      moveGuy(guy, ({
+        vector.dir.up,
+        vector.dir.down,
+        vector.dir.left,
+        vector.dir.right,
+      })[math.random(1, 4)], canMoveTo)
+    end
+  end
 end
 
 ---@return Guy
@@ -56,21 +64,8 @@ end
 ---@param guy Guy
 ---@param collider Collider
 local function addWanderBehavior(guy, collider)
-  local time = math.random()
-  local super = guy.update
-  function guy:update(dt)
-    super(guy, dt)
-    time = time + dt
-    while time > 0.25 do
-      time = time % 0.25
-      self:move(({
-        vector.dir.up,
-        vector.dir.down,
-        vector.dir.left,
-        vector.dir.right,
-      })[math.random(1, 4)], collider)
-    end
-  end
+  guy.time = math.random()
+  guy.behavior = 'wander'
 end
 
 ---@param pos Vector
@@ -85,9 +80,7 @@ end
 ---@param pos Vector
 function Guy.makeGoodGuy(pos)
   local guy = Guy.new{ pos = pos }
-  function guy:canRecruit()
-    return true
-  end
+  guy.canRecruit = true
   return guy
 end
 
@@ -102,10 +95,18 @@ function Guy.makeEvilGuy(pos, collider)
   return guy
 end
 
----@param self Guy
-function Guy:draw()
-  self.pixie:draw()
+local function canRecruitGuy(guy)
+  return guy.canRecruit
 end
 
+local function drawGuy(guy)
+  guy.pixie:draw()
+end
 
-return { Guy = Guy }
+return {
+  Guy = Guy,
+  canRecruitGuy = canRecruitGuy,
+  drawGuy = drawGuy,
+  moveGuy = moveGuy,
+  updateGuy = updateGuy,
+}

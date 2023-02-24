@@ -1,4 +1,8 @@
 local Guy = require('./guy').Guy
+local canRecruitGuy = require('./guy').canRecruitGuy
+local drawGuy = require('./guy').drawGuy
+local moveGuy = require('./guy').moveGuy
+local updateGuy = require('./guy').updateGuy
 local World = require('./world').World
 local drawWorld = require('./world').drawWorld
 local isPassable = require('./world').isPassable
@@ -69,7 +73,7 @@ end
 ---@return boolean
 function game:mayRecruit(guy)
   if tbl.has(self.squad.followers, guy) then return false end
-  if not guy:canRecruit() then return false end
+  if not canRecruitGuy(guy) then return false end
   return vector.dist(guy.pos, self.player.pos) < self.recruitCircle + 0.5
 end
 
@@ -108,10 +112,10 @@ end
 function game:orderMove(vec)
   if self.squad.shouldFollow then
     for _, guy in ipairs(self.squad.followers) do
-      guy:move(vec, collider)
+      moveGuy(guy, vec, collider)
     end
   end
-  self.squad.leader:move(vec, collider)
+  moveGuy(self.squad.leader, vec, collider)
 end
 
 function game:draw()
@@ -129,7 +133,7 @@ function game:draw()
   )
 
   for _, guy in ipairs(self.guys) do
-    guy:draw()
+    drawGuy(guy)
   end
 
   self:drawRecruitables()
@@ -151,7 +155,7 @@ end
 ---@param dt number
 function game:update(dt)
   for _, guy in ipairs(self.guys) do
-    guy:update(dt)
+    updateGuy(guy, dt, collider)
   end
   if self.recruitCircle ~= nil then
     self.recruitCircle = math.min(
