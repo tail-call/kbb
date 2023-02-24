@@ -147,8 +147,8 @@ local function drawGuy(guy)
   guy.pixie:draw()
   withTransform(
     love.math.newTransform(
-      guy.pos.x * 16,
-      guy.pos.y * 16 - 4
+      guy.pos.x * tileWidth,
+      guy.pos.y * tileHeight - 4
     ):apply(small),
     function ()
       love.graphics.print(guy.team)
