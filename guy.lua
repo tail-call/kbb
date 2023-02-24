@@ -1,7 +1,7 @@
 local draw = require('./draw')
 local vector = require('./vector')
 
----@alias Collider fun(v: Vector): boolean
+---@alias Collider fun(collidingGuy: Guy, v: Vector): boolean
 
 ---@class Guy
 ---@field pos Vector
@@ -26,7 +26,7 @@ local Guy = {
 ---@param canMoveTo Collider
 local function moveGuy(guy, vec, canMoveTo)
   local newPos = vector.add(guy.pos, vec)
-  if canMoveTo(newPos) then
+  if canMoveTo(guy, newPos) then
     guy.pos = newPos
   end
   guy.pixie:move(guy.pos)

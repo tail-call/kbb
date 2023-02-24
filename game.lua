@@ -21,11 +21,18 @@ local instructions = ''
   .. '\n\n'
   .. 'G to dismiss squad.\n\nSpace to recruit units.'
 
+---@class Battle
+---@field attacker Guy
+---@field defender Guy
+---@field timer number
+
 local game = {
   ---@type World
   world = nil,
   ---@type Guy[]
   guys = {},
+  ---@type Battle[]
+  battles = {},
   ---@type Guy
   player = nil,
   squad = {},
@@ -34,13 +41,18 @@ local game = {
   recruitCircle = nil,
 }
 
-local function collider(v)
+---@param collidingGuy Guy
+---@param v Vector
+---@returns boolean
+local function collider(collidingGuy, v)
   local found = tbl.find(game.guys, function(guy)
-    return vector.equal(guy.pos, v)
+    -- Only collide with guys from their own team
+    return collidingGuy.team == guy.team and vector.equal(guy.pos, v)
   end)
   return not found and isPassable(game.world, v)
 end
 
+---@type GuyDelegate
 local guyDelegate = {
   collider = collider,
 }
