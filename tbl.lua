@@ -53,9 +53,26 @@ local function iclone(items)
   return result
 end
 
+---@generic T
+---@param items T[]
+local function fastRemoveAtIndex(items, index)
+  items[index] = items[#items]
+  -- Delete last element
+  table.remove(items)
+end
+
+local function indexOf(items, item)
+  for i, v in ipairs(items) do
+    if v == item then return i end
+  end
+  return nil
+end
+
 return {
   find = find,
   iclone = iclone,
   ifilter = ifilter,
   has = has,
+  fastRemoveAtIndex = fastRemoveAtIndex,
+  indexOf = indexOf,
 }

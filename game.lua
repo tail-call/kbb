@@ -21,9 +21,13 @@ local instructions = ''
   .. '\n\n'
   .. 'G to dismiss squad.\n\nSpace to recruit units.'
 
+---@type CollisionInfo
+local noneCollision = { type = 'none' }
+
 ---@class Battle
 ---@field attacker Guy
 ---@field defender Guy
+---@field pos Vector
 ---@field timer number
 
 local game = {
@@ -41,19 +45,44 @@ local game = {
   recruitCircle = nil,
 }
 
----@param collidingGuy Guy
----@param v Vector
----@returns boolean
+---@type Collider
 local function collider(collidingGuy, v)
-  local found = tbl.find(game.guys, function(guy)
-    -- Only collide with guys from their own team
-    return collidingGuy.team == guy.team and vector.equal(guy.pos, v)
+  local otherGuy = tbl.find(game.guys, function(guy)
+    return vector.equal(guy.pos, v)
   end)
-  return not found and isPassable(game.world, v)
+  if otherGuy then
+    return { type = 'guy', guy = otherGuy }
+  end
+  if isPassable(game.world, v) then
+    return noneCollision
+  end
+  return { type = 'terrain' }
+end
+
+---@generic T
+---@param items T[]
+---@param item T
+local function maybeDrop(items, item)
+  local i = tbl.indexOf(items, item)
+  if not i then return end
+
+  tbl.fastRemoveAtIndex(items, i)
 end
 
 ---@type GuyDelegate
 local guyDelegate = {
+  beginBattle = function (attacker, defender)
+    maybeDrop(game.guys, attacker)
+    maybeDrop(game.guys, defender)
+    maybeDrop(game.squad.followers, defender)
+
+    table.insert(game.battles, {
+      attacker = attacker,
+      defender = defender,
+      pos = defender.pos,
+      timer = 1,
+    })
+  end,
   collider = collider,
 }
 
@@ -127,10 +156,10 @@ end
 function game:orderMove(vec)
   if self.squad.shouldFollow then
     for _, guy in ipairs(self.squad.followers) do
-      moveGuy(guy, vec, collider)
+      moveGuy(guy, vec, guyDelegate)
     end
   end
-  moveGuy(self.player, vec, collider)
+  moveGuy(self.player, vec, guyDelegate)
 end
 
 function game:draw()
@@ -151,7 +180,9 @@ function game:draw()
 
   self:drawRecruitables()
 
-  draw.battle({ x = 4, y = 4 })
+  for _, battle in ipairs(game.battles) do
+    draw.battle(battle.pos)
+  end
 
   if self.recruitCircle then
     draw.recruitCircle(self.player.pos, self.recruitCircle)

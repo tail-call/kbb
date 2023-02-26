@@ -1,8 +1,6 @@
 local draw = require('./draw')
 local vector = require('./vector')
 
----@alias Collider fun(collidingGuy: Guy, v: Vector): boolean
-
 ---@class Guy
 ---@field pos Vector
 ---@field pixie Pixie
@@ -10,8 +8,12 @@ local vector = require('./vector')
 ---@field behavior 'none' | 'wander'
 ---@field team 'good' | 'evil'
 
+---@alias CollisionInfo { type: 'guy' | 'terrain' | 'none', guy: Guy | nil }
+---@alias Collider fun(collidingGuy: Guy, v: Vector): CollisionInfo
+
 ---@class GuyDelegate
 ---@field collider Collider
+---@field beginBattle fun(attacker: Guy, defender: Guy): nil
 
 ---@type Guy
 local Guy = {
@@ -23,11 +25,17 @@ local Guy = {
 
 ---@param guy Guy
 ---@param vec Vector
----@param canMoveTo Collider
-local function moveGuy(guy, vec, canMoveTo)
+---@param delegate GuyDelegate
+local function moveGuy(guy, vec, delegate)
   local newPos = vector.add(guy.pos, vec)
-  if canMoveTo(guy, newPos) then
+  local collision = delegate.collider(guy, newPos)
+  if collision.type == 'none' then
     guy.pos = newPos
+  elseif collision.type == 'guy' then
+    if guy.team ~= collision.guy.team then
+      guy.pos = newPos
+      delegate.beginBattle(guy, collision.guy)
+    end
   end
   guy.pixie:move(guy.pos)
 end
@@ -46,7 +54,7 @@ local function updateGuy(guy, dt, delegate)
         vector.dir.down,
         vector.dir.left,
         vector.dir.right,
-      })[math.random(1, 4)], delegate.collider)
+      })[math.random(1, 4)], delegate)
     end
   end
 end
