@@ -232,9 +232,11 @@ function game:update(dt)
       if math.random() > 0.5 then
         unfreeze(battle.attacker)
         maybeDrop(game.guys, battle.defender)
+        maybeDrop(game.squad.followers, battle.defender)
       else
         unfreeze(battle.defender)
         maybeDrop(game.guys, battle.attacker)
+        maybeDrop(game.squad.followers, battle.attacker)
       end
     end
   end

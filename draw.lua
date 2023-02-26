@@ -120,6 +120,15 @@ end
 
 ---@param pos Vector
 local function battle(pos)
+  withColor(0, 0, 0, 0.5, function ()
+    love.graphics.rectangle(
+      'fill',
+      pos.x * tileWidth,
+      pos.y * tileHeight,
+      tileWidth,
+      tileHeight
+    )
+  end)
   if battleTimer % 1/4 < 1/16 then
     return
   end
