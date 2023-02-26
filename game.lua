@@ -45,6 +45,7 @@ local game = {
   ---@type Vector
   lerpVec = { x = 0, y = 0 },
   recruitCircle = nil,
+  onLost = nil,
 }
 
 ---@param guy Guy
@@ -233,10 +234,16 @@ function game:update(dt)
         unfreeze(battle.attacker)
         maybeDrop(game.guys, battle.defender)
         maybeDrop(game.squad.followers, battle.defender)
+        if battle.defender == game.player then
+          game.onLost()
+        end
       else
         unfreeze(battle.defender)
         maybeDrop(game.guys, battle.attacker)
         maybeDrop(game.squad.followers, battle.attacker)
+        if battle.attacker == game.player then
+          game.onLost()
+        end
       end
     end
   end
