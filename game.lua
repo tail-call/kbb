@@ -33,6 +33,8 @@ local noneCollision = { type = 'none' }
 local game = {
   ---@type World
   world = nil,
+  ---@type { [Guy]: true }
+  frozenGuys = tbl.weaken({}, 'k'),
   ---@type Guy[]
   guys = {},
   ---@type Battle[]
@@ -45,13 +47,35 @@ local game = {
   recruitCircle = nil,
 }
 
+---@param guy Guy
+local function freeze(guy)
+  game.frozenGuys[guy] = true
+end
+
+---@param guy Guy
+local function unfreeze(guy)
+  game.frozenGuys[guy] = nil
+end
+
+---@param guy Guy
+---@return boolean
+local function isFrozen(guy)
+  return game.frozenGuys[guy] or false
+end
+
 ---@type Collider
 local function collider(collidingGuy, v)
-  local otherGuy = tbl.find(game.guys, function(guy)
+  local otherGuy = tbl.find(game.guys, function (guy)
     return vector.equal(guy.pos, v)
   end)
   if otherGuy then
     return { type = 'guy', guy = otherGuy }
+  end
+  local battle = tbl.find(game.battles, function (battle)
+    return vector.equal(battle.pos, v)
+  end)
+  if battle then
+    return { type = 'terrain' }
   end
   if isPassable(game.world, v) then
     return noneCollision
@@ -72,9 +96,8 @@ end
 ---@type GuyDelegate
 local guyDelegate = {
   beginBattle = function (attacker, defender)
-    maybeDrop(game.guys, attacker)
-    maybeDrop(game.guys, defender)
-    maybeDrop(game.squad.followers, defender)
+    freeze(attacker)
+    freeze(defender)
 
     table.insert(game.battles, {
       attacker = attacker,
@@ -156,10 +179,14 @@ end
 function game:orderMove(vec)
   if self.squad.shouldFollow then
     for _, guy in ipairs(self.squad.followers) do
-      moveGuy(guy, vec, guyDelegate)
+      if not isFrozen(guy) then
+        moveGuy(guy, vec, guyDelegate)
+      end
     end
   end
-  moveGuy(self.player, vec, guyDelegate)
+  if not isFrozen(self.player) then
+    moveGuy(self.player, vec, guyDelegate)
+  end
 end
 
 function game:draw()
@@ -176,7 +203,7 @@ function game:draw()
     16 * 8
   )
 
-  draw.drawGuys(self.guys)
+  draw.drawGuys(self.guys, isFrozen)
 
   self:drawRecruitables()
 
@@ -198,8 +225,23 @@ end
 
 ---@param dt number
 function game:update(dt)
+  for _, battle in ipairs(self.battles) do
+    battle.timer = battle.timer - dt
+    if battle.timer < 0 then
+      maybeDrop(self.battles, battle)
+      if math.random() > 0.5 then
+        unfreeze(battle.attacker)
+        maybeDrop(game.guys, battle.defender)
+      else
+        unfreeze(battle.defender)
+        maybeDrop(game.guys, battle.attacker)
+      end
+    end
+  end
   for _, guy in ipairs(self.guys) do
-    updateGuy(guy, dt, guyDelegate)
+    if not isFrozen(guy) then
+      updateGuy(guy, dt, guyDelegate)
+    end
   end
   if self.recruitCircle ~= nil then
     self.recruitCircle = math.min(

@@ -68,6 +68,14 @@ local function indexOf(items, item)
   return nil
 end
 
+---@param table table
+---@param mode 'k' | 'v' | 'kv'
+---@return table
+local function weaken(table, mode)
+  setmetatable(table, { __mode = mode })
+  return table
+end
+
 return {
   find = find,
   iclone = iclone,
@@ -75,4 +83,5 @@ return {
   has = has,
   fastRemoveAtIndex = fastRemoveAtIndex,
   indexOf = indexOf,
+  weaken = weaken,
 }

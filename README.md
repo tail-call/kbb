@@ -13,7 +13,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Sprite turning
  - [x] Use canvas for animated water
  - [x] Squad recruiting
- - [ ] Combat
+ - [x] Combat
  - [ ] Sprite bumping
  - [ ] Building
 

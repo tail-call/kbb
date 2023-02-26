@@ -157,13 +157,16 @@ local function drawGuy(guy)
 end
 
 ---@param guys Guy[]
-local function drawGuys(guys)
+---@param shouldSkip fun(guy: Guy): boolean
+local function drawGuys(guys, shouldSkip)
   local guysClone = tbl.iclone(guys)
   table.sort(guysClone, function (g1, g2)
     return g1.pos.y < g2.pos.y
   end)
   for _, guy in ipairs(guysClone) do
-    drawGuy(guy)
+    if not shouldSkip(guy) then
+      drawGuy(guy)
+    end
   end
 end
 
