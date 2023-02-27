@@ -15,6 +15,29 @@ local whiteColor = { 1, 1, 1, 1 }
 local grayColor = { 0.5, 0.5, 0.5, 1 }
 local shrinkTransform = love.math.newTransform():scale(1/2)
 
+local sky = love.graphics.newMesh({
+  {
+    0, 0,
+    0, 0,
+    0.5, 0.5, 1,
+  },
+  {
+    320, 0,
+    0, 0,
+    0.5, 0.5, 1,
+  },
+  {
+    320, 200,
+    0, 0,
+    0.25, 0.25, 0.5,
+  },
+  {
+    0, 200,
+    0, 0,
+    0.25, 0.25, 0.5,
+  },
+})
+
 -- Variables
 
 local highlightCircleRadius = 10
@@ -90,6 +113,7 @@ end
 --- Should be called whenever at the start of love.draw
 local function prepareFrame()
   love.graphics.scale(zoom)
+  love.graphics.draw(sky)
 end
 
 ---@param name string

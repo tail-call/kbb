@@ -173,16 +173,6 @@ function game:mayRecruit(guy)
   return vector.dist(guy.pos, self.player.pos) < self.recruitCircle + 0.5
 end
 
-function game:drawRecruitables()
-  if not self.recruitCircle then return end
-
-  for _, guy in tbl.ifilter(self.guys, function (guy)
-    return self:mayRecruit(guy)
-  end) do
-    draw.recruitableHighlight(guy.pos)
-  end
-end
-
 function game:toggleFollow()
   self.squad.shouldFollow = not self.squad.shouldFollow
 end
@@ -224,6 +214,7 @@ function game:draw()
   self.lerpVec = vector.lerp(self.lerpVec, self.player.pos, 0.04)
 
   draw.centerCameraOn(self.lerpVec)
+
   drawWorld(self.world)
 
   draw.textAtTile(instructions1, { x = 3, y = 6 }, 8)
@@ -235,7 +226,13 @@ function game:draw()
 
   draw.drawGuys(self.guys, isFrozen)
 
-  self:drawRecruitables()
+  if self.recruitCircle then
+    for _, guy in tbl.ifilter(self.guys, function (guy)
+      return self:mayRecruit(guy)
+    end) do
+      draw.recruitableHighlight(guy.pos)
+    end
+  end
 
   for _, battle in ipairs(game.battles) do
     draw.battle(battle.pos)
