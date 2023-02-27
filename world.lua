@@ -23,6 +23,12 @@ local function isWater(v)
   return v.x > 10 and v.x < 20 and v.y > 4 and v.y < 8
 end
 
+---@param v Vector
+---@return boolean
+local function isForest(v)
+  return v.x >= 3 and v.x <= 38 and v.y >= 18 and v.y <= 24
+end
+
 ---@param world World
 ---@param v Vector
 ---@return boolean
@@ -41,7 +47,6 @@ local function isPassable(world, v)
     or v.y == 4
     or v.x == world.width
     or v.y == 1
-    or v.y == 16
     or v.y == world.height
   then
     return false
@@ -67,6 +72,8 @@ function World.new()
     for y = 1, world.height do
       if isWater{ x = x, y = y } then
         world.tiles:add(tileset.water, x * 16, y * 16)
+      elseif isForest{ x = x, y = y } then
+        world.tiles:add(tileset.forest, x * 16, y * 16)
       elseif isPassable(world, { x = x, y = y }) then
         world.tiles:add(tileset.grass, x * 16, y * 16)
       else

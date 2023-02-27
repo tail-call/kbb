@@ -12,6 +12,7 @@ local withCanvas = require('./canvas').withCanvas
 ---@field water love.Quad
 ---@field battle love.Quad
 ---@field house love.Quad
+---@field forest love.Quad
 
 local timerCeil = 0.3
 
@@ -45,6 +46,7 @@ local function load()
     water = tile(3, 0),
     battle = tile(0, 2),
     house = tile(1, 2),
+    forest = tile(2, 2),
     waterFrames = {
       tile(0, 1),
       tile(1, 1),
