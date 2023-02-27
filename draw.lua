@@ -179,6 +179,20 @@ local function drawGuys(guys, shouldSkip)
   end
 end
 
+---@param text string
+---@param pos Vector
+---@param maxWidth integer
+local function textAtTile(text, pos, maxWidth)
+  withColor(1, 1, 1, 0.8, function ()
+    love.graphics.printf(
+      text,
+      tileWidth * pos.x,
+      tileHeight * pos.y,
+      tileWidth * maxWidth
+    )
+  end)
+end
+
 return {
   battle = battle,
   centerCameraOn = centerCameraOn,
@@ -194,4 +208,5 @@ return {
   update = update,
   withColor = withColor,
   withTransform = withTransform,
+  textAtTile = textAtTile,
 }

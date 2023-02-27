@@ -12,7 +12,7 @@ local vector = require('./vector')
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 
-local instructions = ''
+local instructions1 = ''
   .. 'Move your troops with arrow keys.'
   .. '\n\n'
   .. 'Press 1, 2, 3, 4 to change window scale.'
@@ -20,6 +20,11 @@ local instructions = ''
   .. 'Press F to toggle follow mode.'
   .. '\n\n'
   .. 'G to dismiss squad.\n\nSpace to recruit units.'
+
+local instructions2 = ''
+  .. 'Your enemies are red. Bump into them to fight.'
+  .. '\n\n'
+  .. 'If your character dies, you lose.'
 
 ---@type CollisionInfo
 local noneCollision = { type = 'none' }
@@ -114,10 +119,10 @@ function game:init()
   self.player = Guy.makeLeader({ x = 10, y = 9 })
   self.guys = {
     self.player,
+    Guy.makeGoodGuy({ x = 10, y = 10 }),
     Guy.makeGoodGuy({ x = 11, y = 10 }),
-    Guy.makeGoodGuy({ x = 12, y = 10 }),
+    Guy.makeGoodGuy({ x = 10, y = 11 }),
     Guy.makeGoodGuy({ x = 11, y = 11 }),
-    Guy.makeGoodGuy({ x = 12, y = 11 }),
     Guy.makeEvilGuy({ x = 20, y = 9 }),
     Guy.makeEvilGuy({ x = 21, y = 9 }),
     Guy.makeEvilGuy({ x = 22, y = 9 }),
@@ -198,11 +203,8 @@ function game:draw()
   draw.centerCameraOn(self.lerpVec)
   drawWorld(self.world)
 
-  love.graphics.printf(
-    instructions,
-    16 * 3, 16 * 6,
-    16 * 8
-  )
+  draw.textAtTile(instructions1, { x = 3, y = 6 }, 8)
+  draw.textAtTile(instructions2, { x = 12, y = 9 }, 9)
 
   draw.drawGuys(self.guys, isFrozen)
 
@@ -230,7 +232,7 @@ function game:update(dt)
     battle.timer = battle.timer - dt
     if battle.timer < 0 then
       maybeDrop(self.battles, battle)
-      if math.random() > 0.5 then
+      if math.random() > 0.6 then
         unfreeze(battle.attacker)
         maybeDrop(game.guys, battle.defender)
         maybeDrop(game.squad.followers, battle.defender)
