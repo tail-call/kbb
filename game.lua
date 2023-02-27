@@ -9,6 +9,20 @@ local draw = require('./draw')
 local tbl = require('./tbl')
 local vector = require('./vector')
 
+---@class Building
+---@field pos Vector
+--
+---@class Resources
+---@field pretzels integer
+---@field wood integer
+---@field stone integer
+
+---@class Battle
+---@field attacker Guy
+---@field defender Guy
+---@field pos Vector
+---@field timer number
+
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 
@@ -32,20 +46,17 @@ local instructions2 = ''
 local noneCollision = { type = 'none' }
 local terrainCollision = { type = 'terrain' }
 
----@class Building
----@field pos Vector
-
----@class Battle
----@field attacker Guy
----@field defender Guy
----@field pos Vector
----@field timer number
-
 local game = {
   ---@type World
   world = nil,
   ---@type { [Guy]: true }
   frozenGuys = tbl.weaken({}, 'k'),
+  ---@type Resources
+  resources = {
+    pretzels = 1,
+    wood = 10,
+    stone = 10,
+  },
   ---@type Guy[]
   guys = {},
   ---@type Battle[]
@@ -58,6 +69,7 @@ local game = {
   ---@type Vector
   lerpVec = { x = 0, y = 0 },
   recruitCircle = nil,
+  ---@type fun(): nil
   onLost = nil,
 }
 
@@ -237,7 +249,8 @@ function game:draw()
   draw.hud(
     #self.squad.followers,
     self.squad.shouldFollow,
-    self.player.pos
+    self.player.pos,
+    self.resources
   )
 end
 
@@ -278,6 +291,10 @@ function game:update(dt)
 end
 
 function game:orderBuild()
+  if game.resources.wood <= 0 then
+    return
+  end
+  game.resources.wood = game.resources.wood - 1
   table.insert(game.buildings, {
     pos = game.player.pos
   })

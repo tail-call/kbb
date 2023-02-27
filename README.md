@@ -15,7 +15,10 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Squad recruiting
  - [x] Combat
  - [x] Building
- - [ ] Sprite bumping
+ - [x] Wood resource
+ - [ ] Trees
+ - [ ] Chop trees
+ - [ ] Destroy rocks
 
 # Sources
 

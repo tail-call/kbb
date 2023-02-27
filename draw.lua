@@ -63,9 +63,11 @@ end
 ---@param numberOfGuys integer
 ---@param isFollowMode boolean
 ---@param position Vector
-local function hud(numberOfGuys, isFollowMode, position)
+---@param resources Resources
+local function hud(numberOfGuys, isFollowMode, position, resources)
   withColor(0, 0, 0, 1, function ()
-    love.graphics.rectangle("fill", 0, 0, screenWidth, 8)
+    love.graphics.rectangle('fill', 0, 0, screenWidth, 8)
+    love.graphics.rectangle('fill', 0, screenHeight - 8, screenWidth, 8)
   end)
   local num = '' .. numberOfGuys
   love.graphics.print(
@@ -77,7 +79,12 @@ local function hud(numberOfGuys, isFollowMode, position)
       whiteColor,
       ' | Coords: (' .. position.x .. ', ' .. position.y .. ')',
     },
-  0, 0)
+    0, 0
+  )
+  love.graphics.print(
+    'Wood: ' .. resources.wood .. ' | Stone: ' .. resources.stone .. ' | Pretzels: ' .. resources.pretzels,
+    0, screenHeight - 8
+  )
 end
 
 --- Should be called whenever at the start of love.draw
