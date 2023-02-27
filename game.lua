@@ -226,26 +226,26 @@ function game:draw()
   )
 end
 
+local function fight(attacker, defender)
+  if math.random() > 0.6 then
+    return attacker, defender
+  else
+    return defender, attacker
+  end
+end
+
 ---@param dt number
 function game:update(dt)
   for _, battle in ipairs(self.battles) do
     battle.timer = battle.timer - dt
     if battle.timer < 0 then
       maybeDrop(self.battles, battle)
-      if math.random() > 0.6 then
-        unfreeze(battle.attacker)
-        maybeDrop(game.guys, battle.defender)
-        maybeDrop(game.squad.followers, battle.defender)
-        if battle.defender == game.player then
-          game.onLost()
-        end
-      else
-        unfreeze(battle.defender)
-        maybeDrop(game.guys, battle.attacker)
-        maybeDrop(game.squad.followers, battle.attacker)
-        if battle.attacker == game.player then
-          game.onLost()
-        end
+      local winner, loser = fight(battle.attacker, battle.defender)
+      unfreeze(winner)
+      maybeDrop(game.guys, loser)
+      maybeDrop(game.squad.followers, loser)
+      if loser == game.player then
+        game.onLost()
       end
     end
   end

@@ -183,14 +183,12 @@ end
 ---@param pos Vector
 ---@param maxWidth integer
 local function textAtTile(text, pos, maxWidth)
-  withColor(1, 1, 1, 0.8, function ()
-    love.graphics.printf(
-      text,
-      tileWidth * pos.x,
-      tileHeight * pos.y,
-      tileWidth * maxWidth
-    )
-  end)
+  love.graphics.printf(
+    text,
+    tileWidth * pos.x,
+    tileHeight * pos.y,
+    tileWidth * maxWidth
+  )
 end
 
 return {
