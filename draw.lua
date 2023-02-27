@@ -191,6 +191,16 @@ local function textAtTile(text, pos, maxWidth)
   )
 end
 
+---@param pos Vector
+local function house(pos)
+  love.graphics.draw(
+    tileset.tiles,
+    tileset.house,
+    pos.x * tileWidth,
+    pos.y * tileHeight
+  )
+end
+
 return {
   battle = battle,
   centerCameraOn = centerCameraOn,
@@ -207,4 +217,5 @@ return {
   withColor = withColor,
   withTransform = withTransform,
   textAtTile = textAtTile,
+  house = house,
 }

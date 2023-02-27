@@ -51,6 +51,10 @@ function love.keypressed(key, scancode, isrepeat)
   if vec then
     game:orderMove(vec)
   end
+
+  if scancode == 'b' then
+    game:orderBuild()
+  end
 end
 
 ---@param key love.KeyConstant

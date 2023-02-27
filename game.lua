@@ -20,6 +20,8 @@ local instructions1 = ''
   .. 'Press F to toggle follow mode.'
   .. '\n\n'
   .. 'G to dismiss squad.\n\nSpace to recruit units.'
+  .. '\n\n'
+  .. 'B to biuld a house.'
 
 local instructions2 = ''
   .. 'Your enemies are red. Bump into them to fight.'
@@ -28,6 +30,10 @@ local instructions2 = ''
 
 ---@type CollisionInfo
 local noneCollision = { type = 'none' }
+local terrainCollision = { type = 'terrain' }
+
+---@class Building
+---@field pos Vector
 
 ---@class Battle
 ---@field attacker Guy
@@ -47,6 +53,8 @@ local game = {
   ---@type Guy
   player = nil,
   squad = {},
+  ---@type Building[]
+  buildings = {},
   ---@type Vector
   lerpVec = { x = 0, y = 0 },
   recruitCircle = nil,
@@ -81,12 +89,12 @@ local function collider(collidingGuy, v)
     return vector.equal(battle.pos, v)
   end)
   if battle then
-    return { type = 'terrain' }
+    return terrainCollision
   end
   if isPassable(game.world, v) then
     return noneCollision
   end
-  return { type = 'terrain' }
+  return terrainCollision
 end
 
 ---@generic T
@@ -132,6 +140,9 @@ function game:init()
     Guy.makeEvilGuy({ x = 20, y = 11 }),
     Guy.makeEvilGuy({ x = 21, y = 11 }),
     Guy.makeEvilGuy({ x = 22, y = 11 }),
+  }
+  self.buildings = {
+    { pos = { x = 15, y = 14 } }
   }
   self.world = World.new()
   self.squad = {
@@ -206,6 +217,10 @@ function game:draw()
   draw.textAtTile(instructions1, { x = 3, y = 6 }, 8)
   draw.textAtTile(instructions2, { x = 12, y = 9 }, 9)
 
+  for _, building in ipairs(game.buildings) do
+    draw.house(building.pos)
+  end
+
   draw.drawGuys(self.guys, isFrozen)
 
   self:drawRecruitables()
@@ -260,6 +275,12 @@ function game:update(dt)
       recruitCircleMaxRadius
     )
   end
+end
+
+function game:orderBuild()
+  table.insert(game.buildings, {
+    pos = game.player.pos
+  })
 end
 
 return game
