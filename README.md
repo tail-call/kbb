@@ -14,8 +14,8 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Use canvas for animated water
  - [x] Squad recruiting
  - [x] Combat
+ - [x] Building
  - [ ] Sprite bumping
- - [ ] Building
 
 # Sources
 
