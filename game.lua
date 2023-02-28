@@ -11,7 +11,11 @@ local vector = require('./vector')
 
 ---@class Building
 ---@field pos Vector
---
+
+---@class Squad
+---@field shouldFollow boolean
+---@field followers Guy[]
+
 ---@class Resources
 ---@field pretzels integer
 ---@field wood integer
@@ -63,11 +67,16 @@ local game = {
   battles = {},
   ---@type Guy
   player = nil,
-  squad = {},
+  ---@type Squad
+  squad = {
+    followers = {},
+    shouldFollow = false,
+  },
   ---@type Building[]
   buildings = {},
   ---@type Vector
   lerpVec = { x = 0, y = 0 },
+  ---@type number | nil
   recruitCircle = nil,
   ---@type fun(): nil
   onLost = nil,
