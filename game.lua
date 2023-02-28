@@ -3,6 +3,8 @@ local canRecruitGuy = require('./guy').canRecruitGuy
 local moveGuy = require('./guy').moveGuy
 local updateGuy = require('./guy').updateGuy
 local newWorld = require('./world').newWorld
+local setTile = require('./world').setTile
+local getTile = require('./world').getTile
 local drawWorld = require('./world').drawWorld
 local isPassable = require('./world').isPassable
 local draw = require('./draw')
@@ -39,7 +41,9 @@ local instructions1 = ''
   .. '\n\n'
   .. 'G to dismiss squad.\n\nSpace to recruit units.'
   .. '\n\n'
-  .. 'B to biuld a house.'
+  .. 'C to chop wood.'
+  .. '\n\n'
+  .. 'B to biuld a house (5 wood).'
 
 local instructions2 = ''
   .. 'Your enemies are red. Bump into them to fight.'
@@ -58,7 +62,7 @@ local game = {
   ---@type Resources
   resources = {
     pretzels = 1,
-    wood = 10,
+    wood = 0,
     stone = 10,
   },
   ---@type Guy[]
@@ -297,13 +301,31 @@ function game:update(dt)
 end
 
 function game:orderBuild()
-  if game.resources.wood <= 0 then
+  if game.resources.wood < 5 then
     return
   end
-  game.resources.wood = game.resources.wood - 1
+  game.resources.wood = game.resources.wood - 5
   table.insert(game.buildings, {
     pos = game.player.pos
   })
+end
+
+local function maybeChop(guy)
+  if isFrozen(guy) then return end
+
+  local pos = guy.pos
+  local t = getTile(game.world, pos)
+  if t == 'forest' then
+    game.resources.wood = game.resources.wood + 1
+    setTile(game.world, pos, 'grass')
+  end
+end
+
+function game:orderChop()
+  maybeChop(game.player)
+  for _, guy in ipairs(game.squad.followers) do
+    maybeChop(guy)
+  end
 end
 
 return game

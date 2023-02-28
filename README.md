@@ -17,7 +17,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Building
  - [x] Wood resource
  - [x] Trees
- - [ ] Chop trees
+ - [x] Chop trees
  - [ ] Destroy rocks
 
 # Sources

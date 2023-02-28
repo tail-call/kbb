@@ -43,6 +43,10 @@ function love.keypressed(key, scancode, isrepeat)
     game:dismissSquad()
   end
 
+  if scancode == 'c' then
+    game:orderChop()
+  end
+
   if scancode == 'space' then
     game:beginRecruiting()
   end

@@ -1,10 +1,13 @@
 local vector = require('./vector')
 local draw = require('./draw')
 
+---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest'
+
 ---@class World
 ---@field width integer
 ---@field height integer
 ---@field tiles love.SpriteBatch
+---@field tileTypes WorldTile[]
 
 ---@param world World
 local function drawWorld(world)
@@ -26,7 +29,7 @@ end
 ---@param world World
 ---@param v Vector
 ---@return boolean
-local function isPassable(world, v)
+local function isGrass(world, v)
   if isWater(v) then
     return false
   end
@@ -52,29 +55,36 @@ end
 
 ---@return World
 local function newWorld()
-  local world = {
-    width = 40,
-    height = 26,
-    tiles = nil,
-  }
-
   local tileset = draw.getTileset()
 
-  world.tiles = love.graphics.newSpriteBatch(
-    tileset.tiles,
-    world.width * world.height
-  )
+  local width = 40
+  local height = 26
 
-  for x = 1, world.width do
-    for y = 1, world.height do
+  ---@type World
+  local world = {
+    width = width,
+    height = height,
+    tiles = love.graphics.newSpriteBatch(
+      tileset.tiles,
+      width * height
+    ),
+    tileTypes = {}
+  }
+
+  for y = 1, world.height do
+    for x = 1, world.width do
       if isWater{ x = x, y = y } then
         world.tiles:add(tileset.quads.water, x * 16, y * 16)
+        table.insert(world.tileTypes, 'water')
       elseif isForest{ x = x, y = y } then
         world.tiles:add(tileset.quads.forest, x * 16, y * 16)
-      elseif isPassable(world, { x = x, y = y }) then
+        table.insert(world.tileTypes, 'forest')
+      elseif isGrass(world, { x = x, y = y }) then
         world.tiles:add(tileset.quads.grass, x * 16, y * 16)
+        table.insert(world.tileTypes, 'grass')
       else
         world.tiles:add(tileset.quads.rock, x * 16, y * 16)
+        table.insert(world.tileTypes, 'rock')
       end
     end
   end
@@ -82,8 +92,42 @@ local function newWorld()
   return world
 end
 
+---@param world World
+---@param v Vector
+---@return integer
+local function vToTile(world, v)
+  return (v.y - 1) * world.width + v.x
+end
+
+---@param world World
+---@param v Vector
+local function isPassable(world, v)
+  local t = world.tileTypes[vToTile(world, v)]
+  return t == 'grass' or t == 'forest'
+end
+
+---@param world World
+---@param v Vector
+---@param t WorldTile
+local function setTile(world, v, t)
+  local tileset = draw.getTileset()
+
+  local id = vToTile(world, v)
+  world.tileTypes[id] = t
+  world.tiles:set(id, tileset.quads[t], v.x * 16, v.y * 16)
+end
+
+---@param world World
+---@param v Vector
+---@return WorldTile
+local function getTile(world, v)
+  return world.tileTypes[vToTile(world, v)]
+end
+
 return {
   newWorld = newWorld,
   drawWorld = drawWorld,
   isPassable = isPassable,
+  setTile = setTile,
+  getTile = getTile,
 }
