@@ -2,7 +2,7 @@ local Guy = require('./guy').Guy
 local canRecruitGuy = require('./guy').canRecruitGuy
 local moveGuy = require('./guy').moveGuy
 local updateGuy = require('./guy').updateGuy
-local World = require('./world').World
+local newWorld = require('./world').newWorld
 local drawWorld = require('./world').drawWorld
 local isPassable = require('./world').isPassable
 local draw = require('./draw')
@@ -165,7 +165,7 @@ function game:init()
   self.buildings = {
     { pos = { x = 15, y = 14 } }
   }
-  self.world = World.new()
+  self.world = newWorld()
   self.squad = {
     shouldFollow = true,
     ---@type Guy[]

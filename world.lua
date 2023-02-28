@@ -6,12 +6,6 @@ local draw = require('./draw')
 ---@field height integer
 ---@field tiles love.SpriteBatch
 
-local World = {
-  width = 40,
-  height = 26,
-  tiles = nil,
-}
-
 ---@param world World
 local function drawWorld(world)
   love.graphics.draw(world.tiles)
@@ -57,9 +51,12 @@ end
 
 
 ---@return World
-function World.new()
-  local world = {}
-  setmetatable(world, { __index = World })
+local function newWorld()
+  local world = {
+    width = 40,
+    height = 26,
+    tiles = nil,
+  }
 
   local tileset = draw.getTileset()
 
@@ -86,7 +83,7 @@ function World.new()
 end
 
 return {
-  World = World,
+  newWorld = newWorld,
   drawWorld = drawWorld,
   isPassable = isPassable,
 }
