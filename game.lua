@@ -301,13 +301,20 @@ function game:update(dt)
 end
 
 function game:orderBuild()
+  if isFrozen(game.player) then
+    return
+  end
   if game.resources.wood < 5 then
     return
   end
+  local pos = game.player.pos
+  for _, building in ipairs(game.buildings) do
+    if vector.equal(building.pos, pos) then
+      return
+    end
+  end
   game.resources.wood = game.resources.wood - 5
-  table.insert(game.buildings, {
-    pos = game.player.pos
-  })
+  table.insert(game.buildings, { pos = pos })
 end
 
 local function maybeChop(guy)
