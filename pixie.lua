@@ -9,7 +9,6 @@
 ---@field targetTransform love.Transform
 ---@field color number[]
 ---@field move fun(self: Pixie, pos: Vector): nil
----@field draw fun(self: Pixie): nil
 ---@field update fun(self: Pixie, dt: number): nil
 
 local Pixie = {}
@@ -57,14 +56,6 @@ function Pixie:move(pos)
 end
 
 ---@param self Pixie
-function Pixie:draw()
-  local r, g, b, a = love.graphics.getColor()
-  love.graphics.setColor(unpack(self.color))
-  love.graphics.draw(self.texture, self.quad, self.transform)
-  love.graphics.setColor(r, g, b, a)
-end
-
----@param self Pixie
 ---@param dt number
 function Pixie:update(dt)
   local m1 = { self.transform:getMatrix() }
@@ -78,4 +69,6 @@ function Pixie:update(dt)
   self.transform:setMatrix(unpack(m3))
 end
 
-return Pixie
+return {
+  Pixie = Pixie,
+}

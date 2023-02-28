@@ -1,11 +1,6 @@
 local withCanvas = require('./canvas').withCanvas
 
----@class Tileset
----@field tiles love.Canvas
----@field image love.Image
----@field timer number
----@field waterFrames love.Quad[]
----@field waterFrame integer
+---@class TilesetQuads
 ---@field guy love.Quad
 ---@field grass love.Quad
 ---@field rock love.Quad
@@ -13,6 +8,14 @@ local withCanvas = require('./canvas').withCanvas
 ---@field battle love.Quad
 ---@field house love.Quad
 ---@field forest love.Quad
+---@field waterFrames love.Quad[]
+
+---@class Tileset
+---@field tiles love.Canvas
+---@field image love.Image
+---@field timer number
+---@field waterFrame integer
+---@field quads TilesetQuads
 
 local timerCeil = 0.3
 
@@ -40,18 +43,20 @@ local function load()
     tiles = canvas,
     waterFrame = 4,
     image = image,
-    guy = tile(0, 0),
-    grass = tile(1, 0),
-    rock = tile(2, 0),
-    water = tile(3, 0),
-    battle = tile(0, 2),
-    house = tile(1, 2),
-    forest = tile(2, 2),
-    waterFrames = {
-      tile(0, 1),
-      tile(1, 1),
-      tile(2, 1),
-      tile(3, 1),
+    quads = {
+      guy = tile(0, 0),
+      grass = tile(1, 0),
+      rock = tile(2, 0),
+      water = tile(3, 0),
+      battle = tile(0, 2),
+      house = tile(1, 2),
+      forest = tile(2, 2),
+      waterFrames = {
+        tile(0, 1),
+        tile(1, 1),
+        tile(2, 1),
+        tile(3, 1),
+      }
     }
   }
 
@@ -65,13 +70,13 @@ local function update(tileset, dt)
   if tileset.timer > timerCeil then
     tileset.timer = tileset.timer % timerCeil
     tileset.waterFrame = tileset.waterFrame + 1
-    if tileset.waterFrame > #tileset.waterFrames then
+    if tileset.waterFrame > #tileset.quads.waterFrames then
       tileset.waterFrame = 1
     end
 
     withCanvas(tileset.tiles, function ()
-      local quad = tileset.waterFrames[tileset.waterFrame]
-      local x, y = tileset.water:getViewport()
+      local quad = tileset.quads.waterFrames[tileset.waterFrame]
+      local x, y = tileset.quads.water:getViewport()
       love.graphics.draw(tileset.image, quad, x, y)
     end)
   end

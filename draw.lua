@@ -2,7 +2,7 @@ local loadTileset = require('./tileset').load
 local updateTileset = require('./tileset').update
 local regenerateTileset = require('./tileset').regenerate
 local loadFont = require('./font').load
-local Pixie = require('./pixie')
+local pix = require('./pixie')
 local tbl = require('./tbl')
 
 -- Constants
@@ -119,7 +119,7 @@ end
 ---@param name string
 ---@return Pixie
 local function makePixie(name)
-  return Pixie.new(tileset.tiles, tileset[name])
+  return pix.Pixie.new(tileset.tiles, tileset.quads[name])
 end
 
 local function update(dt)
@@ -166,7 +166,7 @@ local function battle(pos)
   withColor(0.5 + battleTimer / 2, 1 - battleTimer / 2, 0, 1, function ()
     love.graphics.draw(
       tileset.tiles,
-      tileset.battle,
+      tileset.quads.battle,
       pos.x * tileWidth,
       pos.y * tileHeight
     )
@@ -182,9 +182,17 @@ local function withTransform(transform, cb)
   love.graphics.pop()
 end
 
+---@param pixie Pixie
+local function drawPixie(pixie)
+  local r, g, b, a = love.graphics.getColor()
+  love.graphics.setColor(unpack(pixie.color))
+  love.graphics.draw(pixie.texture, pixie.quad, pixie.transform)
+  love.graphics.setColor(r, g, b, a)
+end
+
 ---@param guy Guy
 local function drawGuy(guy)
-  guy.pixie:draw()
+  drawPixie(guy.pixie)
   withTransform(
     love.math.newTransform(
       guy.pos.x * tileWidth,
@@ -226,7 +234,7 @@ end
 local function house(pos)
   love.graphics.draw(
     tileset.tiles,
-    tileset.house,
+    tileset.quads.house,
     pos.x * tileWidth,
     pos.y * tileHeight
   )
@@ -249,4 +257,5 @@ return {
   withTransform = withTransform,
   textAtTile = textAtTile,
   house = house,
+  drawPixie = drawPixie,
 }

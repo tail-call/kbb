@@ -71,13 +71,13 @@ function World.new()
   for x = 1, world.width do
     for y = 1, world.height do
       if isWater{ x = x, y = y } then
-        world.tiles:add(tileset.water, x * 16, y * 16)
+        world.tiles:add(tileset.quads.water, x * 16, y * 16)
       elseif isForest{ x = x, y = y } then
-        world.tiles:add(tileset.forest, x * 16, y * 16)
+        world.tiles:add(tileset.quads.forest, x * 16, y * 16)
       elseif isPassable(world, { x = x, y = y }) then
-        world.tiles:add(tileset.grass, x * 16, y * 16)
+        world.tiles:add(tileset.quads.grass, x * 16, y * 16)
       else
-        world.tiles:add(tileset.rock, x * 16, y * 16)
+        world.tiles:add(tileset.quads.rock, x * 16, y * 16)
       end
     end
   end
