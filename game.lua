@@ -16,7 +16,7 @@ local vector = require('./vector')
 
 ---@class Squad
 ---@field shouldFollow boolean
----@field followers Guy[]
+---@field followers { [Guy]: true }
 
 ---@class Resources
 ---@field pretzels integer
@@ -73,7 +73,7 @@ local game = {
   player = nil,
   ---@type Squad
   squad = {
-    followers = {},
+    frozenGuys = tbl.weaken({}, 'k'),
     shouldFollow = false,
   },
   ---@type Building[]
@@ -191,7 +191,7 @@ end
 ---@return boolean
 function game:mayRecruit(guy)
   if guy == self.player then return false end
-  if tbl.has(self.squad.followers, guy) then return false end
+  if self.squad.followers[guy] then return false end
   if not canRecruitGuy(guy) then return false end
   return vector.dist(guy.pos, self.player.pos) < self.recruitCircle + 0.5
 end
@@ -201,7 +201,9 @@ function game:toggleFollow()
 end
 
 function game:dismissSquad()
-  self.squad.followers = {}
+  for guy in pairs(self.squad.followers) do
+    self.squad.followers[guy] = nil
+  end
 end
 
 function game:beginRecruiting()
@@ -212,7 +214,7 @@ function game:endRecruiting()
   for _, guy in tbl.ifilter(self.guys, function (guy)
     return self:mayRecruit(guy)
   end) do
-    table.insert(self.squad.followers, guy)
+    self.squad.followers[guy] = true
   end
   self.squad.shouldFollow = true
   self.recruitCircle = nil
@@ -220,7 +222,7 @@ end
 
 function game:orderMove(vec)
   if self.squad.shouldFollow then
-    for _, guy in ipairs(self.squad.followers) do
+    for guy in pairs(self.squad.followers) do
       if not isFrozen(guy) then
         moveGuy(guy, vec, guyDelegate)
       end
@@ -229,6 +231,16 @@ function game:orderMove(vec)
   if not isFrozen(self.player) then
     moveGuy(self.player, vec, guyDelegate)
   end
+end
+
+---@param squad Squad
+---@return integer
+local function countFollowers(squad)
+  local counter = 0
+  for _ in pairs(squad.followers) do
+    counter = counter + 1
+  end
+  return counter
 end
 
 function game:draw()
@@ -267,7 +279,7 @@ function game:draw()
 
   love.graphics.pop()
   draw.hud(
-    #self.squad.followers,
+    countFollowers(self.squad),
     self.squad.shouldFollow,
     self.player.pos,
     self.resources
@@ -291,7 +303,7 @@ function game:update(dt)
       local winner, loser = fight(battle.attacker, battle.defender)
       unfreeze(winner)
       maybeDrop(game.guys, loser)
-      maybeDrop(game.squad.followers, loser)
+      game.squad.followers[loser] = nil
       if loser == game.player then
         game.onLost()
       end
@@ -340,7 +352,7 @@ end
 
 function game:orderChop()
   maybeChop(game.player)
-  for _, guy in ipairs(game.squad.followers) do
+  for guy in pairs(game.squad.followers) do
     maybeChop(guy)
   end
 end
