@@ -19,6 +19,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Trees
  - [x] Chop trees
  - [ ] HP system
+ - [ ] Cursor
  - [ ] Wolves
  - [ ] Destroy rocks
  - [ ] Boats
@@ -28,6 +29,11 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [ ] Tavern
  - [ ] Day/night cycle
  - [ ] Order guys to chop trees
+ - [ ] RPG stats
+ - [ ] Mushrooms
+ - [ ] Daily routines
+ - [ ] Jobs
+ - [ ] Hunger
 
 # Sources
 
