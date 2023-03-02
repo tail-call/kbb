@@ -18,8 +18,8 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Wood resource
  - [x] Trees
  - [x] Chop trees
+ - [x] Cursor
  - [ ] HP system
- - [ ] Cursor
  - [ ] Wolves
  - [ ] Destroy rocks
  - [ ] Boats

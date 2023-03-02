@@ -85,9 +85,8 @@ end
 
 ---@param numberOfGuys integer
 ---@param isFollowMode boolean
----@param position Vector
 ---@param resources Resources
-local function hud(numberOfGuys, isFollowMode, position, resources)
+local function hud(numberOfGuys, isFollowMode, resources)
   withColor(0, 0, 0, 1, function ()
     love.graphics.rectangle('fill', 0, 0, screenWidth, 8)
     love.graphics.rectangle('fill', 0, screenHeight - 8, screenWidth, 8)
@@ -99,8 +98,6 @@ local function hud(numberOfGuys, isFollowMode, position, resources)
       'Units: ',
       isFollowMode and whiteColor or grayColor,
       num,
-      whiteColor,
-      ' | Coords: (' .. position.x .. ', ' .. position.y .. ')',
     },
     0, 0
   )
@@ -240,6 +237,26 @@ local function house(pos)
   )
 end
 
+---@return number, number
+local function getCursorCoords()
+  local cx, cy = love.graphics.inverseTransformPoint(
+    love.mouse.getPosition()
+  )
+
+  return math.floor(cx / tileWidth), math.floor(cy / tileHeight)
+end
+
+---@param pos Vector
+local function cursor(pos)
+  return love.graphics.rectangle(
+    'line',
+    pos.x * tileWidth,
+    pos.y * tileHeight,
+    tileWidth,
+    tileHeight
+  )
+end
+
 return {
   battle = battle,
   centerCameraOn = centerCameraOn,
@@ -258,4 +275,6 @@ return {
   textAtTile = textAtTile,
   house = house,
   drawPixie = drawPixie,
+  getCursorCoords = getCursorCoords,
+  cursor = cursor,
 }

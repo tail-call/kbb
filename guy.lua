@@ -9,7 +9,7 @@ local vector = require('./vector')
 ---@field team 'good' | 'evil'
 
 ---@alias CollisionInfo { type: 'guy' | 'terrain' | 'none', guy: Guy | nil }
----@alias Collider fun(collidingGuy: Guy, v: Vector): CollisionInfo
+---@alias Collider fun(nothing: nil, v: Vector): CollisionInfo
 
 ---@class GuyDelegate
 ---@field collider Collider
@@ -28,7 +28,7 @@ local Guy = {
 ---@param delegate GuyDelegate
 local function moveGuy(guy, vec, delegate)
   local newPos = vector.add(guy.pos, vec)
-  local collision = delegate.collider(guy, newPos)
+  local collision = delegate.collider(nil, newPos)
   if collision.type == 'none' then
     guy.pos = newPos
   elseif collision.type == 'guy' then

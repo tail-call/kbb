@@ -29,6 +29,10 @@ local vector = require('./vector')
 ---@field pos Vector
 ---@field timer number
 
+local whiteColor = { 1, 1, 1, 1 }
+local redColor = { 1, 0, 0, 1 }
+local yellowColor = { 1, 1, 0, 1 }
+
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 
@@ -103,7 +107,7 @@ local function isFrozen(guy)
 end
 
 ---@type Collider
-local function collider(collidingGuy, v)
+local function collider(nothing, v)
   local otherGuy = tbl.find(game.guys, function (guy)
     return vector.equal(guy.pos, v)
   end)
@@ -251,7 +255,11 @@ function game:draw()
 
   draw.centerCameraOn(self.lerpVec)
 
+  -- Draw terrain
+
   drawWorld(self.world)
+
+  -- Draw in-game objects
 
   draw.textAtTile(instructions1, { x = 268, y = 227 }, 8)
   draw.textAtTile(instructions2, { x = 280, y = 227 }, 9)
@@ -278,11 +286,39 @@ function game:draw()
     draw.recruitCircle(self.player.pos, self.recruitCircle)
   end
 
+  -- Draw cursor
+
+  local cx, cy = draw.getCursorCoords()
+  do
+    local cursorPos = { x = cx, y = cy }
+    local collision = collider(nil, cursorPos)
+    local cursorColor = whiteColor
+
+    local tile = getTile(game.world, cursorPos)
+
+    if collision.type == 'guy' then
+      cursorColor = yellowColor
+    elseif collision.type == 'terrain' then
+      cursorColor = redColor
+    end
+    local r, g, b, a = unpack(cursorColor)
+    draw.withColor(r, g, b, a, function ()
+      draw.cursor(cursorPos)
+      draw.textAtTile(
+        '(' .. cx .. ',' .. cy .. ')\n' .. tile,
+        vector.add(cursorPos, { x = 0, y = 1 }),
+        8
+      )
+    end)
+  end
+
   love.graphics.pop()
+
+  -- Draw HUD
+
   draw.hud(
     countFollowers(self.squad),
     self.squad.shouldFollow,
-    self.player.pos,
     self.resources
   )
 end
@@ -304,7 +340,7 @@ function game:update(dt)
       local winner, loser = fight(battle.attacker, battle.defender)
       unfreeze(winner)
       maybeDrop(game.guys, loser)
-      game.squad.followers[loser] = nil
+      game.squad.followers = nil
       if loser == game.player then
         game.onLost()
       end
