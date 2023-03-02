@@ -185,15 +185,16 @@ function game:init()
     ---@type Guy[]
     followers = { },
   }
+  self.lerpVec = self.player.pos
 end
 
 ---@param guy Guy
 ---@return boolean
-function game:mayRecruit(guy)
-  if guy == self.player then return false end
-  if self.squad.followers[guy] then return false end
+local function mayRecruit(guy)
+  if guy == game.player then return false end
+  if game.squad.followers[guy] then return false end
   if not canRecruitGuy(guy) then return false end
-  return vector.dist(guy.pos, self.player.pos) < self.recruitCircle + 0.5
+  return vector.dist(guy.pos, game.player.pos) < game.recruitCircle + 0.5
 end
 
 function game:toggleFollow()
@@ -212,7 +213,7 @@ end
 
 function game:endRecruiting()
   for _, guy in tbl.ifilter(self.guys, function (guy)
-    return self:mayRecruit(guy)
+    return mayRecruit(guy)
   end) do
     self.squad.followers[guy] = true
   end
@@ -263,7 +264,7 @@ function game:draw()
 
   if self.recruitCircle then
     for _, guy in tbl.ifilter(self.guys, function (guy)
-      return self:mayRecruit(guy)
+      return mayRecruit(guy)
     end) do
       draw.recruitableHighlight(guy.pos)
     end
