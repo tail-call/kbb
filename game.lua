@@ -88,6 +88,8 @@ local game = {
   recruitCircle = nil,
   ---@type fun(): nil
   onLost = nil,
+  ---@type Vector
+  cursorPos = { x = 0, y = 0 },
 }
 
 ---@param guy Guy
@@ -310,6 +312,7 @@ function game:draw()
         8
       )
     end)
+    game.cursorPos = cursorPos
   end
 
   love.graphics.pop()
@@ -366,7 +369,7 @@ function game:orderBuild()
   if game.resources.wood < 5 then
     return
   end
-  local pos = game.player.pos
+  local pos = game.cursorPos
   for _, building in ipairs(game.buildings) do
     if vector.equal(building.pos, pos) then
       return

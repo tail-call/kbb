@@ -19,6 +19,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Trees
  - [x] Chop trees
  - [x] Cursor
+ - [x] Build houses with cursor
  - [ ] HP system
  - [ ] Wolves
  - [ ] Destroy rocks

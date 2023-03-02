@@ -55,8 +55,10 @@ function love.keypressed(key, scancode, isrepeat)
   if vec then
     game:orderMove(vec)
   end
+end
 
-  if scancode == 'b' then
+function love.mousepressed(x, y, button, presses)
+  if button == 1 then
     game:orderBuild()
   end
 end
