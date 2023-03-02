@@ -2,7 +2,7 @@ local Guy = require('./guy').Guy
 local canRecruitGuy = require('./guy').canRecruitGuy
 local moveGuy = require('./guy').moveGuy
 local updateGuy = require('./guy').updateGuy
-local newWorld = require('./world').newWorld
+local loadWorld = require('./world').loadWorld
 local setTile = require('./world').setTile
 local getTile = require('./world').getTile
 local drawWorld = require('./world').drawWorld
@@ -149,27 +149,37 @@ local guyDelegate = {
 }
 
 function game:init()
-  self.player = Guy.makeLeader({ x = 10, y = 9 })
+  self.player = Guy.makeLeader({ x = 268, y = 227 })
   self.guys = {
     self.player,
-    Guy.makeGoodGuy({ x = 10, y = 10 }),
-    Guy.makeGoodGuy({ x = 11, y = 10 }),
-    Guy.makeGoodGuy({ x = 10, y = 11 }),
-    Guy.makeGoodGuy({ x = 11, y = 11 }),
-    Guy.makeEvilGuy({ x = 20, y = 9 }),
-    Guy.makeEvilGuy({ x = 21, y = 9 }),
-    Guy.makeEvilGuy({ x = 22, y = 9 }),
-    Guy.makeEvilGuy({ x = 20, y = 10 }),
-    Guy.makeEvilGuy({ x = 21, y = 10 }),
-    Guy.makeEvilGuy({ x = 22, y = 10 }),
-    Guy.makeEvilGuy({ x = 20, y = 11 }),
-    Guy.makeEvilGuy({ x = 21, y = 11 }),
-    Guy.makeEvilGuy({ x = 22, y = 11 }),
+    Guy.makeGoodGuy({ x = 269, y = 228 }),
+    Guy.makeGoodGuy({ x = 269, y = 230 }),
+    Guy.makeGoodGuy({ x = 270, y = 228 }),
+    Guy.makeGoodGuy({ x = 270, y = 230 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
+    Guy.makeEvilGuy({ x = 364, y = 199 }),
   }
   self.buildings = {
     { pos = { x = 15, y = 14 } }
   }
-  self.world = newWorld()
+  self.world = loadWorld('map.png')
   self.squad = {
     shouldFollow = true,
     ---@type Guy[]
@@ -230,8 +240,8 @@ function game:draw()
 
   drawWorld(self.world)
 
-  draw.textAtTile(instructions1, { x = 3, y = 6 }, 8)
-  draw.textAtTile(instructions2, { x = 12, y = 9 }, 9)
+  draw.textAtTile(instructions1, { x = 268, y = 227 }, 8)
+  draw.textAtTile(instructions2, { x = 280, y = 227 }, 9)
 
   for _, building in ipairs(game.buildings) do
     draw.house(building.pos)

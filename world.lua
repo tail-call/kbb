@@ -1,7 +1,7 @@
 local vector = require('./vector')
 local draw = require('./draw')
 
----@alias WorldTile 'grass' | 'rock' | 'water' | 'forest'
+---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand'
 
 ---@class World
 ---@field width integer
@@ -92,6 +92,54 @@ local function newWorld()
   return world
 end
 
+---@param filename string
+---@return World
+local function loadWorld(filename)
+  local tileset = draw.getTileset()
+  local data = love.image.newImageData(filename)
+
+  local width = data:getWidth()
+  local height = data:getHeight()
+
+  ---@type World
+  local world = {
+    width = width,
+    height = height,
+    tiles = love.graphics.newSpriteBatch(
+      tileset.tiles,
+      width * height
+    ),
+    tileTypes = {}
+  }
+
+  for y = 0, data:getHeight() - 1 do
+    for x = 0, data:getWidth() - 1 do
+      local r, g, b = data:getPixel(x, y)
+      r = math.floor(r*2)/2
+      g = math.floor(g*2)/2
+      b = math.floor(b*2)/2
+      if r == 0 and g == 0 and b == 1 then
+        world.tiles:add(tileset.quads.water, (x + 1) * 16, (y + 1) * 16)
+        table.insert(world.tileTypes, 'water')
+      elseif r == 0 and g == 0.5 and b == 0 then
+        world.tiles:add(tileset.quads.forest, (x + 1) * 16, (y + 1) * 16)
+        table.insert(world.tileTypes, 'forest')
+      elseif r == 0.5 and g == 0.5 and b == 0.5 then
+        world.tiles:add(tileset.quads.rock, (x + 1) * 16, (y + 1) * 16)
+        table.insert(world.tileTypes, 'rock')
+      elseif r == 1 and g == 1 and b == 0 then
+        world.tiles:add(tileset.quads.sand, (x + 1) * 16, (y + 1) * 16)
+        table.insert(world.tileTypes, 'sand')
+      else
+        world.tiles:add(tileset.quads.grass, (x + 1) * 16, (y + 1) * 16)
+        table.insert(world.tileTypes, 'grass')
+      end
+    end
+  end
+
+  return world
+end
+
 ---@param world World
 ---@param v Vector
 ---@return integer
@@ -103,7 +151,7 @@ end
 ---@param v Vector
 local function isPassable(world, v)
   local t = world.tileTypes[vToTile(world, v)]
-  return t == 'grass' or t == 'forest'
+  return t == 'grass' or t == 'forest' or t == 'sand'
 end
 
 ---@param world World
@@ -130,4 +178,5 @@ return {
   isPassable = isPassable,
   setTile = setTile,
   getTile = getTile,
+  loadWorld = loadWorld,
 }

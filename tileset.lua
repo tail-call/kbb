@@ -8,6 +8,7 @@ local withCanvas = require('./canvas').withCanvas
 ---@field battle love.Quad
 ---@field house love.Quad
 ---@field forest love.Quad
+---@field sand love.Quad
 ---@field waterFrames love.Quad[]
 
 ---@class Tileset
@@ -51,6 +52,7 @@ local function load()
       battle = tile(0, 2),
       house = tile(1, 2),
       forest = tile(2, 2),
+      sand = tile(3, 2),
       waterFrames = {
         tile(0, 1),
         tile(1, 1),
