@@ -18,7 +18,16 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Wood resource
  - [x] Trees
  - [x] Chop trees
+ - [ ] HP system
+ - [ ] Wolves
  - [ ] Destroy rocks
+ - [ ] Boats
+ - [ ] Ponies
+ - [ ] Hold arrows to walk
+ - [ ] Town hall
+ - [ ] Tavern
+ - [ ] Day/night cycle
+ - [ ] Order guys to chop trees
 
 # Sources
 
