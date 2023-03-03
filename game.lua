@@ -337,7 +337,7 @@ end
 function game:update(dt)
   game.lerpVec = vector.lerp(
     game.lerpVec,
-    game.player.pos,
+    vector.midpoint(game.player.pos, game.cursorPos),
     dt * lerpSpeed
   )
 

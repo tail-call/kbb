@@ -20,6 +20,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Chop trees
  - [x] Cursor
  - [x] Build houses with cursor
+ - [x] Mouselook
  - [ ] Workshop where foundations of buildings are made
  - [ ] A group of units must carry foundation to its place
  - [ ] Then unit carries wood to the site and builds the thing
