@@ -189,7 +189,7 @@ function game:init()
   self.squad = {
     shouldFollow = true,
     ---@type Guy[]
-    followers = { },
+    followers = tbl.weaken({}, 'k'),
   }
   self.lerpVec = self.player.pos
 end
