@@ -35,6 +35,7 @@ local yellowColor = { 1, 1, 0, 1 }
 
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
+local lerpSpeed = 5
 
 local instructions1 = ''
   .. 'Move your troops with arrow keys.'
@@ -253,8 +254,6 @@ end
 local function drawGame(game)
   love.graphics.push('transform')
 
-  game.lerpVec = vector.lerp(game.lerpVec, game.player.pos, 0.04)
-
   draw.centerCameraOn(game.lerpVec)
 
   -- Draw terrain
@@ -336,6 +335,12 @@ end
 
 ---@param dt number
 function game:update(dt)
+  game.lerpVec = vector.lerp(
+    game.lerpVec,
+    game.player.pos,
+    dt * lerpSpeed
+  )
+
   for _, battle in ipairs(self.battles) do
     battle.timer = battle.timer - dt
     if battle.timer < 0 then
