@@ -21,6 +21,9 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Cursor
  - [x] Build houses with cursor
  - [x] Mouselook
+ - [ ] Zoom in/out
+ - [ ] Minimap
+ - [ ] FOV
  - [ ] Workshop where foundations of buildings are made
  - [ ] A group of units must carry foundation to its place
  - [ ] Then unit carries wood to the site and builds the thing
@@ -33,6 +36,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [ ] Town hall
  - [ ] Tavern
  - [ ] Day/night cycle
+ - [ ] Dynamic lighting
  - [ ] Order guys to chop trees
  - [ ] RPG stats
  - [ ] Mushrooms

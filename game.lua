@@ -348,7 +348,7 @@ function game:update(dt)
       local winner, loser = fight(battle.attacker, battle.defender)
       unfreeze(winner)
       maybeDrop(game.guys, loser)
-      game.squad.followers = nil
+      game.squad.followers[loser] = nil
       if loser == game.player then
         game.onLost()
       end
