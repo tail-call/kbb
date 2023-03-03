@@ -250,16 +250,16 @@ local function countFollowers(squad)
   return counter
 end
 
-function game:draw()
+local function drawGame(game)
   love.graphics.push('transform')
 
-  self.lerpVec = vector.lerp(self.lerpVec, self.player.pos, 0.04)
+  game.lerpVec = vector.lerp(game.lerpVec, game.player.pos, 0.04)
 
-  draw.centerCameraOn(self.lerpVec)
+  draw.centerCameraOn(game.lerpVec)
 
   -- Draw terrain
 
-  drawWorld(self.world)
+  drawWorld(game.world)
 
   -- Draw in-game objects
 
@@ -270,10 +270,10 @@ function game:draw()
     draw.house(building.pos)
   end
 
-  draw.drawGuys(self.guys, isFrozen)
+  draw.drawGuys(game.guys, isFrozen)
 
-  if self.recruitCircle then
-    for _, guy in tbl.ifilter(self.guys, function (guy)
+  if game.recruitCircle then
+    for _, guy in tbl.ifilter(game.guys, function (guy)
       return mayRecruit(guy)
     end) do
       draw.recruitableHighlight(guy.pos)
@@ -284,8 +284,8 @@ function game:draw()
     draw.battle(battle.pos)
   end
 
-  if self.recruitCircle then
-    draw.recruitCircle(self.player.pos, self.recruitCircle)
+  if game.recruitCircle then
+    draw.recruitCircle(game.player.pos, game.recruitCircle)
   end
 
   -- Draw cursor
@@ -320,9 +320,9 @@ function game:draw()
   -- Draw HUD
 
   draw.hud(
-    countFollowers(self.squad),
-    self.squad.shouldFollow,
-    self.resources
+    countFollowers(game.squad),
+    game.squad.shouldFollow,
+    game.resources
   )
 end
 
@@ -397,4 +397,7 @@ function game:orderChop()
   end
 end
 
-return game
+return {
+  game = game,
+  drawGame = drawGame,
+}

@@ -1,5 +1,6 @@
 local draw = require('./draw')
-local game = require('./game')
+local game = require('./game').game
+local drawGame = require('./game').drawGame
 local tbl = require('./tbl')
 local vector = require('./vector')
 local gameover = require('./gameover')
@@ -76,7 +77,7 @@ end
 function love.draw()
   draw.prepareFrame()
   if state == 'game' then
-    game:draw()
+    drawGame(game)
   else
     gameover.draw()
   end
