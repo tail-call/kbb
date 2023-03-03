@@ -1,6 +1,7 @@
 local draw = require('./draw')
 local game = require('./game').game
 local drawGame = require('./game').drawGame
+local switchMagn = require('./game').switchMagn
 local tbl = require('./tbl')
 local vector = require('./vector')
 local gameover = require('./gameover')
@@ -42,6 +43,10 @@ function love.keypressed(key, scancode, isrepeat)
 
   if scancode == 'g' then
     game:dismissSquad()
+  end
+
+  if scancode == 'z' then
+    switchMagn()
   end
 
   if scancode == 'c' then

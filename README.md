@@ -21,7 +21,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Cursor
  - [x] Build houses with cursor
  - [x] Mouselook
- - [ ] Zoom in/out
+ - [x] Zoom in/out
  - [ ] Minimap
  - [ ] FOV
  - [ ] Workshop where foundations of buildings are made
@@ -38,6 +38,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [ ] Day/night cycle
  - [ ] Dynamic lighting
  - [ ] Order guys to chop trees
+ - [ ] Noisy texture details when zooming in
  - [ ] RPG stats
  - [ ] Mushrooms
  - [ ] Daily routines

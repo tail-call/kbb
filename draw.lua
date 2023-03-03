@@ -69,10 +69,12 @@ local function init()
 end
 
 ---@param pos Vector
-local function centerCameraOn(pos)
+---@param magn number
+local function centerCameraOn(pos, magn)
+  love.graphics.scale(magn)
   love.graphics.translate(
-    math.floor(screenWidth/2 - 8 - pos.x * tileWidth),
-    math.floor(screenHeight/2 - tileHeight/2- pos.y * tileHeight)
+    math.floor(screenWidth/magn/2 - 8 - pos.x * tileWidth),
+    math.floor(screenHeight/magn/2 - tileHeight/2- pos.y * tileHeight)
   )
 end
 

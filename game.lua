@@ -48,7 +48,9 @@ local instructions1 = ''
   .. '\n\n'
   .. 'C to chop wood.'
   .. '\n\n'
-  .. 'B to biuld a house (5 wood).'
+  .. 'Click to biuld a house (5 wood).'
+  .. '\n\n'
+  .. 'Z to switch camera zoom.'
 
 local instructions2 = ''
   .. 'Your enemies are red. Bump into them to fight.'
@@ -91,6 +93,7 @@ local game = {
   onLost = nil,
   ---@type Vector
   cursorPos = { x = 0, y = 0 },
+  magnificationFactor = 1,
 }
 
 ---@param guy Guy
@@ -254,9 +257,9 @@ end
 local function drawGame(game)
   love.graphics.push('transform')
 
-  draw.centerCameraOn(game.lerpVec)
-
   -- Draw terrain
+
+  draw.centerCameraOn(game.lerpVec, game.magnificationFactor)
 
   drawWorld(game.world)
 
@@ -295,7 +298,7 @@ local function drawGame(game)
     local collision = collider(nil, cursorPos)
     local cursorColor = whiteColor
 
-    local tile = getTile(game.world, cursorPos)
+    local tile = getTile(game.world, cursorPos) or '???'
 
     if collision.type == 'guy' then
       cursorColor = yellowColor
@@ -402,7 +405,18 @@ function game:orderChop()
   end
 end
 
+local function switchMagn()
+  if game.magnificationFactor == 1 then
+    game.magnificationFactor = 0.5
+  elseif game.magnificationFactor == 0.5 then
+    game.magnificationFactor = 2
+  else
+    game.magnificationFactor = 1
+  end
+end
+
 return {
   game = game,
   drawGame = drawGame,
+  switchMagn = switchMagn,
 }
