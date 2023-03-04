@@ -23,6 +23,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Mouselook
  - [x] Zoom in/out
  - [ ] Minimap
+ - [ ] Squad's turn follows cursor
  - [ ] FOV
  - [ ] Workshop where foundations of buildings are made
  - [ ] A group of units must carry foundation to its place

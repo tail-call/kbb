@@ -34,7 +34,7 @@ local function load()
   local function tile(x, y)
     return love.graphics.newQuad(
       x * 16, y * 16, 16, 16,
-      image:getWidth(), image:getHeight()
+      image:getDimensions()
     )
   end
 

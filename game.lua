@@ -196,6 +196,7 @@ function game:init()
     followers = tbl.weaken({}, 'k'),
   }
   self.lerpVec = self.player.pos
+  self.cursorPos = self.player.pos
 end
 
 ---@param guy Guy

@@ -44,7 +44,7 @@ function Pixie:move(pos)
     self.flip = true
   end
   local vDirection = pos.y - self.pos.y
-  if not (direction == 0) then
+  if direction ~= 0 then
     self.transform:translate(16, 4)
     self.transform:scale(1.5, 0.5)
     self.transform:translate(-16, 0)
