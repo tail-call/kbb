@@ -262,7 +262,13 @@ end
 
 ---@param world World
 local function drawWorld(world)
-  love.graphics.draw(world.tiles)
+  for y = 1, world.height do
+    for x = 1, world.width do
+      love.graphics.draw(tileset.tiles, tileset.quads[
+        world.tileTypes[world.width * (y - 1) + x] or 'water'
+      ], x * 16, y * 16)
+    end
+  end
 end
 
 return {

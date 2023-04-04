@@ -5,13 +5,10 @@ local draw = require('./draw')
 ---@class World
 ---@field width integer
 ---@field height integer
----@field tiles love.SpriteBatch
 ---@field tileTypes WorldTile[]
 
 ---@return World
 local function newWorld()
-  local tileset = draw.getTileset()
-
   local width = 40
   local height = 26
 
@@ -19,20 +16,15 @@ local function newWorld()
   local world = {
     width = width,
     height = height,
-    tiles = love.graphics.newSpriteBatch(
-      tileset.tiles,
-      width * height
-    ),
     tileTypes = {}
   }
 
-return world
+  return world
 end
 
 ---@param filename string
 ---@return World
 local function loadWorld(filename)
-  local tileset = draw.getTileset()
   local data = love.image.newImageData(filename)
 
   local width = data:getWidth()
@@ -42,10 +34,6 @@ local function loadWorld(filename)
   local world = {
     width = width,
     height = height,
-    tiles = love.graphics.newSpriteBatch(
-      tileset.tiles,
-      width * height
-    ),
     tileTypes = {}
   }
 
@@ -66,7 +54,6 @@ local function loadWorld(filename)
       local tileType = tileColors[
         string.format('%s,%s,%s', r, g, b)
       ] or tileColors.default
-      world.tiles:add(tileset.quads[tileType], (x + 1) * 16, (y + 1) * 16)
       table.insert(world.tileTypes, tileType)
     end
   end
@@ -96,7 +83,6 @@ local function setTile(world, v, t)
 
   local id = vToTile(world, v)
   world.tileTypes[id] = t
-  world.tiles:set(id, tileset.quads[t], v.x * 16, v.y * 16)
 end
 
 ---@param world World
