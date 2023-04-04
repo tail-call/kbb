@@ -55,22 +55,20 @@ local function loadWorld(filename)
       r = math.floor(r*2)/2
       g = math.floor(g*2)/2
       b = math.floor(b*2)/2
+      local tileType
       if r == 0 and g == 0 and b == 1 then
-        world.tiles:add(tileset.quads.water, (x + 1) * 16, (y + 1) * 16)
-        table.insert(world.tileTypes, 'water')
+        tileType = 'water'
       elseif r == 0 and g == 0.5 and b == 0 then
-        world.tiles:add(tileset.quads.forest, (x + 1) * 16, (y + 1) * 16)
-        table.insert(world.tileTypes, 'forest')
+        tileType = 'forest'
       elseif r == 0.5 and g == 0.5 and b == 0.5 then
-        world.tiles:add(tileset.quads.rock, (x + 1) * 16, (y + 1) * 16)
-        table.insert(world.tileTypes, 'rock')
+        tileType = 'rock'
       elseif r == 1 and g == 1 and b == 0 then
-        world.tiles:add(tileset.quads.sand, (x + 1) * 16, (y + 1) * 16)
-        table.insert(world.tileTypes, 'sand')
+        tileType = 'sand'
       else
-        world.tiles:add(tileset.quads.grass, (x + 1) * 16, (y + 1) * 16)
-        table.insert(world.tileTypes, 'grass')
+        tileType = 'grass'
       end
+      world.tiles:add(tileset.quads[tileType], (x + 1) * 16, (y + 1) * 16)
+      table.insert(world.tileTypes, tileType)
     end
   end
 
