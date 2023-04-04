@@ -192,15 +192,16 @@ end
 ---@param guy Guy
 local function drawGuy(guy)
   drawPixie(guy.pixie)
-  withTransform(
-    love.math.newTransform(
-      guy.pos.x * tileWidth,
-      guy.pos.y * tileHeight - tileHeight / 4
-    ):apply(shrinkTransform),
-    function ()
-      love.graphics.print(guy.team)
-    end
-  )
+
+  -- withTransform(
+  --   love.math.newTransform(
+  --     guy.pos.x * tileWidth,
+  --     guy.pos.y * tileHeight - tileHeight / 4
+  --   ):apply(shrinkTransform),
+  --   function ()
+  --     love.graphics.print(guy.team)
+  --   end
+  -- )
 end
 
 ---@param guys Guy[]
@@ -259,6 +260,11 @@ local function cursor(pos)
   )
 end
 
+---@param world World
+local function drawWorld(world)
+  love.graphics.draw(world.tiles)
+end
+
 return {
   battle = battle,
   centerCameraOn = centerCameraOn,
@@ -279,4 +285,5 @@ return {
   drawPixie = drawPixie,
   getCursorCoords = getCursorCoords,
   cursor = cursor,
+  drawWorld = drawWorld,
 }

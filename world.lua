@@ -9,11 +9,6 @@ local draw = require('./draw')
 ---@field tiles love.SpriteBatch
 ---@field tileTypes WorldTile[]
 
----@param world World
-local function drawWorld(world)
-  love.graphics.draw(world.tiles)
-end
-
 ---@param v Vector
 ---@return boolean
 local function isWater(v)
@@ -174,7 +169,6 @@ end
 
 return {
   newWorld = newWorld,
-  drawWorld = drawWorld,
   isPassable = isPassable,
   setTile = setTile,
   getTile = getTile,

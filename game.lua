@@ -5,7 +5,6 @@ local updateGuy = require('./guy').updateGuy
 local loadWorld = require('./world').loadWorld
 local setTile = require('./world').setTile
 local getTile = require('./world').getTile
-local drawWorld = require('./world').drawWorld
 local isPassable = require('./world').isPassable
 local draw = require('./draw')
 local tbl = require('./tbl')
@@ -262,7 +261,7 @@ local function drawGame(game)
 
   draw.centerCameraOn(game.lerpVec, game.magnificationFactor)
 
-  drawWorld(game.world)
+  draw.drawWorld(game.world)
 
   -- Draw in-game objects
 
