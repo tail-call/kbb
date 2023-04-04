@@ -1,4 +1,3 @@
-local vector = require('./vector')
 local draw = require('./draw')
 
 ---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand'
@@ -8,45 +7,6 @@ local draw = require('./draw')
 ---@field height integer
 ---@field tiles love.SpriteBatch
 ---@field tileTypes WorldTile[]
-
----@param v Vector
----@return boolean
-local function isWater(v)
-  return v.x > 10 and v.x < 20 and v.y > 4 and v.y < 8
-end
-
----@param v Vector
----@return boolean
-local function isForest(v)
-  return v.x >= 3 and v.x <= 38 and v.y >= 18 and v.y <= 24
-end
-
----@param world World
----@param v Vector
----@return boolean
-local function isGrass(world, v)
-  if isWater(v) then
-    return false
-  end
-  if vector.equal(v, { x = 4, y = 4 }) then
-    return true
-  end
-  if vector.equal(v, { x = 16, y = 16 }) then
-    return true
-  end
-  if
-    v.x == 1
-    or v.y == 4
-    or v.x == world.width
-    or v.y == 1
-    or v.y == world.height
-  then
-    return false
-  else
-    return true
-  end
-end
-
 
 ---@return World
 local function newWorld()
@@ -66,25 +26,7 @@ local function newWorld()
     tileTypes = {}
   }
 
-  for y = 1, world.height do
-    for x = 1, world.width do
-      if isWater{ x = x, y = y } then
-        world.tiles:add(tileset.quads.water, x * 16, y * 16)
-        table.insert(world.tileTypes, 'water')
-      elseif isForest{ x = x, y = y } then
-        world.tiles:add(tileset.quads.forest, x * 16, y * 16)
-        table.insert(world.tileTypes, 'forest')
-      elseif isGrass(world, { x = x, y = y }) then
-        world.tiles:add(tileset.quads.grass, x * 16, y * 16)
-        table.insert(world.tileTypes, 'grass')
-      else
-        world.tiles:add(tileset.quads.rock, x * 16, y * 16)
-        table.insert(world.tileTypes, 'rock')
-      end
-    end
-  end
-
-  return world
+return world
 end
 
 ---@param filename string
