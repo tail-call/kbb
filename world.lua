@@ -49,24 +49,23 @@ local function loadWorld(filename)
     tileTypes = {}
   }
 
+  local tileColors = {
+    ['0,0,1'] = 'water',
+    ['0,0.5,0'] = 'forest',
+    ['0.5,0.5,0.5'] = 'rock',
+    ['1,1,0'] = 'sand',
+    default = 'grass',
+  }
+
   for y = 0, data:getHeight() - 1 do
     for x = 0, data:getWidth() - 1 do
       local r, g, b = data:getPixel(x, y)
       r = math.floor(r*2)/2
       g = math.floor(g*2)/2
       b = math.floor(b*2)/2
-      local tileType
-      if r == 0 and g == 0 and b == 1 then
-        tileType = 'water'
-      elseif r == 0 and g == 0.5 and b == 0 then
-        tileType = 'forest'
-      elseif r == 0.5 and g == 0.5 and b == 0.5 then
-        tileType = 'rock'
-      elseif r == 1 and g == 1 and b == 0 then
-        tileType = 'sand'
-      else
-        tileType = 'grass'
-      end
+      local tileType = tileColors[
+        string.format('%s,%s,%s', r, g, b)
+      ] or tileColors.default
       world.tiles:add(tileset.quads[tileType], (x + 1) * 16, (y + 1) * 16)
       table.insert(world.tileTypes, tileType)
     end
