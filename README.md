@@ -2,6 +2,12 @@
 
 See https://github.com/LuaLS/lua-language-server/wiki/Annotations
 
+# Plot
+
+You're a magical kobold princess. You lead your tribe to the prosperity.
+
+You have psy abilities, so your cursor has FOV just like you do.
+
 # Plan
 
  - [x] Load from images and stuff
