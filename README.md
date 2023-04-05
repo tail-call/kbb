@@ -25,7 +25,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] FOV
  - [x] Focus mode
  - [x] Build with B
- - [ ] Hold LMB to show tile info
+ - [x] Press LMB to show tile info
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions
  - [ ] Minimap

@@ -303,18 +303,19 @@ local function drawGame(game)
   -- Draw cursor
 
   local cx, cy = draw.getCursorCoords()
+  local tileUnderCursor
   do
     local cursorPos = { x = cx, y = cy }
-    local collision = collider(nil, cursorPos)
     local cursorColor = whiteColor
-
-    local tile = getTile(game.world, cursorPos) or '???'
 
     if game.isFocused then
       cursorColor = yellowColor
     else
       game.cursorPos = cursorPos
     end
+
+    tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
+    local collision = collider(nil, game.cursorPos)
 
     if collision.type == 'terrain' then
       cursorColor = redColor
@@ -323,16 +324,6 @@ local function drawGame(game)
     local r, g, b, a = unpack(cursorColor)
     draw.withColor(r, g, b, a, function ()
       draw.cursor(game.cursorPos)
-      draw.textAtTile(
-        string.format(
-          '(%s,%s)\n%s',
-          game.cursorPos.x,
-          game.cursorPos.y,
-          tile
-        ),
-        vector.add(game.cursorPos, { x = -1.5, y = -2 }),
-        8
-      )
     end)
   end
 
@@ -345,6 +336,17 @@ local function drawGame(game)
     game.squad.shouldFollow,
     game.resources
   )
+
+  if game.isFocused then
+    love.graphics.print(
+      string.format(
+        'Terrain: %s\nCoords: (%s,%s)\n',
+        tileUnderCursor,
+        game.cursorPos.x,
+        game.cursorPos.y
+      ), 0, 8
+    )
+  end
 end
 
 local function fight(attacker, defender)
