@@ -48,8 +48,6 @@ local instructions1 = ''
   .. '\n\n'
   .. 'C to chop wood.'
   .. '\n\n'
-  .. 'B to build a house (5 wood).'
-  .. '\n\n'
   .. 'Z to switch camera zoom.'
 
 local instructions2 = ''
@@ -205,6 +203,7 @@ end
 ---@param guy Guy
 ---@return boolean
 local function mayRecruit(guy)
+  if not game.recruitCircle then return false end
   if guy == game.player then return false end
   if game.squad.followers[guy] then return false end
   if not canRecruitGuy(guy) then return false end
@@ -340,7 +339,7 @@ local function drawGame(game)
   if game.isFocused then
     love.graphics.print(
       string.format(
-        'Terrain: %s\nCoords: (%s,%s)\n',
+        'Terrain: %s\nCoords: (%s,%s)\nPress B to build a house (5 wood)',
         tileUnderCursor,
         game.cursorPos.x,
         game.cursorPos.y
@@ -412,6 +411,7 @@ function game:orderBuild()
   end
   game.resources.wood = game.resources.wood - 5
   table.insert(game.buildings, { pos = pos })
+  game.isFocused = false
 end
 
 local function maybeChop(guy)

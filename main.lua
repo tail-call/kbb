@@ -33,37 +33,39 @@ end
 function love.keypressed(key, scancode, isrepeat)
   if state ~= 'game' then return end
 
-  if tbl.has({ '1', '2', '3', '4' }, scancode) then
-    draw.setZoom(tonumber(scancode))
-  end
-
-  if scancode == 'f' then
-    game:toggleFollow()
-  end
-
-  if scancode == 'g' then
-    game:dismissSquad()
-  end
-
   if scancode == 'z' then
     switchMagn()
   end
 
-  if scancode == 'c' then
-    game:orderChop()
-  end
+  if game.isFocused then
+    if scancode == 'b' then
+      game:orderBuild()
+    end
+  else
+    if tbl.has({ '1', '2', '3', '4' }, scancode) then
+      draw.setZoom(tonumber(scancode))
+    end
 
-  if scancode == 'space' then
-    game:beginRecruiting()
-  end
+    if scancode == 'f' then
+      game:toggleFollow()
+    end
 
-  if scancode == 'b' then
-    game:orderBuild()
-  end
+    if scancode == 'g' then
+      game:dismissSquad()
+    end
 
-  local vec = vector.dir[scancode]
-  if vec then
-    game:orderMove(vec)
+    if scancode == 'c' then
+      game:orderChop()
+    end
+
+    if scancode == 'space' then
+      game:beginRecruiting()
+    end
+
+    local vec = vector.dir[scancode]
+    if vec then
+      game:orderMove(vec)
+    end
   end
 end
 
