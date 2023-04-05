@@ -37,15 +37,15 @@ function love.keypressed(key, scancode, isrepeat)
     switchMagn()
   end
 
+  if tbl.has({ '1', '2', '3', '4' }, scancode) then
+    draw.setZoom(tonumber(scancode))
+  end
+
   if game.isFocused then
     if scancode == 'b' then
       game:orderBuild()
     end
   else
-    if tbl.has({ '1', '2', '3', '4' }, scancode) then
-      draw.setZoom(tonumber(scancode))
-    end
-
     if scancode == 'f' then
       game:toggleFollow()
     end
