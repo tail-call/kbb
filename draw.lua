@@ -261,9 +261,10 @@ local function cursor(pos)
 end
 
 ---@param world World
-local function drawWorld(world)
-  for y = 1, world.height do
-    for x = 1, world.width do
+---@param pos Vector
+local function drawWorld(world, pos)
+  for y = pos.y - 50, pos.y + 50 do
+    for x = pos.x - 50, pos.x + 50 do
       love.graphics.draw(tileset.tiles, tileset.quads[
         world.tileTypes[world.width * (y - 1) + x] or 'water'
       ], x * 16, y * 16)
