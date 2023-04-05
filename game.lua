@@ -269,6 +269,7 @@ local function drawGame(game)
       draw.drawWorld(game.world, guy.pos, 10)
     end
   end
+  draw.drawWorld(game.world, game.cursorPos, 2)
 
   -- Draw in-game objects
 

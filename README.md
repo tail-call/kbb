@@ -23,10 +23,14 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Mouselook
  - [x] Zoom in/out
  - [x] FOV
+ - [ ] Build with B
  - [ ] Hold LMB to show tile info
+ - [ ] Unit and terrain are stacked like cards
+ - [ ] Cards have actions
  - [ ] Minimap
- - [ ] Fog of war
+ - [ ] Buried treasures
  - [ ] Squad's turn follows cursor
+ - [ ] Fog of war
  - [ ] Workshop where foundations of buildings are made
  - [ ] A group of units must carry foundation to its place
  - [ ] Then unit carries wood to the site and builds the thing
