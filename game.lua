@@ -16,6 +16,7 @@ local vector = require('./vector')
 ---@class Squad
 ---@field shouldFollow boolean
 ---@field followers { [Guy]: true }
+---@field frozenGuys { [Guy]: true }
 
 ---@class Resources
 ---@field pretzels integer
@@ -80,6 +81,7 @@ local game = {
   ---@type Squad
   squad = {
     frozenGuys = tbl.weaken({}, 'k'),
+    followers = {},
     shouldFollow = false,
   },
   ---@type Building[]
@@ -262,6 +264,11 @@ local function drawGame(game)
   draw.centerCameraOn(game.lerpVec, game.magnificationFactor)
 
   draw.drawWorld(game.world, game.player.pos, 10)
+  for _, guy in ipairs(game.guys) do
+    if guy.team == 'good' then
+      draw.drawWorld(game.world, guy.pos, 10)
+    end
+  end
 
   -- Draw in-game objects
 

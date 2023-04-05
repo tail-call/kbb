@@ -264,13 +264,18 @@ end
 ---@param pos Vector
 ---@param visionDistance number
 local function drawWorld(world, pos, visionDistance)
-  for y = pos.y - 50, pos.y + 50 do
-    for x = pos.x - 50, pos.x + 50 do
-      local dist = vector.sub(pos, { x = x, y = y })
-      if dist.x ^ 2 + dist.y ^ 2 < visionDistance ^ 2 then
-        love.graphics.draw(tileset.tiles, tileset.quads[
-          world.tileTypes[world.width * (y - 1) + x] or 'water'
-        ], x * 16, y * 16)
+  local vd2 = visionDistance ^ 2
+  for y = pos.y - visionDistance, pos.y + visionDistance do
+    for x = pos.x - visionDistance, pos.x + visionDistance do
+      local dir = vector.sub(pos, { x = x, y = y })
+      local dist = vd2 - dir.x ^ 2 - dir.y ^ 2
+      if dist > 0 then
+        local alpha = 1 - (1 - (math.sqrt(dist) / visionDistance)) ^ 2
+        withColor(1, 1, 1, alpha, function ()
+          love.graphics.draw(tileset.tiles, tileset.quads[
+            world.tileTypes[world.width * (y - 1) + x] or 'water'
+          ], x * tileWidth, y * tileHeight)
+        end)
       end
     end
   end
