@@ -29,9 +29,9 @@ local vector = require('./vector')
 ---@field pos Vector
 ---@field timer number
 
-local whiteColor = { 1, 1, 1, 1 }
-local redColor = { 1, 0, 0, 1 }
-local yellowColor = { 1, 1, 0, 1 }
+local whiteColor = { 1, 1, 1, 0.8 }
+local redColor = { 1, 0, 0, 0.8 }
+local yellowColor = { 1, 1, 0, 0.8 }
 
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
@@ -317,7 +317,7 @@ local function drawGame(game)
       draw.cursor(cursorPos)
       draw.textAtTile(
         '(' .. cx .. ',' .. cy .. ')\n' .. tile,
-        vector.add(cursorPos, { x = 0, y = 1 }),
+        vector.add(cursorPos, { x = -1.5, y = -2 }),
         8
       )
     end)

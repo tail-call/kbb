@@ -268,7 +268,7 @@ local function drawWorld(world, pos, visionDistance)
   for y = pos.y - visionDistance, pos.y + visionDistance do
     for x = pos.x - visionDistance, pos.x + visionDistance do
       local dir = vector.sub(pos, { x = x, y = y })
-      local dist = vd2 - dir.x ^ 2 - dir.y ^ 2
+      local dist = vd2 - dir.x ^ 2 - dir.y ^ 2 + 2
       if dist > 0 then
         local alpha = 1 - (1 - (math.sqrt(dist) / visionDistance)) ^ 2
         withColor(1, 1, 1, alpha, function ()
