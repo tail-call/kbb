@@ -261,7 +261,7 @@ local function drawGame(game)
 
   draw.centerCameraOn(game.lerpVec, game.magnificationFactor)
 
-  draw.drawWorld(game.world, game.player.pos)
+  draw.drawWorld(game.world, game.player.pos, 10)
 
   -- Draw in-game objects
 

@@ -4,6 +4,7 @@ local regenerateTileset = require('./tileset').regenerate
 local loadFont = require('./font').load
 local pix = require('./pixie')
 local tbl = require('./tbl')
+local vector = require('./vector')
 
 -- Constants
 
@@ -13,7 +14,6 @@ local tileHeight = 16
 local tileWidth = 16
 local whiteColor = { 1, 1, 1, 1 }
 local grayColor = { 0.5, 0.5, 0.5, 1 }
-local shrinkTransform = love.math.newTransform():scale(1/2)
 
 local sky = love.graphics.newMesh({
   {
@@ -262,12 +262,16 @@ end
 
 ---@param world World
 ---@param pos Vector
-local function drawWorld(world, pos)
+---@param visionDistance number
+local function drawWorld(world, pos, visionDistance)
   for y = pos.y - 50, pos.y + 50 do
     for x = pos.x - 50, pos.x + 50 do
-      love.graphics.draw(tileset.tiles, tileset.quads[
-        world.tileTypes[world.width * (y - 1) + x] or 'water'
-      ], x * 16, y * 16)
+      local dist = vector.sub(pos, { x = x, y = y })
+      if dist.x ^ 2 + dist.y ^ 2 < visionDistance ^ 2 then
+        love.graphics.draw(tileset.tiles, tileset.quads[
+          world.tileTypes[world.width * (y - 1) + x] or 'water'
+        ], x * 16, y * 16)
+      end
     end
   end
 end
