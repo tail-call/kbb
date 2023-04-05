@@ -314,7 +314,9 @@ local function drawGame(game)
     end
     local r, g, b, a = unpack(cursorColor)
     draw.withColor(r, g, b, a, function ()
-      draw.cursor(cursorPos)
+      if collision.type ~= 'terrain' then
+        draw.cursor(cursorPos)
+      end
       draw.textAtTile(
         '(' .. cx .. ',' .. cy .. ')\n' .. tile,
         vector.add(cursorPos, { x = -1.5, y = -2 }),

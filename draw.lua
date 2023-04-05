@@ -42,6 +42,8 @@ local sky = love.graphics.newMesh({
 
 local highlightCircleRadius = 10
 local zoom = 1
+local cursorTimer = 0
+local cursorTimerSpeed = 2
 local battleTimer = 0
 local battleTimerSpeed = 2
 
@@ -123,6 +125,7 @@ end
 
 local function update(dt)
   battleTimer = (battleTimer + battleTimerSpeed * dt) % 1
+  cursorTimer = (cursorTimer + cursorTimerSpeed * dt) % (math.pi * 2)
   updateTileset(tileset, dt)
 end
 
@@ -251,13 +254,22 @@ end
 
 ---@param pos Vector
 local function cursor(pos)
-  return love.graphics.rectangle(
-    'line',
-    pos.x * tileWidth,
-    pos.y * tileHeight,
-    tileWidth,
-    tileHeight
+  local invSqrt2 = 1/math.sqrt(2)
+  local mInvSqrt2 = 1 - invSqrt2
+
+  local transform = love.math.newTransform(
+    pos.x * tileWidth + tileWidth / 2,
+    pos.y * tileHeight + tileHeight / 2
   )
+    :rotate(cursorTimer)
+    :scale(mInvSqrt2 * math.cos(cursorTimer * 4 + 4 * math.pi/2) / 2 + invSqrt2)
+    :translate(-tileWidth/2, -tileHeight/2)
+
+  withTransform(transform, function ()
+    love.graphics.rectangle(
+      'line', 0, 0, tileWidth, tileHeight
+    )
+  end)
 end
 
 ---@param world World
