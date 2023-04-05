@@ -48,7 +48,7 @@ local instructions1 = ''
   .. '\n\n'
   .. 'C to chop wood.'
   .. '\n\n'
-  .. 'Click to biuld a house (5 wood).'
+  .. 'B to build a house (5 wood).'
   .. '\n\n'
   .. 'Z to switch camera zoom.'
 
@@ -95,6 +95,8 @@ local game = {
   ---@type Vector
   cursorPos = { x = 0, y = 0 },
   magnificationFactor = 1,
+  ---@type boolean
+  isFocused = false,
 }
 
 ---@param guy Guy
@@ -308,23 +310,30 @@ local function drawGame(game)
 
     local tile = getTile(game.world, cursorPos) or '???'
 
-    if collision.type == 'guy' then
+    if game.isFocused then
       cursorColor = yellowColor
-    elseif collision.type == 'terrain' then
+    else
+      game.cursorPos = cursorPos
+    end
+
+    if collision.type == 'terrain' then
       cursorColor = redColor
     end
+
     local r, g, b, a = unpack(cursorColor)
     draw.withColor(r, g, b, a, function ()
-      if collision.type ~= 'terrain' then
-        draw.cursor(cursorPos)
-      end
+      draw.cursor(game.cursorPos)
       draw.textAtTile(
-        '(' .. cx .. ',' .. cy .. ')\n' .. tile,
-        vector.add(cursorPos, { x = -1.5, y = -2 }),
+        string.format(
+          '(%s,%s)\n%s',
+          game.cursorPos.x,
+          game.cursorPos.y,
+          tile
+        ),
+        vector.add(game.cursorPos, { x = -1.5, y = -2 }),
         8
       )
     end)
-    game.cursorPos = cursorPos
   end
 
   love.graphics.pop()
@@ -378,6 +387,10 @@ function game:update(dt)
       recruitCircleMaxRadius
     )
   end
+end
+
+function game:orderFocus()
+  game.isFocused = not game.isFocused
 end
 
 function game:orderBuild()

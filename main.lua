@@ -57,6 +57,10 @@ function love.keypressed(key, scancode, isrepeat)
     game:beginRecruiting()
   end
 
+  if scancode == 'b' then
+    game:orderBuild()
+  end
+
   local vec = vector.dir[scancode]
   if vec then
     game:orderMove(vec)
@@ -65,7 +69,7 @@ end
 
 function love.mousepressed(x, y, button, presses)
   if button == 1 then
-    game:orderBuild()
+    game:orderFocus()
   end
 end
 
