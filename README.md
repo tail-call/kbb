@@ -22,9 +22,9 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Build houses with cursor
  - [x] Mouselook
  - [x] Zoom in/out
+ - [x] FOV
  - [ ] Minimap
  - [ ] Squad's turn follows cursor
- - [ ] FOV
  - [ ] Workshop where foundations of buildings are made
  - [ ] A group of units must carry foundation to its place
  - [ ] Then unit carries wood to the site and builds the thing
