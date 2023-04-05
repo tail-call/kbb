@@ -2,6 +2,11 @@
 
 local vector
 
+local up = { x =  0, y = -1 }
+local down = { x =  0, y =  1 }
+local left = { x = -1, y =  0 }
+local right = { x =  1, y =  0 }
+
 vector = {
   ---@param v1 Vector
   ---@param v2 Vector
@@ -64,10 +69,18 @@ vector = {
   end,
 
   dir = {
-    up    = { x =  0, y = -1 },
-    down  = { x =  0, y =  1 },
-    left  = { x = -1, y =  0 },
-    right = { x =  1, y =  0 },
+    up = up,
+    down = down,
+    left = left,
+    right = right,
+    w = up,
+    a = left,
+    s = down,
+    d = right,
+    h = left,
+    j = down,
+    k = up,
+    ['l'] = right,
   },
 }
 

@@ -26,6 +26,7 @@ See https://github.com/LuaLS/lua-language-server/wiki/Annotations
  - [x] Focus mode
  - [x] Build with B
  - [x] Press LMB to show tile info
+ - [x] WASD and HJKL movement
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions
  - [ ] Minimap
