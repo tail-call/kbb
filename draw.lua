@@ -191,20 +191,6 @@ local function drawGuy(guy)
   -- )
 end
 
----@param guys Guy[]
----@param shouldSkip fun(guy: Guy): boolean
-local function drawGuys(guys, shouldSkip)
-  local guysClone = tbl.iclone(guys)
-  table.sort(guysClone, function (g1, g2)
-    return g1.pos.y < g2.pos.y
-  end)
-  for _, guy in ipairs(guysClone) do
-    if not shouldSkip(guy) then
-      drawGuy(guy)
-    end
-  end
-end
-
 ---@param text string
 ---@param pos Vector
 ---@param maxWidth integer
@@ -295,9 +281,9 @@ end
 local function drawGame(game)
   love.graphics.push('transform')
 
-  -- Draw terrain
-
   centerCameraOn(game.lerpVec, game.magnificationFactor)
+
+  -- Draw visible terrain
 
   drawWorld(game.world, game.player.pos, 10)
   for _, guy in ipairs(game.guys) do
@@ -317,15 +303,13 @@ local function drawGame(game)
     house(building.pos)
   end
 
-  drawGuys(game.guys, function (guy)
-    return game.isFrozen(guy)
+  local guysClone = tbl.iclone(game.guys)
+  table.sort(guysClone, function (g1, g2)
+    return g1.pos.y < g2.pos.y
   end)
-
-  if game.recruitCircle then
-    for _, guy in tbl.ifilter(game.guys, function (guy)
-      return game.mayRecruit(guy)
-    end) do
-      recruitableHighlight(guy.pos)
+  for _, guy in ipairs(guysClone) do
+    if not game.isFrozen(guy) then
+      drawGuy(guy)
     end
   end
 
@@ -335,6 +319,11 @@ local function drawGame(game)
 
   if game.recruitCircle then
     recruitCircle(game.player.pos, game.recruitCircle)
+    for _, guy in tbl.ifilter(game.guys, function (guy)
+      return game.mayRecruit(guy)
+    end) do
+      recruitableHighlight(guy.pos)
+    end
   end
 
   -- Draw cursor
@@ -371,7 +360,6 @@ end
 return {
   battle = drawBattle,
   centerCameraOn = centerCameraOn,
-  drawGuys = drawGuys,
   getTileset = getTileset,
   hud = drawHud,
   init = init,
