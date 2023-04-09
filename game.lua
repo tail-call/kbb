@@ -6,6 +6,7 @@ local loadWorld = require('./world').loadWorld
 local setTile = require('./world').setTile
 local getTile = require('./world').getTile
 local isPassable = require('./world').isPassable
+local ui = require('./ui')
 local tbl = require('./tbl')
 local vector = require('./vector')
 
@@ -53,6 +54,7 @@ local vector = require('./vector')
 ---@field ui UI
 
 local whiteColor = { 1, 1, 1, 1 }
+local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
 local grayColor = { 0.5, 0.5, 0.5, 1 }
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
@@ -130,48 +132,29 @@ game = {
       maxWidth = 9,
     },
   },
-  ui = {
-    type = 'none',
-    x = 0,
-    y = 0,
-    children = {
-      ---@type PanelUI
-      {
-        type = 'panel',
-        x = 0,
-        y = 0,
-        w = 320,
-        h = 8,
-        background = { r = 0, g = 0, b = 0, a = 1 },
-        coloredText = function ()
-          return {
-            whiteColor,
-            'Units: ',
-            game.squad.shouldFollow and whiteColor or grayColor,
-            '' .. countFollowers(game.squad)
-          }
-        end,
-        children = {},
-      },
-      ---@type PanelUI
-      {
-        type = 'panel',
-        x = 0,
-        y = 200 - 8,
-        w = 320,
-        h = 8,
-        background = { r = 0, g = 0, b = 0, a = 1 },
-        text = function ()
-          return string.format(
-            'Wood: %s | Stone: %s | Pretzels: %s',
-            game.resources.wood,
-            game.resources.stone,
-            game.resources.pretzels
-          )
-        end,
-        children = {},
-      },
-    },
+  ui = ui.makeRoot {
+    ---@type PanelUI
+    ui.makePanel(0, 0, 320, 8, blackPanelColor, {
+      coloredText = function ()
+        return {
+          whiteColor,
+          'Units: ',
+          game.squad.shouldFollow and whiteColor or grayColor,
+          '' .. countFollowers(game.squad)
+        }
+      end
+    }),
+    ---@type PanelUI
+    ui.makePanel(0, 192, 320, 8, blackPanelColor, {
+      text = function ()
+        return string.format(
+          'Wood: %s | Stone: %s | Pretzels: %s',
+          game.resources.wood,
+          game.resources.stone,
+          game.resources.pretzels
+        )
+      end,
+    }),
   }
 }
 
