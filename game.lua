@@ -6,7 +6,6 @@ local loadWorld = require('./world').loadWorld
 local setTile = require('./world').setTile
 local getTile = require('./world').getTile
 local isPassable = require('./world').isPassable
-local draw = require('./draw')
 local tbl = require('./tbl')
 local vector = require('./vector')
 
@@ -29,31 +28,9 @@ local vector = require('./vector')
 ---@field pos Vector
 ---@field timer number
 
-local whiteColor = { 1, 1, 1, 0.8 }
-local redColor = { 1, 0, 0, 0.8 }
-local yellowColor = { 1, 1, 0, 0.8 }
-
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 local lerpSpeed = 5
-
-local instructions1 = ''
-  .. 'Move your troops with arrow keys.'
-  .. '\n\n'
-  .. 'Press 1, 2, 3, 4 to change window scale.'
-  .. '\n\n'
-  .. 'Press F to toggle follow mode.'
-  .. '\n\n'
-  .. 'G to dismiss squad.\n\nSpace to recruit units.'
-  .. '\n\n'
-  .. 'C to chop wood.'
-  .. '\n\n'
-  .. 'Z to switch camera zoom.'
-
-local instructions2 = ''
-  .. 'Your enemies are red. Bump into them to fight.'
-  .. '\n\n'
-  .. 'If your character dies, you lose.'
 
 ---@type CollisionInfo
 local noneCollision = { type = 'none' }
@@ -95,6 +72,24 @@ local game = {
   magnificationFactor = 1,
   ---@type boolean
   isFocused = false,
+  instructions = {
+    ''
+      .. 'Move your troops with arrow keys.'
+      .. '\n\n'
+      .. 'Press 1, 2, 3, 4 to change window scale.'
+      .. '\n\n'
+      .. 'Press F to toggle follow mode.'
+      .. '\n\n'
+      .. 'G to dismiss squad.\n\nSpace to recruit units.'
+      .. '\n\n'
+      .. 'C to chop wood.'
+      .. '\n\n'
+      .. 'Z to switch camera zoom.',
+    ''
+      .. 'Your enemies are red. Bump into them to fight.'
+      .. '\n\n'
+      .. 'If your character dies, you lose.',
+  },
 }
 
 ---@param guy Guy
@@ -109,12 +104,12 @@ end
 
 ---@param guy Guy
 ---@return boolean
-local function isFrozen(guy)
-  return game.frozenGuys[guy] or false
+function game:isFrozen(guy)
+  return self.frozenGuys[guy] or false
 end
 
 ---@type Collider
-local function collider(nothing, v)
+function game.collider(nothing, v)
   local otherGuy = tbl.find(game.guys, function (guy)
     return vector.equal(guy.pos, v)
   end)
@@ -156,7 +151,7 @@ local guyDelegate = {
       timer = 1,
     })
   end,
-  collider = collider,
+  collider = game.collider,
 }
 
 function game:init()
@@ -202,7 +197,7 @@ end
 
 ---@param guy Guy
 ---@return boolean
-local function mayRecruit(guy)
+ function game:mayRecruit(guy)
   if not game.recruitCircle then return false end
   if guy == game.player then return false end
   if game.squad.followers[guy] then return false end
@@ -226,7 +221,7 @@ end
 
 function game:endRecruiting()
   for _, guy in tbl.ifilter(self.guys, function (guy)
-    return mayRecruit(guy)
+    return game:mayRecruit(guy)
   end) do
     self.squad.followers[guy] = true
   end
@@ -237,114 +232,13 @@ end
 function game:orderMove(vec)
   if self.squad.shouldFollow then
     for guy in pairs(self.squad.followers) do
-      if not isFrozen(guy) then
+      if not game:isFrozen(guy) then
         moveGuy(guy, vec, guyDelegate)
       end
     end
   end
-  if not isFrozen(self.player) then
+  if not game:isFrozen(self.player) then
     moveGuy(self.player, vec, guyDelegate)
-  end
-end
-
----@param squad Squad
----@return integer
-local function countFollowers(squad)
-  local counter = 0
-  for _ in pairs(squad.followers) do
-    counter = counter + 1
-  end
-  return counter
-end
-
-local function drawGame(game)
-  love.graphics.push('transform')
-
-  -- Draw terrain
-
-  draw.centerCameraOn(game.lerpVec, game.magnificationFactor)
-
-  draw.drawWorld(game.world, game.player.pos, 10)
-  for _, guy in ipairs(game.guys) do
-    if guy.team == 'good' then
-      draw.drawWorld(game.world, guy.pos, 10)
-    end
-  end
-  draw.drawWorld(game.world, game.cursorPos, 2)
-
-  -- Draw in-game objects
-
-  draw.textAtTile(instructions1, { x = 268, y = 227 }, 8)
-  draw.textAtTile(instructions2, { x = 280, y = 227 }, 9)
-
-  for _, building in ipairs(game.buildings) do
-    draw.house(building.pos)
-  end
-
-  draw.drawGuys(game.guys, isFrozen)
-
-  if game.recruitCircle then
-    for _, guy in tbl.ifilter(game.guys, function (guy)
-      return mayRecruit(guy)
-    end) do
-      draw.recruitableHighlight(guy.pos)
-    end
-  end
-
-  for _, battle in ipairs(game.battles) do
-    draw.battle(battle.pos)
-  end
-
-  if game.recruitCircle then
-    draw.recruitCircle(game.player.pos, game.recruitCircle)
-  end
-
-  -- Draw cursor
-
-  local cx, cy = draw.getCursorCoords()
-  local tileUnderCursor
-  do
-    local cursorPos = { x = cx, y = cy }
-    local cursorColor = whiteColor
-
-    if game.isFocused then
-      cursorColor = yellowColor
-    else
-      game.cursorPos = cursorPos
-    end
-
-    tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
-    local collision = collider(nil, game.cursorPos)
-
-    if collision.type == 'terrain' then
-      cursorColor = redColor
-    end
-
-    local r, g, b, a = unpack(cursorColor)
-    draw.withColor(r, g, b, a, function ()
-      draw.cursor(game.cursorPos)
-    end)
-  end
-
-  love.graphics.pop()
-
-  -- Draw HUD
-
-  draw.hud(
-    countFollowers(game.squad),
-    game.squad.shouldFollow,
-    game.resources
-  )
-
-  if game.isFocused then
-    love.graphics.print(
-      string.format(
-        'Terrain: %s\nCoords: (%s,%s)\nPress B to build a house (5 wood)',
-        tileUnderCursor,
-        game.cursorPos.x,
-        game.cursorPos.y
-      ), 0, 8
-    )
   end
 end
 
@@ -380,7 +274,7 @@ function game:update(dt)
     end
   end
   for _, guy in ipairs(self.guys) do
-    if not isFrozen(guy) then
+    if not game:isFrozen(guy) then
       updateGuy(guy, dt, guyDelegate)
     end
   end
@@ -397,7 +291,7 @@ function game:orderFocus()
 end
 
 function game:orderBuild()
-  if isFrozen(game.player) then
+  if game:isFrozen(game.player) then
     return
   end
   if game.resources.wood < 5 then
@@ -415,7 +309,7 @@ function game:orderBuild()
 end
 
 local function maybeChop(guy)
-  if isFrozen(guy) then return end
+  if game:isFrozen(guy) then return end
 
   local pos = guy.pos
   local t = getTile(game.world, pos)
@@ -444,6 +338,5 @@ end
 
 return {
   game = game,
-  drawGame = drawGame,
   switchMagn = switchMagn,
 }

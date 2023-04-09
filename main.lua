@@ -1,6 +1,6 @@
 local draw = require('./draw')
 local game = require('./game').game
-local drawGame = require('./game').drawGame
+local drawGame = require('./draw').drawGame
 local switchMagn = require('./game').switchMagn
 local tbl = require('./tbl')
 local vector = require('./vector')

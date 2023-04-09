@@ -26,7 +26,13 @@ local function regenerate(tileset)
   end)
 end
 
----@return Tileset
+---@type Tileset
+local tileset
+
+local function getTileset()
+  return tileset
+end
+
 local function load()
   local image = love.graphics.newImage('tiles.png')
   local canvas = love.graphics.newCanvas(image:getWidth(), image:getHeight())
@@ -39,7 +45,7 @@ local function load()
   end
 
   ---@type Tileset
-  local tileset = {
+  local aTileset = {
     timer = 1,
     tiles = canvas,
     waterFrame = 4,
@@ -62,8 +68,8 @@ local function load()
     }
   }
 
-  regenerate(tileset)
-  return tileset
+  regenerate(aTileset)
+  tileset = aTileset
 end
 ---@param tileset Tileset
 ---@param dt number
@@ -88,4 +94,5 @@ return {
   load = load,
   update = update,
   regenerate = regenerate,
+  getTileset = getTileset,
 }

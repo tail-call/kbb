@@ -1,4 +1,4 @@
-local draw = require('./draw')
+local getTileset = require('./tileset').getTileset
 
 ---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand'
 
@@ -79,7 +79,7 @@ end
 ---@param v Vector
 ---@param t WorldTile
 local function setTile(world, v, t)
-  local tileset = draw.getTileset()
+  local tileset = getTileset()
 
   local id = vToTile(world, v)
   world.tileTypes[id] = t

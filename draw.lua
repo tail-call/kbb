@@ -1,10 +1,12 @@
 local loadTileset = require('./tileset').load
 local updateTileset = require('./tileset').update
+local getTileset = require('./tileset').getTileset
 local regenerateTileset = require('./tileset').regenerate
 local loadFont = require('./font').load
 local pix = require('./pixie')
 local tbl = require('./tbl')
 local vector = require('./vector')
+local getTile = require('./world').getTile
 
 -- Constants
 
@@ -17,6 +19,10 @@ local grayColor = { 0.5, 0.5, 0.5, 1 }
 local cursorTimerSpeed = 2
 local battleTimerSpeed = 2
 
+local whiteCursorColor = { 1, 1, 1, 0.8 }
+local redColor = { 1, 0, 0, 0.8 }
+local yellowColor = { 1, 1, 0, 0.8 }
+
 -- Variables
 
 local highlightCircleRadius = 10
@@ -24,16 +30,10 @@ local zoom = 1
 local cursorTimer = 0
 local battleTimer = 0
 
----@type Tileset
-local tileset
-
-local function getTileset()
-  return tileset
-end
-
 local function setZoom(z)
   zoom = z
   love.window.setMode(screenWidth * z, screenHeight * z)
+  local tileset = getTileset()
   if tileset then
     regenerateTileset(tileset)
   end
@@ -44,7 +44,7 @@ local function init()
   love.graphics.setDefaultFilter('linear', 'nearest')
   love.graphics.setFont(loadFont('cga8.png', 8, 8))
   love.graphics.setLineStyle('rough')
-  tileset = loadTileset()
+  loadTileset()
 end
 
 ---@param pos Vector
@@ -67,7 +67,7 @@ end
 ---@param numberOfGuys integer
 ---@param isFollowMode boolean
 ---@param resources Resources
-local function hud(numberOfGuys, isFollowMode, resources)
+local function drawHud(numberOfGuys, isFollowMode, resources)
   withColor(0, 0, 0, 1, function ()
     love.graphics.rectangle('fill', 0, 0, screenWidth, 8)
     love.graphics.rectangle('fill', 0, screenHeight - 8, screenWidth, 8)
@@ -101,10 +101,12 @@ end
 ---@param name string
 ---@return Pixie
 local function makePixie(name)
+  local tileset = getTileset()
   return pix.Pixie.new(tileset.tiles, tileset.quads[name])
 end
 
 local function update(dt)
+  local tileset = getTileset()
   battleTimer = (battleTimer + battleTimerSpeed * dt) % 1
   cursorTimer = (cursorTimer + cursorTimerSpeed * dt) % (math.pi * 2)
   updateTileset(tileset, dt)
@@ -133,7 +135,8 @@ local function recruitCircle(pos, radius)
 end
 
 ---@param pos Vector
-local function battle(pos)
+local function drawBattle(pos)
+  local tileset = getTileset()
   withColor(0, 0, 0, 0.5, function ()
     love.graphics.rectangle(
       'fill',
@@ -216,6 +219,7 @@ end
 
 ---@param pos Vector
 local function house(pos)
+  local tileset = getTileset()
   love.graphics.draw(
     tileset.tiles,
     tileset.quads.house,
@@ -234,7 +238,7 @@ local function getCursorCoords()
 end
 
 ---@param pos Vector
-local function cursor(pos)
+local function drawCursor(pos)
   local invSqrt2 = 1/math.sqrt(2)
   local mInvSqrt2 = 1 - invSqrt2
 
@@ -257,6 +261,7 @@ end
 ---@param pos Vector
 ---@param visionDistance number
 local function drawWorld(world, pos, visionDistance)
+  local tileset = getTileset()
   local vd2 = visionDistance ^ 2
   for y = pos.y - visionDistance, pos.y + visionDistance do
     for x = pos.x - visionDistance, pos.x + visionDistance do
@@ -286,12 +291,116 @@ local function drawWorld(world, pos, visionDistance)
   end
 end
 
+---@param squad Squad
+---@return integer
+local function countFollowers(squad)
+  local counter = 0
+  for _ in pairs(squad.followers) do
+    counter = counter + 1
+  end
+  return counter
+end
+
+local function drawGame(game)
+  love.graphics.push('transform')
+
+  -- Draw terrain
+
+  centerCameraOn(game.lerpVec, game.magnificationFactor)
+
+  drawWorld(game.world, game.player.pos, 10)
+  for _, guy in ipairs(game.guys) do
+    if guy.team == 'good' then
+      drawWorld(game.world, guy.pos, 10)
+    end
+  end
+  drawWorld(game.world, game.cursorPos, 2)
+
+  -- Draw in-game objects
+
+  textAtTile(game.instructions[1], { x = 268, y = 227 }, 8)
+  textAtTile(game.instructions[2], { x = 280, y = 227 }, 9)
+
+  for _, building in ipairs(game.buildings) do
+    house(building.pos)
+  end
+
+  drawGuys(game.guys, function (guy)
+    return game.isFrozen(guy)
+  end)
+
+  if game.recruitCircle then
+    for _, guy in tbl.ifilter(game.guys, function (guy)
+      return game:mayRecruit(guy)
+    end) do
+      recruitableHighlight(guy.pos)
+    end
+  end
+
+  for _, battle in ipairs(game.battles) do
+    drawBattle(battle.pos)
+  end
+
+  if game.recruitCircle then
+    recruitCircle(game.player.pos, game.recruitCircle)
+  end
+
+  -- Draw cursor
+
+  local cx, cy = getCursorCoords()
+  local tileUnderCursor
+  do
+    local cursorPos = { x = cx, y = cy }
+    local cursorColor = whiteCursorColor
+
+    if game.isFocused then
+      cursorColor = yellowColor
+    else
+      game.cursorPos = cursorPos
+    end
+
+    tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
+    local collision = game.collider(nil, game.cursorPos)
+
+    if collision.type == 'terrain' then
+      cursorColor = redColor
+    end
+
+    local r, g, b, a = unpack(cursorColor)
+    withColor(r, g, b, a, function ()
+      drawCursor(game.cursorPos)
+    end)
+  end
+
+  love.graphics.pop()
+
+  -- Draw HUD
+
+  drawHud(
+    countFollowers(game.squad),
+    game.squad.shouldFollow,
+    game.resources
+  )
+
+  if game.isFocused then
+    love.graphics.print(
+      string.format(
+        'Terrain: %s\nCoords: (%s,%s)\nPress B to build a house (5 wood)',
+        tileUnderCursor,
+        game.cursorPos.x,
+        game.cursorPos.y
+      ), 0, 8
+    )
+  end
+end
+
+
 return {
-  battle = battle,
+  battle = drawBattle,
   centerCameraOn = centerCameraOn,
   drawGuys = drawGuys,
   getTileset = getTileset,
-  hud = hud,
+  hud = drawHud,
   init = init,
   prepareFrame = prepareFrame,
   recruitCircle = recruitCircle,
@@ -305,6 +414,7 @@ return {
   house = house,
   drawPixie = drawPixie,
   getCursorCoords = getCursorCoords,
-  cursor = cursor,
+  cursor = drawCursor,
   drawWorld = drawWorld,
+  drawGame = drawGame,
 }
