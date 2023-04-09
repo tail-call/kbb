@@ -312,8 +312,9 @@ local function drawGame(game)
 
   -- Draw in-game objects
 
-  textAtTile(game.instructions[1], { x = 268, y = 227 }, 8)
-  textAtTile(game.instructions[2], { x = 280, y = 227 }, 9)
+  for _, text in ipairs(game.texts) do
+    textAtTile(text.text, text.pos, text.maxWidth)
+  end
 
   for _, building in ipairs(game.buildings) do
     house(building.pos)

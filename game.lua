@@ -27,6 +27,11 @@ local vector = require('./vector')
 ---@field defender Guy
 ---@field pos Vector
 ---@field timer number
+--
+---@class Text
+---@field text string
+---@field pos Vector
+---@field maxWidth number
 
 ---@class Game
 ---@field world World
@@ -41,7 +46,7 @@ local vector = require('./vector')
 ---@field magnificationFactor number
 ---@field recruitCircle number | nil
 ---@field isFocused boolean
----@field instructions string[]
+---@field texts Text[]
 ---@field isFrozen fun(guy: Guy): boolean
 ---@field mayRecruit fun(guy: Guy): boolean
 ---@field collider Collider
@@ -82,23 +87,32 @@ local game = {
   cursorPos = { x = 0, y = 0 },
   magnificationFactor = 1,
   isFocused = false,
-  instructions = {
-    ''
-      .. 'Move your troops with arrow keys.'
-      .. '\n\n'
-      .. 'Press 1, 2, 3, 4 to change window scale.'
-      .. '\n\n'
-      .. 'Press F to toggle follow mode.'
-      .. '\n\n'
-      .. 'G to dismiss squad.\n\nSpace to recruit units.'
-      .. '\n\n'
-      .. 'C to chop wood.'
-      .. '\n\n'
-      .. 'Z to switch camera zoom.',
-    ''
-      .. 'Your enemies are red. Bump into them to fight.'
-      .. '\n\n'
-      .. 'If your character dies, you lose.',
+  texts = {
+    {
+      text = ''
+        .. 'Move your troops with arrow keys.'
+        .. '\n\n'
+        .. 'Press 1, 2, 3, 4 to change window scale.'
+        .. '\n\n'
+        .. 'Press F to toggle follow mode.'
+        .. '\n\n'
+        .. 'G to dismiss squad.\n\nSpace to recruit units.'
+        .. '\n\n'
+        .. 'C to chop wood.'
+        .. '\n\n'
+        .. 'Z to switch camera zoom.',
+      pos = { x = 268, y = 227 },
+      maxWidth = 8,
+    },
+    {
+
+      text = ''
+        .. 'Your enemies are red. Bump into them to fight.'
+        .. '\n\n'
+        .. 'If your character dies, you lose.',
+      pos = { x = 280, y = 227 },
+      maxWidth = 9,
+    },
   },
 }
 
