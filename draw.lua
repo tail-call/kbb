@@ -257,7 +257,8 @@ end
 ---@param world World
 ---@param pos Vector
 ---@param visionDistance number
-local function drawWorld(world, pos, visionDistance)
+---@param sky { r: number, b: number, g: number }
+local function drawWorld(world, pos, visionDistance, sky)
   local tileset = getTileset()
   local vd2 = visionDistance ^ 2
   local posX = pos.x
@@ -273,7 +274,7 @@ local function drawWorld(world, pos, visionDistance)
             end
           end
         end
-        withColor(0.5, 0.5, 0.8, alpha, function ()
+        withColor(sky.r, sky.g, sky.b, alpha, function ()
           love.graphics.draw(tileset.tiles, tileset.quads[
             world.tileTypes[world.width * (y - 1) + x] or 'water'
           ], x * tileWidth, y * tileHeight)
@@ -296,6 +297,31 @@ local function forEachVisionSource(game, cb)
   end
 end
 
+local skyTable = {
+  -- 00:00
+  { r = 0.3, g = 0.3, b = 0.6, },
+  -- 06:00
+  { r = 1.0, g = 0.9, b = 0.8, },
+  -- 12:00
+  { r = 1, g = 1, b = 1, },
+  -- 18:00
+  { r = 1.0, g = 0.7, b = 0.7, },
+}
+
+---@param time number
+---@return { r: number, g: number, b: number }
+local function skyColor(time)
+  local length = #skyTable
+  local offset, blendFactor = math.modf((time) / (24 * 60) * length)
+  local colorA = skyTable[1 + (offset + 0) % length]
+  local colorB = skyTable[1 + (offset + 1) % length]
+  return {
+    r = colorA.r + (colorB.r - colorA.r) * blendFactor,
+    g = colorA.g + (colorB.g - colorA.g) * blendFactor,
+    b = colorA.b + (colorB.b - colorA.b) * blendFactor,
+  }
+end
+
 ---@param game Game
 local function drawGame(game)
   love.graphics.push('transform')
@@ -304,16 +330,24 @@ local function drawGame(game)
 
   -- Draw visible terrain
 
-  forEachVisionSource(game, function (visionSource)
-    drawWorld(game.world, visionSource.pos, visionSource.sight)
-  end)
+  local colorOfSky = skyColor(game.time)
+  do
+    forEachVisionSource(game, function (visionSource)
+      drawWorld(
+        game.world,
+        visionSource.pos,
+        math.floor(visionSource.sight * colorOfSky.g),
+        colorOfSky
+      )
+    end)
+  end
 
   -- Draw in-game objects
 
   local drawn = {}
 
   forEachVisionSource(game, function (visionSource)
-    local vd2 = visionSource.sight ^ 2
+    local vd2 = (visionSource.sight * colorOfSky.b) ^ 2
     local posX = visionSource.pos.x
     local posY = visionSource.pos.y
 
@@ -322,7 +356,7 @@ local function drawGame(game)
         vd2,
         posX, posY,
         text.pos.x, text.pos.y
-      )then
+      ) then
         textAtTile(text.text, text.pos, text.maxWidth)
         drawn[text] = true
       end

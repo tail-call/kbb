@@ -43,6 +43,7 @@ local vector = require('./vector')
 ---@field frozenGuys { [Guy]: true }
 ---@field resources Resources
 ---@field guys Guy[]
+---@field time number
 ---@field battles Battle[]
 ---@field player Guy
 ---@field squad Squad
@@ -92,6 +93,7 @@ game = {
     stone = 10,
   },
   guys = {},
+  time = 12 * 60,
   battles = {},
   ---@type Guy
   player = nil,
@@ -146,7 +148,13 @@ game = {
           whiteColor,
           'Units: ',
           game.squad.shouldFollow and whiteColor or grayColor,
-          '' .. countFollowers(game.squad)
+          '' .. countFollowers(game.squad),
+          whiteColor,
+          string.format(
+            ' | Time: %02d:%02d',
+            math.floor(game.time / 60),
+            math.floor(game.time % 60)
+          ),
         }
       end
     }),
@@ -382,6 +390,8 @@ function game:update(dt)
       or game.cursorPos,
     dt * lerpSpeed
   )
+
+  game.time = (game.time + dt) % (24 * 60)
 
   for _, battle in ipairs(self.battles) do
     battle.timer = battle.timer - dt

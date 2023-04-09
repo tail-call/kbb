@@ -35,6 +35,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] WASD and HJKL movement
  - [x] Use neighbor-count based fov shading
  - [x] Hide objects outside of FOV
+ - [x] Day/night cycle
  - [ ] Zoom in on a highlighted tile
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions
@@ -53,7 +54,6 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Hold arrows to walk
  - [ ] Town hall
  - [ ] Tavern
- - [ ] Day/night cycle
  - [ ] Dynamic lighting
  - [ ] Order guys to chop trees
  - [ ] Noisy texture details when zooming in
