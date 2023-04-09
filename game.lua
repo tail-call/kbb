@@ -140,7 +140,7 @@ game = {
       maxWidth = 9,
     },
   },
-  ui = ui.makeRoot {
+  ui = ui.makeRoot({}, {
     ---@type PanelUI
     ui.makePanel(ui.origin(), 320, 8, blackPanelColor, {
       coloredText = function ()
@@ -187,7 +187,7 @@ game = {
         )
       end,
     }),
-  }
+  })
 }
 
 ---@param guy Guy

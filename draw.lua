@@ -97,11 +97,6 @@ local function drawUI(ui)
   love.graphics.applyTransform(ui.transform:inverse())
 end
 
----@param ui UI
-local function drawHud(ui)
-  drawUI(ui)
-end
-
 --- Should be called whenever at the start of love.draw
 local function prepareFrame()
   love.graphics.scale(zoom)
@@ -444,7 +439,6 @@ return {
   battle = drawBattle,
   centerCameraOn = centerCameraOn,
   getTileset = getTileset,
-  hud = drawHud,
   init = init,
   prepareFrame = prepareFrame,
   recruitCircle = recruitCircle,

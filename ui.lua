@@ -1,4 +1,5 @@
 ---@alias UIType 'none' | 'panel'
+
 ---@class UI
 ---@field type UIType
 ---@field transform love.Transform
@@ -13,17 +14,21 @@
 ---@field text fun(): string
 ---@field coloredText fun(): table
 
+---@class UIOptions
+---@field shouldDraw (fun(): boolean) | nil
 
 local function origin()
   return love.math.newTransform()
 end
 
+---@param opts UIOptions
 ---@param children UI[]
 ---@return UI
-local function makeRoot(children)
+local function makeRoot(opts, children)
   return {
     type = 'none',
     transform = origin(),
+    shouldDraw = opts.shouldDraw,
     children = children
   }
 end
