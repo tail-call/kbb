@@ -28,6 +28,24 @@ local vector = require('./vector')
 ---@field pos Vector
 ---@field timer number
 
+---@class Game
+---@field world World
+---@field frozenGuys { [Guy]: true }
+---@field resources Resources
+---@field guys Guy[]
+---@field battles Battle[]
+---@field player Guy
+---@field squad Squad
+---@field buildings Building[]
+---@field lerpVec Vector
+---@field magnificationFactor number
+---@field recruitCircle number | nil
+---@field isFocused boolean
+---@field instructions string[]
+---@field isFrozen fun(guy: Guy): boolean
+---@field mayRecruit fun(guy: Guy): boolean
+---@field collider Collider
+
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 local lerpSpeed = 5
@@ -36,41 +54,33 @@ local lerpSpeed = 5
 local noneCollision = { type = 'none' }
 local terrainCollision = { type = 'terrain' }
 
+---@type Game
 local game = {
   ---@type World
   world = nil,
-  ---@type { [Guy]: true }
   frozenGuys = tbl.weaken({}, 'k'),
-  ---@type Resources
   resources = {
     pretzels = 1,
     wood = 0,
     stone = 10,
   },
-  ---@type Guy[]
   guys = {},
-  ---@type Battle[]
   battles = {},
   ---@type Guy
   player = nil,
-  ---@type Squad
   squad = {
     frozenGuys = tbl.weaken({}, 'k'),
     followers = {},
     shouldFollow = false,
   },
-  ---@type Building[]
   buildings = {},
-  ---@type Vector
   lerpVec = { x = 0, y = 0 },
-  ---@type number | nil
   recruitCircle = nil,
   ---@type fun(): nil
   onLost = nil,
   ---@type Vector
   cursorPos = { x = 0, y = 0 },
   magnificationFactor = 1,
-  ---@type boolean
   isFocused = false,
   instructions = {
     ''
@@ -197,7 +207,7 @@ end
 
 ---@param guy Guy
 ---@return boolean
- function game:mayRecruit(guy)
+ function game.mayRecruit(guy)
   if not game.recruitCircle then return false end
   if guy == game.player then return false end
   if game.squad.followers[guy] then return false end
@@ -221,7 +231,7 @@ end
 
 function game:endRecruiting()
   for _, guy in tbl.ifilter(self.guys, function (guy)
-    return game:mayRecruit(guy)
+    return game.mayRecruit(guy)
   end) do
     self.squad.followers[guy] = true
   end

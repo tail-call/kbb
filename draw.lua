@@ -294,6 +294,7 @@ local function countFollowers(squad)
   return counter
 end
 
+---@param game Game
 local function drawGame(game)
   love.graphics.push('transform')
 
@@ -324,7 +325,7 @@ local function drawGame(game)
 
   if game.recruitCircle then
     for _, guy in tbl.ifilter(game.guys, function (guy)
-      return game:mayRecruit(guy)
+      return game.mayRecruit(guy)
     end) do
       recruitableHighlight(guy.pos)
     end
