@@ -380,7 +380,8 @@ local function drawGame(game)
   if game.isFocused then
     love.graphics.print(
       string.format(
-        'Terrain: %s\nCoords: (%s,%s)\nPress B to build a house (5 wood)',
+        'Terrain: %s\nCoords: (%s,%s)\nPress B to build a house (5 wood)'
+          .. '\nPress S to scribe a message.',
         tileUnderCursor,
         game.cursorPos.x,
         game.cursorPos.y

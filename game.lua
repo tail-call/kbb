@@ -92,6 +92,8 @@ local game = {
       text = ''
         .. 'Move your troops with arrow keys.'
         .. '\n\n'
+        .. 'Click on ground to focus.'
+        .. '\n\n'
         .. 'Press 1, 2, 3, 4 to change window scale.'
         .. '\n\n'
         .. 'Press F to toggle follow mode.'
@@ -266,6 +268,26 @@ function game:orderMove(vec)
   end
 end
 
+function game:orderScribe()
+  local function randomLetter()
+    local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    local idx = math.random(#letters)
+    return string.byte(letters, idx)
+  end
+  table.insert(game.texts, {
+    text = string.format(
+      '%c%c\n%c%c',
+      randomLetter(),
+      randomLetter(),
+      randomLetter(),
+      randomLetter()
+    ),
+    pos = game.cursorPos,
+    maxWidth = 4,
+  })
+  game.isFocused = false
+end
+
 local function fight(attacker, defender)
   if math.random() > 0.6 then
     return attacker, defender
@@ -315,9 +337,6 @@ function game:orderFocus()
 end
 
 function game:orderBuild()
-  if game.isFrozen(game.player) then
-    return
-  end
   if game.resources.wood < 5 then
     return
   end

@@ -45,6 +45,9 @@ function love.keypressed(key, scancode, isrepeat)
     if scancode == 'b' then
       game:orderBuild()
     end
+    if scancode == 's' then
+      game:orderScribe()
+    end
   else
     if scancode == 'f' then
       game:toggleFollow()
