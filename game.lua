@@ -61,7 +61,7 @@ local vector = require('./vector')
 
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
-local transparentPanelColor = { r = 0, g = 0, b = 0, a = 0 }
+local grayPanelColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
 local grayColor = { 0.5, 0.5, 0.5, 1 }
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
@@ -159,22 +159,21 @@ game = {
       end
     }),
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 8), 320, 32, transparentPanelColor, {
+    ui.makePanel(ui.origin():translate(0, 8), 320, 32, grayPanelColor, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
       text = function ()
-        if game.isFocused then
-          local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
-          return string.format(
-            'Terrain: %s'
-              .. '\nCoords: (%s,%s)'
-              .. '\nPress B to build a house (5 wood)'
-              .. '\nPress S to scribe a message.',
-            tileUnderCursor,
-            game.cursorPos.x,
-            game.cursorPos.y
-          )
-        else
-          return ''
-        end
+        local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
+        return string.format(
+          'Terrain: %s'
+            .. '\nCoords: (%s,%s)'
+            .. '\nPress B to build a house (5 wood)'
+            .. '\nPress S to scribe a message.',
+          tileUnderCursor,
+          game.cursorPos.x,
+          game.cursorPos.y
+        )
       end
     }),
     ---@type PanelUI

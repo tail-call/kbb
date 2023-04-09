@@ -63,6 +63,8 @@ end
 
 ---@param ui UI
 local function drawUI(ui)
+  if ui.shouldDraw and not ui.shouldDraw() then return end
+
   love.graphics.applyTransform(ui.transform)
   if ui.type == 'none' then
     ---@cast ui UI

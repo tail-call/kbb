@@ -2,6 +2,7 @@
 ---@class UI
 ---@field type UIType
 ---@field transform love.Transform
+---@field shouldDraw (fun(): boolean) | nil
 ---@field children UI[]
 
 ---@class PanelUI: UI
@@ -31,7 +32,7 @@ end
 ---@param w number
 ---@param h number
 ---@param background { r: number, g: number, b: number, a: number }
----@param textOpt { text: (fun(): string), coloredText: (fun(): table) }
+---@param textOpt { text: (fun(): string), coloredText: (fun(): table), shouldDraw: (fun(): boolean) }
 ---@return PanelUI
 local function makePanel(transform, w, h, background, textOpt)
   return {
@@ -42,6 +43,7 @@ local function makePanel(transform, w, h, background, textOpt)
     background = background,
     coloredText = textOpt.coloredText,
     text = textOpt.text,
+    shouldDraw = textOpt.shouldDraw,
     children = {},
   }
 end
