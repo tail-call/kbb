@@ -276,7 +276,7 @@ local function drawWorld(world, pos, visionDistance)
             end
           end
         end
-        withColor(1, 1, 1, alpha, function ()
+        withColor(0.5, 0.5, 0.8, alpha, function ()
           love.graphics.draw(tileset.tiles, tileset.quads[
             world.tileTypes[world.width * (y - 1) + x] or 'water'
           ], x * tileWidth, y * tileHeight)
