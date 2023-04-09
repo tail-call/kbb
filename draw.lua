@@ -64,33 +64,83 @@ local function withColor(r, g, b, a, cb)
   love.graphics.setColor(xr, xg, xb, xa)
 end
 
+---@param ui UI
+local function drawUI(ui)
+  love.graphics.translate(ui.x, ui.y)
+  if ui.type == 'none' then
+    ---@cast ui UI
+  elseif ui.type == 'panel' then
+    ---@cast ui PanelUI
+    local bg = ui.background
+    withColor(bg.r, bg.g, bg.b, bg.a, function ()
+      love.graphics.rectangle(
+        'fill',
+        0,
+        0,
+        ui.w,
+        ui.h
+      )
+    end)
+    if ui.coloredText then
+      love.graphics.print(
+        ui.coloredText,
+        0, 0
+      )
+    else
+      withColor(1, 1, 1, 1, function ()
+        love.graphics.printf(ui.text, 0, 0, ui.w)
+      end)
+    end
+  end
+  for _, child in ipairs(ui.children) do
+    drawUI(child)
+  end
+  love.graphics.translate(-ui.x, -ui.y)
+end
+
 ---@param numberOfGuys integer
 ---@param isFollowMode boolean
 ---@param resources Resources
 local function drawHud(numberOfGuys, isFollowMode, resources)
-  withColor(0, 0, 0, 1, function ()
-    love.graphics.rectangle('fill', 0, 0, screenWidth, 8)
-    love.graphics.rectangle('fill', 0, screenHeight - 8, screenWidth, 8)
-  end)
-  local num = '' .. numberOfGuys
-  love.graphics.print(
-    {
-      whiteColor,
-      'Units: ',
-      isFollowMode and whiteColor or grayColor,
-      num,
+  drawUI({
+    type = 'none',
+    x = 0,
+    y = 0,
+    children = {
+      ---@type PanelUI
+      {
+        type = 'panel',
+        x = 0,
+        y = 0,
+        w = screenWidth,
+        h = 8,
+        background = { r = 0, g = 0, b = 0, a = 1 },
+        coloredText = {
+          whiteColor,
+          'Units: ',
+          isFollowMode and whiteColor or grayColor,
+          '' .. numberOfGuys,
+        },
+        children = {},
+      },
+      ---@type PanelUI
+      {
+        type = 'panel',
+        x = 0,
+        y = screenHeight - 8,
+        w = screenWidth,
+        h = 8,
+        background = { r = 0, g = 0, b = 0, a = 1 },
+        text = string.format(
+          'Wood: %s | Stone: %s | Pretzels: %s',
+          resources.wood,
+          resources.stone,
+          resources.pretzels
+        ),
+        children = {},
+      },
     },
-    0, 0
-  )
-  love.graphics.print(
-    string.format(
-      'Wood: %s | Stone: %s | Pretzels: %s',
-      resources.wood,
-      resources.stone,
-      resources.pretzels
-    ),
-    0, screenHeight - 8
-  )
+  })
 end
 
 --- Should be called whenever at the start of love.draw
