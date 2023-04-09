@@ -3,7 +3,6 @@ local updateTileset = require('./tileset').update
 local getTileset = require('./tileset').getTileset
 local regenerateTileset = require('./tileset').regenerate
 local loadFont = require('./font').load
-local pix = require('./pixie')
 local tbl = require('./tbl')
 local vector = require('./vector')
 local getTile = require('./world').getTile
@@ -14,8 +13,6 @@ local screenWidth = 320
 local screenHeight = 200
 local tileHeight = 16
 local tileWidth = 16
-local whiteColor = { 1, 1, 1, 1 }
-local grayColor = { 0.5, 0.5, 0.5, 1 }
 local cursorTimerSpeed = 2
 local battleTimerSpeed = 2
 
@@ -98,53 +95,9 @@ local function drawUI(ui)
   love.graphics.translate(-ui.x, -ui.y)
 end
 
----@param numberOfGuys integer
----@param isFollowMode boolean
----@param resources Resources
-local function drawHud(numberOfGuys, isFollowMode, resources)
-  drawUI({
-    type = 'none',
-    x = 0,
-    y = 0,
-    children = {
-      ---@type PanelUI
-      {
-        type = 'panel',
-        x = 0,
-        y = 0,
-        w = screenWidth,
-        h = 8,
-        background = { r = 0, g = 0, b = 0, a = 1 },
-        coloredText = function ()
-          return {
-            whiteColor,
-            'Units: ',
-            isFollowMode and whiteColor or grayColor,
-            '' .. numberOfGuys,
-          }
-        end,
-        children = {},
-      },
-      ---@type PanelUI
-      {
-        type = 'panel',
-        x = 0,
-        y = screenHeight - 8,
-        w = screenWidth,
-        h = 8,
-        background = { r = 0, g = 0, b = 0, a = 1 },
-        text = function ()
-          return string.format(
-            'Wood: %s | Stone: %s | Pretzels: %s',
-            resources.wood,
-            resources.stone,
-            resources.pretzels
-          )
-        end,
-        children = {},
-      },
-    },
-  })
+---@param ui UI
+local function drawHud(ui)
+  drawUI(ui)
 end
 
 --- Should be called whenever at the start of love.draw
@@ -338,16 +291,6 @@ local function drawWorld(world, pos, visionDistance)
   end
 end
 
----@param squad Squad
----@return integer
-local function countFollowers(squad)
-  local counter = 0
-  for _ in pairs(squad.followers) do
-    counter = counter + 1
-  end
-  return counter
-end
-
 ---@param game Game
 local function drawGame(game)
   love.graphics.push('transform')
@@ -425,11 +368,7 @@ local function drawGame(game)
 
   -- Draw HUD
 
-  drawHud(
-    countFollowers(game.squad),
-    game.squad.shouldFollow,
-    game.resources
-  )
+  drawUI(game.ui)
 
   if game.isFocused then
     love.graphics.print(
