@@ -83,12 +83,12 @@ local function drawUI(ui)
     end)
     if ui.coloredText then
       love.graphics.print(
-        ui.coloredText,
+        ui.coloredText(),
         0, 0
       )
     else
       withColor(1, 1, 1, 1, function ()
-        love.graphics.printf(ui.text, 0, 0, ui.w)
+        love.graphics.printf(ui.text(), 0, 0, ui.w)
       end)
     end
   end
@@ -115,12 +115,14 @@ local function drawHud(numberOfGuys, isFollowMode, resources)
         w = screenWidth,
         h = 8,
         background = { r = 0, g = 0, b = 0, a = 1 },
-        coloredText = {
-          whiteColor,
-          'Units: ',
-          isFollowMode and whiteColor or grayColor,
-          '' .. numberOfGuys,
-        },
+        coloredText = function ()
+          return {
+            whiteColor,
+            'Units: ',
+            isFollowMode and whiteColor or grayColor,
+            '' .. numberOfGuys,
+          }
+        end,
         children = {},
       },
       ---@type PanelUI
@@ -131,12 +133,14 @@ local function drawHud(numberOfGuys, isFollowMode, resources)
         w = screenWidth,
         h = 8,
         background = { r = 0, g = 0, b = 0, a = 1 },
-        text = string.format(
-          'Wood: %s | Stone: %s | Pretzels: %s',
-          resources.wood,
-          resources.stone,
-          resources.pretzels
-        ),
+        text = function ()
+          return string.format(
+            'Wood: %s | Stone: %s | Pretzels: %s',
+            resources.wood,
+            resources.stone,
+            resources.pretzels
+          )
+        end,
         children = {},
       },
     },

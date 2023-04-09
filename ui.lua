@@ -10,5 +10,5 @@
 ---@field w integer
 ---@field h integer
 ---@field background { r: number, g: number, b: number, a: number }
----@field text string
----@field coloredText table
+---@field text fun(): string
+---@field coloredText fun(): table
