@@ -135,7 +135,7 @@ game = {
   },
   ui = ui.makeRoot {
     ---@type PanelUI
-    ui.makePanel(0, 0, 320, 8, blackPanelColor, {
+    ui.makePanel(ui.origin(), 320, 8, blackPanelColor, {
       coloredText = function ()
         return {
           whiteColor,
@@ -146,7 +146,7 @@ game = {
       end
     }),
     ---@type PanelUI
-    ui.makePanel(0, 8, 320, 32, transparentPanelColor, {
+    ui.makePanel(ui.origin():translate(0, 8), 320, 32, transparentPanelColor, {
       text = function ()
         if game.isFocused then
           local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
@@ -164,7 +164,7 @@ game = {
       end
     }),
     ---@type PanelUI
-    ui.makePanel(0, 192, 320, 8, blackPanelColor, {
+    ui.makePanel(ui.origin():translate(0, 192), 320, 8, blackPanelColor, {
       text = function ()
         return string.format(
           'Wood: %s | Stone: %s | Pretzels: %s',

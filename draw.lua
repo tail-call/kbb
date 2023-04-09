@@ -63,7 +63,7 @@ end
 
 ---@param ui UI
 local function drawUI(ui)
-  love.graphics.translate(ui.x, ui.y)
+  love.graphics.applyTransform(ui.transform)
   if ui.type == 'none' then
     ---@cast ui UI
   elseif ui.type == 'panel' then
@@ -92,7 +92,7 @@ local function drawUI(ui)
   for _, child in ipairs(ui.children) do
     drawUI(child)
   end
-  love.graphics.translate(-ui.x, -ui.y)
+  love.graphics.applyTransform(ui.transform:inverse())
 end
 
 ---@param ui UI
