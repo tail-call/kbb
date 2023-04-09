@@ -83,7 +83,7 @@ local function drawUI(ui)
         ui.coloredText(),
         0, 0
       )
-    else
+    elseif ui.text then
       withColor(1, 1, 1, 1, function ()
         love.graphics.printf(ui.text(), 0, 0, ui.w)
       end)
@@ -340,7 +340,6 @@ local function drawGame(game)
   -- Draw cursor
 
   local cx, cy = getCursorCoords()
-  local tileUnderCursor
   do
     local cursorPos = { x = cx, y = cy }
     local cursorColor = whiteCursorColor
@@ -351,7 +350,6 @@ local function drawGame(game)
       game.cursorPos = cursorPos
     end
 
-    tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
     local collision = game.collider(nil, game.cursorPos)
 
     if collision.type == 'terrain' then
@@ -366,21 +364,7 @@ local function drawGame(game)
 
   love.graphics.pop()
 
-  -- Draw HUD
-
   drawUI(game.ui)
-
-  if game.isFocused then
-    love.graphics.print(
-      string.format(
-        'Terrain: %s\nCoords: (%s,%s)\nPress B to build a house (5 wood)'
-          .. '\nPress S to scribe a message.',
-        tileUnderCursor,
-        game.cursorPos.x,
-        game.cursorPos.y
-      ), 0, 8
-    )
-  end
 end
 
 

@@ -55,6 +55,7 @@ local vector = require('./vector')
 
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
+local transparentPanelColor = { r = 0, g = 0, b = 0, a = 0 }
 local grayColor = { 0.5, 0.5, 0.5, 1 }
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
@@ -142,6 +143,24 @@ game = {
           game.squad.shouldFollow and whiteColor or grayColor,
           '' .. countFollowers(game.squad)
         }
+      end
+    }),
+    ---@type PanelUI
+    ui.makePanel(0, 8, 320, 32, transparentPanelColor, {
+      text = function ()
+        if game.isFocused then
+          local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
+          return string.format(
+            'Terrain: %s\nCoords: (%s,%s)'
+              .. '\nPress B to build a house (5 wood)'
+              .. '\nPress S to scribe a message.',
+            tileUnderCursor,
+            game.cursorPos.x,
+            game.cursorPos.y
+          )
+        else
+          return ''
+        end
       end
     }),
     ---@type PanelUI
