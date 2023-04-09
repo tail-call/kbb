@@ -310,16 +310,24 @@ local function drawGame(game)
 
   -- Draw in-game objects
 
-  for _, text in ipairs(game.texts) do
-    textAtTile(text.text, text.pos, text.maxWidth)
-  end
-
   local drawn = {}
 
   forEachVisionSource(game, function (visionSource)
     local vd2 = visionSource.sight ^ 2
     local posX = visionSource.pos.x
     local posY = visionSource.pos.y
+
+    for _, text in ipairs(game.texts) do
+      if not drawn[text] and isVisible(
+        vd2,
+        posX, posY,
+        text.pos.x, text.pos.y
+      )then
+        textAtTile(text.text, text.pos, text.maxWidth)
+        drawn[text] = true
+      end
+    end
+
     for _, building in ipairs(game.buildings) do
       if not drawn[house] and isVisible(
         vd2,
