@@ -260,10 +260,22 @@ local function drawWorld(world, pos, visionDistance)
   local vd2 = visionDistance ^ 2
   for y = pos.y - visionDistance, pos.y + visionDistance do
     for x = pos.x - visionDistance, pos.x + visionDistance do
-      local dir = vector.sub(pos, { x = x, y = y })
-      local dist = vd2 - dir.x ^ 2 - dir.y ^ 2 + 2
+      ---@param v Vector
+      ---@return number
+      local function calcDist(v)
+        local dir = vector.sub(pos, v)
+        return vd2 - dir.x ^ 2 - dir.y ^ 2 + 2
+      end
+      local dist = calcDist({ x = x, y = y })
       if dist > 0 then
-        local alpha = 1 - (1 - (math.sqrt(dist) / visionDistance)) ^ 2
+        local alpha = 1
+        for dy = -1, 1 do
+          for dx = -1, 1 do
+            if calcDist({ x = x + dx, y = y + dy }) < 0 then
+              alpha = alpha - 1/8
+            end
+          end
+        end
         withColor(1, 1, 1, alpha, function ()
           love.graphics.draw(tileset.tiles, tileset.quads[
             world.tileTypes[world.width * (y - 1) + x] or 'water'
