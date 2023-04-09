@@ -188,7 +188,7 @@ function game:init()
     Guy.makeEvilGuy({ x = 364, y = 199 }),
   }
   self.buildings = {
-    { pos = { x = 15, y = 14 } }
+    { pos = { x = 277, y = 233 } }
   }
   self.world = loadWorld('map.png')
   self.squad = {
