@@ -1,4 +1,4 @@
-local draw = require('./draw')
+local makePixie = require('./pixie').makePixie
 local vector = require('./vector')
 
 ---@class Guy
@@ -65,7 +65,7 @@ function Guy.new(props)
   local guy = {}
   setmetatable(guy, { __index = Guy })
   guy.pos = props.pos or guy.pos
-  guy.pixie = draw.makePixie('guy')
+  guy.pixie = makePixie('guy')
   guy.pixie.color = props.color or guy.pixie.color
   guy.pixie:move(guy.pos)
   return guy

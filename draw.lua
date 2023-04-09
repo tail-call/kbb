@@ -98,13 +98,6 @@ local function prepareFrame()
   love.graphics.scale(zoom)
 end
 
----@param name string
----@return Pixie
-local function makePixie(name)
-  local tileset = getTileset()
-  return pix.Pixie.new(tileset.tiles, tileset.quads[name])
-end
-
 local function update(dt)
   local tileset = getTileset()
   battleTimer = (battleTimer + battleTimerSpeed * dt) % 1
@@ -406,7 +399,6 @@ return {
   recruitCircle = recruitCircle,
   recruitableHighlight = recruitableHighlight,
   setZoom = setZoom,
-  makePixie = makePixie,
   update = update,
   withColor = withColor,
   withTransform = withTransform,

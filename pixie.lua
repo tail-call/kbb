@@ -1,4 +1,5 @@
 -- A pixie is a texture + quad + transform with animation support
+local getTileset = require('./tileset').getTileset
 
 ---@class Pixie
 ---@field texture love.Texture
@@ -69,6 +70,13 @@ function Pixie:update(dt)
   self.transform:setMatrix(unpack(m3))
 end
 
+---@param name string
+---@return Pixie
+local function makePixie(name)
+  local tileset = getTileset()
+  return Pixie.new(tileset.tiles, tileset.quads[name])
+end
+
 return {
-  Pixie = Pixie,
+  makePixie = makePixie,
 }

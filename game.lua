@@ -104,8 +104,8 @@ end
 
 ---@param guy Guy
 ---@return boolean
-function game:isFrozen(guy)
-  return self.frozenGuys[guy] or false
+function game.isFrozen(guy)
+  return game.frozenGuys[guy] or false
 end
 
 ---@type Collider
@@ -232,12 +232,12 @@ end
 function game:orderMove(vec)
   if self.squad.shouldFollow then
     for guy in pairs(self.squad.followers) do
-      if not game:isFrozen(guy) then
+      if not game.isFrozen(guy) then
         moveGuy(guy, vec, guyDelegate)
       end
     end
   end
-  if not game:isFrozen(self.player) then
+  if not game.isFrozen(self.player) then
     moveGuy(self.player, vec, guyDelegate)
   end
 end
@@ -274,7 +274,7 @@ function game:update(dt)
     end
   end
   for _, guy in ipairs(self.guys) do
-    if not game:isFrozen(guy) then
+    if not game.isFrozen(guy) then
       updateGuy(guy, dt, guyDelegate)
     end
   end
@@ -291,7 +291,7 @@ function game:orderFocus()
 end
 
 function game:orderBuild()
-  if game:isFrozen(game.player) then
+  if game.isFrozen(game.player) then
     return
   end
   if game.resources.wood < 5 then
@@ -309,7 +309,7 @@ function game:orderBuild()
 end
 
 local function maybeChop(guy)
-  if game:isFrozen(guy) then return end
+  if game.isFrozen(guy) then return end
 
   local pos = guy.pos
   local t = getTile(game.world, pos)
