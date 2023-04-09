@@ -151,7 +151,8 @@ game = {
         if game.isFocused then
           local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
           return string.format(
-            'Terrain: %s\nCoords: (%s,%s)'
+            'Terrain: %s'
+              .. '\nCoords: (%s,%s)'
               .. '\nPress B to build a house (5 wood)'
               .. '\nPress S to scribe a message.',
             tileUnderCursor,
