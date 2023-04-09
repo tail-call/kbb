@@ -34,6 +34,10 @@ local vector = require('./vector')
 ---@field pos Vector
 ---@field maxWidth number
 
+---@class VisionSource
+---@field pos Vector
+---@field sight integer
+
 ---@class Game
 ---@field world World
 ---@field frozenGuys { [Guy]: true }
@@ -52,6 +56,7 @@ local vector = require('./vector')
 ---@field mayRecruit fun(guy: Guy): boolean
 ---@field collider Collider
 ---@field ui UI
+---@field visionSourcesCo fun(): VisionSource
 
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
@@ -346,6 +351,18 @@ function game:orderScribe()
     maxWidth = 4,
   })
   game.isFocused = false
+end
+
+function game.visionSourcesCo()
+  coroutine.yield({ pos = game.player.pos, sight = 10 })
+
+  for _, guy in ipairs(game.guys) do
+    if guy.team == 'good' then
+      coroutine.yield({ pos = guy.pos, sight = 8 })
+    end
+  end
+
+  return { pos = game.cursorPos, sight = 2 }
 end
 
 local function fight(attacker, defender)

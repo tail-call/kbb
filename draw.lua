@@ -243,26 +243,32 @@ local function drawCursor(pos)
   end)
 end
 
+---Returns true if the target should be directly visible from the point
+---@param vd2 number Square of vision's distance
+---@param ox number Origin's X coordinate
+---@param oy number Origin's Y coordinate
+---@param tx number Target's X coordinate
+---@param ty number Target's Y coordinate
+---@return boolean
+local function isVisible(vd2, ox, oy, tx, ty)
+  return vd2 + 2 - (ox - tx) ^ 2 - (oy - ty) ^ 2 > 0
+end
+
 ---@param world World
 ---@param pos Vector
 ---@param visionDistance number
 local function drawWorld(world, pos, visionDistance)
   local tileset = getTileset()
   local vd2 = visionDistance ^ 2
-  for y = pos.y - visionDistance, pos.y + visionDistance do
-    for x = pos.x - visionDistance, pos.x + visionDistance do
-      ---@param v Vector
-      ---@return number
-      local function calcDist(v)
-        local dir = vector.sub(pos, v)
-        return vd2 - dir.x ^ 2 - dir.y ^ 2 + 2
-      end
-      local dist = calcDist({ x = x, y = y })
-      if dist > 0 then
+  local posX = pos.x
+  local posY = pos.y
+  for y = posY - visionDistance, posY + visionDistance do
+    for x = posX - visionDistance, posX + visionDistance do
+      if isVisible(vd2, posX, posY, x, y) then
         local alpha = 1
         for dy = -1, 1 do
           for dx = -1, 1 do
-            if calcDist({ x = x + dx, y = y + dy }) < 0 then
+            if not isVisible(vd2, posX, posY, x + dx, y + dy) then
               alpha = alpha - 1/8
             end
           end
@@ -278,6 +284,19 @@ local function drawWorld(world, pos, visionDistance)
 end
 
 ---@param game Game
+---@param cb fun(visionSource: VisionSource): nil
+local function forEachVisionSource(game, cb)
+  do
+    local visionSources = coroutine.create(game.visionSourcesCo)
+    local isRunning, visionSource = coroutine.resume(visionSources)
+    while isRunning do
+      cb(visionSource)
+      isRunning, visionSource = coroutine.resume(visionSources)
+    end
+  end
+end
+
+---@param game Game
 local function drawGame(game)
   love.graphics.push('transform')
 
@@ -285,13 +304,9 @@ local function drawGame(game)
 
   -- Draw visible terrain
 
-  drawWorld(game.world, game.player.pos, 10)
-  for _, guy in ipairs(game.guys) do
-    if guy.team == 'good' then
-      drawWorld(game.world, guy.pos, 10)
-    end
-  end
-  drawWorld(game.world, game.cursorPos, 2)
+  forEachVisionSource(game, function (visionSource)
+    drawWorld(game.world, visionSource.pos, visionSource.sight)
+  end)
 
   -- Draw in-game objects
 
@@ -299,23 +314,47 @@ local function drawGame(game)
     textAtTile(text.text, text.pos, text.maxWidth)
   end
 
-  for _, building in ipairs(game.buildings) do
-    house(building.pos)
-  end
+  local drawn = {}
 
-  local guysClone = tbl.iclone(game.guys)
-  table.sort(guysClone, function (g1, g2)
-    return g1.pos.y < g2.pos.y
-  end)
-  for _, guy in ipairs(guysClone) do
-    if not game.isFrozen(guy) then
-      drawGuy(guy)
+  forEachVisionSource(game, function (visionSource)
+    local vd2 = visionSource.sight ^ 2
+    local posX = visionSource.pos.x
+    local posY = visionSource.pos.y
+    for _, building in ipairs(game.buildings) do
+      if not drawn[house] and isVisible(
+        vd2,
+        posX, posY,
+        building.pos.x, building.pos.y
+      ) then
+        house(building.pos)
+        drawn[house] = true
+      end
     end
-  end
 
-  for _, battle in ipairs(game.battles) do
-    drawBattle(battle.pos)
-  end
+    local guysClone = tbl.iclone(game.guys)
+    table.sort(guysClone, function (g1, g2)
+      return g1.pos.y < g2.pos.y
+    end)
+    for _, guy in ipairs(guysClone) do
+      if not game.isFrozen(guy) then
+        if not drawn[guy] and isVisible(
+          vd2,
+          posX, posY,
+          guy.pos.x, guy.pos.y
+        ) then
+          drawGuy(guy)
+          drawn[guy] = true
+        end
+      end
+    end
+
+    for _, battle in ipairs(game.battles) do
+      if not drawn[battle] then
+        drawBattle(battle.pos)
+        drawn[battle] = true
+      end
+    end
+  end)
 
   if game.recruitCircle then
     recruitCircle(game.player.pos, game.recruitCircle)

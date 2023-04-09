@@ -26,6 +26,7 @@ end
 ---@generic T
 ---@param items T[]
 ---@param pred fun(item: T): boolean
+---@return fun(): nil | number, T
 local function ifilter(items, pred)
   local i = 0
 
