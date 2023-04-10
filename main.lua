@@ -1,3 +1,6 @@
+-- Need to do this before anything else is executed
+math.randomseed(os.time())
+
 local draw = require('./draw')
 local game = require('./game').game
 local drawGame = require('./draw').drawGame

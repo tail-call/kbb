@@ -94,7 +94,7 @@ game = {
     stone = 10,
   },
   guys = {},
-  time = 12 * 60,
+  time = math.random() * 24 * 60,
   battles = {},
   ---@type Guy
   player = nil,
