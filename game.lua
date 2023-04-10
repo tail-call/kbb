@@ -153,9 +153,10 @@ game = {
           '' .. countFollowers(game.squad),
           whiteColor,
           string.format(
-            ' | Time: %02d:%02d',
+            ' | Time: %02d:%02d | FPS: %.1f',
             math.floor(game.time / 60),
-            math.floor(game.time % 60)
+            math.floor(game.time % 60),
+            love.timer.getFPS()
           ),
         }
       end
