@@ -201,7 +201,7 @@ local function textAtTile(text, pos, maxWidth)
 end
 
 ---@param pos Vector
-local function house(pos)
+local function drawHouse(pos)
   local tileset = getTileset()
   love.graphics.draw(
     tileset.tiles,
@@ -365,13 +365,13 @@ local function drawGame(game)
     end
 
     for _, building in ipairs(game.buildings) do
-      if not drawn[house] and isVisible(
+      if not drawn[building] and isVisible(
         vd2,
         posX, posY,
         building.pos.x, building.pos.y
       ) then
-        house(building.pos)
-        drawn[house] = true
+        drawHouse(building.pos)
+        drawn[building] = true
       end
     end
 
@@ -449,7 +449,7 @@ return {
   withColor = withColor,
   withTransform = withTransform,
   textAtTile = textAtTile,
-  house = house,
+  house = drawHouse,
   drawPixie = drawPixie,
   getCursorCoords = getCursorCoords,
   cursor = drawCursor,
