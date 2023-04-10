@@ -124,7 +124,7 @@ game = {
       maxWidth = 8,
     },
     {
-      text = 'Click on ground to focus.',
+      text = 'Space to focus.',
       pos = { x = 268, y = 229 },
       maxWidth = 8,
     },
@@ -144,7 +144,7 @@ game = {
       maxWidth = 8,
     },
     {
-      text = 'Space to recruit units.',
+      text = 'Click to recruit units.',
       pos = { x = 268, y = 237 },
       maxWidth = 8,
     },
@@ -330,7 +330,7 @@ end
   if guy == game.player then return false end
   if game.squad.followers[guy] then return false end
   if not canRecruitGuy(guy) then return false end
-  return vector.dist(guy.pos, game.player.pos) < game.recruitCircle + 0.5
+  return vector.dist(guy.pos, game.cursorPos) < game.recruitCircle + 0.5
 end
 
 function game:toggleFollow()
@@ -344,6 +344,7 @@ function game:dismissSquad()
 end
 
 function game:beginRecruiting()
+  if game.isFocused then return end
   self.recruitCircle = 0
 end
 
@@ -538,6 +539,9 @@ local function handleInput(game, scancode)
   end
   if scancode == 's' then
     orderScribe(game)
+  end
+  if scancode == 'space' then
+    game:orderFocus()
   end
 end
 

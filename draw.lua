@@ -397,7 +397,7 @@ local function drawGame(game)
   end)
 
   if game.recruitCircle then
-    recruitCircle(game.player.pos, game.recruitCircle)
+    recruitCircle(game.cursorPos, game.recruitCircle)
     for _, guy in tbl.ifilter(game.guys, function (guy)
       return game.mayRecruit(guy)
     end) do

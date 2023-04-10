@@ -75,14 +75,20 @@ function love.keypressed(key, scancode, isrepeat)
     end
 
     if scancode == 'space' then
-      game:beginRecruiting()
+      game:orderFocus()
     end
   end
 end
 
 function love.mousepressed(x, y, button, presses)
   if button == 1 then
-    game:orderFocus()
+    game:beginRecruiting()
+  end
+end
+
+function love.mousereleased(x, y, button, presses)
+  if button == 1 then
+    game:endRecruiting()
   end
 end
 
@@ -90,10 +96,6 @@ end
 ---@param scancode love.Scancode
 function love.keyreleased(key, scancode)
   if state ~= 'game' then return end
-
-  if scancode == 'space' then
-    game:endRecruiting()
-  end
 end
 
 function love.draw()
