@@ -61,6 +61,7 @@ local vector = require('./vector')
 ---@field isFrozen fun(guy: Guy): boolean
 ---@field mayRecruit fun(guy: Guy): boolean
 ---@field orderMove fun(self: Game, vec: Vector): nil
+---@field isReadyForOrder fun(self: Game): boolean
 ---@field init fun(self: Game): nil
 ---@field update fun(self: Game, dt: number): nil
 
@@ -331,6 +332,10 @@ function game:endRecruiting()
   end
   self.squad.shouldFollow = true
   self.recruitCircle = nil
+end
+
+function game:isReadyForOrder()
+  return self.player.mayMove
 end
 
 function game:orderMove(vec)

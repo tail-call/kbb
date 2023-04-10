@@ -37,8 +37,8 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Hide objects outside of FOV
  - [x] Day/night cycle
  - [x] Hold arrows to walk
+ - [x] Diagonal movement
  - [ ] Zoom in on a highlighted tile
- - [ ] Diagonal movement
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions
  - [ ] Minimap

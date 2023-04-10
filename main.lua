@@ -22,17 +22,26 @@ function love.load()
   end
 end
 
+local alternatingKeyIndex = 0
+
 ---@param dt number
 function love.update(dt)
   draw.update(dt)
   if state == 'game' then
-    updateGame(game, dt)
-
+    -- Handle diagonal movement
+    local directions = {}
     for key, value in pairs(vector.dir) do
       if love.keyboard.isDown(key) then
-        game:orderMove(value)
+        table.insert(directions, value)
       end
     end
+
+    if game:isReadyForOrder() and #directions > 0 then
+      alternatingKeyIndex = (alternatingKeyIndex + 1) % (#directions)
+      game:orderMove(directions[alternatingKeyIndex + 1])
+    end
+
+    updateGame(game, dt)
   end
 end
 
