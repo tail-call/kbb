@@ -5,6 +5,7 @@ local vector = require('./vector')
 ---@field pos Vector
 ---@field pixie Pixie
 ---@field time number
+---@field mayMove boolean
 ---@field behavior 'none' | 'wander'
 ---@field team 'good' | 'evil'
 
@@ -15,18 +16,25 @@ local vector = require('./vector')
 ---@field collider Collider
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil
 
+local guySpeed = 0.15
+
 ---@type Guy
 local Guy = {
   pos = { x = 0, y = 0 },
   time = 0,
   behavior = 'none',
   team = 'good',
+  mayMove = false,
 }
 
 ---@param guy Guy
 ---@param vec Vector
 ---@param delegate GuyDelegate
 local function moveGuy(guy, vec, delegate)
+  if not guy.mayMove then return end
+
+  guy.mayMove = false
+
   local newPos = vector.add(guy.pos, vec)
   local collision = delegate.collider(nil, newPos)
   if collision.type == 'none' then
@@ -45,17 +53,19 @@ end
 ---@param delegate GuyDelegate
 local function updateGuy(guy, dt, delegate)
   guy.pixie:update(dt)
+  guy.time = guy.time + dt
+  while guy.time >= guySpeed do
+    guy.time = guy.time % guySpeed
+    guy.mayMove = true
+  end
+
   if guy.behavior == 'wander' then
-    guy.time = guy.time + dt
-    while guy.time > 0.25 do
-      guy.time = guy.time % 0.25
-      moveGuy(guy, ({
-        vector.dir.up,
-        vector.dir.down,
-        vector.dir.left,
-        vector.dir.right,
-      })[math.random(1, 4)], delegate)
-    end
+    moveGuy(guy, ({
+      vector.dir.up,
+      vector.dir.down,
+      vector.dir.left,
+      vector.dir.right,
+    })[math.random(1, 4)], delegate)
   end
 end
 

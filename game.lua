@@ -53,11 +53,12 @@ local vector = require('./vector')
 ---@field recruitCircle number | nil
 ---@field isFocused boolean
 ---@field texts Text[]
----@field isFrozen fun(guy: Guy): boolean
----@field mayRecruit fun(guy: Guy): boolean
 ---@field collider Collider
 ---@field ui UI
 ---@field visionSourcesCo fun(): VisionSource
+---@field isFrozen fun(guy: Guy): boolean
+---@field mayRecruit fun(guy: Guy): boolean
+---@field orderMove fun(self: Game, vec: Vector): nil
 
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
@@ -65,7 +66,7 @@ local grayPanelColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
 local grayColor = { 0.5, 0.5, 0.5, 1 }
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
-local lerpSpeed = 5
+local lerpSpeed = 10
 
 ---@type CollisionInfo
 local noneCollision = { type = 'none' }

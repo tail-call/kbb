@@ -22,8 +22,12 @@ function love.update(dt)
   draw.update(dt)
   if state == 'game' then
     game:update(dt)
-  else
 
+    for key, value in pairs(vector.dir) do
+      if love.keyboard.isDown(key) then
+        game:orderMove(value)
+      end
+    end
   end
 end
 
@@ -63,11 +67,6 @@ function love.keypressed(key, scancode, isrepeat)
 
     if scancode == 'space' then
       game:beginRecruiting()
-    end
-
-    local vec = vector.dir[scancode]
-    if vec then
-      game:orderMove(vec)
     end
   end
 end
