@@ -51,15 +51,16 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] HP system
  - [ ] Wolves
  - [ ] Destroy rocks
+ - [ ] Circle shaped cursor when pointing to unit/building
+ - [ ] Tavern
  - [ ] Boats
  - [ ] Ponies
  - [ ] Town hall
- - [ ] Tavern
+ - [ ] Mushrooms
+ - [ ] RPG stats
  - [ ] Dynamic lighting
  - [ ] Order guys to chop trees
  - [ ] Noisy texture details when zooming in
- - [ ] RPG stats
- - [ ] Mushrooms
  - [ ] Daily routines
  - [ ] Jobs
  - [ ] Hunger
