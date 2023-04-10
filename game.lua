@@ -59,6 +59,7 @@ local vector = require('./vector')
 ---@field isFrozen fun(guy: Guy): boolean
 ---@field mayRecruit fun(guy: Guy): boolean
 ---@field orderMove fun(self: Game, vec: Vector): nil
+---@field init fun(self: Game): nil
 
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
