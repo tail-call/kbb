@@ -384,7 +384,10 @@ function game.visionSourcesCo()
     end
   end
 
-  return { pos = game.cursorPos, sight = 2 }
+  return {
+    pos = game.cursorPos,
+    sight = math.max(2, game.recruitCircle or 0),
+  }
 end
 
 local function fight(attacker, defender)
