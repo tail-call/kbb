@@ -4,6 +4,7 @@ math.randomseed(os.time())
 local draw = require('./draw')
 local game = require('./game').game
 local drawGame = require('./draw').drawGame
+local handleInput = require('./game').handleInput
 local switchMagn = require('./game').switchMagn
 local updateGame = require('./game').updateGame
 local tbl = require('./tbl')
@@ -41,21 +42,16 @@ end
 function love.keypressed(key, scancode, isrepeat)
   if state ~= 'game' then return end
 
-  if scancode == 'z' then
-    switchMagn()
-  end
-
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
     draw.setZoom(tonumber(scancode))
   end
 
+  if scancode == 'z' then
+    switchMagn()
+  end
+
   if game.isFocused then
-    if scancode == 'b' then
-      game:orderBuild()
-    end
-    if scancode == 's' then
-      game:orderScribe()
-    end
+    handleInput(game, scancode)
   else
     if scancode == 'f' then
       game:toggleFollow()

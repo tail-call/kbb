@@ -346,26 +346,6 @@ function game:orderMove(vec)
   end
 end
 
-function game:orderScribe()
-  local function randomLetter()
-    local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    local idx = math.random(#letters)
-    return string.byte(letters, idx)
-  end
-  table.insert(game.texts, {
-    text = string.format(
-      '%c%c\n%c%c',
-      randomLetter(),
-      randomLetter(),
-      randomLetter(),
-      randomLetter()
-    ),
-    pos = game.cursorPos,
-    maxWidth = 4,
-  })
-  game.isFocused = false
-end
-
 function game.visionSourcesCo()
   coroutine.yield({ pos = game.player.pos, sight = 10 })
 
@@ -457,21 +437,6 @@ function game:orderFocus()
   game.isFocused = not game.isFocused
 end
 
-function game:orderBuild()
-  if game.resources.wood < 5 then
-    return
-  end
-  local pos = game.cursorPos
-  for _, building in ipairs(game.buildings) do
-    if vector.equal(building.pos, pos) then
-      return
-    end
-  end
-  game.resources.wood = game.resources.wood - 5
-  table.insert(game.buildings, { pos = pos })
-  game.isFocused = false
-end
-
 local function maybeChop(guy)
   if game.isFrozen(guy) then return end
 
@@ -500,8 +465,57 @@ local function switchMagn()
   end
 end
 
+---@param game Game
+local function orderBuild(game)
+  if game.resources.wood < 5 then
+    return
+  end
+  local pos = game.cursorPos
+  for _, building in ipairs(game.buildings) do
+    if vector.equal(building.pos, pos) then
+      return
+    end
+  end
+  game.resources.wood = game.resources.wood - 5
+  table.insert(game.buildings, { pos = pos })
+  game.isFocused = false
+end
+
+---@param game Game
+local function orderScribe(game)
+  local function randomLetter()
+    local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    local idx = math.random(#letters)
+    return string.byte(letters, idx)
+  end
+  table.insert(game.texts, {
+    text = string.format(
+      '%c%c\n%c%c',
+      randomLetter(),
+      randomLetter(),
+      randomLetter(),
+      randomLetter()
+    ),
+    pos = game.cursorPos,
+    maxWidth = 4,
+  })
+  game.isFocused = false
+end
+
+---@param game Game
+---@param scancode string
+local function handleInput(game, scancode)
+  if scancode == 'b' then
+    orderBuild(game)
+  end
+  if scancode == 's' then
+    orderScribe(game)
+  end
+end
+
 return {
   game = game,
   switchMagn = switchMagn,
   updateGame = updateGame,
+  handleInput = handleInput,
 }
