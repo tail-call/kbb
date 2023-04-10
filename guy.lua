@@ -6,6 +6,7 @@ local vector = require('./vector')
 ---@field pixie Pixie
 ---@field time number
 ---@field mayMove boolean
+---@field speed number
 ---@field behavior 'none' | 'wander'
 ---@field team 'good' | 'evil'
 
@@ -16,7 +17,6 @@ local vector = require('./vector')
 ---@field collider Collider
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil
 
-local guySpeed = 0.15
 
 ---@type Guy
 local Guy = {
@@ -25,6 +25,7 @@ local Guy = {
   behavior = 'none',
   team = 'good',
   mayMove = false,
+  speed = 0.15,
 }
 
 ---@param guy Guy
@@ -54,8 +55,8 @@ end
 local function updateGuy(guy, dt, delegate)
   guy.pixie:update(dt)
   guy.time = guy.time + dt
-  while guy.time >= guySpeed do
-    guy.time = guy.time % guySpeed
+  while guy.time >= guy.speed do
+    guy.time = guy.time % guy.speed
     guy.mayMove = true
   end
 
@@ -104,6 +105,7 @@ function Guy.makeEvilGuy(pos)
     color = { 1, 0, 0, 1 },
   }
   guy.time = math.random()
+  guy.speed = 0.5
   guy.behavior = 'wander'
   guy.team = 'evil'
   return guy
