@@ -119,31 +119,54 @@ game = {
   isFocused = false,
   texts = {
     {
-      text = ''
-        .. 'Move your troops with arrow keys.'
-        .. '\n\n'
-        .. 'Click on ground to focus.'
-        .. '\n\n'
-        .. 'Press 1, 2, 3, 4 to change window scale.'
-        .. '\n\n'
-        .. 'Press F to toggle follow mode.'
-        .. '\n\n'
-        .. 'G to dismiss squad.\n\nSpace to recruit units.'
-        .. '\n\n'
-        .. 'C to chop wood.'
-        .. '\n\n'
-        .. 'Z to switch camera zoom.',
+      text = 'Move your troops with arrow keys.',
       pos = { x = 268, y = 227 },
       maxWidth = 8,
     },
     {
-
-      text = ''
-        .. 'Your enemies are red. Bump into them to fight.'
-        .. '\n\n'
-        .. 'If your character dies, you lose.',
-      pos = { x = 280, y = 227 },
+      text = 'Click on ground to focus.',
+      pos = { x = 268, y = 229 },
+      maxWidth = 8,
+    },
+    {
+      text = 'Press 1, 2, 3, 4 to change window scale.',
+      pos = { x = 268, y = 231 },
+      maxWidth = 8,
+    },
+    {
+      text = 'Press F to toggle follow mode.',
+      pos = { x = 268, y = 233 },
+      maxWidth = 8,
+    },
+    {
+      text = 'G to dismiss squad.',
+      pos = { x = 268, y = 235 },
+      maxWidth = 8,
+    },
+    {
+      text = 'Space to recruit units.',
+      pos = { x = 268, y = 237 },
+      maxWidth = 8,
+    },
+    {
+      text = 'C to chop wood.',
+      pos = { x = 268, y = 239 },
+      maxWidth = 8,
+    },
+    {
+      text = 'Z to switch camera zoom.',
+      pos = { x = 268, y = 241 },
+      maxWidth = 8,
+    },
+    {
+      text = 'Your enemies are red. Bump into them to fight.',
+      pos = { x = 342, y = 189 },
       maxWidth = 9,
+    },
+    {
+      text = 'If your character dies, you lose.',
+      pos = { x = 342, y = 191 },
+      maxWidth = 8,
     },
   },
   ui = ui.makeRoot({}, {
