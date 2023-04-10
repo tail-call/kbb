@@ -5,6 +5,7 @@ local draw = require('./draw')
 local game = require('./game').game
 local drawGame = require('./draw').drawGame
 local switchMagn = require('./game').switchMagn
+local updateGame = require('./game').updateGame
 local tbl = require('./tbl')
 local vector = require('./vector')
 local gameover = require('./gameover')
@@ -24,7 +25,7 @@ end
 function love.update(dt)
   draw.update(dt)
   if state == 'game' then
-    game:update(dt)
+    updateGame(game, dt)
 
     for key, value in pairs(vector.dir) do
       if love.keyboard.isDown(key) then

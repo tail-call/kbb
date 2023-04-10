@@ -55,11 +55,14 @@ local vector = require('./vector')
 ---@field texts Text[]
 ---@field collider Collider
 ---@field ui UI
+---@field cursorPos Vector
+---@field onLost (fun(): nil) | nil
 ---@field visionSourcesCo fun(): VisionSource
 ---@field isFrozen fun(guy: Guy): boolean
 ---@field mayRecruit fun(guy: Guy): boolean
 ---@field orderMove fun(self: Game, vec: Vector): nil
 ---@field init fun(self: Game): nil
+---@field update fun(self: Game, dt: number): nil
 
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
@@ -383,42 +386,71 @@ local function fight(attacker, defender)
   end
 end
 
+---@param game Game
 ---@param dt number
-function game:update(dt)
-  game.lerpVec = vector.lerp(
+local function calcNewLerpVector(game, dt)
+  return vector.lerp(
     game.lerpVec,
     (not game.isFocused)
       and vector.midpoint(game.player.pos, game.cursorPos)
       or game.cursorPos,
     dt * lerpSpeed
   )
+end
 
-  game.time = (game.time + dt) % (24 * 60)
+---@param game Game
+---@param dt number
+local function advanceClock(game, dt)
+  return (game.time + dt) % (24 * 60)
+end
 
-  for _, battle in ipairs(self.battles) do
+---@param game Game
+---@param dt number
+local function updateBattles(game, dt)
+  for _, battle in ipairs(game.battles) do
     battle.timer = battle.timer - dt
     if battle.timer < 0 then
-      maybeDrop(self.battles, battle)
+      maybeDrop(game.battles, battle)
       local winner, loser = fight(battle.attacker, battle.defender)
       unfreeze(winner)
       maybeDrop(game.guys, loser)
       game.squad.followers[loser] = nil
-      if loser == game.player then
+      if loser == game.player and game.onLost then
         game.onLost()
       end
     end
   end
-  for _, guy in ipairs(self.guys) do
+end
+
+---@param game Game
+---@param dt number
+local function updateGuys(game, dt)
+  for _, guy in ipairs(game.guys) do
     if not game.isFrozen(guy) then
       updateGuy(guy, dt, guyDelegate)
     end
   end
-  if self.recruitCircle ~= nil then
-    self.recruitCircle = math.min(
-      self.recruitCircle + dt * recruitCircleGrowthSpeed,
-      recruitCircleMaxRadius
-    )
-  end
+end
+
+---@param game Game
+---@param dt number
+local function updateRecruitCircle(game, dt)
+  if game.recruitCircle == nil then return end
+
+  game.recruitCircle = math.min(
+    game.recruitCircle + dt * recruitCircleGrowthSpeed,
+    recruitCircleMaxRadius
+  )
+end
+
+---@param game Game
+---@param dt number
+local function updateGame(game, dt)
+  game.lerpVec = calcNewLerpVector(game, dt)
+  game.time = advanceClock(game, dt)
+  updateBattles(game, dt)
+  updateGuys(game, dt)
+  updateRecruitCircle(game, dt)
 end
 
 function game:orderFocus()
@@ -471,4 +503,5 @@ end
 return {
   game = game,
   switchMagn = switchMagn,
+  updateGame = updateGame,
 }
