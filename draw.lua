@@ -343,6 +343,11 @@ local function drawGame(game)
 
   local drawn = {}
 
+  local guysClone = tbl.iclone(game.guys)
+  table.sort(guysClone, function (g1, g2)
+    return g1.pos.y < g2.pos.y
+  end)
+
   forEachVisionSource(game, function (visionSource)
     local vd2 = (visionSource.sight * colorOfSky.b) ^ 2
     local posX = visionSource.pos.x
@@ -370,10 +375,6 @@ local function drawGame(game)
       end
     end
 
-    local guysClone = tbl.iclone(game.guys)
-    table.sort(guysClone, function (g1, g2)
-      return g1.pos.y < g2.pos.y
-    end)
     for _, guy in ipairs(guysClone) do
       if not game.isFrozen(guy) then
         if not drawn[guy] and isVisible(
