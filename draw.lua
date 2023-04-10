@@ -408,6 +408,11 @@ local function drawGame(game)
   -- Draw cursor
 
   local cx, cy = getCursorCoords()
+  local curDistance = 12
+  cx = math.min(game.player.pos.x + curDistance, cx)
+  cx = math.max(game.player.pos.x - curDistance, cx)
+  cy = math.min(game.player.pos.y + curDistance, cy)
+  cy = math.max(game.player.pos.y - curDistance, cy)
   do
     local cursorPos = { x = cx, y = cy }
     local cursorColor = whiteCursorColor
