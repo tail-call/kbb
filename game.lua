@@ -54,7 +54,7 @@ local ability = require('./ability')
 ---@field battles Battle[]
 ---@field player Guy
 ---@field squad Squad
----@field consoleMessages ConsoleMessage
+---@field consoleMessages ConsoleMessage[]
 ---@field buildings Building[]
 ---@field lerpVec Vector
 ---@field magnificationFactor number
@@ -175,7 +175,7 @@ game = {
   },
   ui = ui.makeRoot({}, {
     ---@type PanelUI
-    ui.makePanel(ui.origin(), 320, 8, blackPanelColor, {
+    ui.makePanel(ui.origin(), 320, 8, grayPanelColor, {
       coloredText = function ()
         return {
           whiteColor,
@@ -210,8 +210,15 @@ game = {
         )
       end
     }),
+    -- Empty underlay for console
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 192), 320, 8, blackPanelColor, {
+    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, blackPanelColor, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+    }),
+    ---@type PanelUI
+    ui.makePanel(ui.origin():translate(0, 192), 320, 8, grayPanelColor, {
       text = function ()
         return string.format(
           'Wood: %s | Stone: %s | Pretzels: %s',
@@ -315,7 +322,16 @@ function game:init()
   }
   self.lerpVec = self.player.pos
   self.cursorPos = self.player.pos
-  self.consoleMessages = {}
+  self.consoleMessages = {
+    {
+      text = 'Welcome to Kobold Princess Simulator.',
+      lifetime = 10,
+    },
+    {
+      text = 'This is day 1 of your reign.',
+      lifetime = 16,
+    }
+  }
 end
 
 ---@param guy Guy
@@ -412,7 +428,7 @@ local function fight(game, attacker, defender, damageModifier)
   ---@param damage number
   local function dealDamage(guy, damage)
     guy.stats.hp = guy.stats.hp - damage * damageModifier
-    echo(game, string.format('%s took %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
+    echo(game, string.format('%s got %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
   end
 
   local function say(message)
@@ -530,6 +546,14 @@ local function updateRecruitCircle(game, dt)
   )
 end
 
+---@param consoleMessages ConsoleMessage[]
+---@param dt number
+local function updateConsole(consoleMessages, dt)
+  for _, message in ipairs(consoleMessages) do
+    message.lifetime = math.max(message.lifetime - dt, 0)
+  end
+end
+
 ---@param game Game
 ---@param dt number
 local function updateGame(game, dt)
@@ -538,6 +562,7 @@ local function updateGame(game, dt)
   updateBattles(game, dt)
   updateGuys(game, dt)
   updateRecruitCircle(game, dt)
+  updateConsole(game.consoleMessages, dt)
 end
 
 function game:orderFocus()
