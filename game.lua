@@ -154,12 +154,17 @@ game = {
     },
     {
       text = 'Your enemies are red. Bump into them to fight.',
-      pos = { x = 342, y = 189 },
+      pos = { x = 279, y = 229 },
       maxWidth = 9,
     },
     {
       text = 'If your character dies, you lose.',
-      pos = { x = 342, y = 191 },
+      pos = { x = 279, y = 231 },
+      maxWidth = 8,
+    },
+    {
+      text = 'Out of troops? Press space and R.',
+      pos = { x = 279, y = 233 },
       maxWidth = 8,
     },
   },
@@ -290,27 +295,10 @@ function game:init()
     Guy.makeEvilGuy({ x = 287, y = 230 }),
     Guy.makeEvilGuy({ x = 286, y = 231 }),
     Guy.makeEvilGuy({ x = 287, y = 231 }),
-    -- To the north-east
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
-    Guy.makeEvilGuy({ x = 364, y = 199 }),
   }
+  for _ = 1, 20 do
+    table.insert(self.guys, Guy.makeEvilGuy({ x = 281, y = 195 }))
+  end
   self.buildings = {
     { pos = { x = 277, y = 233 } }
   }
