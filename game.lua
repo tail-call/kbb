@@ -67,6 +67,7 @@ local ability = require('./ability')
 ---@field isReadyForOrder fun(self: Game): boolean
 ---@field init fun(self: Game): nil
 ---@field update fun(self: Game, dt: number): nil
+---@field orderFocus fun(self: Game): nil
 
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
