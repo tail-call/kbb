@@ -153,29 +153,30 @@ local function recruitCircle(pos, radius)
   )
 end
 
----@param pos Vector
-local function drawBattle(pos)
+---@param battle Battle
+local function drawBattle(battle)
+  local posX = battle.pos.x * tileWidth
+  local posY = battle.pos.y * tileHeight
   local tileset = getTileset()
   withColor(0, 0, 0, 0.5, function ()
     love.graphics.rectangle(
-      'fill',
-      pos.x * tileWidth,
-      pos.y * tileHeight,
-      tileWidth,
-      tileHeight
+      'fill', posX, posY, tileWidth, tileHeight
     )
   end)
-  if battleTimer % 1/4 < 1/16 then
-    return
+
+  local isBlink = battleTimer % 1/4 < 1/16
+
+  if not isBlink then
+    withColor(0.5 + battleTimer / 2, 1 - battleTimer / 2, 0, 1, function ()
+      love.graphics.draw(tileset.tiles, tileset.quads.battle, posX, posY)
+    end)
   end
-  withColor(0.5 + battleTimer / 2, 1 - battleTimer / 2, 0, 1, function ()
-    love.graphics.draw(
-      tileset.tiles,
-      tileset.quads.battle,
-      pos.x * tileWidth,
-      pos.y * tileHeight
-    )
-  end)
+
+  love.graphics.print(
+    tostring(battle.round),
+    posX + tileWidth / 4,
+    posY + tileHeight / 4 - battle.round * 2
+  )
 end
 
 ---@param transform love.Transform
@@ -412,7 +413,7 @@ local function drawGame(game)
 
     for _, battle in ipairs(game.battles) do
       if not drawn[battle] then
-        drawBattle(battle.pos)
+        drawBattle(battle)
         drawn[battle] = true
       end
     end

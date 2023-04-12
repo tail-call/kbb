@@ -30,7 +30,8 @@ local ability = require('./ability')
 ---@field defender Guy
 ---@field pos Vector
 ---@field timer number
---
+---@field round number
+
 ---@class Text
 ---@field text string
 ---@field pos Vector
@@ -279,7 +280,8 @@ local guyDelegate = {
       attacker = attacker,
       defender = defender,
       pos = defender.pos,
-      timer = 1,
+      round = 1,
+      timer = battleRoundDuration,
     })
   end,
   collider = game.collider,
@@ -424,7 +426,6 @@ local function fight(attacker, defender, damageModifier)
     ))
   end
 
-
   if defenderEffect == ability.effects.defence.parry then
     if attackerEffect == ability.effects.combat.normalAttack then
       say('1. %s attacked, but %s parried!')
@@ -502,6 +503,8 @@ local function updateBattles(game, dt)
         unfreeze(battle.defender)
       end
 
+      -- Next round
+      battle.round = battle.round + 1
     end
   end
 end
