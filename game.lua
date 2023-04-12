@@ -76,6 +76,7 @@ local ability = require('./ability')
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
 local grayPanelColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
+local darkGrayPanelColor = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 local battleRoundDuration = 0.5
@@ -178,8 +179,7 @@ game = {
         return {
           whiteColor,
           string.format(
-            'HP: %s | Time: %02d:%02d | FPS: %.1f',
-            game.player.stats.hp,
+            'Time: %02d:%02d | FPS: %.1f',
             math.floor(game.time / 60),
             math.floor(game.time % 60),
             love.timer.getFPS()
@@ -210,9 +210,31 @@ game = {
     }),
     -- Empty underlay for console
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, blackPanelColor, {
+    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, darkGrayPanelColor, {
       shouldDraw = function ()
         return game.isFocused
+      end,
+    }),
+    ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, blackPanelColor, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+      text = function ()
+        return string.format(
+          ''
+            .. 'Name:\n %s\n'
+            .. 'Coords:\n %sX %sY\n'
+            .. 'HP:\n %s/%s\n'
+            .. 'Action:\n %.2f/%.2f\n'
+            .. 'Rank:\n Harmless',
+          game.player.name,
+          game.player.pos.x,
+          game.player.pos.y,
+          game.player.stats.hp,
+          game.player.stats.maxHp,
+          game.player.time,
+          game.player.speed
+        )
       end,
     }),
     ---@type PanelUI

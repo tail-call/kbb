@@ -41,6 +41,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Highlight followers
  - [x] Minimap
  - [x] Pretzels will summon guys
+ - [x] RPG stats
  - [ ] Zoom in on a highlighted tile
  - [ ] Damage numbers will display as damage is dealt
  - [ ] Add units to highlight continuously as button is held
@@ -75,7 +76,6 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Ponies
  - [ ] Town hall
  - [ ] Mushrooms
- - [ ] RPG stats
  - [ ] Dynamic lighting
  - [ ] Order guys to chop trees
  - [ ] Noisy texture details when zooming in

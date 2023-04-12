@@ -109,7 +109,7 @@ local function update(dt, camera, magn, isAltCentering)
     lerpVec,
     vector.add(
       vector.scale(camera, tileWidth),
-      { x = 0, y = isAltCentering and screenHeight/magn/6 or 0 }
+      { x = 0, y = isAltCentering and screenHeight/magn/8 or 0 }
     ),
     dt * lerpSpeed
   )
