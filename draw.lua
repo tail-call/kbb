@@ -502,6 +502,7 @@ local function drawGame(game)
 
     local alpha = game.isFocused and 1 or 0.25
 
+    -- Overlay
     withColor(1, 1, 1, alpha, function ()
       love.graphics.draw(game.world.image, quad, 0, 0)
       love.graphics.print('R A D A R', 0, -8)
@@ -511,11 +512,24 @@ local function drawGame(game)
       love.graphics.print('    S    ', 0, 64)
     end)
 
-    withColor(0, 0, 0, 1, function ()
-      love.graphics.rectangle('fill', minimapSize / 2, minimapSize / 2, 1, 1)
-    end)
+    -- Units
+    for _, guy in ipairs(game.guys) do
+      local color = guy.pixie.color
+      local pointX = guy.pos.x - offsetX
+      local pointY = guy.pos.y - offsetY
+      if pointX >= 0
+        and pointX < minimapSize
+        and pointY >= 0
+        and pointY < minimapSize
+      then
+        withColor(color[1], color[2], color[3], 1, function ()
+          love.graphics.rectangle('fill', pointX, pointY, 1, 1)
+        end)
+      end
+    end
 
-    withColor(1, 1, 1, 1, function ()
+    -- Cursor
+    withColor(1, 1, 1, 0.5, function ()
       love.graphics.rectangle('fill', cx - offsetX, cy - offsetY, 1, 1)
     end)
   end)
