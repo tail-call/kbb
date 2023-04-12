@@ -1,6 +1,7 @@
 local Guy = require('./guy').Guy
 local canRecruitGuy = require('./guy').canRecruitGuy
 local moveGuy = require('./guy').moveGuy
+local warpGuy = require('./guy').warpGuy
 local updateGuy = require('./guy').updateGuy
 local loadWorld = require('./world').loadWorld
 local setTile = require('./world').setTile
@@ -201,8 +202,9 @@ game = {
             .. 'Terrain:\n %s'
             .. '\nCoords:\n %sX %sY'
             .. '\nB] build\n (5 wood)'
-            .. '\nM] scribe\n   message'
-            .. '\nR] ritual',
+            .. '\nM] message'
+            .. '\nR] ritual'
+            .. '\nT] warp',
           math.floor(game.time / 60),
           math.floor(game.time % 60),
           tileUnderCursor,
@@ -659,6 +661,10 @@ local function handleInput(game, scancode)
   end
   if scancode == 'r' then
     orderSummon(game)
+  end
+  if scancode == 't' then
+    warpGuy(game.player, game.cursorPos)
+    game.isFocused = false
   end
   if scancode == 'space' then
     game:orderFocus()

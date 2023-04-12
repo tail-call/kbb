@@ -66,6 +66,11 @@ local function moveGuy(guy, vec, delegate)
   guy.pixie:move(guy.pos)
 end
 
+local function warpGuy(guy, vec)
+  guy.pos = vec
+  guy.pixie:spawn(guy.pos)
+end
+
 ---@param guy Guy
 ---@param dt number
 ---@param delegate GuyDelegate
@@ -144,4 +149,5 @@ return {
   canRecruitGuy = canRecruitGuy,
   moveGuy = moveGuy,
   updateGuy = updateGuy,
+  warpGuy = warpGuy,
 }
