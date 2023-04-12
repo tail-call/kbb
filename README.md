@@ -43,6 +43,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Zoom in on a highlighted tile
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions
+ - [ ] Command for bringing your troops closer to you
  - [ ] Fade in / fade out objects within FOV
  - [ ] Chopping wood is performed like combat
  - [ ] Mining stone is performed like combat
