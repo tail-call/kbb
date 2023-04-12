@@ -76,17 +76,21 @@ local function drawUI(ui)
         ui.h
       )
     end)
-    if ui.coloredText then
-      love.graphics.print(
-        ui.coloredText(),
-        0, 0
-      )
-    elseif ui.text then
-      withColor(1, 1, 1, 1, function ()
-        love.graphics.printf(ui.text(), 0, 0, ui.w)
+
+    for _, val in ipairs{ 0, 1 } do
+      withColor(val, val, val, 1, function ()
+        if ui.coloredText then
+          love.graphics.print(
+            ui.coloredText(),
+            1 - val, 1 - val
+          )
+        elseif ui.text then
+          love.graphics.printf(ui.text(), 1 - val, 1 - val, ui.w)
+        end
       end)
     end
   end
+
   for _, child in ipairs(ui.children) do
     drawUI(child)
   end
