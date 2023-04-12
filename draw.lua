@@ -375,7 +375,8 @@ local function drawGame(game)
 
   -- Draw squad highlight
   for guy in pairs(game.squad.followers) do
-    withColor(1, 1, 1, 0.5, function ()
+    local guyHealth = guy.stats.hp / guy.stats.maxHp
+    withColor(1, guyHealth, guyHealth, 0.5, function ()
       local ax = game.player.pos.x * tileWidth + tileWidth / 2
       local ay = game.player.pos.y * tileHeight + tileHeight
       local bx = guy.pos.x * tileWidth + tileWidth / 2
@@ -387,7 +388,7 @@ local function drawGame(game)
 
       love.graphics.line(ax, ay, bx, by)
       love.graphics.ellipse(
-        'line', 
+        'line',
         guy.pos.x * tileWidth + tileWidth / 2,
         guy.pos.y * tileHeight + tileHeight,
         tileWidth / 1.9,

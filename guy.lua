@@ -4,6 +4,7 @@ local abilities = require('./ability').abilities
 
 ---@class GuyStats
 ---@field hp number
+---@field maxHp number
 
 ---@class Guy
 ---@field pos Vector
@@ -32,6 +33,7 @@ local Guy = {
   behavior = 'none',
   stats = {
     hp = -1,
+    maxHp = -1,
   },
   abilities = {
     { ability = abilities.normalSuccess, weight = 4 },
@@ -95,7 +97,8 @@ function Guy.new(props)
   guy.pixie.color = props.color or guy.pixie.color
   guy.pixie:move(guy.pos)
   guy.stats = {
-    hp = 10
+    hp = 10,
+    maxHp = 10,
   }
   return guy
 end
