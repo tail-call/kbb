@@ -44,6 +44,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Zoom in on a highlighted tile
  - [ ] Damage numbers will display as damage is dealt
  - [ ] Add units to highlight continuously as button is held
+ - [ ] Spawn animation for guys
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions
  - [ ] Command for bringing your troops closer to you
