@@ -1,15 +1,19 @@
 local makePixie = require('./pixie').makePixie
 local vector = require('./vector')
+local abilities = require('./ability').abilities
 
 ---@class GuyStats
 ---@field hp number
 
 ---@class Guy
 ---@field pos Vector
+---@field name string
 ---@field pixie Pixie
+---@field stats GuyStats
 ---@field time number
 ---@field mayMove boolean
 ---@field speed number
+---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
 ---@field team 'good' | 'evil'
 
@@ -20,24 +24,20 @@ local vector = require('./vector')
 ---@field collider Collider
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil
 
-local combatAbilities = {
-  miss = { name = "Miss" },
-  normalAttack = { name = "Normal Attack" },
-  criticalAttack = { name = "Critical Attack" },
-}
-
-local chopAbilities = {
-  loiter = { name = "Loiter" },
-  normalChop = { name = "Normal Chop" },
-  criticalChop = { name = "Critical Chop" },
-}
-
-
 ---@type Guy
 local Guy = {
   pos = { x = 0, y = 0 },
+  name = 'Good Guy',
   time = 0,
   behavior = 'none',
+  stats = {
+    hp = -1,
+  },
+  abilities = {
+    { ability = abilities.normalSuccess, weight = 4 },
+    { ability = abilities.normalCriticalSuccess, weight = 1 },
+    { ability = abilities.normalFail, weight = 1 },
+  },
   team = 'good',
   mayMove = false,
   speed = 0.15,
@@ -94,6 +94,9 @@ function Guy.new(props)
   guy.pixie = makePixie('guy')
   guy.pixie.color = props.color or guy.pixie.color
   guy.pixie:move(guy.pos)
+  guy.stats = {
+    hp = 10
+  }
   return guy
 end
 
@@ -110,6 +113,7 @@ end
 function Guy.makeGoodGuy(pos)
   local guy = Guy.new{ pos = pos }
   guy.team = 'good'
+  guy.name = 'Good Guy'
   return guy
 end
 
@@ -123,6 +127,7 @@ function Guy.makeEvilGuy(pos)
   guy.speed = 0.5
   guy.behavior = 'wander'
   guy.team = 'evil'
+  guy.name = 'Evil Guy'
   return guy
 end
 

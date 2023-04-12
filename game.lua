@@ -9,6 +9,8 @@ local isPassable = require('./world').isPassable
 local ui = require('./ui')
 local tbl = require('./tbl')
 local vector = require('./vector')
+local rng = require('./rng')
+local ability = require('./ability')
 
 ---@class Building
 ---@field pos Vector
@@ -72,6 +74,7 @@ local grayColor = { 0.5, 0.5, 0.5, 1 }
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 local lerpSpeed = 10
+local battleRoundDuration = 0.5
 
 ---@type CollisionInfo
 local noneCollision = { type = 'none' }
@@ -283,13 +286,19 @@ local guyDelegate = {
 }
 
 function game:init()
-  self.player = Guy.makeLeader({ x = 268, y = 227 })
+  self.player = Guy.makeLeader({ x = 266, y = 229 })
   self.guys = {
     self.player,
     Guy.makeGoodGuy({ x = 269, y = 228 }),
     Guy.makeGoodGuy({ x = 269, y = 230 }),
     Guy.makeGoodGuy({ x = 270, y = 228 }),
     Guy.makeGoodGuy({ x = 270, y = 230 }),
+    -- Close to us, to the east
+    Guy.makeEvilGuy({ x = 286, y = 230 }),
+    Guy.makeEvilGuy({ x = 287, y = 230 }),
+    Guy.makeEvilGuy({ x = 286, y = 231 }),
+    Guy.makeEvilGuy({ x = 287, y = 231 }),
+    -- To the north-east
     Guy.makeEvilGuy({ x = 364, y = 199 }),
     Guy.makeEvilGuy({ x = 364, y = 199 }),
     Guy.makeEvilGuy({ x = 364, y = 199 }),
@@ -390,11 +399,54 @@ function game.visionSourcesCo()
   }
 end
 
-local function fight(attacker, defender)
-  if math.random() > 0.6 then
-    return attacker, defender
-  else
-    return defender, attacker
+---@param attacker Guy
+---@param defender Guy
+---@param damageModifier number
+local function fight(attacker, defender, damageModifier)
+  local attackerAction = rng.weightedRandom(attacker.abilities)
+  local defenderAction = rng.weightedRandom(attacker.abilities)
+
+  local attackerEffect = attackerAction.ability.combat
+  local defenderEffect = defenderAction.ability.defence
+
+  ---@param guy Guy
+  ---@param damage number
+  local function dealDamage(guy, damage)
+    print(string.format('   %s gets %s damage.', guy.name, damage))
+    guy.stats.hp = guy.stats.hp - damage * damageModifier
+    print(string.format('   %s has %s hp now.', guy.name, guy.stats.hp))
+  end
+
+  local function say(message)
+    print(string.format(
+      message,
+      attacker.name, defender.name, damageModifier
+    ))
+  end
+
+
+  if defenderEffect == ability.effects.defence.parry then
+    if attackerEffect == ability.effects.combat.normalAttack then
+      say('1. %s attacked, but %s parried!')
+      dealDamage(defender, 0)
+    elseif attackerEffect == ability.effects.combat.miss then
+      say('2. %s attacked and missed, %s gets an extra turn!')
+      fight(defender, attacker, damageModifier)
+    elseif attackerEffect == ability.effects.combat.criticalAttack then
+      say('3. %s did a critical attack, but %s parried! They strike back with %sx damage.')
+      fight(defender, attacker, damageModifier * 2)
+    end
+  elseif defenderEffect == ability.effects.defence.takeDamage then
+    if attackerEffect == ability.effects.combat.normalAttack then
+      say('4. %s attacked! %s takes damage.')
+      dealDamage(defender, attackerAction.weight)
+    elseif attackerEffect == ability.effects.combat.miss then
+      say('5. %s attacked but missed!')
+      dealDamage(defender, 0)
+    elseif attackerEffect == ability.effects.combat.criticalAttack then
+      say('6. %s did a critical attack! %s takes %sx damage.')
+      dealDamage(defender, attackerAction.weight * 2)
+    end
   end
 end
 
@@ -422,14 +474,34 @@ local function updateBattles(game, dt)
   for _, battle in ipairs(game.battles) do
     battle.timer = battle.timer - dt
     if battle.timer < 0 then
-      maybeDrop(game.battles, battle)
-      local winner, loser = fight(battle.attacker, battle.defender)
-      unfreeze(winner)
-      maybeDrop(game.guys, loser)
-      game.squad.followers[loser] = nil
-      if loser == game.player and game.onLost then
-        game.onLost()
+      fight(battle.attacker, battle.defender, 1)
+      battle.attacker, battle.defender = battle.defender, battle.attacker
+
+      ---@param guy Guy
+      local function maybeDie(guy)
+        if guy.stats.hp <= 0 then
+          print((guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
+          maybeDrop(game.guys, guy)
+          game.squad.followers[guy] = nil
+
+          if guy == game.player and game.onLost then
+            game.onLost()
+          end
+        end
       end
+
+      if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
+        -- Keep fighting
+        battle.timer = battleRoundDuration
+      else
+        -- Fight is over
+        maybeDrop(game.battles, battle)
+        maybeDie(battle.attacker)
+        maybeDie(battle.defender)
+        unfreeze(battle.attacker)
+        unfreeze(battle.defender)
+      end
+
     end
   end
 end
