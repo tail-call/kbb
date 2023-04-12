@@ -35,7 +35,11 @@ local cameraOffset = { x = 0, y = 0 }
 
 local function setZoom(z)
   zoom = z
-  love.window.setMode(screenWidth * z, screenHeight * z)
+  love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
+  local w, h = love.window.getMode()
+  if w ~= screenWidth * z and h ~= screenWidth * z then
+    love.window.setMode(screenWidth * z, screenHeight * z)
+  end
   local tileset = getTileset()
   if tileset then
     regenerateTileset(tileset)
@@ -45,7 +49,7 @@ end
 local function init()
   setZoom(3)
   love.graphics.setDefaultFilter('linear', 'nearest')
-  love.graphics.setFont(loadFont('cga8.png', 8, 8))
+  love.graphics.setFont(loadFont('cga8.png', 8, 8, true))
   love.graphics.setLineStyle('rough')
   loadTileset()
 end

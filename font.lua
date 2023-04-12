@@ -3,7 +3,8 @@
 ---@param name string
 ---@param charWidth integer
 ---@param charHeight integer
-local function load(name, charWidth, charHeight)
+---@param isBold boolean
+local function load(name, charWidth, charHeight, isBold)
   local data = love.image.newImageData(name)
   local characters = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
   local fontWidth = 1 + #characters * (charWidth + 1)
@@ -15,7 +16,7 @@ local function load(name, charWidth, charHeight)
     end
   end
 
-  local base = 256 + 32 -- base 0 + 32 for non-bold font
+  local base = (isBold and 256 or 0) + 32 -- base 0 + 32 for non-bold font
   local offset = 0
   for char = base, base + #characters do
     putSeparator(offset)
