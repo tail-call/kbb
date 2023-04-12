@@ -28,10 +28,12 @@ local alternatingKeyIndex = 0
 function love.update(dt)
   draw.update(
     dt,
-    (not game.isFocused)
-      and vector.midpoint(game.player.pos, game.cursorPos)
-      or vector.add(game.cursorPos, { x = 0, y = 0 }),
-    game.magnificationFactor,
+    game.isFocused
+      and vector.add(game.cursorPos, { x = 0, y = 0 })
+      or vector.midpoint(game.player.pos, game.cursorPos),
+    game.isFocused
+      and game.magnificationFactor * 2
+      or game.magnificationFactor,
     game.isFocused
   )
   if state == 'game' then
