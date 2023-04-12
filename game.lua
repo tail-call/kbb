@@ -503,7 +503,7 @@ local function updateBattles(game, dt)
       ---@param guy Guy
       local function maybeDie(guy)
         if guy.stats.hp <= 0 then
-          print((guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
+          echo(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
           maybeDrop(game.guys, guy)
           game.squad.followers[guy] = nil
 
