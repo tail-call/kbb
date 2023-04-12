@@ -123,6 +123,28 @@ end
 
 ---@param pos Vector
 local function recruitCircle(pos, radius)
+  for i = 1, radius + 2 do
+    local alpha = 0.6 * (1 - (i / (2 + radius)) ^ 2)
+    withColor(1, 1, 1, alpha, function ()
+      love.graphics.circle(
+        'line',
+        pos.x * tileWidth + tileWidth / 2,
+        pos.y * tileHeight + tileHeight / 2,
+        (i - 0.5) * tileWidth
+      )
+    end)
+  end
+  local lineWidth = love.graphics.getLineWidth()
+  withColor(1, 1, 1, 0.5, function ()
+    love.graphics.setLineWidth(lineWidth * 3)
+    love.graphics.circle(
+      'line',
+      pos.x * tileWidth + tileWidth / 2,
+      pos.y * tileHeight + tileHeight / 2,
+      radius * tileWidth
+    )
+  end)
+  love.graphics.setLineWidth(lineWidth)
   love.graphics.circle(
     'line',
     pos.x * tileWidth + tileWidth / 2,
