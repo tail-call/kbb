@@ -170,7 +170,8 @@ game = {
         return {
           whiteColor,
           string.format(
-            'Time: %02d:%02d | FPS: %.1f',
+            'HP: %s | Time: %02d:%02d | FPS: %.1f',
+            game.player.stats.hp,
             math.floor(game.time / 60),
             math.floor(game.time % 60),
             love.timer.getFPS()
@@ -186,7 +187,8 @@ game = {
       text = function ()
         local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
         return string.format(
-          'Terrain: %s'
+          ''
+            .. 'Terrain: %s'
             .. '\nCoords: (%s,%s)'
             .. '\nPress B to build a house (5 wood)'
             .. '\nPress S to scribe a message.',
