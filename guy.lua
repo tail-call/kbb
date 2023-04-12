@@ -1,6 +1,9 @@
 local makePixie = require('./pixie').makePixie
 local vector = require('./vector')
 
+---@class GuyStats
+---@field hp number
+
 ---@class Guy
 ---@field pos Vector
 ---@field pixie Pixie
@@ -16,6 +19,18 @@ local vector = require('./vector')
 ---@class GuyDelegate
 ---@field collider Collider
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil
+
+local combatAbilities = {
+  miss = { name = "Miss" },
+  normalAttack = { name = "Normal Attack" },
+  criticalAttack = { name = "Critical Attack" },
+}
+
+local chopAbilities = {
+  loiter = { name = "Loiter" },
+  normalChop = { name = "Normal Chop" },
+  criticalChop = { name = "Critical Chop" },
+}
 
 
 ---@type Guy

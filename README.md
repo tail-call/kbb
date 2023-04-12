@@ -42,7 +42,17 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions
  - [ ] Minimap
+ - [ ] Highlight followers
+ - [ ] Chopping wood is performed like combat
+ - [ ] Mining stone is performed like combat
+ - [ ] Fishing is performed like combat
+ - [ ] Digging for treasures is performed like combat
+ - [ ] Building is performed like combat
  - [ ] Buried treasures
+ - [ ] Every guy may carry up to 10 of any item
+ - [ ] Items may be dropped
+ - [ ] Every guy may also have an item equipped: a tool or a weapon
+ - [ ] A tool or a weapon affects ability rings
  - [ ] Squad's turn follows cursor
  - [ ] Fog of war
  - [ ] Workshop where foundations of buildings are made
@@ -52,6 +62,8 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Wolves
  - [ ] Destroy rocks
  - [ ] Circle shaped cursor when pointing to unit/building
+ - [ ] All guys have ability rings: they're being spinned during the battle to determine next action. Player is invited to optimize the ability rings towards most preferable outcome.
+ - [ ] Ability rings has non-combat use, too: they may affect the outcome of other tasks such as gathering wood
  - [ ] Tavern
  - [ ] Boats
  - [ ] Ponies
