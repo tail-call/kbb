@@ -373,6 +373,7 @@ local function drawGame(game)
     return g1.pos.y < g2.pos.y
   end)
 
+  -- Draw squad highlight
   for guy in pairs(game.squad.followers) do
     withColor(1, 1, 1, 0.5, function ()
       local ax = game.player.pos.x * tileWidth + tileWidth / 2
