@@ -574,7 +574,6 @@ end
 
 return {
   battle = drawBattle,
-  centerCameraOn = centerCameraOn,
   getTileset = getTileset,
   init = init,
   prepareFrame = prepareFrame,
