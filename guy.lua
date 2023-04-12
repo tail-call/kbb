@@ -100,6 +100,7 @@ function Guy.new(props)
     hp = 10,
     maxHp = 10,
   }
+  guy.pixie:spawn(props.pos)
   return guy
 end
 

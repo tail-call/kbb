@@ -7,10 +7,12 @@ local getTileset = require('./tileset').getTileset
 ---@field pos Vector
 ---@field flip boolean
 ---@field transform love.Transform
+---@field transformSpeed number
 ---@field targetTransform love.Transform
 ---@field color number[]
 ---@field move fun(self: Pixie, pos: Vector): nil
 ---@field update fun(self: Pixie, dt: number): nil
+---@field spawn fun(self: Pixie, pos: Vector): nil
 
 local Pixie = {}
 
@@ -22,6 +24,7 @@ function Pixie.new(texture, quad)
     pos = { x = 0, y = 0 },
     flip = false,
     transform = love.math.newTransform(),
+    transformSpeed = 1,
     color = { 1, 1, 1, 1 },
     targetTransform = love.math.newTransform(),
   }
@@ -32,6 +35,7 @@ end
 ---@param self Pixie
 ---@param pos Vector
 function Pixie:move(pos)
+  self.transformSpeed = 24
   self.targetTransform:setTransformation(
     pos.x * 16, pos.y * 16
   )
@@ -56,6 +60,18 @@ function Pixie:move(pos)
   self.pos = pos
 end
 
+function Pixie:spawn(pos)
+  self.transformSpeed = 8
+  self.transform:setTransformation(
+    pos.x * 16, pos.y * 16
+  ):scale(8, 8):translate(
+    32, -24
+  )
+  self.targetTransform:setTransformation(
+    pos.x * 16, pos.y * 16
+  )
+end
+
 ---@param self Pixie
 ---@param dt number
 function Pixie:update(dt)
@@ -64,7 +80,7 @@ function Pixie:update(dt)
   local m3 = {}
 
   for i = 1, #m1 do
-    m3[i] = (m1[i] + m2[i]) / 2
+    m3[i] = m1[i] + (m2[i] - m1[i]) * dt * self.transformSpeed
   end
 
   self.transform:setMatrix(unpack(m3))
