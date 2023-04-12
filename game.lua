@@ -197,10 +197,9 @@ game = {
         local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
         return string.format(
           ''
-            .. 'Time: %02d:%02d\n'
+            .. 'Time: %02d:%02d\n (paused)\n'
             .. 'Terrain:\n %s'
             .. '\nCoords:\n %sX %sY'
-            .. '\n'
             .. '\nB] build\n (5 wood)'
             .. '\nM] scribe\n   message'
             .. '\nR] ritual',
@@ -227,10 +226,10 @@ game = {
         return string.format(
           ''
             .. 'Name:\n %s\n'
+            .. 'Rank:\n Harmless\n'
             .. 'Coords:\n %sX %sY\n'
             .. 'HP:\n %s/%s\n'
-            .. 'Action:\n %.2f/%.2f\n'
-            .. 'Rank:\n Harmless',
+            .. 'Action:\n %.2f/%.2f\n',
           game.player.name,
           game.player.pos.x,
           game.player.pos.y,
