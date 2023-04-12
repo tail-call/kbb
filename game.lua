@@ -93,7 +93,7 @@ game = {
   world = nil,
   frozenGuys = tbl.weaken({}, 'k'),
   resources = {
-    pretzels = 0,
+    pretzels = 4,
     wood = 0,
     stone = 10,
   },
@@ -312,10 +312,6 @@ function game:init()
   self.player = Guy.makeLeader({ x = 266, y = 229 })
   self.guys = {
     self.player,
-    Guy.makeGoodGuy({ x = 269, y = 228 }),
-    Guy.makeGoodGuy({ x = 269, y = 230 }),
-    Guy.makeGoodGuy({ x = 270, y = 228 }),
-    Guy.makeGoodGuy({ x = 270, y = 230 }),
     -- Close to us, to the east
     Guy.makeEvilGuy({ x = 286, y = 230 }),
     Guy.makeEvilGuy({ x = 287, y = 230 }),
