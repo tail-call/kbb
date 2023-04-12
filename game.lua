@@ -118,6 +118,11 @@ game = {
   isFocused = false,
   texts = {
     {
+      text = 'Out of troops? Press space and R.',
+      pos = { x = 268, y = 225 },
+      maxWidth = 8,
+    },
+    {
       text = 'Move your troops with arrow keys.',
       pos = { x = 268, y = 227 },
       maxWidth = 8,
@@ -165,11 +170,6 @@ game = {
     {
       text = 'If your character dies, you lose.',
       pos = { x = 279, y = 231 },
-      maxWidth = 8,
-    },
-    {
-      text = 'Out of troops? Press space and R.',
-      pos = { x = 279, y = 233 },
       maxWidth = 8,
     },
   },
