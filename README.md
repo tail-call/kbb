@@ -40,6 +40,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Diagonal movement
  - [x] Highlight followers
  - [x] Minimap
+ - [x] Pretzels will summon guys
  - [ ] Zoom in on a highlighted tile
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions

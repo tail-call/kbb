@@ -88,7 +88,7 @@ game = {
   world = nil,
   frozenGuys = tbl.weaken({}, 'k'),
   resources = {
-    pretzels = 1,
+    pretzels = 0,
     wood = 0,
     stone = 10,
   },
@@ -192,7 +192,8 @@ game = {
             .. '\nCoords:\n %sX %sY'
             .. '\n'
             .. '\nB] build\n (5 wood)'
-            .. '\nM] scribe',
+            .. '\nM] scribe msg'
+            .. '\nR] ritual',
           tileUnderCursor,
           game.cursorPos.x,
           game.cursorPos.y
@@ -474,6 +475,10 @@ local function updateBattles(game, dt)
           maybeDrop(game.guys, guy)
           game.squad.followers[guy] = nil
 
+          if guy.team == 'evil' then
+            game.resources.pretzels = game.resources.pretzels + 1
+          end
+
           if guy == game.player and game.onLost then
             game.onLost()
           end
@@ -599,6 +604,20 @@ local function orderScribe(game)
 end
 
 ---@param game Game
+local function orderSummon(game)
+  if game.resources.pretzels > 0 then
+    local guy = Guy.makeGoodGuy({
+      x = game.cursorPos.x,
+      y = game.cursorPos.y
+    })
+    table.insert(game.guys, guy)
+    game.squad.followers[guy] = true
+    game.resources.pretzels = game.resources.pretzels - 1
+    game.isFocused = not game.isFocused
+  end
+end
+
+---@param game Game
 ---@param scancode string
 local function handleInput(game, scancode)
   if scancode == 'b' then
@@ -606,6 +625,9 @@ local function handleInput(game, scancode)
   end
   if scancode == 'm' then
     orderScribe(game)
+  end
+  if scancode == 'r' then
+    orderSummon(game)
   end
   if scancode == 'space' then
     game:orderFocus()
