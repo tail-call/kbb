@@ -26,7 +26,14 @@ local alternatingKeyIndex = 0
 
 ---@param dt number
 function love.update(dt)
-  draw.update(dt)
+  draw.update(
+    dt,
+    (not game.isFocused)
+      and vector.midpoint(game.player.pos, game.cursorPos)
+      or vector.add(game.cursorPos, { x = 0, y = 0 }),
+    game.magnificationFactor,
+    game.isFocused
+  )
   if state == 'game' then
     -- Handle diagonal movement
     local directions = {}

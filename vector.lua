@@ -23,6 +23,13 @@ vector = {
   end,
 
   ---@param v Vector
+  ---@param c number
+  ---@return Vector
+  scale = function(v, c)
+    return { x = c * v.x, y = c * v.y }
+  end,
+
+  ---@param v Vector
   ---@return Vector
   neg = function(v)
     return { x = -v.x, y = -v.y }

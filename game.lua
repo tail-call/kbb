@@ -56,7 +56,6 @@ local ability = require('./ability')
 ---@field squad Squad
 ---@field consoleMessages ConsoleMessage[]
 ---@field buildings Building[]
----@field lerpVec Vector
 ---@field magnificationFactor number
 ---@field recruitCircle number | nil
 ---@field isFocused boolean
@@ -79,7 +78,6 @@ local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
 local grayPanelColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
-local lerpSpeed = 10
 local battleRoundDuration = 0.5
 
 ---@type CollisionInfo
@@ -320,7 +318,6 @@ function game:init()
     ---@type Guy[]
     followers = tbl.weaken({}, 'k'),
   }
-  self.lerpVec = self.player.pos
   self.cursorPos = self.player.pos
   self.consoleMessages = {
     {
@@ -465,18 +462,6 @@ end
 
 ---@param game Game
 ---@param dt number
-local function calcNewLerpVector(game, dt)
-  return vector.lerp(
-    game.lerpVec,
-    (not game.isFocused)
-      and vector.midpoint(game.player.pos, game.cursorPos)
-      or game.cursorPos,
-    dt * lerpSpeed
-  )
-end
-
----@param game Game
----@param dt number
 local function advanceClock(game, dt)
   return (game.time + dt) % (24 * 60)
 end
@@ -557,7 +542,6 @@ end
 ---@param game Game
 ---@param dt number
 local function updateGame(game, dt)
-  game.lerpVec = calcNewLerpVector(game, dt)
   game.time = advanceClock(game, dt)
   updateBattles(game, dt)
   updateGuys(game, dt)

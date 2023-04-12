@@ -21,12 +21,16 @@ local whiteCursorColor = { 1, 1, 1, 0.8 }
 local redColor = { 1, 0, 0, 0.8 }
 local yellowColor = { 1, 1, 0, 0.8 }
 
+local lerpSpeed = 10
+
 -- Variables
 
 local highlightCircleRadius = 10
 local zoom = 1
 local cursorTimer = 0
 local battleTimer = 0
+local lerpVec = { x = 0, y = 0 }
+local cameraOffset = { x = 0, y = 0 }
 
 local function setZoom(z)
   zoom = z
@@ -43,16 +47,6 @@ local function init()
   love.graphics.setFont(loadFont('cga8.png', 8, 8))
   love.graphics.setLineStyle('rough')
   loadTileset()
-end
-
----@param pos Vector
----@param magn number
-local function centerCameraOn(pos, magn)
-  love.graphics.scale(magn)
-  love.graphics.translate(
-    math.floor(screenWidth/magn/2 - 8 - pos.x * tileWidth),
-    math.floor(screenHeight/magn/2 - tileHeight/2- pos.y * tileHeight)
-  )
 end
 
 local function withColor(r, g, b, a, cb)
@@ -103,10 +97,22 @@ local function prepareFrame()
   love.graphics.scale(zoom)
 end
 
-local function update(dt)
+---@param dt number
+---@param camera Vector
+---@param magn number
+---@param isAltCentering boolean
+local function update(dt, camera, magn, isAltCentering)
   local tileset = getTileset()
   battleTimer = (battleTimer + battleTimerSpeed * dt) % 1
   cursorTimer = (cursorTimer + cursorTimerSpeed * dt) % (math.pi * 2)
+  lerpVec = vector.lerp(
+    lerpVec,
+    vector.add(
+      vector.scale(camera, tileWidth),
+      { x = 0, y = isAltCentering and screenHeight/magn/6 or 0 }
+    ),
+    dt * lerpSpeed
+  )
   updateTileset(tileset, dt)
 end
 
@@ -348,7 +354,21 @@ end
 local function drawGame(game)
   love.graphics.push('transform')
 
-  centerCameraOn(game.lerpVec, game.magnificationFactor)
+  -- Setup camera
+
+  do
+    local magn = game.magnificationFactor
+    local cx, cy = 0.5, 0.5
+    local pos = {
+      x = 8 + lerpVec.x,
+      y = 8 + lerpVec.y
+    }
+    love.graphics.scale(magn)
+    love.graphics.translate(
+      math.floor(screenWidth / magn * cx - pos.x - cameraOffset.x),
+      math.floor(screenHeight / magn * cy - pos.y - cameraOffset.y)
+    )
+  end
 
   -- Draw visible terrain
 
