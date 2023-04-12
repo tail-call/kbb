@@ -382,6 +382,8 @@ function game:isReadyForOrder()
 end
 
 function game:orderMove(vec)
+  if game.isFocused then return end
+
   if self.squad.shouldFollow then
     for guy in pairs(self.squad.followers) do
       if not game.isFrozen(guy) then
