@@ -100,9 +100,8 @@ end
 
 function love.draw()
   draw.prepareFrame()
-  if state == 'game' then
-    drawGame(game)
-  else
+  drawGame(game)
+  if state == 'dead' then
     gameover.draw()
   end
 end
