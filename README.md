@@ -45,6 +45,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Lerp over zoom
  - [x] Spawn animation for guys
  - [x] Zoom in on a highlighted tile
+ - [ ] Parallax out-of-border background
  - [ ] Pixies visibly jump when they walk
  - [ ] Damage numbers will display as damage is dealt
  - [ ] Add units to highlight continuously as button is held
