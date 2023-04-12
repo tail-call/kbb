@@ -191,7 +191,7 @@ game = {
             .. 'Terrain: %s'
             .. '\nCoords: (%s,%s)'
             .. '\nPress B to build a house (5 wood)'
-            .. '\nPress S to scribe a message.',
+            .. '\nPress M to scribe a message.',
           tileUnderCursor,
           game.cursorPos.x,
           game.cursorPos.y
@@ -603,7 +603,7 @@ local function handleInput(game, scancode)
   if scancode == 'b' then
     orderBuild(game)
   end
-  if scancode == 's' then
+  if scancode == 'm' then
     orderScribe(game)
   end
   if scancode == 'space' then
