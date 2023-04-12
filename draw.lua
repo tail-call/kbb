@@ -15,6 +15,7 @@ local tileHeight = 16
 local tileWidth = 16
 local cursorTimerSpeed = 2
 local battleTimerSpeed = 2
+local minimapSize = 72
 
 local whiteCursorColor = { 1, 1, 1, 0.8 }
 local redColor = { 1, 0, 0, 0.8 }
@@ -486,7 +487,7 @@ local function drawGame(game)
   drawUI(game.ui)
 
   -- Minimap
-  local minimapSize = 72
+
   withTransform(love.math.newTransform(8, screenHeight - 16 - minimapSize), function ()
     local offsetX = game.player.pos.x - minimapSize / 2
     local offsetY = game.player.pos.y - minimapSize / 2

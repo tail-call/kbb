@@ -180,7 +180,7 @@ game = {
       end
     }),
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 8), 320, 32, grayPanelColor, {
+    ui.makePanel(ui.origin():translate(0, 8), 88, 184, grayPanelColor, {
       shouldDraw = function ()
         return game.isFocused
       end,
@@ -188,10 +188,11 @@ game = {
         local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
         return string.format(
           ''
-            .. 'Terrain: %s'
-            .. '\nCoords: (%s,%s)'
-            .. '\nPress B to build a house (5 wood)'
-            .. '\nPress M to scribe a message.',
+            .. 'Terrain:\n %s'
+            .. '\nCoords:\n %sX %sY'
+            .. '\n'
+            .. '\nB] build\n (5 wood)'
+            .. '\nM] scribe',
           tileUnderCursor,
           game.cursorPos.x,
           game.cursorPos.y
