@@ -32,6 +32,10 @@ local ability = require('./ability')
 ---@field timer number
 ---@field round number
 
+---@class ConsoleMessage
+---@field text string
+---@field lifetime number
+
 ---@class Text
 ---@field text string
 ---@field pos Vector
@@ -50,6 +54,7 @@ local ability = require('./ability')
 ---@field battles Battle[]
 ---@field player Guy
 ---@field squad Squad
+---@field consoleMessages ConsoleMessage
 ---@field buildings Building[]
 ---@field lerpVec Vector
 ---@field magnificationFactor number
@@ -310,6 +315,7 @@ function game:init()
   }
   self.lerpVec = self.player.pos
   self.cursorPos = self.player.pos
+  self.consoleMessages = {}
 end
 
 ---@param guy Guy
@@ -379,10 +385,23 @@ function game.visionSourcesCo()
   }
 end
 
+---@param game Game
+---@param text string
+local function echo(game, text)
+  table.insert(game.consoleMessages, {
+    text = text,
+    lifetime = 6,
+  })
+  while #game.consoleMessages >= 8 do
+    table.remove(game.consoleMessages, 1)
+  end
+end
+
+---@param game Game
 ---@param attacker Guy
 ---@param defender Guy
 ---@param damageModifier number
-local function fight(attacker, defender, damageModifier)
+local function fight(game, attacker, defender, damageModifier)
   local attackerAction = rng.weightedRandom(attacker.abilities)
   local defenderAction = rng.weightedRandom(attacker.abilities)
 
@@ -392,13 +411,12 @@ local function fight(attacker, defender, damageModifier)
   ---@param guy Guy
   ---@param damage number
   local function dealDamage(guy, damage)
-    print(string.format('   %s gets %s damage.', guy.name, damage))
     guy.stats.hp = guy.stats.hp - damage * damageModifier
-    print(string.format('   %s has %s hp now.', guy.name, guy.stats.hp))
+    echo(game, string.format('%s took %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
   end
 
   local function say(message)
-    print(string.format(
+    echo(game, string.format(
       message,
       attacker.name, defender.name, damageModifier
     ))
@@ -406,24 +424,24 @@ local function fight(attacker, defender, damageModifier)
 
   if defenderEffect == ability.effects.defence.parry then
     if attackerEffect == ability.effects.combat.normalAttack then
-      say('1. %s attacked, but %s parried!')
+      say('%s attacked, but %s parried!')
       dealDamage(defender, 0)
     elseif attackerEffect == ability.effects.combat.miss then
-      say('2. %s attacked and missed, %s gets an extra turn!')
-      fight(defender, attacker, damageModifier)
+      say('%s attacked and missed, %s gets an extra turn!')
+      fight(game, defender, attacker, damageModifier)
     elseif attackerEffect == ability.effects.combat.criticalAttack then
-      say('3. %s did a critical attack, but %s parried! They strike back with %sx damage.')
-      fight(defender, attacker, damageModifier * 2)
+      say('%s did a critical attack, but %s parried! They strike back with %sx damage.')
+      fight(game, defender, attacker, damageModifier * 2)
     end
   elseif defenderEffect == ability.effects.defence.takeDamage then
     if attackerEffect == ability.effects.combat.normalAttack then
-      say('4. %s attacked! %s takes damage.')
+      say('%s attacked! %s takes damage.')
       dealDamage(defender, attackerAction.weight)
     elseif attackerEffect == ability.effects.combat.miss then
-      say('5. %s attacked but missed!')
+      say('%s attacked but missed!')
       dealDamage(defender, 0)
     elseif attackerEffect == ability.effects.combat.criticalAttack then
-      say('6. %s did a critical attack! %s takes %sx damage.')
+      say('%s did a critical attack! %s takes %sx damage.')
       dealDamage(defender, attackerAction.weight * 2)
     end
   end
@@ -453,7 +471,7 @@ local function updateBattles(game, dt)
   for _, battle in ipairs(game.battles) do
     battle.timer = battle.timer - dt
     if battle.timer < 0 then
-      fight(battle.attacker, battle.defender, 1)
+      fight(game, battle.attacker, battle.defender, 1)
       battle.attacker, battle.defender = battle.defender, battle.attacker
 
       ---@param guy Guy
@@ -627,4 +645,5 @@ return {
   switchMagn = switchMagn,
   updateGame = updateGame,
   handleInput = handleInput,
+  echo = echo,
 }

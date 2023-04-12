@@ -488,6 +488,8 @@ local function drawGame(game)
 
   drawUI(game.ui)
 
+  -- Console
+
   -- Minimap
 
   withTransform(love.math.newTransform(8, screenHeight - 16 - minimapSize), function ()
@@ -531,6 +533,14 @@ local function drawGame(game)
     -- Cursor
     withColor(1, 1, 1, 0.5, function ()
       love.graphics.rectangle('fill', cx - offsetX, cy - offsetY, 1, 1)
+    end)
+
+    withTransform(love.math.newTransform(88, 32):scale(2/3, 2/3), function ()
+      withColor(1, 1, 1, alpha, function ()
+        for i, message in ipairs(game.consoleMessages) do
+          love.graphics.print(message.text, 0, 8 * i)
+        end
+      end)
     end)
   end)
 end
