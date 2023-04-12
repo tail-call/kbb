@@ -643,6 +643,7 @@ local function orderSummon(game)
       x = game.cursorPos.x,
       y = game.cursorPos.y
     })
+    echo(game, ('%s was summonned.'):format(guy.name))
     table.insert(game.guys, guy)
     game.squad.followers[guy] = true
     game.resources.pretzels = game.resources.pretzels - 1
