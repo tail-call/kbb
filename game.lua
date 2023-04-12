@@ -200,7 +200,7 @@ game = {
             .. '\nCoords:\n %sX %sY'
             .. '\n'
             .. '\nB] build\n (5 wood)'
-            .. '\nM] scribe msg'
+            .. '\nM] scribe\n   message'
             .. '\nR] ritual',
           tileUnderCursor,
           game.cursorPos.x,

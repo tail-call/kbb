@@ -29,7 +29,8 @@ local highlightCircleRadius = 10
 local zoom = 1
 local cursorTimer = 0
 local battleTimer = 0
-local lerpVec = { x = 0, y = 0 }
+---@type Vector3
+local lerpVec = { x = 0, y = 0, z = 1 }
 local cameraOffset = { x = 0, y = 0 }
 
 local function setZoom(z)
@@ -105,12 +106,13 @@ local function update(dt, camera, magn, isAltCentering)
   local tileset = getTileset()
   battleTimer = (battleTimer + battleTimerSpeed * dt) % 1
   cursorTimer = (cursorTimer + cursorTimerSpeed * dt) % (math.pi * 2)
-  lerpVec = vector.lerp(
+  local offset = vector.add(
+    vector.scale(camera, tileWidth),
+    { x = 0, y = isAltCentering and screenHeight/magn/8 or 0 }
+  )
+  lerpVec = vector.lerp3(
     lerpVec,
-    vector.add(
-      vector.scale(camera, tileWidth),
-      { x = 0, y = isAltCentering and screenHeight/magn/8 or 0 }
-    ),
+    { x = offset.x, y = offset.y, z = magn },
     dt * lerpSpeed
   )
   updateTileset(tileset, dt)
@@ -357,16 +359,15 @@ local function drawGame(game)
   -- Setup camera
 
   do
-    local magn = game.magnificationFactor
     local cx, cy = 0.5, 0.5
     local pos = {
       x = 8 + lerpVec.x,
       y = 8 + lerpVec.y
     }
-    love.graphics.scale(magn)
+    love.graphics.scale(lerpVec.z)
     love.graphics.translate(
-      math.floor(screenWidth / magn * cx - pos.x - cameraOffset.x),
-      math.floor(screenHeight / magn * cy - pos.y - cameraOffset.y)
+      math.floor(screenWidth / lerpVec.z * cx - pos.x - cameraOffset.x),
+      math.floor(screenHeight / lerpVec.z * cy - pos.y - cameraOffset.y)
     )
   end
 

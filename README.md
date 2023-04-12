@@ -42,6 +42,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Minimap
  - [x] Pretzels will summon guys
  - [x] RPG stats
+ - [x] Lerp over zoom
  - [ ] Zoom in on a highlighted tile
  - [ ] Damage numbers will display as damage is dealt
  - [ ] Add units to highlight continuously as button is held
