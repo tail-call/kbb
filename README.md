@@ -38,11 +38,11 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Day/night cycle
  - [x] Hold arrows to walk
  - [x] Diagonal movement
+ - [x] Highlight followers
  - [ ] Zoom in on a highlighted tile
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions
  - [ ] Minimap
- - [ ] Highlight followers
  - [ ] Chopping wood is performed like combat
  - [ ] Mining stone is performed like combat
  - [ ] Fishing is performed like combat

@@ -180,12 +180,8 @@ game = {
       coloredText = function ()
         return {
           whiteColor,
-          'Units: ',
-          game.squad.shouldFollow and whiteColor or grayColor,
-          '' .. countFollowers(game.squad),
-          whiteColor,
           string.format(
-            ' | Time: %02d:%02d | FPS: %.1f',
+            'Time: %02d:%02d | FPS: %.1f',
             math.floor(game.time / 60),
             math.floor(game.time % 60),
             love.timer.getFPS()

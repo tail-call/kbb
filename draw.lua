@@ -157,6 +157,7 @@ end
 local function drawBattle(battle)
   local posX = battle.pos.x * tileWidth
   local posY = battle.pos.y * tileHeight
+
   local tileset = getTileset()
   withColor(0, 0, 0, 0.5, function ()
     love.graphics.rectangle(
@@ -370,6 +371,28 @@ local function drawGame(game)
   table.sort(guysClone, function (g1, g2)
     return g1.pos.y < g2.pos.y
   end)
+
+  for guy in pairs(game.squad.followers) do
+    withColor(1, 1, 1, 0.5, function ()
+      local ax = game.player.pos.x * tileWidth + tileWidth / 2
+      local ay = game.player.pos.y * tileHeight + tileHeight
+      local bx = guy.pos.x * tileWidth + tileWidth / 2
+      local by = guy.pos.y * tileHeight + tileHeight
+
+      if not game.squad.shouldFollow then
+        love.graphics.setColor(0.3, 0.3, 0.4, 0.5)
+      end
+
+      love.graphics.line(ax, ay, bx, by)
+      love.graphics.ellipse(
+        'line', 
+        guy.pos.x * tileWidth + tileWidth / 2,
+        guy.pos.y * tileHeight + tileHeight,
+        tileWidth / 1.9,
+        tileHeight / 8
+      )
+    end)
+  end
 
   forEachVisionSource(game, function (visionSource)
     local vd2 = (visionSource.sight * colorOfSky.b) ^ 2
