@@ -206,23 +206,23 @@ end
 local function drawPixie(pixie)
   local r, g, b, a = love.graphics.getColor()
   love.graphics.setColor(unpack(pixie.color))
-  love.graphics.draw(pixie.texture, pixie.quad, pixie.transform)
+  withTransform(pixie.transform, function()
+    -- Shadow
+    withColor(0, 0, 0, 0.5, function ()
+      love.graphics.ellipse('fill', 8, 16, 4, 1.5)
+    end)
+    withColor(0, 0, 0, 0.25, function ()
+      love.graphics.ellipse('fill', 8, 16, 8, 3)
+    end)
+    -- Texture
+    love.graphics.draw(pixie.texture, pixie.quad, 0, 0)
+  end)
   love.graphics.setColor(r, g, b, a)
 end
 
 ---@param guy Guy
 local function drawGuy(guy)
   drawPixie(guy.pixie)
-
-  -- withTransform(
-  --   love.math.newTransform(
-  --     guy.pos.x * tileWidth,
-  --     guy.pos.y * tileHeight - tileHeight / 4
-  --   ):apply(shrinkTransform),
-  --   function ()
-  --     love.graphics.print(guy.team)
-  --   end
-  -- )
 end
 
 ---@param text string
@@ -597,7 +597,6 @@ return {
   withTransform = withTransform,
   textAtTile = textAtTile,
   house = drawHouse,
-  drawPixie = drawPixie,
   getCursorCoords = getCursorCoords,
   cursor = drawCursor,
   drawWorld = drawWorld,
