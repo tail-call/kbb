@@ -258,7 +258,8 @@ local function getCursorCoords()
 end
 
 ---@param pos Vector
-local function drawCursor(pos)
+---@param isFocused boolean
+local function drawCursor(pos, isFocused)
   local invSqrt2 = 1/math.sqrt(2)
   local mInvSqrt2 = 1 - invSqrt2
 
@@ -275,6 +276,17 @@ local function drawCursor(pos)
       'line', 0, 0, tileWidth, tileHeight
     )
   end)
+  -- Four times FOCUS
+  if isFocused then
+    withTransform(transform:scale(1/2.5, 1/2.5), function ()
+      love.graphics.print('FOCUS', 0, 48)
+    end)
+    for _ = 1, 3 do
+      withTransform(transform:rotate(math.rad(90)):translate(0,-42), function ()
+        love.graphics.print('FOCUS', 0, 48)
+      end)
+    end
+  end
 end
 
 ---Returns true if the target should be directly visible from the point
@@ -505,7 +517,7 @@ local function drawGame(game)
 
     local r, g, b, a = unpack(cursorColor)
     withColor(r, g, b, a, function ()
-      drawCursor(game.cursorPos)
+      drawCursor(game.cursorPos, game.isFocused)
     end)
   end
 
