@@ -179,10 +179,10 @@ game = {
         return {
           whiteColor,
           string.format(
-            'Time: %02d:%02d | FPS: %.1f',
+            'Goal: survive | FPS: %.1f\n%02d:%02d',
+            love.timer.getFPS(),
             math.floor(game.time / 60),
-            math.floor(game.time % 60),
-            love.timer.getFPS()
+            math.floor(game.time % 60)
           ),
         }
       end
@@ -196,12 +196,15 @@ game = {
         local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
         return string.format(
           ''
+            .. 'Time: %02d:%02d\n'
             .. 'Terrain:\n %s'
             .. '\nCoords:\n %sX %sY'
             .. '\n'
             .. '\nB] build\n (5 wood)'
             .. '\nM] scribe\n   message'
             .. '\nR] ritual',
+          math.floor(game.time / 60),
+          math.floor(game.time % 60),
           tileUnderCursor,
           game.cursorPos.x,
           game.cursorPos.y
