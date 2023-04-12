@@ -561,8 +561,8 @@ end
 
 local function switchMagn()
   if game.magnificationFactor == 1 then
-    game.magnificationFactor = 0.5
-  elseif game.magnificationFactor == 0.5 then
+    game.magnificationFactor = 2/3
+  elseif game.magnificationFactor == 2/3 then
     game.magnificationFactor = 2
   else
     game.magnificationFactor = 1
