@@ -77,6 +77,16 @@ local function weaken(table, mode)
   return table
 end
 
+---@generic T
+---@param items T[]
+---@param item T
+local function maybeDrop(items, item)
+  local i = indexOf(items, item)
+  if not i then return end
+
+  fastRemoveAtIndex(items, i)
+end
+
 return {
   find = find,
   iclone = iclone,
@@ -85,4 +95,5 @@ return {
   fastRemoveAtIndex = fastRemoveAtIndex,
   indexOf = indexOf,
   weaken = weaken,
+  maybeDrop = maybeDrop,
 }

@@ -11,6 +11,7 @@ local tbl = require('./tbl')
 local vector = require('./vector')
 local rng = require('./rng')
 local ability = require('./ability')
+local maybeDrop = require('./tbl').maybeDrop
 
 ---@class Building
 ---@field pos Vector
@@ -288,16 +289,6 @@ function game.collider(nothing, v)
     return noneCollision
   end
   return terrainCollision
-end
-
----@generic T
----@param items T[]
----@param item T
-local function maybeDrop(items, item)
-  local i = tbl.indexOf(items, item)
-  if not i then return end
-
-  tbl.fastRemoveAtIndex(items, i)
 end
 
 ---@type GuyDelegate
