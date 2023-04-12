@@ -72,7 +72,6 @@ local ability = require('./ability')
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
 local grayPanelColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
-local grayColor = { 0.5, 0.5, 0.5, 1 }
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 local lerpSpeed = 10
@@ -81,16 +80,6 @@ local battleRoundDuration = 0.5
 ---@type CollisionInfo
 local noneCollision = { type = 'none' }
 local terrainCollision = { type = 'terrain' }
-
----@param squad Squad
----@return integer
-local function countFollowers(squad)
-  local counter = 0
-  for _ in pairs(squad.followers) do
-    counter = counter + 1
-  end
-  return counter
-end
 
 ---@type Game
 local game
