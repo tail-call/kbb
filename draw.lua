@@ -484,6 +484,38 @@ local function drawGame(game)
   love.graphics.pop()
 
   drawUI(game.ui)
+
+  -- Minimap
+  local minimapSize = 72
+  withTransform(love.math.newTransform(8, screenHeight - 16 - minimapSize), function ()
+    local offsetX = game.player.pos.x - minimapSize / 2
+    local offsetY = game.player.pos.y - minimapSize / 2
+    local quad = love.graphics.newQuad(
+      offsetX, offsetY,
+      minimapSize, minimapSize,
+      game.world.image:getWidth(),
+      game.world.image:getHeight()
+    )
+
+    local alpha = game.isFocused and 1 or 0.25
+
+    withColor(1, 1, 1, alpha, function ()
+      love.graphics.draw(game.world.image, quad, 0, 0)
+      love.graphics.print('R A D A R', 0, -8)
+      love.graphics.setColor(0, 0, 0, 0.25)
+      love.graphics.print('    N    ', 0, 0)
+      love.graphics.print('W       E', 0, 32)
+      love.graphics.print('    S    ', 0, 64)
+    end)
+
+    withColor(0, 0, 0, 1, function ()
+      love.graphics.rectangle('fill', minimapSize / 2, minimapSize / 2, 1, 1)
+    end)
+
+    withColor(1, 1, 1, 1, function ()
+      love.graphics.rectangle('fill', cx - offsetX, cy - offsetY, 1, 1)
+    end)
+  end)
 end
 
 

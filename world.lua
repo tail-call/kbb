@@ -5,6 +5,7 @@ local getTileset = require('./tileset').getTileset
 ---@class World
 ---@field width integer
 ---@field height integer
+---@field image love.Image
 ---@field tileTypes WorldTile[]
 
 ---@return World
@@ -26,6 +27,7 @@ end
 ---@return World
 local function loadWorld(filename)
   local data = love.image.newImageData(filename)
+  local image = love.graphics.newImage(data)
 
   local width = data:getWidth()
   local height = data:getHeight()
@@ -34,6 +36,7 @@ local function loadWorld(filename)
   local world = {
     width = width,
     height = height,
+    image = image,
     tileTypes = {}
   }
 
