@@ -554,11 +554,14 @@ end
 ---@param game Game
 ---@param dt number
 local function updateGame(game, dt)
+  updateConsole(game.consoleMessages, dt)
+  updateRecruitCircle(game, dt)
+
+  if game.isFocused then return end
+
   game.time = advanceClock(game, dt)
   updateBattles(game, dt)
   updateGuys(game, dt)
-  updateRecruitCircle(game, dt)
-  updateConsole(game.consoleMessages, dt)
 end
 
 function game:orderFocus()
