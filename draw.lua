@@ -30,7 +30,7 @@ local zoom = 1
 local cursorTimer = 0
 local battleTimer = 0
 ---@type Vector3
-local lerpVec = { x = 0, y = 0, z = 1 }
+local lerpVec = { x = 266 * 16, y = 229 * 16, z = 0.01 }
 local cameraOffset = { x = 0, y = 0 }
 
 local function setZoom(z)
