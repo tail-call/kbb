@@ -51,13 +51,12 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field world World
 ---@field frozenGuys { [Guy]: true }
 ---@field resources Resources
+---@field entities GameEntity[]
 ---@field guys Guy[]
 ---@field time number
----@field battles Battle[]
 ---@field player Guy
 ---@field squad Squad
 ---@field consoleMessages ConsoleMessage[]
----@field buildings Building[]
 ---@field magnificationFactor number
 ---@field recruitCircle number | nil
 ---@field isFocused boolean
@@ -74,6 +73,18 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field init fun(self: Game): nil
 ---@field update fun(self: Game, dt: number): nil
 ---@field orderFocus fun(self: Game): nil
+
+---@class GameEntity
+---@field type string
+---@field object any
+
+---@class BuildingGameEntity
+---@field type 'building'
+---@field object Building
+
+---@class BattleGameEntity
+---@field type 'battle'
+---@field object Battle
 
 local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
@@ -100,7 +111,7 @@ game = {
   },
   guys = {},
   time = math.random() * 24 * 60,
-  battles = {},
+  entities = {},
   ---@type Guy
   player = nil,
   squad = {
@@ -280,10 +291,10 @@ function game.collider(nothing, v)
   if otherGuy then
     return { type = 'guy', guy = otherGuy }
   end
-  local battle = tbl.find(game.battles, function (battle)
-    return vector.equal(battle.pos, v)
+  local entity = tbl.find(game.entities, function (entity)
+    return vector.equal(entity.object.pos, v)
   end)
-  if battle then
+  if entity then
     return terrainCollision
   end
   if isPassable(game.world, v) then
@@ -298,12 +309,15 @@ local guyDelegate = {
     freeze(attacker)
     freeze(defender)
 
-    table.insert(game.battles, {
-      attacker = attacker,
-      defender = defender,
-      pos = defender.pos,
-      round = 1,
-      timer = battleRoundDuration,
+    table.insert(game.entities, {
+      type = 'battle',
+      object = {
+        attacker = attacker,
+        defender = defender,
+        pos = defender.pos,
+        round = 1,
+        timer = battleRoundDuration,
+      }
     })
   end,
   collider = game.collider,
@@ -482,45 +496,55 @@ local function advanceClock(game, dt)
 end
 
 ---@param game Game
+---@param entity BattleGameEntity
 ---@param dt number
-local function updateBattles(game, dt)
-  for _, battle in ipairs(game.battles) do
-    battle.timer = battle.timer - dt
-    if battle.timer < 0 then
-      fight(game, battle.attacker, battle.defender, 1)
-      battle.attacker, battle.defender = battle.defender, battle.attacker
+local function updateBattle(game, entity, dt)
+  local battle = entity.object
+  battle.timer = battle.timer - dt
+  if battle.timer < 0 then
+    fight(game, battle.attacker, battle.defender, 1)
+    battle.attacker, battle.defender = battle.defender, battle.attacker
 
-      ---@param guy Guy
-      local function maybeDie(guy)
-        if guy.stats.hp <= 0 then
-          echo(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
-          maybeDrop(game.guys, guy)
-          game.squad.followers[guy] = nil
+    ---@param guy Guy
+    local function maybeDie(guy)
+      if guy.stats.hp <= 0 then
+        echo(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
+        maybeDrop(game.guys, guy)
+        game.squad.followers[guy] = nil
 
-          if guy.team == 'evil' then
-            game.resources.pretzels = game.resources.pretzels + 1
-          end
+        if guy.team == 'evil' then
+          game.resources.pretzels = game.resources.pretzels + 1
+        end
 
-          if guy == game.player and game.onLost then
-            game.onLost()
-          end
+        if guy == game.player and game.onLost then
+          game.onLost()
         end
       end
+    end
 
-      if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
-        -- Keep fighting
-        battle.timer = battleRoundDuration
-      else
-        -- Fight is over
-        maybeDrop(game.battles, battle)
-        maybeDie(battle.attacker)
-        maybeDie(battle.defender)
-        unfreeze(battle.attacker)
-        unfreeze(battle.defender)
-      end
+    if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
+      -- Keep fighting
+      battle.timer = battleRoundDuration
+    else
+      -- Fight is over
+      maybeDrop(game.entities, entity)
+      maybeDie(battle.attacker)
+      maybeDie(battle.defender)
+      unfreeze(battle.attacker)
+      unfreeze(battle.defender)
+    end
 
-      -- Next round
-      battle.round = battle.round + 1
+    -- Next round
+    battle.round = battle.round + 1
+  end
+end
+
+---@param game Game
+---@param dt number
+local function updateBattles(game, dt)
+  for _, entity in ipairs(game.entities) do
+    if entity.type == 'battle' then
+      updateBattle(game, entity, dt)
     end
   end
 end
@@ -605,13 +629,13 @@ local function orderBuild(game)
     return
   end
   local pos = game.cursorPos
-  for _, building in ipairs(game.buildings) do
-    if vector.equal(building.pos, pos) then
+  for _, entity in ipairs(game.entities) do
+    if vector.equal(entity.object.pos, pos) then
       return
     end
   end
   game.resources.wood = game.resources.wood - 5
-  table.insert(game.buildings, { pos = pos })
+  table.insert(game.entities, { type = 'building', object = { pos = pos }})
   game.isFocused = false
 end
 

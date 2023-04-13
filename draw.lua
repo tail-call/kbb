@@ -454,14 +454,26 @@ local function drawGame(game)
       end
     end
 
-    for _, building in ipairs(game.buildings) do
-      if not drawn[building] and isVisible(
-        vd2,
-        posX, posY,
-        building.pos.x, building.pos.y
-      ) then
-        drawHouse(building.pos)
-        drawn[building] = true
+    for _, entity in ipairs(game.entities) do
+      if entity.type == 'building' then
+        if not drawn[entity] and isVisible(
+          vd2,
+          posX, posY,
+          entity.object.pos.x, entity.object.pos.y
+        ) then
+          drawHouse(entity.object.pos)
+          drawn[entity] = true
+        end
+      end
+    end
+
+    for _, entity in ipairs(game.entities) do
+      if entity.type == 'battle' then
+        local battle = entity.object
+        if not drawn[entity] then
+          drawBattle(battle)
+          drawn[entity] = true
+        end
       end
     end
 
@@ -475,13 +487,6 @@ local function drawGame(game)
           drawGuy(guy)
           drawn[guy] = true
         end
-      end
-    end
-
-    for _, battle in ipairs(game.battles) do
-      if not drawn[battle] then
-        drawBattle(battle)
-        drawn[battle] = true
       end
     end
   end)
