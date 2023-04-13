@@ -108,9 +108,9 @@ game = {
   world = nil,
   frozenGuys = tbl.weaken({}, 'k'),
   resources = {
-    pretzels = 4,
+    pretzels = 0,
     wood = 0,
-    stone = 10,
+    stone = 0,
   },
   guys = {},
   time = math.random() * 24 * 60,
@@ -133,7 +133,7 @@ game = {
   isFocused = false,
   texts = {
     {
-      text = 'Chop wood. Build houses.',
+      text = 'Build house on rock.',
       pos = { x = 269, y = 228 },
       maxWidth = 9,
     },
@@ -610,6 +610,11 @@ local function orderBuild(game)
     if vector.equal(entity.object.pos, pos) then
       return
     end
+  end
+  local t = getTile(game.world, pos)
+  if t == 'rock' then
+    game.resources.stone = game.resources.stone + 1
+    setTile(game.world, pos, 'sand')
   end
   game.resources.wood = game.resources.wood - 5
   table.insert(game.entities, {
