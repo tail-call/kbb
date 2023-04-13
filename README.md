@@ -45,6 +45,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Lerp over zoom
  - [x] Spawn animation for guys
  - [x] Zoom in on a highlighted tile
+ - [x] HP system
  - [ ] Parallax out-of-border background
  - [ ] Pixies visibly jump when they walk
  - [ ] Damage numbers will display as damage is dealt
@@ -68,7 +69,6 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Workshop where foundations of buildings are made
  - [ ] A group of units must carry foundation to its place
  - [ ] Then unit carries wood to the site and builds the thing
- - [ ] HP system
  - [ ] Wolves
  - [ ] Destroy rocks
  - [ ] Circle shaped cursor when pointing to unit/building
