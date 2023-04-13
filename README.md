@@ -46,6 +46,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Spawn animation for guys
  - [x] Zoom in on a highlighted tile
  - [x] HP system
+ - [ ] Catch enemies into houses to recruit them
  - [ ] Parallax out-of-border background
  - [ ] Pixies visibly jump when they walk
  - [ ] Damage numbers will display as damage is dealt
