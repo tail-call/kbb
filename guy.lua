@@ -132,7 +132,7 @@ function Guy.makeEvilGuy(pos)
     pos = pos,
     color = { 1, 0, 0, 1 },
   }
-  guy.time = math.random()
+  guy.time = 0
   guy.speed = 0.5
   guy.behavior = 'wander'
   guy.team = 'evil'

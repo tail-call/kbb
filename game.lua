@@ -90,6 +90,7 @@ local whiteColor = { 1, 1, 1, 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
 local grayPanelColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
 local darkGrayPanelColor = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
+local evilSpawnLocation = { x = 281, y = 195 }
 local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 local battleRoundDuration = 0.5
@@ -327,15 +328,10 @@ function game:init()
   self.player = Guy.makeLeader({ x = 266, y = 229 })
   self.guys = {
     self.player,
-    -- Close to us, to the east
-    Guy.makeEvilGuy({ x = 286, y = 230 }),
-    Guy.makeEvilGuy({ x = 287, y = 230 }),
-    Guy.makeEvilGuy({ x = 286, y = 231 }),
-    Guy.makeEvilGuy({ x = 287, y = 231 }),
   }
-  for _ = 1, 20 do
-    table.insert(self.guys, Guy.makeEvilGuy({ x = 281, y = 195 }))
-  end
+  -- for _ = 1, 20 do
+    -- table.insert(self.guys, Guy.makeEvilGuy(evilSpawnLocation))
+  -- end
   self.buildings = {
     { pos = { x = 277, y = 233 } }
   }
@@ -604,6 +600,7 @@ local function maybeChop(guy)
   if t == 'forest' then
     game.resources.wood = game.resources.wood + 1
     setTile(game.world, pos, 'grass')
+    table.insert(game.guys, Guy.makeEvilGuy(evilSpawnLocation))
   end
 end
 
