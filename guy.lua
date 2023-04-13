@@ -140,6 +140,22 @@ function Guy.makeEvilGuy(pos)
   return guy
 end
 
+---@param pos Vector
+function Guy.makeStrongEvilGuy(pos)
+  local guy = Guy.new{
+    pos = pos,
+    color = { 1, 0, 1, 1 },
+  }
+  guy.time = 0
+  guy.stats.hp = 50
+  guy.stats.maxHp = 50
+  guy.speed = 0.25
+  guy.behavior = 'wander'
+  guy.team = 'evil'
+  guy.name = 'Evil Guy'
+  return guy
+end
+
 local function canRecruitGuy(guy)
   return guy.team == 'good'
 end

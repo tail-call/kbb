@@ -614,6 +614,7 @@ local function orderBuild(game)
   local t = getTile(game.world, pos)
   if t == 'rock' then
     game.resources.stone = game.resources.stone + 1
+    table.insert(game.guys, Guy.makeStrongEvilGuy(evilSpawnLocation))
     setTile(game.world, pos, 'sand')
   end
   game.resources.wood = game.resources.wood - 5
