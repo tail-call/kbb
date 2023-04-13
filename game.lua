@@ -99,6 +99,8 @@ local battleRoundDuration = 0.5
 local noneCollision = { type = 'none' }
 local terrainCollision = { type = 'terrain' }
 
+local activeTab = 0
+
 ---@type Game
 local game
 game = {
@@ -131,59 +133,9 @@ game = {
   isFocused = false,
   texts = {
     {
-      text = 'Out of troops? Press space and R.',
-      pos = { x = 268, y = 225 },
-      maxWidth = 8,
-    },
-    {
-      text = 'Move your troops with arrow keys.',
-      pos = { x = 268, y = 227 },
-      maxWidth = 8,
-    },
-    {
-      text = 'Space to focus.',
-      pos = { x = 268, y = 229 },
-      maxWidth = 8,
-    },
-    {
-      text = 'Press 1, 2, 3, 4 to change window scale.',
-      pos = { x = 268, y = 231 },
-      maxWidth = 8,
-    },
-    {
-      text = 'Press F to toggle follow mode.',
-      pos = { x = 268, y = 233 },
-      maxWidth = 8,
-    },
-    {
-      text = 'G to dismiss squad.',
-      pos = { x = 268, y = 235 },
-      maxWidth = 8,
-    },
-    {
-      text = 'Click to recruit units.',
-      pos = { x = 268, y = 237 },
-      maxWidth = 8,
-    },
-    {
-      text = 'C to chop wood.',
-      pos = { x = 268, y = 239 },
-      maxWidth = 8,
-    },
-    {
-      text = 'Z to switch camera zoom.',
-      pos = { x = 268, y = 241 },
-      maxWidth = 8,
-    },
-    {
-      text = 'Your enemies are red. Bump into them to fight.',
-      pos = { x = 279, y = 229 },
+      text = 'Chop wood. Build houses.',
+      pos = { x = 269, y = 228 },
       maxWidth = 9,
-    },
-    {
-      text = 'If your character dies, you lose.',
-      pos = { x = 279, y = 231 },
-      maxWidth = 8,
     },
   },
   ui = ui.makeRoot({}, {
@@ -237,7 +189,8 @@ game = {
         return game.isFocused
       end,
       text = function ()
-        return string.format(
+        local text = '<- Tab ->\n\n'
+        local charSheet = string.format(
           ''
             .. 'Name:\n %s\n'
             .. 'Rank:\n Harmless\n'
@@ -252,6 +205,29 @@ game = {
           game.player.time,
           game.player.speed
         )
+        local tips = ''
+          .. 'Out of troops? Press space and R.\n\n'
+          .. 'Move your troops with arrow keys.\n\n'
+          .. 'Space to focus.\n\n'
+          .. 'Click to recruit units.\n\n'
+
+        local tips2 = ''
+          .. 'Press 1, 2, 3, 4 to change window scale.\n\n'
+          .. 'Press F to toggle follow mode.\n\n'
+          .. 'G to dismiss squad.\n\n'
+
+        local tips3 = ''
+          .. 'C to chop wood.\n\n'
+          .. 'Z to switch camera zoom.\n\n'
+
+        local tips4 = ''
+          .. 'Your enemies are red. Bump into them to fight.\n\n'
+          .. 'If your character dies, you lose.\n\n'
+
+        local tabs = { charSheet, tips, tips2, tips3, tips4 }
+
+        local idx = 1 + (activeTab % #tabs)
+        return text .. tabs[idx]
       end,
     }),
     ---@type PanelUI
@@ -328,6 +304,9 @@ function game:init()
   self.player = Guy.makeLeader({ x = 269, y = 231 })
   self.guys = {
     self.player,
+    Guy.makeGoodGuy({ x = 274, y = 231 }),
+    Guy.makeGoodGuy({ x = 272, y = 231 }),
+    Guy.makeGoodGuy({ x = 274, y = 229 }),
   }
   -- for _ = 1, 20 do
     -- table.insert(self.guys, Guy.makeEvilGuy(evilSpawnLocation))
@@ -633,7 +612,10 @@ local function orderBuild(game)
     end
   end
   game.resources.wood = game.resources.wood - 5
-  table.insert(game.entities, { type = 'building', object = { pos = pos }})
+  table.insert(game.entities, {
+    type = 'building',
+    object = { pos = pos }
+  })
   game.isFocused = false
 end
 
@@ -676,20 +658,18 @@ end
 ---@param game Game
 ---@param scancode string
 local function handleInput(game, scancode)
-  if scancode == 'b' then
+  if scancode == 'tab' then
+    activeTab = activeTab + 1
+  elseif scancode == 'b' then
     orderBuild(game)
-  end
-  if scancode == 'm' then
+  elseif scancode == 'm' then
     orderScribe(game)
-  end
-  if scancode == 'r' then
+  elseif scancode == 'r' then
     orderSummon(game)
-  end
-  if scancode == 't' then
+  elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
     game.isFocused = false
-  end
-  if scancode == 'space' then
+  elseif scancode == 'space' then
     game:orderFocus()
   end
 end
