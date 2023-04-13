@@ -544,6 +544,7 @@ end
 local function updateBattles(game, dt)
   for _, entity in ipairs(game.entities) do
     if entity.type == 'battle' then
+      ---@cast entity any
       updateBattle(game, entity, dt)
     end
   end
