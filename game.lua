@@ -325,7 +325,7 @@ local guyDelegate = {
 }
 
 function game:init()
-  self.player = Guy.makeLeader({ x = 266, y = 229 })
+  self.player = Guy.makeLeader({ x = 269, y = 231 })
   self.guys = {
     self.player,
   }
