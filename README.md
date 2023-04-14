@@ -47,7 +47,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Zoom in on a highlighted tile
  - [x] HP system
  - [x] Diagonal movement should slide along walls
- - [ ] Guys should attempt diagonal movement when moving forward doesn't work
+ - [x] Guys should attempt diagonal movement when moving forward doesn't work
  - [ ] Catch enemies into houses to recruit them
  - [ ] Where player's guy die, wood spawns
  - [ ] Teleport a group of guys

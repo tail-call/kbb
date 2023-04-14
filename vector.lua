@@ -87,6 +87,16 @@ vector = {
     }
   end,
 
+  ---@param v1 Vector
+  ---@param v2 Vector
+  ---@return Vector
+  dotProd = function(v1, v2)
+    return {
+      x = v1.x * v2.x - v1.y * v2.y,
+      y = v1.x * v2.y + v1.y * v2.x
+    }
+  end,
+
   dir = {
     up = up,
     down = down,

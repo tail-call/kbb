@@ -55,33 +55,45 @@ local function moveGuy(guy, vec, delegate)
 
   local didMove = false
 
-  local newPos = vector.add(guy.pos, vec)
+  local stepForward = vector.add(guy.pos, vec)
+  local diagonalStepLeft = vector.add(guy.pos,
+    vector.add(vec, vector.dotProd(vec, { x = 0, y = 1 }))
+  )
+  local diagonalStepRight = vector.add(guy.pos,
+    vector.add(vec, vector.dotProd(vec, { x = 0, y = -1 }))
+  )
 
-  local function move()
+  ---@param pos Vector
+  local function move(pos)
     didMove = true
     guy.mayMove = false
-    guy.pos = newPos
+    guy.pos = pos
     guy.pixie:move(guy.pos)
   end
 
-  local collision = delegate.collider(nil, newPos)
-  if collision.type == 'none' then
-    move()
-  elseif collision.type == 'guy' then
-    if guy.team ~= collision.guy.team then
-      move()
-      delegate.beginBattle(guy, collision.guy)
-    end
-  elseif collision.type == 'entity' then
-    if collision.entity.type == 'building' then
-      local entity = collision.entity
-      ---@cast entity any
-      local sameEntity = entity
-      ---@cast sameEntity BuildingGameEntity
-      local shouldMove = delegate.enterHouse(guy, sameEntity)
-      if shouldMove then
-        move()
+  for _, pos in ipairs{stepForward, diagonalStepLeft, diagonalStepRight} do
+    local collision = delegate.collider(nil, pos)
+    if collision.type == 'none' then
+      move(pos)
+    elseif collision.type == 'guy' then
+      if guy.team ~= collision.guy.team then
+        move(pos)
+        delegate.beginBattle(guy, collision.guy)
       end
+    elseif collision.type == 'entity' then
+      if collision.entity.type == 'building' then
+        local entity = collision.entity
+        ---@cast entity any
+        local sameEntity = entity
+        ---@cast sameEntity BuildingGameEntity
+        local shouldMove = delegate.enterHouse(guy, sameEntity)
+        if shouldMove then
+          move(pos)
+        end
+      end
+    end
+    if didMove then
+      break
     end
   end
 
