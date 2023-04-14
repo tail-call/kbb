@@ -47,6 +47,9 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Zoom in on a highlighted tile
  - [x] HP system
  - [ ] Catch enemies into houses to recruit them
+ - [ ] Diagonal movement should slide along walls
+ - [ ] Teleport a group of guys
+ - [ ] Multi-layer parallax pseudo 3D of world
  - [ ] Constantly lower HP in the area of enemy's spawn
  - [ ] Parallax out-of-border background
  - [ ] Pixies visibly jump when they walk
