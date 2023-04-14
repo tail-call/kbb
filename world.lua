@@ -1,6 +1,6 @@
 local getTileset = require('./tileset').getTileset
 
----@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand'
+---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand' | 'void'
 
 ---@class World
 ---@field width integer
@@ -45,6 +45,7 @@ local function loadWorld(filename)
     ['0,0.5,0'] = 'forest',
     ['0.5,0.5,0.5'] = 'rock',
     ['1,1,0'] = 'sand',
+    ['0.5,0,0'] = 'void',
     default = 'grass',
   }
 
@@ -75,7 +76,7 @@ end
 ---@param v Vector
 local function isPassable(world, v)
   local t = world.tileTypes[vToTile(world, v)]
-  return t == 'grass' or t == 'forest' or t == 'sand'
+  return t == 'grass' or t == 'forest' or t == 'sand' or t == 'void'
 end
 
 ---@param world World
