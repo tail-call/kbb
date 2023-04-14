@@ -49,6 +49,7 @@ local maybeDrop = require('./tbl').maybeDrop
 
 ---@class Game
 ---@field world World
+---@field score integer
 ---@field frozenGuys { [Guy]: true }
 ---@field resources Resources
 ---@field entities GameEntity[]
@@ -95,6 +96,11 @@ local recruitCircleMaxRadius = 6
 local recruitCircleGrowthSpeed = 6
 local battleRoundDuration = 0.5
 
+local scoresTable = {
+  killedAnEnemy = 100,
+  builtAHouse = 500,
+}
+
 ---@type CollisionInfo
 local noneCollision = { type = 'none' }
 local terrainCollision = { type = 'terrain' }
@@ -106,6 +112,7 @@ local game
 game = {
   ---@type World
   world = nil,
+  score = 0,
   frozenGuys = tbl.weaken({}, 'k'),
   resources = {
     pretzels = 0,
@@ -137,6 +144,11 @@ game = {
       pos = { x = 269, y = 228 },
       maxWidth = 9,
     },
+    {
+      text = '\nGARDEN\n  OF\n  OF\n EDEN',
+      pos = { x = 280, y = 194 },
+      maxWidth = 8,
+    },
   },
   ui = ui.makeRoot({}, {
     ---@type PanelUI
@@ -145,7 +157,8 @@ game = {
         return {
           whiteColor,
           string.format(
-            'Goal: survive | FPS: %.1f\n%02d:%02d',
+            'Score: %d | FPS: %.1f\n%02d:%02d',
+            game.score,
             love.timer.getFPS(),
             math.floor(game.time / 60),
             math.floor(game.time % 60)
@@ -316,6 +329,7 @@ function game:init()
     Guy.makeGoodGuy({ x = 274, y = 231 }),
     Guy.makeGoodGuy({ x = 272, y = 231 }),
     Guy.makeGoodGuy({ x = 274, y = 229 }),
+    Guy.makeGoodGuy({ x = 272, y = 229 }),
   }
   -- for _ = 1, 20 do
     -- table.insert(self.guys, Guy.makeEvilGuy(evilSpawnLocation))
@@ -479,6 +493,23 @@ local function advanceClock(game, dt)
   return (game.time + dt) % (24 * 60)
 end
 
+
+---@param game Game
+---@param guy Guy
+local function killGuy(game, guy)
+  maybeDrop(game.guys, guy)
+  game.squad.followers[guy] = nil
+
+  if guy.team == 'evil' then
+    game.resources.pretzels = game.resources.pretzels + 1
+    game.score = game.score + scoresTable.killedAnEnemy
+  end
+
+  if guy == game.player and game.onLost then
+    game.onLost()
+  end
+end
+
 ---@param game Game
 ---@param entity BattleGameEntity
 ---@param dt number
@@ -493,16 +524,7 @@ local function updateBattle(game, entity, dt)
     local function maybeDie(guy)
       if guy.stats.hp <= 0 then
         echo(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
-        maybeDrop(game.guys, guy)
-        game.squad.followers[guy] = nil
-
-        if guy.team == 'evil' then
-          game.resources.pretzels = game.resources.pretzels + 1
-        end
-
-        if guy == game.player and game.onLost then
-          game.onLost()
-        end
+        killGuy(game, guy)
       end
     end
 
@@ -631,6 +653,7 @@ local function orderBuild(game)
     type = 'building',
     object = { pos = pos }
   })
+  game.score = game.score + scoresTable.builtAHouse
   game.isFocused = false
 end
 
