@@ -49,14 +49,17 @@ local Guy = {
 ---@param guy Guy
 ---@param vec Vector
 ---@param delegate GuyDelegate
+---@return boolean didMove
 local function moveGuy(guy, vec, delegate)
-  if not guy.mayMove then return end
+  if not guy.mayMove then return false end
 
-  guy.mayMove = false
+  local didMove = false
 
   local newPos = vector.add(guy.pos, vec)
 
   local function move()
+    didMove = true
+    guy.mayMove = false
     guy.pos = newPos
     guy.pixie:move(guy.pos)
   end
@@ -81,6 +84,8 @@ local function moveGuy(guy, vec, delegate)
       end
     end
   end
+
+  return didMove
 end
 
 local function warpGuy(guy, vec)

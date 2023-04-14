@@ -69,7 +69,6 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field visionSourcesCo fun(): VisionSource
 ---@field isFrozen fun(guy: Guy): boolean
 ---@field mayRecruit fun(guy: Guy): boolean
----@field orderMove fun(self: Game, vec: Vector): nil
 ---@field isReadyForOrder fun(self: Game): boolean
 ---@field init fun(self: Game): nil
 ---@field update fun(self: Game, dt: number): nil
@@ -257,6 +256,18 @@ game = {
   })
 }
 
+---@param game Game
+---@param text string
+local function echo(game, text)
+  table.insert(game.consoleMessages, {
+    text = text,
+    lifetime = 6,
+  })
+  while #game.consoleMessages >= 8 do
+    table.remove(game.consoleMessages, 1)
+  end
+end
+
 ---@param guy Guy
 local function freeze(guy)
   game.frozenGuys[guy] = true
@@ -395,19 +406,25 @@ function game:isReadyForOrder()
   return self.player.mayMove
 end
 
-function game:orderMove(vec)
-  if game.isFocused then return end
+---@param game Game
+---@param vec Vector
+---@return 'shouldRetryOtherDirection' | 'shouldStop'
+local function orderMove(game, vec)
+  if game.isFocused then return 'shouldStop' end
 
-  if self.squad.shouldFollow then
-    for guy in pairs(self.squad.followers) do
+  if game.squad.shouldFollow then
+    for guy in pairs(game.squad.followers) do
       if not game.isFrozen(guy) then
         moveGuy(guy, vec, guyDelegate)
       end
     end
   end
-  if not game.isFrozen(self.player) then
-    moveGuy(self.player, vec, guyDelegate)
+  if not game.isFrozen(game.player) then
+    if moveGuy(game.player, vec, guyDelegate) then
+      return 'shouldStop'
+    end
   end
+  return 'shouldRetryOtherDirection'
 end
 
 function game.visionSourcesCo()
@@ -423,18 +440,6 @@ function game.visionSourcesCo()
     pos = game.cursorPos,
     sight = math.max(2, game.recruitCircle or 0),
   }
-end
-
----@param game Game
----@param text string
-local function echo(game, text)
-  table.insert(game.consoleMessages, {
-    text = text,
-    lifetime = 6,
-  })
-  while #game.consoleMessages >= 8 do
-    table.remove(game.consoleMessages, 1)
-  end
 end
 
 ---@param game Game
@@ -722,5 +727,6 @@ return {
   switchMagn = switchMagn,
   updateGame = updateGame,
   handleInput = handleInput,
+  orderMove = orderMove,
   echo = echo,
 }

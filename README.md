@@ -46,8 +46,9 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Spawn animation for guys
  - [x] Zoom in on a highlighted tile
  - [x] HP system
+ - [x] Diagonal movement should slide along walls
+ - [ ] Guys should attempt diagonal movement when moving forward doesn't work
  - [ ] Catch enemies into houses to recruit them
- - [ ] Diagonal movement should slide along walls
  - [ ] Teleport a group of guys
  - [ ] Multi-layer parallax pseudo 3D of world
  - [ ] Constantly lower HP in the area of enemy's spawn

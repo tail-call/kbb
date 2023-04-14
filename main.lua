@@ -3,6 +3,7 @@ math.randomseed(os.time())
 
 local draw = require('./draw')
 local game = require('./game').game
+local orderMove = require('./game').orderMove
 local drawGame = require('./draw').drawGame
 local handleInput = require('./game').handleInput
 local switchMagn = require('./game').switchMagn
@@ -46,8 +47,14 @@ function love.update(dt)
     end
 
     if game:isReadyForOrder() and #directions > 0 then
-      alternatingKeyIndex = (alternatingKeyIndex + 1) % (#directions)
-      game:orderMove(directions[alternatingKeyIndex + 1])
+      for _ = 1, #directions do
+        alternatingKeyIndex = (alternatingKeyIndex + 1) % (#directions)
+        if orderMove(
+          game, directions[alternatingKeyIndex + 1]
+        ) == 'shouldStop' then
+          break
+        end
+      end
     end
 
     updateGame(game, dt)
