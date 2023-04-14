@@ -144,7 +144,7 @@ game = {
       maxWidth = 9,
     },
     {
-      text = '\nGARDEN\n  OF\n  OF\n EDEN',
+      text = '\nGARDEN\n  O\n   F\n EDEN',
       pos = { x = 280, y = 194 },
       maxWidth = 8,
     },
