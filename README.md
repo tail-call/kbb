@@ -49,6 +49,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Diagonal movement should slide along walls
  - [ ] Guys should attempt diagonal movement when moving forward doesn't work
  - [ ] Catch enemies into houses to recruit them
+ - [ ] Where player's guy die, wood spawns
  - [ ] Teleport a group of guys
  - [ ] Multi-layer parallax pseudo 3D of world
  - [ ] Constantly lower HP in the area of enemy's spawn
