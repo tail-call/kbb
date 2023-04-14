@@ -298,9 +298,13 @@ local guyDelegate = {
     })
   end,
   enterHouse = function (guy, entity)
+    if guy.stats.hp >= guy.stats.maxHp then
+      return false
+    end
     guy.stats.hp = guy.stats.maxHp
     local idx = tbl.indexOf(game.entities, entity)
     table.remove(game.entities, idx)
+    return true
   end,
   collider = game.collider,
 }

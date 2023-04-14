@@ -75,8 +75,10 @@ local function moveGuy(guy, vec, delegate)
       ---@cast entity any
       local sameEntity = entity
       ---@cast sameEntity BuildingGameEntity
-      move()
-      delegate.enterHouse(guy, sameEntity)
+      local shouldMove = delegate.enterHouse(guy, sameEntity)
+      if shouldMove then
+        move()
+      end
     end
   end
 end
