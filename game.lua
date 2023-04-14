@@ -272,7 +272,7 @@ function game.collider(nothing, v)
     return vector.equal(entity.object.pos, v)
   end)
   if entity then
-    return terrainCollision
+    return { type = 'entity', entity = entity }
   end
   if isPassable(game.world, v) then
     return noneCollision
@@ -296,6 +296,11 @@ local guyDelegate = {
         timer = battleRoundDuration,
       }
     })
+  end,
+  enterHouse = function (guy, entity)
+    guy.stats.hp = guy.stats.maxHp
+    local idx = tbl.indexOf(game.entities, entity)
+    table.remove(game.entities, idx)
   end,
   collider = game.collider,
 }
@@ -625,20 +630,22 @@ local function orderBuild(game)
   game.isFocused = false
 end
 
+---@return integer
+local function randomLetterCode()
+  local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  local idx = math.random(#letters)
+  return string.byte(letters, idx)
+end
+
 ---@param game Game
 local function orderScribe(game)
-  local function randomLetter()
-    local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    local idx = math.random(#letters)
-    return string.byte(letters, idx)
-  end
   table.insert(game.texts, {
     text = string.format(
       '%c%c\n%c%c',
-      randomLetter(),
-      randomLetter(),
-      randomLetter(),
-      randomLetter()
+      randomLetterCode(),
+      randomLetterCode(),
+      randomLetterCode(),
+      randomLetterCode()
     ),
     pos = game.cursorPos,
     maxWidth = 4,
@@ -648,17 +655,20 @@ end
 
 ---@param game Game
 local function orderSummon(game)
-  if game.resources.pretzels > 0 then
-    local guy = Guy.makeGoodGuy({
-      x = game.cursorPos.x,
-      y = game.cursorPos.y
-    })
-    echo(game, ('%s was summonned.'):format(guy.name))
-    table.insert(game.guys, guy)
-    game.squad.followers[guy] = true
-    game.resources.pretzels = game.resources.pretzels - 1
-    game.isFocused = not game.isFocused
+  if game.resources.pretzels <= 0 then
+    return
   end
+
+  game.resources.pretzels = game.resources.pretzels - 1
+  local guy = Guy.makeGoodGuy({
+    x = game.cursorPos.x,
+    y = game.cursorPos.y
+  })
+  echo(game, ('%s was summonned.'):format(guy.name))
+  table.insert(game.guys, guy)
+  game.squad.followers[guy] = true
+
+  game.isFocused = not game.isFocused
 end
 
 ---@param game Game

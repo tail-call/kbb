@@ -18,12 +18,13 @@ local abilities = require('./ability').abilities
 ---@field behavior 'none' | 'wander'
 ---@field team 'good' | 'evil'
 
----@alias CollisionInfo { type: 'guy' | 'terrain' | 'none', guy: Guy | nil }
+---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
 ---@alias Collider fun(nothing: nil, v: Vector): CollisionInfo
 
 ---@class GuyDelegate
 ---@field collider Collider
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil
+---@field enterHouse fun(guest: Guy, entity: BuildingGameEntity): nil
 
 ---@type Guy
 local Guy = {
@@ -54,16 +55,30 @@ local function moveGuy(guy, vec, delegate)
   guy.mayMove = false
 
   local newPos = vector.add(guy.pos, vec)
+
+  local function move()
+    guy.pos = newPos
+    guy.pixie:move(guy.pos)
+  end
+
   local collision = delegate.collider(nil, newPos)
   if collision.type == 'none' then
-    guy.pos = newPos
+    move()
   elseif collision.type == 'guy' then
     if guy.team ~= collision.guy.team then
-      guy.pos = newPos
+      move()
       delegate.beginBattle(guy, collision.guy)
     end
+  elseif collision.type == 'entity' then
+    if collision.entity.type == 'building' then
+      local entity = collision.entity
+      ---@cast entity any
+      local sameEntity = entity
+      ---@cast sameEntity BuildingGameEntity
+      move()
+      delegate.enterHouse(guy, sameEntity)
+    end
   end
-  guy.pixie:move(guy.pos)
 end
 
 local function warpGuy(guy, vec)
