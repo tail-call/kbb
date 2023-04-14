@@ -59,6 +59,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Unit and terrain are stacked like cards
  - [ ] Cards have actions
  - [ ] Command for bringing your troops closer to you
+ - [ ] Underworld
  - [ ] Fade in / fade out objects within FOV
  - [ ] Chopping wood is performed like combat
  - [ ] Mining stone is performed like combat
