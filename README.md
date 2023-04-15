@@ -48,7 +48,8 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] HP system
  - [x] Diagonal movement should slide along walls
  - [x] Guys should attempt diagonal movement when moving forward doesn't work
- - [ ] Flight ability
+ - [x] Order guys to chop trees
+ - [ ] Fight ability
  - [ ] Travelling through void is veeeeery slow but possible, even outside of the map
  - [ ] Catch enemies into houses to recruit them
  - [ ] Where player's guy die, wood spawns
@@ -90,7 +91,6 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Town hall
  - [ ] Mushrooms
  - [ ] Dynamic lighting
- - [ ] Order guys to chop trees
  - [ ] Noisy texture details when zooming in
  - [ ] Daily routines
  - [ ] Jobs
