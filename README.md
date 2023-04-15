@@ -48,6 +48,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] HP system
  - [x] Diagonal movement should slide along walls
  - [x] Guys should attempt diagonal movement when moving forward doesn't work
+ - [ ] Flight ability
  - [ ] Travelling through void is veeeeery slow but possible, even outside of the map
  - [ ] Catch enemies into houses to recruit them
  - [ ] Where player's guy die, wood spawns
