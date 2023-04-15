@@ -49,7 +49,11 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Diagonal movement should slide along walls
  - [x] Guys should attempt diagonal movement when moving forward doesn't work
  - [x] Order guys to chop trees
- - [ ] Fight ability
+ - [ ] Flight ability
+ - [ ] Items on the ground are 2D sprites rotating around Z axis
+ - [ ] Skills: combat, defence, chopping, etc. All of these grant XP. +1 level means +1 weight in table and +1 to the effect.
+ - [ ] Chest for resources
+ - [ ] Chest for treasures
  - [ ] Travelling through void is veeeeery slow but possible, even outside of the map
  - [ ] Catch enemies into houses to recruit them
  - [ ] Where player's guy die, wood spawns
