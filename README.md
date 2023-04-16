@@ -49,11 +49,16 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Diagonal movement should slide along walls
  - [x] Guys should attempt diagonal movement when moving forward doesn't work
  - [x] Order guys to chop trees
+ - [x] Fog of war
+ - [ ] Map reveal percent stat
+ - [ ] Combine fog of war with FOV
+ - [ ] Minimap fog of war
  - [ ] Flight ability
  - [ ] Items on the ground are 2D sprites rotating around Z axis
  - [ ] Skills: combat, defence, chopping, etc. All of these grant XP. +1 level means +1 weight in table and +1 to the effect.
  - [ ] Chest for resources
  - [ ] Chest for treasures
+ - [ ] Different types of tiles yield different movement speeds
  - [ ] Travelling through void is veeeeery slow but possible, even outside of the map
  - [ ] Catch enemies into houses to recruit them
  - [ ] Where player's guy die, wood spawns
@@ -80,7 +85,6 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Every guy may also have an item equipped: a tool or a weapon
  - [ ] A tool or a weapon affects ability rings
  - [ ] Squad's turn follows cursor
- - [ ] Fog of war
  - [ ] Workshop where foundations of buildings are made
  - [ ] A group of units must carry foundation to its place
  - [ ] Then unit carries wood to the site and builds the thing
@@ -99,6 +103,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Daily routines
  - [ ] Jobs
  - [ ] Hunger
+ - [ ] Bonuses for exploring map
 
 # Sources
 

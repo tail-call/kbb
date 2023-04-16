@@ -346,10 +346,17 @@ end
 ---@param sky { r: number, b: number, g: number }
 local function drawWorld(game, sky)
   local world = game.world
+  local function index(x, y) return world.width * (y - 1) + x end
+
+  ---@param visionSource VisionSource
+  local function calcVisionDistance(visionSource)
+    return math.floor(visionSource.sight * sky.g)
+  end
+
+  -- Reveal fog of war
   forEachVisionSource(game, function (visionSource)
-    local tileset = getTileset()
     local pos = visionSource.pos
-    local visionDistance = math.floor(visionSource.sight * sky.g)
+    local visionDistance = calcVisionDistance(visionSource)
     local vd2 = visionDistance ^ 2
     local posX = pos.x
     local posY = pos.y
@@ -368,18 +375,26 @@ local function drawWorld(game, sky)
         else
           alpha = 0
         end
-        local idx = world.width * (y - 1) + x
+        local idx = index(x,y)
         world.fogOfWar[idx] = math.max(alpha, world.fogOfWar[idx] or 0)
-        withColor(sky.r, sky.g, sky.b, 1, function ()
-          love.graphics.draw(tileset.tiles, tileset.quads[
-            world.tileTypes[idx] or 'void'
-          ], x * tileWidth, y * tileHeight)
-          local fog = world.fogOfWar[idx] * 255
-          textAtTile(('%2x'):format(fog), { x = x, y = y }, 2)
-        end)
       end
     end
   end)
+
+  local tileset = getTileset()
+  local posX, posY = game.player.pos.x, game.player.pos.y
+  local visionDistance = 21
+  for y = posY - visionDistance, posY + visionDistance do
+    for x = posX - visionDistance, posX + visionDistance do
+      local idx = index(x, y)
+      local fog = world.fogOfWar[idx] or 0
+      withColor(sky.r, sky.g, sky.b, fog, function ()
+        love.graphics.draw(tileset.tiles, tileset.quads[
+          world.tileTypes[idx] or 'void'
+        ], x * tileWidth, y * tileHeight)
+      end)
+    end
+  end
 end
 
 ---@param game Game
