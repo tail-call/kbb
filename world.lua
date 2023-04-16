@@ -7,6 +7,7 @@ local getTileset = require('./tileset').getTileset
 ---@field height integer
 ---@field image love.Image
 ---@field tileTypes WorldTile[]
+---@field fogOfWar number[] Number from 0 to 1
 
 ---@return World
 local function newWorld()
@@ -37,7 +38,8 @@ local function loadWorld(filename)
     width = width,
     height = height,
     image = image,
-    tileTypes = {}
+    tileTypes = {},
+    fogOfWar = {}
   }
 
   local tileColors = {
@@ -59,6 +61,7 @@ local function loadWorld(filename)
         string.format('%s,%s,%s', r, g, b)
       ] or tileColors.default
       table.insert(world.tileTypes, tileType)
+      table.insert(world.fogOfWar, 0.0)
     end
   end
 

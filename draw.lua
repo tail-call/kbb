@@ -315,8 +315,9 @@ local function drawWorld(world, pos, visionDistance, sky)
   local posY = pos.y
   for y = posY - visionDistance, posY + visionDistance do
     for x = posX - visionDistance, posX + visionDistance do
+      local alpha = 1
       if isVisible(vd2, posX, posY, x, y) then
-        local alpha = 1
+        -- Neighbor based shading
         for dy = -1, 1 do
           for dx = -1, 1 do
             if not isVisible(vd2, posX, posY, x + dx, y + dy) then
@@ -324,12 +325,18 @@ local function drawWorld(world, pos, visionDistance, sky)
             end
           end
         end
-        withColor(sky.r, sky.g, sky.b, alpha, function ()
-          love.graphics.draw(tileset.tiles, tileset.quads[
-            world.tileTypes[world.width * (y - 1) + x] or 'void'
-          ], x * tileWidth, y * tileHeight)
-        end)
+      else
+        alpha = 0
       end
+      local idx = world.width * (y - 1) + x
+      world.fogOfWar[idx] = math.max(alpha, world.fogOfWar[idx] or 0)
+      withColor(sky.r, sky.g, sky.b, 1, function ()
+        love.graphics.draw(tileset.tiles, tileset.quads[
+          world.tileTypes[idx] or 'void'
+        ], x * tileWidth, y * tileHeight)
+        local fog = world.fogOfWar[idx] * 255
+        textAtTile(('%2x'):format(fog), { x = x, y = y }, 2)
+      end)
     end
   end
 end
