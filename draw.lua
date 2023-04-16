@@ -304,43 +304,6 @@ local function isVisible(vd2, ox, oy, tx, ty)
   return vd2 + 2 - (ox - tx) ^ 2 - (oy - ty) ^ 2 > 0
 end
 
----@param world World
----@param pos Vector
----@param visionDistance number
----@param sky { r: number, b: number, g: number }
-local function drawWorld(world, pos, visionDistance, sky)
-  local tileset = getTileset()
-  local vd2 = visionDistance ^ 2
-  local posX = pos.x
-  local posY = pos.y
-  for y = posY - visionDistance, posY + visionDistance do
-    for x = posX - visionDistance, posX + visionDistance do
-      local alpha = 1
-      if isVisible(vd2, posX, posY, x, y) then
-        -- Neighbor based shading
-        for dy = -1, 1 do
-          for dx = -1, 1 do
-            if not isVisible(vd2, posX, posY, x + dx, y + dy) then
-              alpha = alpha - 1/8
-            end
-          end
-        end
-      else
-        alpha = 0
-      end
-      local idx = world.width * (y - 1) + x
-      world.fogOfWar[idx] = math.max(alpha, world.fogOfWar[idx] or 0)
-      withColor(sky.r, sky.g, sky.b, 1, function ()
-        love.graphics.draw(tileset.tiles, tileset.quads[
-          world.tileTypes[idx] or 'void'
-        ], x * tileWidth, y * tileHeight)
-        local fog = world.fogOfWar[idx] * 255
-        textAtTile(('%2x'):format(fog), { x = x, y = y }, 2)
-      end)
-    end
-  end
-end
-
 ---@param game Game
 ---@param cb fun(visionSource: VisionSource): nil
 local function forEachVisionSource(game, cb)
@@ -380,6 +343,46 @@ local function skyColor(time)
 end
 
 ---@param game Game
+---@param sky { r: number, b: number, g: number }
+local function drawWorld(game, sky)
+  local world = game.world
+  forEachVisionSource(game, function (visionSource)
+    local tileset = getTileset()
+    local pos = visionSource.pos
+    local visionDistance = math.floor(visionSource.sight * sky.g)
+    local vd2 = visionDistance ^ 2
+    local posX = pos.x
+    local posY = pos.y
+    for y = posY - visionDistance, posY + visionDistance do
+      for x = posX - visionDistance, posX + visionDistance do
+        local alpha = 1
+        if isVisible(vd2, posX, posY, x, y) then
+          -- Neighbor based shading
+          for dy = -1, 1 do
+            for dx = -1, 1 do
+              if not isVisible(vd2, posX, posY, x + dx, y + dy) then
+                alpha = alpha - 1/8
+              end
+            end
+          end
+        else
+          alpha = 0
+        end
+        local idx = world.width * (y - 1) + x
+        world.fogOfWar[idx] = math.max(alpha, world.fogOfWar[idx] or 0)
+        withColor(sky.r, sky.g, sky.b, 1, function ()
+          love.graphics.draw(tileset.tiles, tileset.quads[
+            world.tileTypes[idx] or 'void'
+          ], x * tileWidth, y * tileHeight)
+          local fog = world.fogOfWar[idx] * 255
+          textAtTile(('%2x'):format(fog), { x = x, y = y }, 2)
+        end)
+      end
+    end
+  end)
+end
+
+---@param game Game
 local function drawGame(game)
   love.graphics.push('transform')
 
@@ -401,16 +404,7 @@ local function drawGame(game)
   -- Draw visible terrain
 
   local colorOfSky = skyColor(game.time)
-  do
-    forEachVisionSource(game, function (visionSource)
-      drawWorld(
-        game.world,
-        visionSource.pos,
-        math.floor(visionSource.sight * colorOfSky.g),
-        colorOfSky
-      )
-    end)
-  end
+  drawWorld(game, colorOfSky)
 
   -- Draw in-game objects
 
@@ -615,6 +609,5 @@ return {
   house = drawHouse,
   getCursorCoords = getCursorCoords,
   cursor = drawCursor,
-  drawWorld = drawWorld,
   drawGame = drawGame,
 }
