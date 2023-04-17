@@ -333,8 +333,7 @@ local guyDelegate = {
 }
 
 function game:init()
-  --self.player = Guy.makeLeader({ x = 269, y = 231 })
-  self.player = Guy.makeLeader({ x = 334, y = 90 })
+  self.player = Guy.makeLeader({ x = 269, y = 231 })
   self.guys = {
     self.player,
     Guy.makeGoodGuy({ x = 274, y = 231 }),
@@ -342,9 +341,6 @@ function game:init()
     Guy.makeGoodGuy({ x = 274, y = 229 }),
     Guy.makeGoodGuy({ x = 272, y = 229 }),
   }
-  -- for _ = 1, 20 do
-    -- table.insert(self.guys, Guy.makeEvilGuy(evilSpawnLocation))
-  -- end
   self.buildings = {
     { pos = { x = 277, y = 233 } }
   }

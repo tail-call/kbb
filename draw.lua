@@ -16,6 +16,7 @@ local tileHeight = 16
 local tileWidth = 16
 local cursorTimerSpeed = 2
 local battleTimerSpeed = 2
+local waterTimerSpeed = 1/4
 local minimapSize = 72
 
 local whiteCursorColor = { 1, 1, 1, 0.8 }
@@ -30,6 +31,7 @@ local highlightCircleRadius = 10
 local zoom = 1
 local cursorTimer = 0
 local battleTimer = 0
+local waterTimer = 0
 ---@type Vector3
 local lerpVec = { x = 266 * 16, y = 229 * 16, z = 0.01 }
 local cameraOffset = { x = 0, y = 0 }
@@ -114,6 +116,7 @@ end
 local function update(dt, camera, magn, isAltCentering)
   local tileset = getTileset()
   battleTimer = (battleTimer + battleTimerSpeed * dt) % 1
+  waterTimer = (waterTimer + waterTimerSpeed * dt) % (math.pi / 2)
   cursorTimer = (cursorTimer + cursorTimerSpeed * dt) % (math.pi * 2)
   local offset = vector.add(
     vector.scale(camera, tileWidth),
@@ -385,7 +388,9 @@ local function drawWorld(game, sky)
   local tileset = getTileset()
   local posX, posY = game.player.pos.x, game.player.pos.y
   local visionDistance = 21
-  local parallaxTile = parallaxTile(lerpVec.x / 6, lerpVec.y / 6)
+  local voidTile = parallaxTile(0, 48, lerpVec.x / 6, lerpVec.y / 6)
+  local waterPhase = 16 * math.sin(waterTimer)
+  local waterTile = parallaxTile(48, 0, -waterPhase, waterPhase)
   for y = posY - visionDistance, posY + visionDistance do
     for x = posX - visionDistance, posX + visionDistance do
       local idx = index(x, y)
@@ -394,7 +399,15 @@ local function drawWorld(game, sky)
       local tile = tileset.quads[tileType]
       withColor(sky.r, sky.g, sky.b, fog, function ()
         if tileType == 'void' then
-          for _, fragment in ipairs(parallaxTile) do
+          for _, fragment in ipairs(voidTile) do
+            withTransform(fragment.transform, function ()
+              love.graphics.draw(
+                tileset.tiles, fragment.quad, x * tileWidth, y * tileHeight
+              )
+            end)
+          end
+        elseif tileType == 'water' then
+          for _, fragment in ipairs(waterTile) do
             withTransform(fragment.transform, function ()
               love.graphics.draw(
                 tileset.tiles, fragment.quad, x * tileWidth, y * tileHeight
