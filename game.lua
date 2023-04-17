@@ -201,45 +201,45 @@ game = {
         return game.isFocused
       end,
       text = function ()
-        local text = '<- Tab ->\n\n'
-        local charSheet = string.format(
-          ''
-            .. 'Name:\n %s\n'
-            .. 'Rank:\n Harmless\n'
-            .. 'Coords:\n %sX %sY\n'
-            .. 'HP:\n %s/%s\n'
-            .. 'Action:\n %.2f/%.2f\n',
-          game.player.name,
-          game.player.pos.x,
-          game.player.pos.y,
-          game.player.stats.hp,
-          game.player.stats.maxHp,
-          game.player.time,
-          game.player.speed
-        )
-        local tips = ''
-          .. 'Out of troops? Press space and R.\n\n'
-          .. 'Move your troops with arrow keys.\n\n'
-          .. 'Space to focus.\n\n'
-          .. 'Click to recruit units.\n\n'
+        local function charSheet(guy)
+          return function ()
+            return string.format(
+              ''
+                .. 'Name:\n %s\n'
+                .. 'Rank:\n Harmless\n'
+                .. 'Coords:\n %sX %sY\n'
+                .. 'HP:\n %s/%s\n'
+                .. 'Action:\n %.2f/%.2f\n',
+              guy.name,
+              guy.pos.x,
+              guy.pos.y,
+              guy.stats.hp,
+              guy.stats.maxHp,
+              guy.time,
+              guy.speed
+            )
+          end
+        end
 
-        local tips2 = ''
-          .. 'Press 1, 2, 3, 4 to change window scale.\n\n'
-          .. 'Press F to toggle follow mode.\n\n'
-          .. 'G to dismiss squad.\n\n'
+        local function controls()
+          return ''
+            .. ' CONTROLS  \n'
+            .. 'WASD:  move\n'
+            .. 'LMB:recruit\n'
+            .. 'Spc:  focus\n'
+            .. '1234: scale\n'
+            .. 'F:   follow\n'
+            .. 'G:  dismiss\n'
+            .. 'C:     chop\n'
+            .. 'Z:     zoom\n'
+        end
 
-        local tips3 = ''
-          .. 'C to chop wood.\n\n'
-          .. 'Z to switch camera zoom.\n\n'
 
-        local tips4 = ''
-          .. 'Your enemies are red. Bump into them to fight.\n\n'
-          .. 'If your character dies, you lose.\n\n'
-
-        local tabs = { charSheet, tips, tips2, tips3, tips4 }
-
+        local header = '<- Tab ->\n\n'
+        local tabs = { charSheet(game.player), controls }
         local idx = 1 + (activeTab % #tabs)
-        return text .. tabs[idx]
+
+        return header .. tabs[idx]()
       end,
     }),
     ---@type PanelUI
@@ -346,6 +346,7 @@ local guyDelegate = {
 
 function game:init()
   self.player = Guy.makeLeader({ x = 269, y = 231 })
+  self.player.name = 'Leader'
   self.guys = {
     self.player,
     Guy.makeGoodGuy({ x = 274, y = 231 }),
