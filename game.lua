@@ -87,6 +87,7 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field object Battle
 
 local whiteColor = { 1, 1, 1, 1 }
+local whitePanelColor = { r = 1, g = 1, b = 1, a = 1 }
 local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
 local grayPanelColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
 local darkGrayPanelColor = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
@@ -250,6 +251,17 @@ game = {
           game.resources.stone,
           game.resources.pretzels
         )
+      end,
+    }),
+    -- Pause icon
+    ui.makePanel(ui.origin():translate(92, 132), 3, 8, whitePanelColor, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+    }),
+    ui.makePanel(ui.origin():translate(97, 132), 3, 8, whitePanelColor, {
+      shouldDraw = function ()
+        return game.isFocused
       end,
     }),
   })
