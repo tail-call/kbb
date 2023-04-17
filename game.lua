@@ -129,7 +129,6 @@ game = {
     shouldFollow = false,
   },
   buildings = {},
-  lerpVec = { x = 0, y = 0 },
   recruitCircle = nil,
   ---@type fun(): nil
   onLost = nil,
@@ -334,7 +333,8 @@ local guyDelegate = {
 }
 
 function game:init()
-  self.player = Guy.makeLeader({ x = 269, y = 231 })
+  --self.player = Guy.makeLeader({ x = 269, y = 231 })
+  self.player = Guy.makeLeader({ x = 334, y = 90 })
   self.guys = {
     self.player,
     Guy.makeGoodGuy({ x = 274, y = 231 }),

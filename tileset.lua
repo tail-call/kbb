@@ -34,6 +34,66 @@ local function getTileset()
   return tileset
 end
 
+---@param offsetX number
+---@param offsetY number
+---@return { transform: love.Transform, quad: love.Quad }[]
+local function parallaxTile(offsetX, offsetY)
+  offsetX = offsetX % 16
+  offsetY = offsetY % 16
+  local baseX = 0
+  local basyY = 48
+  return {
+    {
+      transform = love.math.newTransform(
+        0, 0
+      ),
+      quad = love.graphics.newQuad(
+        baseX + offsetX,
+        basyY + offsetY,
+        16 - offsetX,
+        16 - offsetY,
+        tileset.tiles:getDimensions()
+      ),
+    },
+    {
+      transform = love.math.newTransform(
+        16 - offsetX, 0
+      ),
+      quad = love.graphics.newQuad(
+        baseX,
+        basyY + offsetY,
+        offsetX,
+        16 - offsetY,
+        tileset.tiles:getDimensions()
+      ),
+    },
+    {
+      transform = love.math.newTransform(
+        0, 16 - offsetY
+      ),
+      quad = love.graphics.newQuad(
+        baseX + offsetX,
+        basyY,
+        16 - offsetX,
+        offsetY,
+        tileset.tiles:getDimensions()
+      ),
+    },
+    {
+      transform = love.math.newTransform(
+        16 - offsetX, 16 - offsetY
+      ),
+      quad = love.graphics.newQuad(
+        baseX,
+        basyY,
+        offsetX,
+        offsetY,
+        tileset.tiles:getDimensions()
+      ),
+    },
+  }
+end
+
 local function load()
   local image = love.graphics.newImage('tiles.png')
   local canvas = love.graphics.newCanvas(image:getWidth(), image:getHeight())
@@ -97,4 +157,5 @@ return {
   update = update,
   regenerate = regenerate,
   getTileset = getTileset,
+  parallaxTile = parallaxTile,
 }

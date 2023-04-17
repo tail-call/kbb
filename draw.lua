@@ -1,6 +1,7 @@
 local loadTileset = require('./tileset').load
 local updateTileset = require('./tileset').update
 local getTileset = require('./tileset').getTileset
+local parallaxTile = require('./tileset').parallaxTile
 local regenerateTileset = require('./tileset').regenerate
 local loadFont = require('./font').load
 local tbl = require('./tbl')
@@ -384,14 +385,27 @@ local function drawWorld(game, sky)
   local tileset = getTileset()
   local posX, posY = game.player.pos.x, game.player.pos.y
   local visionDistance = 21
+  local parallaxTile = parallaxTile(lerpVec.x / 6, lerpVec.y / 6)
   for y = posY - visionDistance, posY + visionDistance do
     for x = posX - visionDistance, posX + visionDistance do
       local idx = index(x, y)
       local fog = world.fogOfWar[idx] or 0
+      local tileType = world.tileTypes[idx] or 'void'
+      local tile = tileset.quads[tileType]
       withColor(sky.r, sky.g, sky.b, fog, function ()
-        love.graphics.draw(tileset.tiles, tileset.quads[
-          world.tileTypes[idx] or 'void'
-        ], x * tileWidth, y * tileHeight)
+        if tileType == 'void' then
+          for _, fragment in ipairs(parallaxTile) do
+            withTransform(fragment.transform, function ()
+              love.graphics.draw(
+                tileset.tiles, fragment.quad, x * tileWidth, y * tileHeight
+              )
+            end)
+          end
+        else
+          love.graphics.draw(
+            tileset.tiles, tile, x * tileWidth, y * tileHeight
+          )
+        end
       end)
     end
   end
