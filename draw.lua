@@ -388,7 +388,7 @@ local function drawWorld(game, sky)
   local tileset = getTileset()
   local posX, posY = game.player.pos.x, game.player.pos.y
   local visionDistance = 21
-  local voidTile = parallaxTile(0, 48, lerpVec.x / 6, lerpVec.y / 6)
+  local voidTile = parallaxTile(0, 48, -lerpVec.x/2, -lerpVec.y/2)
   local waterPhase = 16 * math.sin(waterTimer)
   local waterTile = parallaxTile(48, 0, -waterPhase, waterPhase)
   for y = posY - visionDistance, posY + visionDistance do
