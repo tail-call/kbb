@@ -72,7 +72,6 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field isReadyForOrder fun(self: Game): boolean
 ---@field init fun(self: Game): nil
 ---@field update fun(self: Game, dt: number): nil
----@field orderFocus fun(self: Game): nil
 
 ---@class GameEntity
 ---@field type string
@@ -386,29 +385,29 @@ end
   return vector.dist(guy.pos, game.cursorPos) < game.recruitCircle + 0.5
 end
 
-function game:toggleFollow()
-  self.squad.shouldFollow = not self.squad.shouldFollow
+local function toggleFollow(game)
+  game.squad.shouldFollow = not game.squad.shouldFollow
 end
 
-function game:dismissSquad()
-  for guy in pairs(self.squad.followers) do
-    self.squad.followers[guy] = nil
+local function dismissSquad(game)
+  for guy in pairs(game.squad.followers) do
+    game.squad.followers[guy] = nil
   end
 end
 
-function game:beginRecruiting()
+local function beginRecruiting(game)
   if game.isFocused then return end
-  self.recruitCircle = 0
+  game.recruitCircle = 0
 end
 
-function game:endRecruiting()
-  for _, guy in tbl.ifilter(self.guys, function (guy)
+local function endRecruiting(game)
+  for _, guy in tbl.ifilter(game.guys, function (guy)
     return game.mayRecruit(guy)
   end) do
-    self.squad.followers[guy] = true
+    game.squad.followers[guy] = true
   end
-  self.squad.shouldFollow = true
-  self.recruitCircle = nil
+  game.squad.shouldFollow = true
+  game.recruitCircle = nil
 end
 
 function game:isReadyForOrder()
@@ -612,7 +611,7 @@ local function updateGame(game, dt)
   updateGuys(game, dt)
 end
 
-function game:orderFocus()
+local function orderFocus(game)
   game.isFocused = not game.isFocused
 end
 
@@ -628,7 +627,7 @@ local function maybeChop(guy)
   end
 end
 
-function game:orderChop()
+local function orderChop(game)
   maybeChop(game.player)
   for guy in pairs(game.squad.followers) do
     maybeChop(guy)
@@ -732,10 +731,15 @@ local function handleInput(game, scancode)
 end
 
 return {
+  dismissSquad = dismissSquad,
   game = game,
-  switchMagn = switchMagn,
-  updateGame = updateGame,
   handleInput = handleInput,
+  orderChop = orderChop,
   orderMove = orderMove,
   echo = echo,
+  switogMagnleFswitllMagnw = toggleFollow,
+  updateGame = updateGame,
+  orderFocus = orderFocus,
+  beginRecruiting = beginRecruiting,
+  endRecruiting = endRecruiting,
 }

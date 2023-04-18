@@ -8,6 +8,12 @@ local drawGame = require('./draw').drawGame
 local handleInput = require('./game').handleInput
 local switchMagn = require('./game').switchMagn
 local updateGame = require('./game').updateGame
+local toggleFollow = require('./game').toggleFollow
+local dismissSquad = require('./game').dismissSquad
+local orderChop = require('./game').orderChop
+local orderFocus = require('./game').orderFocus
+local beginRecruiting = require('./game').beginRecruiting
+local endRecruiting = require('./game').endRecruiting
 local tbl = require('./tbl')
 local vector = require('./vector')
 local gameover = require('./gameover')
@@ -79,32 +85,32 @@ function love.keypressed(key, scancode, isrepeat)
     handleInput(game, scancode)
   else
     if scancode == 'f' then
-      game:toggleFollow()
+      toggleFollow(game)
     end
 
     if scancode == 'g' then
-      game:dismissSquad()
+      dismissSquad(game)
     end
 
     if scancode == 'c' then
-      game:orderChop()
+      orderChop(game)
     end
 
     if scancode == 'space' then
-      game:orderFocus()
+      orderFocus(game)
     end
   end
 end
 
 function love.mousepressed(x, y, button, presses)
   if button == 1 then
-    game:beginRecruiting()
+    beginRecruiting(game)
   end
 end
 
 function love.mousereleased(x, y, button, presses)
   if button == 1 then
-    game:endRecruiting()
+    endRecruiting(game)
   end
 end
 
