@@ -10,38 +10,39 @@ local util = require('./util')
 
 -- Constants
 
-local screenWidth = 320
-local screenHeight = 200
-local tileHeight = 16
-local tileWidth = 16
-local cursorTimerSpeed = 2
-local battleTimerSpeed = 2
-local waterTimerSpeed = 1/4
-local minimapSize = 72
+local SCREEN_WIDTH = 320
+local SCREEN_HEIGHT = 200
+local TILE_HEIGHT = 16
+local TILE_WIDTH = 16
+local LERP_SPEED = 10
+local CURSOR_TIMER_SPEED = 2
+local BATTLE_TIMER_SPEED = 2
+local WATER_TIMER_SPEED = 1/4
+local MINIMAP_SIZE = 72
 
-local whiteCursorColor = { 1, 1, 1, 0.8 }
-local redColor = { 1, 0, 0, 0.8 }
-local yellowColor = { 1, 1, 0, 0.8 }
-
-local lerpSpeed = 10
+local WHITE_CURSOR_COLOR = { 1, 1, 1, 0.8 }
+local RED_COLOR = { 1, 0, 0, 0.8 }
+local YELLOW_COLOR = { 1, 1, 0, 0.8 }
 
 -- Variables
 
-local highlightCircleRadius = 10
-local zoom = 1
-local cursorTimer = 0
-local battleTimer = 0
-local waterTimer = 0
----@type Vector3
-local lerpVec = { x = 266 * 16, y = 229 * 16, z = 0.01 }
-local cameraOffset = { x = 0, y = 0 }
+local drawState = {
+  highlightCircleRadius = 10,
+  zoom = 1,
+  ---@type Vector3
+  camera = { x = 266 * 16, y = 229 * 16, z = 0.01 },
+  cursorTimer = 0,
+  battleTimer = 0,
+  waterTimer = 0,
+}
+
 
 local function setZoom(z)
-  zoom = z
+  drawState.zoom = z
   love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
   local w, h = love.window.getMode()
-  if w ~= screenWidth * z and h ~= screenWidth * z then
-    love.window.setMode(screenWidth * z, screenHeight * z)
+  if w ~= SCREEN_WIDTH * z and h ~= SCREEN_WIDTH * z then
+    love.window.setMode(SCREEN_WIDTH * z, SCREEN_HEIGHT * z)
   end
   local tileset = getTileset()
   if tileset then
@@ -106,39 +107,49 @@ end
 
 --- Should be called whenever at the start of love.draw
 local function prepareFrame()
-  love.graphics.scale(zoom)
+  love.graphics.scale(drawState.zoom)
 end
 
 ---@param dt number
----@param camera Vector
+---@param lookingAt Vector
 ---@param magn number
 ---@param isAltCentering boolean
-local function update(dt, camera, magn, isAltCentering)
+local function update(dt, lookingAt, magn, isAltCentering)
   local tileset = getTileset()
-  battleTimer = (battleTimer + battleTimerSpeed * dt) % 1
-  waterTimer = (waterTimer + waterTimerSpeed * dt) % (math.pi / 2)
-  cursorTimer = (cursorTimer + cursorTimerSpeed * dt) % (math.pi * 2)
+
+  drawState.battleTimer = (
+    drawState.battleTimer + BATTLE_TIMER_SPEED * dt
+  ) % 1
+
+  drawState.waterTimer = (
+    drawState.waterTimer + WATER_TIMER_SPEED * dt
+  ) % (math.pi / 2)
+
+  drawState.cursorTimer = (
+    drawState.cursorTimer + CURSOR_TIMER_SPEED * dt
+  ) % (math.pi * 2)
+
   local offset = vector.add(
-    vector.scale(camera, tileWidth),
-    { x = 0, y = isAltCentering and screenHeight/magn/8 or 0 }
+    vector.scale(lookingAt, TILE_WIDTH),
+    { x = 0, y = isAltCentering and SCREEN_HEIGHT/magn/8 or 0 }
   )
-  lerpVec = vector.lerp3(
-    lerpVec,
+  drawState.camera = vector.lerp3(
+    drawState.camera,
     { x = offset.x, y = offset.y, z = magn },
-    dt * lerpSpeed
+    dt * LERP_SPEED
   )
   updateTileset(tileset, dt)
 end
 
 ---@param pos Vector
 local function recruitableHighlight(pos)
-  local x = pos.x * tileWidth + tileWidth / 2
-  local y = pos.y * tileHeight + tileHeight / 2
+  local x = pos.x * TILE_WIDTH + TILE_WIDTH / 2
+  local y = pos.y * TILE_HEIGHT + TILE_HEIGHT / 2
   withColor(1, 1, 1, 1, function ()
-    love.graphics.circle('line', x, y, highlightCircleRadius)
+    love.graphics.circle('line', x, y, drawState.highlightCircleRadius)
   end)
   withColor(1, 1, 1, 0.5, function ()
-    love.graphics.circle('fill', x, y, highlightCircleRadius)
+    love.graphics.circle('fill', x, y, drawState.highlightCircleRadius)
   end)
 end
 
@@ -149,9 +160,9 @@ local function recruitCircle(pos, radius)
     withColor(1, 1, 1, alpha, function ()
       love.graphics.circle(
         'line',
-        pos.x * tileWidth + tileWidth / 2,
-        pos.y * tileHeight + tileHeight / 2,
-        (i - 0.5) * tileWidth
+        pos.x * TILE_WIDTH + TILE_WIDTH / 2,
+        pos.y * TILE_HEIGHT + TILE_HEIGHT / 2,
+        (i - 0.5) * TILE_WIDTH
       )
     end)
   end
@@ -160,44 +171,53 @@ local function recruitCircle(pos, radius)
     love.graphics.setLineWidth(lineWidth * 3)
     love.graphics.circle(
       'line',
-      pos.x * tileWidth + tileWidth / 2,
-      pos.y * tileHeight + tileHeight / 2,
-      radius * tileWidth
+      pos.x * TILE_WIDTH + TILE_WIDTH / 2,
+      pos.y * TILE_HEIGHT + TILE_HEIGHT / 2,
+      radius * TILE_WIDTH
     )
   end)
   love.graphics.setLineWidth(lineWidth)
   love.graphics.circle(
     'line',
-    pos.x * tileWidth + tileWidth / 2,
-    pos.y * tileHeight + tileHeight / 2,
-    radius * tileWidth
+    pos.x * TILE_WIDTH + TILE_WIDTH / 2,
+    pos.y * TILE_HEIGHT + TILE_HEIGHT / 2,
+    radius * TILE_WIDTH
   )
 end
 
 ---@param battle Battle
 local function drawBattle(battle)
-  local posX = battle.pos.x * tileWidth
-  local posY = battle.pos.y * tileHeight
-
+  local posX = battle.pos.x * TILE_WIDTH
+  local posY = battle.pos.y * TILE_HEIGHT
   local tileset = getTileset()
+
   withColor(0, 0, 0, 0.5, function ()
     love.graphics.rectangle(
-      'fill', posX, posY, tileWidth, tileHeight
+      'fill', posX, posY, TILE_WIDTH, TILE_HEIGHT
     )
   end)
 
-  local isBlink = battleTimer % 1/4 < 1/16
+  local isBlink = drawState.battleTimer % 1/4 < 1/16
 
   if not isBlink then
-    withColor(0.5 + battleTimer / 2, 1 - battleTimer / 2, 0, 1, function ()
-      love.graphics.draw(tileset.tiles, tileset.quads.battle, posX, posY)
+    local r = 0.5 + drawState.battleTimer / 2
+    local g = 1 - drawState.battleTimer / 2
+    local b = 0
+    withColor(r, g, b, 1, function ()
+      love.graphics.draw(
+        tileset.tiles,
+        tileset.quads.battle,
+        posX, posY
+      )
     end)
   end
 
+  -- Round counter
+
   love.graphics.print(
     tostring(battle.round),
-    posX + tileWidth / 4,
-    posY + tileHeight / 4 - battle.round * 2
+    posX + TILE_WIDTH / 4,
+    posY + TILE_HEIGHT / 4 - battle.round * 2
   )
 end
 
@@ -239,9 +259,9 @@ end
 local function textAtTile(text, pos, maxWidth)
   love.graphics.printf(
     text,
-    tileWidth * pos.x,
-    tileHeight * pos.y,
-    tileWidth * maxWidth
+    TILE_WIDTH * pos.x,
+    TILE_HEIGHT * pos.y,
+    TILE_WIDTH * maxWidth
   )
 end
 
@@ -251,8 +271,8 @@ local function drawHouse(pos)
   love.graphics.draw(
     tileset.tiles,
     tileset.quads.house,
-    pos.x * tileWidth,
-    pos.y * tileHeight
+    pos.x * TILE_WIDTH,
+    pos.y * TILE_HEIGHT
   )
 end
 
@@ -262,7 +282,7 @@ local function getCursorCoords()
     love.mouse.getPosition()
   )
 
-  return math.floor(cx / tileWidth), math.floor(cy / tileHeight)
+  return math.floor(cx / TILE_WIDTH), math.floor(cy / TILE_HEIGHT)
 end
 
 ---@param pos Vector
@@ -272,16 +292,18 @@ local function drawCursor(pos, isFocused)
   local mInvSqrt2 = 1 - invSqrt2
 
   local transform = love.math.newTransform(
-    pos.x * tileWidth + tileWidth / 2,
-    pos.y * tileHeight + tileHeight / 2
+    pos.x * TILE_WIDTH + TILE_WIDTH / 2,
+    pos.y * TILE_HEIGHT + TILE_HEIGHT / 2
   )
-    :rotate(cursorTimer)
-    :scale(mInvSqrt2 * math.cos(cursorTimer * 4 + 4 * math.pi/2) / 2 + invSqrt2)
-    :translate(-tileWidth/2, -tileHeight/2)
+    :rotate(drawState.cursorTimer)
+    :scale(mInvSqrt2 * math.cos(
+      drawState.cursorTimer * 4 + 4 * math.pi/2
+    ) / 2 + invSqrt2)
+    :translate(-TILE_WIDTH/2, -TILE_HEIGHT/2)
 
   withTransform(transform, function ()
     love.graphics.rectangle(
-      'line', 0, 0, tileWidth, tileHeight
+      'line', 0, 0, TILE_WIDTH, TILE_HEIGHT
     )
   end)
   -- Four times FOCUS
@@ -375,8 +397,8 @@ local function drawWorld(game, sky)
   local tileset = getTileset()
   local posX, posY = game.player.pos.x, game.player.pos.y
   local visionDistance = 21
-  local voidTile = parallaxTile(0, 48, -lerpVec.x/2, -lerpVec.y/2)
-  local waterPhase = 16 * math.sin(waterTimer)
+  local voidTile = parallaxTile(0, 48, -drawState.camera.x/2, -drawState.camera.y/2)
+  local waterPhase = 16 * math.sin(drawState.waterTimer)
   local waterTile = parallaxTile(48, 0, -waterPhase, waterPhase)
   for y = posY - visionDistance, posY + visionDistance do
     for x = posX - visionDistance, posX + visionDistance do
@@ -389,7 +411,7 @@ local function drawWorld(game, sky)
           for _, fragment in ipairs(voidTile) do
             withTransform(fragment.transform, function ()
               love.graphics.draw(
-                tileset.tiles, fragment.quad, x * tileWidth, y * tileHeight
+                tileset.tiles, fragment.quad, x * TILE_WIDTH, y * TILE_HEIGHT
               )
             end)
           end
@@ -397,13 +419,13 @@ local function drawWorld(game, sky)
           for _, fragment in ipairs(waterTile) do
             withTransform(fragment.transform, function ()
               love.graphics.draw(
-                tileset.tiles, fragment.quad, x * tileWidth, y * tileHeight
+                tileset.tiles, fragment.quad, x * TILE_WIDTH, y * TILE_HEIGHT
               )
             end)
           end
         else
           love.graphics.draw(
-            tileset.tiles, tile, x * tileWidth, y * tileHeight
+            tileset.tiles, tile, x * TILE_WIDTH, y * TILE_HEIGHT
           )
         end
       end)
@@ -420,13 +442,13 @@ local function drawGame(game)
   do
     local cx, cy = 0.5, 0.5
     local pos = {
-      x = 8 + lerpVec.x,
-      y = 8 + lerpVec.y
+      x = 8 + drawState.camera.x,
+      y = 8 + drawState.camera.y
     }
-    love.graphics.scale(lerpVec.z)
+    love.graphics.scale(drawState.camera.z)
     love.graphics.translate(
-      math.floor(screenWidth / lerpVec.z * cx - pos.x - cameraOffset.x),
-      math.floor(screenHeight / lerpVec.z * cy - pos.y - cameraOffset.y)
+      math.floor(SCREEN_WIDTH / drawState.camera.z * cx - pos.x),
+      math.floor(SCREEN_HEIGHT / drawState.camera.z * cy - pos.y)
     )
   end
 
@@ -448,10 +470,10 @@ local function drawGame(game)
   for guy in pairs(game.squad.followers) do
     local guyHealth = guy.stats.hp / guy.stats.maxHp
     withColor(1, guyHealth, guyHealth, 0.5, function ()
-      local ax = game.player.pos.x * tileWidth + tileWidth / 2
-      local ay = game.player.pos.y * tileHeight + tileHeight
-      local bx = guy.pos.x * tileWidth + tileWidth / 2
-      local by = guy.pos.y * tileHeight + tileHeight
+      local ax = game.player.pos.x * TILE_WIDTH + TILE_WIDTH / 2
+      local ay = game.player.pos.y * TILE_HEIGHT + TILE_HEIGHT
+      local bx = guy.pos.x * TILE_WIDTH + TILE_WIDTH / 2
+      local by = guy.pos.y * TILE_HEIGHT + TILE_HEIGHT
 
       if not game.squad.shouldFollow then
         love.graphics.setColor(0.3, 0.3, 0.4, 0.5)
@@ -460,10 +482,10 @@ local function drawGame(game)
       love.graphics.line(ax, ay, bx, by)
       love.graphics.ellipse(
         'line',
-        guy.pos.x * tileWidth + tileWidth / 2,
-        guy.pos.y * tileHeight + tileHeight,
-        tileWidth / 1.9,
-        tileHeight / 8
+        guy.pos.x * TILE_WIDTH + TILE_WIDTH / 2,
+        guy.pos.y * TILE_HEIGHT + TILE_HEIGHT,
+        TILE_WIDTH / 1.9,
+        TILE_HEIGHT / 8
       )
     end)
   end
@@ -540,10 +562,10 @@ local function drawGame(game)
   cy = math.max(game.player.pos.y - curDistance, cy)
   do
     local cursorPos = { x = cx, y = cy }
-    local cursorColor = whiteCursorColor
+    local cursorColor = WHITE_CURSOR_COLOR
 
     if game.isFocused then
-      cursorColor = yellowColor
+      cursorColor = YELLOW_COLOR
     else
       game.cursorPos = cursorPos
     end
@@ -551,7 +573,7 @@ local function drawGame(game)
     local collision = game.collider(nil, game.cursorPos)
 
     if collision.type == 'terrain' then
-      cursorColor = redColor
+      cursorColor = RED_COLOR
     end
 
     local r, g, b, a = unpack(cursorColor)
@@ -568,12 +590,12 @@ local function drawGame(game)
 
   -- Minimap
 
-  withTransform(love.math.newTransform(8, screenHeight - 16 - minimapSize), function ()
-    local offsetX = game.player.pos.x - minimapSize / 2
-    local offsetY = game.player.pos.y - minimapSize / 2
+  withTransform(love.math.newTransform(8, SCREEN_HEIGHT - 16 - MINIMAP_SIZE), function ()
+    local offsetX = game.player.pos.x - MINIMAP_SIZE / 2
+    local offsetY = game.player.pos.y - MINIMAP_SIZE / 2
     local quad = love.graphics.newQuad(
       offsetX, offsetY,
-      minimapSize, minimapSize,
+      MINIMAP_SIZE, MINIMAP_SIZE,
       game.world.image:getWidth(),
       game.world.image:getHeight()
     )
@@ -596,9 +618,9 @@ local function drawGame(game)
       local pointX = guy.pos.x - offsetX
       local pointY = guy.pos.y - offsetY
       if pointX >= 0
-        and pointX < minimapSize
+        and pointX < MINIMAP_SIZE
         and pointY >= 0
-        and pointY < minimapSize
+        and pointY < MINIMAP_SIZE
       then
         withColor(color[1], color[2], color[3], 1, function ()
           love.graphics.rectangle('fill', pointX, pointY, 1, 1)
