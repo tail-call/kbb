@@ -42,9 +42,19 @@ local function withLineWidth(lineWidth, cb)
   love.graphics.setLineWidth(xLineWidth)
 end
 
+---@param transform love.Transform
+---@param cb fun(): nil
+local function withTransform(transform, cb)
+  love.graphics.push('transform')
+  love.graphics.applyTransform(transform)
+  cb()
+  love.graphics.pop()
+end
+
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,
   withColor = withColor,
   withLineWidth = withLineWidth,
+  withTransform = withTransform,
 }

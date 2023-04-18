@@ -9,6 +9,7 @@ local vector = require('./vector')
 local util = require('./util')
 local withColor = require('./util').withColor
 local withLineWidth = require('./util').withLineWidth
+local withTransform = require('./util').withTransform
 
 -- Constants
 
@@ -234,19 +235,11 @@ local function drawBattle(battle)
   )
 end
 
----@param transform love.Transform
----@param cb fun(): nil
-local function withTransform(transform, cb)
-  love.graphics.push('transform')
-  love.graphics.applyTransform(transform)
-  cb()
-  love.graphics.pop()
-end
-
 ---@param pixie Pixie
 local function drawPixie(pixie)
   local r, g, b, a = love.graphics.getColor()
   love.graphics.setColor(unpack(pixie.color))
+
   withTransform(pixie.transform, function()
     -- Shadow
     withColor(0, 0, 0, 0.5, function ()
@@ -656,7 +649,6 @@ return {
   recruitableHighlight = recruitableHighlight,
   setZoom = setZoom,
   update = update,
-  withTransform = withTransform,
   textAtTile = textAtTile,
   house = drawHouse,
   getCursorCoords = getCursorCoords,
