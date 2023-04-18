@@ -8,6 +8,7 @@ local tbl = require('./tbl')
 local vector = require('./vector')
 local util = require('./util')
 local withColor = require('./util').withColor
+local withLineWidth = require('./util').withLineWidth
 
 -- Constants
 
@@ -15,7 +16,7 @@ local SCREEN_WIDTH = 320
 local SCREEN_HEIGHT = 200
 local TILE_HEIGHT = 16
 local TILE_WIDTH = 16
-local LERP_SPEED = 10
+local CAMERA_LERP_SPEED = 10
 local CURSOR_TIMER_SPEED = 2
 local BATTLE_TIMER_SPEED = 2
 local WATER_TIMER_SPEED = 1/4
@@ -74,22 +75,20 @@ local function drawUI(ui)
   if ui.shouldDraw and not ui.shouldDraw() then return end
 
   love.graphics.applyTransform(ui.transform)
+
   if ui.type == 'none' then
     ---@cast ui UI
   elseif ui.type == 'panel' then
     ---@cast ui PanelUI
     local bg = ui.background
+
     withColor(bg.r, bg.g, bg.b, bg.a, function ()
-      love.graphics.rectangle(
-        'fill',
-        0,
-        0,
-        ui.w,
-        ui.h
-      )
+      love.graphics.rectangle('fill', 0, 0, ui.w, ui.h)
     end)
 
-    for _, val in ipairs{ 0, 1 } do
+    -- Draw text with shadow
+
+    for val = 0, 1 do
       withColor(val, val, val, 1, function ()
         if ui.coloredText then
           love.graphics.print(
@@ -106,10 +105,11 @@ local function drawUI(ui)
   for _, child in ipairs(ui.children) do
     drawUI(child)
   end
+
   love.graphics.applyTransform(ui.transform:inverse())
 end
 
---- Should be called whenever at the start of love.draw
+--- Should be called at the start of love.draw
 local function prepareFrame()
   love.graphics.scale(drawState.zoom)
 end
@@ -133,15 +133,17 @@ local function update(dt, lookingAt, magn, isAltCentering)
     drawState.cursorTimer + CURSOR_TIMER_SPEED * dt
   ) % (math.pi * 2)
 
+  local yOffset = isAltCentering and SCREEN_HEIGHT/magn/8 or 0
   local offset = vector.add(
-    vector.scale(lookingAt, TILE_WIDTH),
-    { x = 0, y = isAltCentering and SCREEN_HEIGHT/magn/8 or 0 }
+    vector.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }
   )
+
   drawState.camera = vector.lerp3(
     drawState.camera,
     { x = offset.x, y = offset.y, z = magn },
-    dt * LERP_SPEED
+    dt * CAMERA_LERP_SPEED
   )
+
   updateTileset(tileset, dt)
 end
 
@@ -149,9 +151,11 @@ end
 local function recruitableHighlight(pos)
   local x = pos.x * TILE_WIDTH + TILE_WIDTH / 2
   local y = pos.y * TILE_HEIGHT + TILE_HEIGHT / 2
+
   withColor(1, 1, 1, 1, function ()
     love.graphics.circle('line', x, y, HIGHLIGHT_CIRCLE_RADIUS)
   end)
+
   withColor(1, 1, 1, 0.5, function ()
     love.graphics.circle('fill', x, y, HIGHLIGHT_CIRCLE_RADIUS)
   end)
@@ -159,6 +163,7 @@ end
 
 ---@param pos Vector
 local function recruitCircle(pos, radius)
+  -- Concentric circles
   for i = 1, radius + 2 do
     local alpha = 0.6 * (1 - (i / (2 + radius)) ^ 2)
     withColor(1, 1, 1, alpha, function ()
@@ -170,17 +175,21 @@ local function recruitCircle(pos, radius)
       )
     end)
   end
-  local lineWidth = love.graphics.getLineWidth()
+
+  -- Thicc outline
+
   withColor(1, 1, 1, 0.5, function ()
-    love.graphics.setLineWidth(lineWidth * 3)
-    love.graphics.circle(
-      'line',
-      pos.x * TILE_WIDTH + TILE_WIDTH / 2,
-      pos.y * TILE_HEIGHT + TILE_HEIGHT / 2,
-      radius * TILE_WIDTH
-    )
+    withLineWidth(3, function ()
+      love.graphics.circle(
+        'line',
+        pos.x * TILE_WIDTH + TILE_WIDTH / 2,
+        pos.y * TILE_HEIGHT + TILE_HEIGHT / 2,
+        radius * TILE_WIDTH
+      )
+    end)
   end)
-  love.graphics.setLineWidth(lineWidth)
+
+  -- Actual circle
   love.graphics.circle(
     'line',
     pos.x * TILE_WIDTH + TILE_WIDTH / 2,
