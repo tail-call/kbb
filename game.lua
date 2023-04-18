@@ -726,7 +726,7 @@ local function handleInput(game, scancode)
     warpGuy(game.player, game.cursorPos)
     game.isFocused = false
   elseif scancode == 'space' then
-    game:orderFocus()
+    orderFocus(game)
   end
 end
 
