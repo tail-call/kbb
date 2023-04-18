@@ -1,4 +1,4 @@
-local withCanvas = require('./canvas').withCanvas
+local withCanvas = require('./util').withCanvas
 
 ---@class TilesetQuads
 ---@field guy love.Quad
