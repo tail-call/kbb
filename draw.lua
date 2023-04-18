@@ -6,7 +6,7 @@ local regenerateTileset = require('./tileset').regenerate
 local loadFont = require('./font').load
 local tbl = require('./tbl')
 local vector = require('./vector')
-local getTile = require('./world').getTile
+local util = require('./util')
 
 -- Constants
 
@@ -308,19 +308,6 @@ local function isVisible(vd2, ox, oy, tx, ty)
   return vd2 + 2 - (ox - tx) ^ 2 - (oy - ty) ^ 2 > 0
 end
 
----@param game Game
----@param cb fun(visionSource: VisionSource): nil
-local function forEachVisionSource(game, cb)
-  do
-    local visionSources = coroutine.create(game.visionSourcesCo)
-    local isRunning, visionSource = coroutine.resume(visionSources)
-    while isRunning do
-      cb(visionSource)
-      isRunning, visionSource = coroutine.resume(visionSources)
-    end
-  end
-end
-
 local skyTable = {
   -- 00:00
   { r = 0.3, g = 0.3, b = 0.6, },
@@ -358,7 +345,7 @@ local function drawWorld(game, sky)
   end
 
   -- Reveal fog of war
-  forEachVisionSource(game, function (visionSource)
+  util.exhaust(game.visionSourcesCo, function (visionSource)
     local pos = visionSource.pos
     local visionDistance = calcVisionDistance(visionSource)
     local vd2 = visionDistance ^ 2
@@ -481,7 +468,7 @@ local function drawGame(game)
     end)
   end
 
-  forEachVisionSource(game, function (visionSource)
+  util.exhaust(game.visionSourcesCo, function (visionSource)
     local vd2 = (visionSource.sight * colorOfSky.b) ^ 2
     local posX = visionSource.pos.x
     local posY = visionSource.pos.y
