@@ -7,6 +7,7 @@ local loadFont = require('./font').load
 local tbl = require('./tbl')
 local vector = require('./vector')
 local util = require('./util')
+local withColor = require('./util').withColor
 
 -- Constants
 
@@ -19,15 +20,26 @@ local CURSOR_TIMER_SPEED = 2
 local BATTLE_TIMER_SPEED = 2
 local WATER_TIMER_SPEED = 1/4
 local MINIMAP_SIZE = 72
+local HIGHLIGHT_CIRCLE_RADIUS = 10
 
 local WHITE_CURSOR_COLOR = { 1, 1, 1, 0.8 }
 local RED_COLOR = { 1, 0, 0, 0.8 }
 local YELLOW_COLOR = { 1, 1, 0, 0.8 }
 
+local SKY_TABLE = {
+  -- 00:00
+  { r = 0.3, g = 0.3, b = 0.6, },
+  -- 06:00
+  { r = 1.0, g = 0.9, b = 0.8, },
+  -- 12:00
+  { r = 1, g = 1, b = 1, },
+  -- 18:00
+  { r = 1.0, g = 0.7, b = 0.7, },
+}
+
 -- Variables
 
 local drawState = {
-  highlightCircleRadius = 10,
   zoom = 1,
   ---@type Vector3
   camera = { x = 266 * 16, y = 229 * 16, z = 0.01 },
@@ -35,7 +47,6 @@ local drawState = {
   battleTimer = 0,
   waterTimer = 0,
 }
-
 
 local function setZoom(z)
   drawState.zoom = z
@@ -56,13 +67,6 @@ local function init()
   love.graphics.setFont(loadFont('cga8.png', 8, 8, true))
   love.graphics.setLineStyle('rough')
   loadTileset()
-end
-
-local function withColor(r, g, b, a, cb)
-  local xr, xg, xb, xa = love.graphics.getColor()
-  love.graphics.setColor(r, g, b, a)
-  cb()
-  love.graphics.setColor(xr, xg, xb, xa)
 end
 
 ---@param ui UI
@@ -146,10 +150,10 @@ local function recruitableHighlight(pos)
   local x = pos.x * TILE_WIDTH + TILE_WIDTH / 2
   local y = pos.y * TILE_HEIGHT + TILE_HEIGHT / 2
   withColor(1, 1, 1, 1, function ()
-    love.graphics.circle('line', x, y, drawState.highlightCircleRadius)
+    love.graphics.circle('line', x, y, HIGHLIGHT_CIRCLE_RADIUS)
   end)
   withColor(1, 1, 1, 0.5, function ()
-    love.graphics.circle('fill', x, y, drawState.highlightCircleRadius)
+    love.graphics.circle('fill', x, y, HIGHLIGHT_CIRCLE_RADIUS)
   end)
 end
 
@@ -330,24 +334,13 @@ local function isVisible(vd2, ox, oy, tx, ty)
   return vd2 + 2 - (ox - tx) ^ 2 - (oy - ty) ^ 2 > 0
 end
 
-local skyTable = {
-  -- 00:00
-  { r = 0.3, g = 0.3, b = 0.6, },
-  -- 06:00
-  { r = 1.0, g = 0.9, b = 0.8, },
-  -- 12:00
-  { r = 1, g = 1, b = 1, },
-  -- 18:00
-  { r = 1.0, g = 0.7, b = 0.7, },
-}
-
 ---@param time number
 ---@return { r: number, g: number, b: number }
-local function skyColor(time)
-  local length = #skyTable
+local function skyColorAtTime(time)
+  local length = #SKY_TABLE
   local offset, blendFactor = math.modf((time) / (24 * 60) * length)
-  local colorA = skyTable[1 + (offset + 0) % length]
-  local colorB = skyTable[1 + (offset + 1) % length]
+  local colorA = SKY_TABLE[1 + (offset + 0) % length]
+  local colorB = SKY_TABLE[1 + (offset + 1) % length]
   return {
     r = colorA.r + (colorB.r - colorA.r) * blendFactor,
     g = colorA.g + (colorB.g - colorA.g) * blendFactor,
@@ -454,7 +447,7 @@ local function drawGame(game)
 
   -- Draw visible terrain
 
-  local colorOfSky = skyColor(game.time)
+  local colorOfSky = skyColorAtTime(game.time)
   drawWorld(game, colorOfSky)
 
   -- Draw in-game objects
@@ -654,7 +647,6 @@ return {
   recruitableHighlight = recruitableHighlight,
   setZoom = setZoom,
   update = update,
-  withColor = withColor,
   withTransform = withTransform,
   textAtTile = textAtTile,
   house = drawHouse,

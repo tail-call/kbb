@@ -19,7 +19,15 @@ local function withCanvas(canvas, cb)
   love.graphics.setCanvas()
 end
 
+local function withColor(r, g, b, a, cb)
+  local xr, xg, xb, xa = love.graphics.getColor()
+  love.graphics.setColor(r, g, b, a)
+  cb()
+  love.graphics.setColor(xr, xg, xb, xa)
+end
+
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,
+  withColor = withColor,
 }
