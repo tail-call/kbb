@@ -285,11 +285,11 @@ end
 
 ---@return number, number
 local function getCursorCoords()
-  local cx, cy = love.graphics.inverseTransformPoint(
+  local x, y = love.graphics.inverseTransformPoint(
     love.mouse.getPosition()
   )
 
-  return math.floor(cx / TILE_WIDTH), math.floor(cy / TILE_HEIGHT)
+  return math.floor(x / TILE_WIDTH), math.floor(y / TILE_HEIGHT)
 end
 
 ---@param pos Vector
@@ -297,6 +297,8 @@ end
 local function drawCursor(pos, isFocused)
   local invSqrt2 = 1/math.sqrt(2)
   local mInvSqrt2 = 1 - invSqrt2
+
+  -- Rotating square
 
   local transform = love.math.newTransform(
     pos.x * TILE_WIDTH + TILE_WIDTH / 2,
@@ -313,7 +315,9 @@ local function drawCursor(pos, isFocused)
       'line', 0, 0, TILE_WIDTH, TILE_HEIGHT
     )
   end)
-  -- Four times FOCUS
+
+  -- FOCUS text: four sides
+
   if isFocused then
     withTransform(transform:scale(1/2.5, 1/2.5), function ()
       love.graphics.print('FOCUS', 0, 48)
@@ -344,6 +348,7 @@ local function skyColorAtTime(time)
   local offset, blendFactor = math.modf((time) / (24 * 60) * length)
   local colorA = SKY_TABLE[1 + (offset + 0) % length]
   local colorB = SKY_TABLE[1 + (offset + 1) % length]
+  -- Blend colors together
   return {
     r = colorA.r + (colorB.r - colorA.r) * blendFactor,
     g = colorA.g + (colorB.g - colorA.g) * blendFactor,
@@ -436,15 +441,14 @@ local function drawGame(game)
   -- Setup camera
 
   do
-    local cx, cy = 0.5, 0.5
     local pos = {
       x = 8 + drawState.camera.x,
       y = 8 + drawState.camera.y
     }
     love.graphics.scale(drawState.camera.z)
     love.graphics.translate(
-      math.floor(SCREEN_WIDTH / drawState.camera.z * cx - pos.x),
-      math.floor(SCREEN_HEIGHT / drawState.camera.z * cy - pos.y)
+      math.floor(SCREEN_WIDTH / 2 / drawState.camera.z - pos.x),
+      math.floor(SCREEN_HEIGHT / 2 / drawState.camera.z - pos.y)
     )
   end
 
@@ -455,27 +459,29 @@ local function drawGame(game)
 
   -- Draw in-game objects
 
+  -- We keep this list so nothing renders twice
   local drawn = {}
 
+  -- TODO: sort all visible objects before drawing
   local guysClone = tbl.iclone(game.guys)
   table.sort(guysClone, function (g1, g2)
     return g1.pos.y < g2.pos.y
   end)
 
-  -- Draw squad highlight
+  -- Draw lines between player and units
   for guy in pairs(game.squad.followers) do
     local guyHealth = guy.stats.hp / guy.stats.maxHp
     withColor(1, guyHealth, guyHealth, 0.5, function ()
-      local ax = game.player.pos.x * TILE_WIDTH + TILE_WIDTH / 2
-      local ay = game.player.pos.y * TILE_HEIGHT + TILE_HEIGHT
-      local bx = guy.pos.x * TILE_WIDTH + TILE_WIDTH / 2
-      local by = guy.pos.y * TILE_HEIGHT + TILE_HEIGHT
+      local playerX = game.player.pos.x * TILE_WIDTH + TILE_WIDTH / 2
+      local playerY = game.player.pos.y * TILE_HEIGHT + TILE_HEIGHT
+      local guyX = guy.pos.x * TILE_WIDTH + TILE_WIDTH / 2
+      local guyY = guy.pos.y * TILE_HEIGHT + TILE_HEIGHT
 
       if not game.squad.shouldFollow then
         love.graphics.setColor(0.3, 0.3, 0.4, 0.5)
       end
 
-      love.graphics.line(ax, ay, bx, by)
+      love.graphics.line(playerX, playerY, guyX, guyY)
       love.graphics.ellipse(
         'line',
         guy.pos.x * TILE_WIDTH + TILE_WIDTH / 2,
@@ -486,10 +492,14 @@ local function drawGame(game)
     end)
   end
 
+  -- Draw visible objects
+
   util.exhaust(game.visionSourcesCo, function (visionSource)
     local vd2 = (visionSource.sight * colorOfSky.b) ^ 2
     local posX = visionSource.pos.x
     local posY = visionSource.pos.y
+
+    -- Draw texts
 
     for _, text in ipairs(game.texts) do
       if not drawn[text] and isVisible(
@@ -502,6 +512,8 @@ local function drawGame(game)
       end
     end
 
+    -- Draw entities
+
     for _, entity in ipairs(game.entities) do
       if entity.type == 'building' then
         if not drawn[entity] and isVisible(
@@ -512,11 +524,7 @@ local function drawGame(game)
           drawHouse(entity.object.pos)
           drawn[entity] = true
         end
-      end
-    end
-
-    for _, entity in ipairs(game.entities) do
-      if entity.type == 'battle' then
+      elseif entity.type == 'battle' then
         local battle = entity.object
         if not drawn[entity] then
           drawBattle(battle)
@@ -524,6 +532,8 @@ local function drawGame(game)
         end
       end
     end
+
+    -- Draw guys
 
     for _, guy in ipairs(guysClone) do
       if not game.isFrozen(guy) then
@@ -539,6 +549,8 @@ local function drawGame(game)
     end
   end)
 
+  -- Draw recruit circle
+
   if game.recruitCircle then
     recruitCircle(game.cursorPos, game.recruitCircle)
     for _, guy in tbl.ifilter(game.guys, function (guy)
@@ -550,14 +562,14 @@ local function drawGame(game)
 
   -- Draw cursor
 
-  local cx, cy = getCursorCoords()
+  local curX, curY = getCursorCoords()
   local curDistance = 12
-  cx = math.min(game.player.pos.x + curDistance, cx)
-  cx = math.max(game.player.pos.x - curDistance, cx)
-  cy = math.min(game.player.pos.y + curDistance, cy)
-  cy = math.max(game.player.pos.y - curDistance, cy)
+  curX = math.min(game.player.pos.x + curDistance, curX)
+  curX = math.max(game.player.pos.x - curDistance, curX)
+  curY = math.min(game.player.pos.y + curDistance, curY)
+  curY = math.max(game.player.pos.y - curDistance, curY)
   do
-    local cursorPos = { x = cx, y = cy }
+    local cursorPos = { x = curX, y = curY }
     local cursorColor = WHITE_CURSOR_COLOR
 
     if game.isFocused then
@@ -580,11 +592,11 @@ local function drawGame(game)
 
   love.graphics.pop()
 
+  -- Draw UI
+
   drawUI(game.ui)
 
-  -- Console
-
-  -- Minimap
+  -- Draw minimap
 
   withTransform(love.math.newTransform(8, SCREEN_HEIGHT - 16 - MINIMAP_SIZE), function ()
     local offsetX = game.player.pos.x - MINIMAP_SIZE / 2
@@ -626,7 +638,7 @@ local function drawGame(game)
 
     -- Cursor
     withColor(1, 1, 1, 0.5, function ()
-      love.graphics.rectangle('fill', cx - offsetX, cy - offsetY, 1, 1)
+      love.graphics.rectangle('fill', curX - offsetX, curY - offsetY, 1, 1)
     end)
 
     withTransform(love.math.newTransform(88, 32):scale(2/3, 2/3), function ()
