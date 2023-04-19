@@ -29,13 +29,17 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field pretzels integer
 ---@field wood integer
 ---@field stone integer
+---@field addPretzels fun(self: Resources, count: integer)
 
 ---@class Battle
 ---@field attacker Guy Who initiated the battle
 ---@field defender Guy Who was attacked
 ---@field pos Vector Battle's location
----@field timer number Timer before current round finishes
+---@field timer number Time before current round finishes
 ---@field round number Current round number
+---@field swapSides fun(self: Battle) Swap attacker and defender
+---@field advanceTimer fun(self: Battle, dt: number) Makes battle timer go down
+---@field resetTimer fun(self: Battle) Reset round timer
 
 ---@class ConsoleMessage
 ---@field text string
@@ -99,6 +103,8 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field toggleFollow fun(self: Game): nil
 ---@field resetRecruitCircle fun(self: Game): nil
 ---@field clearRecruitCircle fun(self: Game): nil
+---@field addScore fun(self: Game, count: integer): nil
+---@field removeGuy fun(self: Game, guy: Guy): nil
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -397,15 +403,24 @@ local function init()
       freeze(game, attacker)
       freeze(game, defender)
 
+        ---@type Battle
+      local battle = {
+        attacker = attacker,
+        defender = defender,
+        pos = defender.pos,
+        round = 1,
+        timer = BATTLE_ROUND_DURATION,
+        swapSides = function (self)
+          self.attacker, self.defender = self.defender, self.attacker
+        end,
+        advanceTimer = function (self, dt)
+          self.timer = self.timer - dt
+        end
+      }
+
       addEntity(game, {
         type = 'battle',
-        object = {
-          attacker = attacker,
-          defender = defender,
-          pos = defender.pos,
-          round = 1,
-          timer = BATTLE_ROUND_DURATION,
-        }
+        object = battle
       })
     end,
     enterHouse = function (guy, entity)
@@ -434,6 +449,9 @@ local function init()
       pretzels = 0,
       wood = 0,
       stone = 0,
+      addPretzels = function (self, count)
+        self.pretzels = self.pretzels + count
+      end
     },
     guys = guys,
     time = math.random() * 24 * 60,
@@ -469,6 +487,17 @@ local function init()
     end,
     clearRecruitCircle = function(self)
       self.recruitCircle = nil
+    end,
+    addScore = function(self, count)
+      self.score = self.score + count
+    end,
+    removeGuy = function (self, guy)
+      maybeDrop(self.guys, guy)
+      self.squad:remove(guy)
+
+      if guy == game.player and game.onLost then
+        game.onLost()
+      end
     end,
   }
   return game
@@ -569,7 +598,7 @@ local function fight(game, attacker, defender, damageModifier)
   ---@param guy Guy
   ---@param damage number
   local function dealDamage(guy, damage)
-    guy.stats.hp = guy.stats.hp - damage * damageModifier
+    guy.stats:hurt(damage * damageModifier)
     echo(game, string.format('%s got %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
   end
 
@@ -612,36 +641,26 @@ local function advanceClock(game, dt)
 end
 
 ---@param game Game
----@param guy Guy
-local function killGuy(game, guy)
-  maybeDrop(game.guys, guy)
-  game.squad.followers[guy] = nil
-
-  if guy.team == 'evil' then
-    game.resources.pretzels = game.resources.pretzels + 1
-    game.score = game.score + SCORES_TABLE.killedAnEnemy
-  end
-
-  if guy == game.player and game.onLost then
-    game.onLost()
-  end
-end
-
----@param game Game
 ---@param entity GameEntity_Battle
 ---@param dt number
 local function updateBattle(game, entity, dt)
   local battle = entity.object
-  battle.timer = battle.timer - dt
+  battle:advanceTimer(dt)
   if battle.timer < 0 then
     fight(game, battle.attacker, battle.defender, 1)
-    battle.attacker, battle.defender = battle.defender, battle.attacker
+    battle:swapSides()
 
     ---@param guy Guy
     local function maybeDie(guy)
       if guy.stats.hp <= 0 then
         echo(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
-        killGuy(game, guy)
+
+        if guy.team == 'evil' then
+          game.resources:addPretzels(1)
+          game:addScore(SCORES_TABLE.killedAnEnemy)
+        end
+
+        game:removeGuy(guy)
       end
     end
 
@@ -773,7 +792,7 @@ local function orderBuild(game)
     type = 'building',
     object = { pos = pos }
   })
-  game.score = game.score + SCORES_TABLE.builtAHouse
+  game:addScore(SCORES_TABLE.builtAHouse)
   game.isFocused = false
 end
 

@@ -5,6 +5,7 @@ local abilities = require('./ability').abilities
 ---@class GuyStats
 ---@field hp number
 ---@field maxHp number
+---@field hurt fun(self: GuyStats, damage: number): nil
 
 ---@class Guy
 ---@field pos Vector
@@ -32,10 +33,6 @@ local Guy = {
   name = 'Good Guy',
   time = 0,
   behavior = 'none',
-  stats = {
-    hp = -1,
-    maxHp = -1,
-  },
   abilities = {
     { ability = abilities.normalSuccess, weight = 4 },
     { ability = abilities.normalCriticalSuccess, weight = 1 },
@@ -138,6 +135,9 @@ function Guy.new(props)
   guy.stats = {
     hp = 10,
     maxHp = 10,
+    hurt = function (self, damage)
+      self.hp = self.hp - damage
+    end
   }
   guy.pixie:spawn(props.pos)
   return guy
