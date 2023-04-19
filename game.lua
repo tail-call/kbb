@@ -216,6 +216,122 @@ local function init()
     },
   }
 
+  local ui = ui.makeRoot({}, {
+    ---@type PanelUI
+    ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
+      coloredText = function ()
+        return {
+          WHITE_COLOR,
+          string.format(
+            'Score: %d | FPS: %.1f\n%02d:%02d',
+            game.score,
+            love.timer.getFPS(),
+            math.floor(game.time / 60),
+            math.floor(game.time % 60)
+          ),
+        }
+      end
+    }),
+    ---@type PanelUI
+    ui.makePanel(ui.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+      text = function ()
+        local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
+        return string.format(
+          ''
+            .. 'Time: %02d:%02d\n (paused)\n'
+            .. 'Terrain:\n %s'
+            .. '\nCoords:\n %sX %sY'
+            .. '\nB] build\n (5 wood)'
+            .. '\nM] message'
+            .. '\nR] ritual'
+            .. '\nT] warp',
+          math.floor(game.time / 60),
+          math.floor(game.time % 60),
+          tileUnderCursor,
+          game.cursorPos.x,
+          game.cursorPos.y
+        )
+      end
+    }),
+    -- Empty underlay for console
+    ---@type PanelUI
+    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+    }),
+    ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+      text = function ()
+        local function charSheet(guy)
+          return function ()
+            return string.format(
+              ''
+                .. 'Name:\n %s\n'
+                .. 'Rank:\n Harmless\n'
+                .. 'Coords:\n %sX %sY\n'
+                .. 'HP:\n %s/%s\n'
+                .. 'Action:\n %.2f/%.2f\n',
+              guy.name,
+              guy.pos.x,
+              guy.pos.y,
+              guy.stats.hp,
+              guy.stats.maxHp,
+              guy.time,
+              guy.speed
+            )
+          end
+        end
+
+        local function controls()
+          return ''
+            .. ' CONTROLS  \n'
+            .. 'WASD:  move\n'
+            .. 'LMB:recruit\n'
+            .. 'Spc:  focus\n'
+            .. '1234: scale\n'
+            .. 'F:   follow\n'
+            .. 'G:  dismiss\n'
+            .. 'C:     chop\n'
+            .. 'Z:     zoom\n'
+        end
+
+        local header = '<- Tab ->\n\n'
+        local tabs = { charSheet(game.player), controls }
+        local idx = 1 + (game.activeTab % #tabs)
+
+        return header .. tabs[idx]()
+      end,
+    }),
+    ---@type PanelUI
+    ui.makePanel(ui.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
+      text = function ()
+        return string.format(
+          'Wood: %s | Stone: %s | Pretzels: %s',
+          game.resources.wood,
+          game.resources.stone,
+          game.resources.pretzels
+        )
+      end,
+    }),
+    -- Pause icon
+    ui.makePanel(ui.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+    }),
+    ui.makePanel(ui.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+    }),
+  })
+
   ---@type Game
   game = {
     world = loadWorld('map.png'),
@@ -247,122 +363,7 @@ local function init()
     magnificationFactor = 1,
     isFocused = false,
     texts = texts,
-    ui = ui.makeRoot({}, {
-      ---@type PanelUI
-      ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
-        coloredText = function ()
-          return {
-            WHITE_COLOR,
-            string.format(
-              'Score: %d | FPS: %.1f\n%02d:%02d',
-              game.score,
-              love.timer.getFPS(),
-              math.floor(game.time / 60),
-              math.floor(game.time % 60)
-            ),
-          }
-        end
-      }),
-      ---@type PanelUI
-      ui.makePanel(ui.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
-        shouldDraw = function ()
-          return game.isFocused
-        end,
-        text = function ()
-          local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
-          return string.format(
-            ''
-              .. 'Time: %02d:%02d\n (paused)\n'
-              .. 'Terrain:\n %s'
-              .. '\nCoords:\n %sX %sY'
-              .. '\nB] build\n (5 wood)'
-              .. '\nM] message'
-              .. '\nR] ritual'
-              .. '\nT] warp',
-            math.floor(game.time / 60),
-            math.floor(game.time % 60),
-            tileUnderCursor,
-            game.cursorPos.x,
-            game.cursorPos.y
-          )
-        end
-      }),
-      -- Empty underlay for console
-      ---@type PanelUI
-      ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
-        shouldDraw = function ()
-          return game.isFocused
-        end,
-      }),
-      ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
-        shouldDraw = function ()
-          return game.isFocused
-        end,
-        text = function ()
-          local function charSheet(guy)
-            return function ()
-              return string.format(
-                ''
-                  .. 'Name:\n %s\n'
-                  .. 'Rank:\n Harmless\n'
-                  .. 'Coords:\n %sX %sY\n'
-                  .. 'HP:\n %s/%s\n'
-                  .. 'Action:\n %.2f/%.2f\n',
-                guy.name,
-                guy.pos.x,
-                guy.pos.y,
-                guy.stats.hp,
-                guy.stats.maxHp,
-                guy.time,
-                guy.speed
-              )
-            end
-          end
-
-          local function controls()
-            return ''
-              .. ' CONTROLS  \n'
-              .. 'WASD:  move\n'
-              .. 'LMB:recruit\n'
-              .. 'Spc:  focus\n'
-              .. '1234: scale\n'
-              .. 'F:   follow\n'
-              .. 'G:  dismiss\n'
-              .. 'C:     chop\n'
-              .. 'Z:     zoom\n'
-          end
-
-
-          local header = '<- Tab ->\n\n'
-          local tabs = { charSheet(game.player), controls }
-          local idx = 1 + (game.activeTab % #tabs)
-
-          return header .. tabs[idx]()
-        end,
-      }),
-      ---@type PanelUI
-      ui.makePanel(ui.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
-        text = function ()
-          return string.format(
-            'Wood: %s | Stone: %s | Pretzels: %s',
-            game.resources.wood,
-            game.resources.stone,
-            game.resources.pretzels
-          )
-        end,
-      }),
-      -- Pause icon
-      ui.makePanel(ui.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
-        shouldDraw = function ()
-          return game.isFocused
-        end,
-      }),
-      ui.makePanel(ui.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
-        shouldDraw = function ()
-          return game.isFocused
-        end,
-      }),
-    })
+    ui = ui,
   }
 
   function game.visionSourcesCo()
