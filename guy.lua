@@ -24,7 +24,7 @@ local abilities = require('./ability').abilities
 ---@class GuyDelegate
 ---@field collider Collider
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil
----@field enterHouse fun(guest: Guy, entity: BuildingGameEntity): nil
+---@field enterHouse fun(guest: Guy, entity: GameEntity_Building): nil
 
 ---@type Guy
 local Guy = {
@@ -85,7 +85,7 @@ local function moveGuy(guy, vec, delegate)
         local entity = collision.entity
         ---@cast entity any
         local sameEntity = entity
-        ---@cast sameEntity BuildingGameEntity
+        ---@cast sameEntity GameEntity_Building
         local shouldMove = delegate.enterHouse(guy, sameEntity)
         if shouldMove then
           move(pos)

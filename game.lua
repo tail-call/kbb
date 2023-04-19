@@ -47,43 +47,47 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field pos Vector
 ---@field sight integer
 
+---@class GameEntity
+---@field type string
+---@field object any
+
+---@class GameEntity_Building
+---@field type 'building'
+---@field object Building
+
+---@class GameEntity_Battle
+---@field type 'battle'
+---@field object Battle
+
 ---@class Game
----@field world World
----@field score integer
----@field frozenGuys { [Guy]: true }
----@field resources Resources
----@field entities GameEntity[]
----@field guys Guy[]
----@field time number
----@field player Guy
----@field squad Squad
----@field consoleMessages ConsoleMessage[]
----@field magnificationFactor number
----@field recruitCircle number | nil
----@field isFocused boolean
----@field texts Text[]
----@field collider Collider
----@field ui UI
----@field cursorPos Vector
+---# Simulation
+---@field world World Game world
+---@field collider Collider Object that performs collision checks between game world objects
+---@field score integer Score the player has accumulated
+---@field frozenGuys { [Guy]: true } Guys that shouldn't be rendered nor updated
+---@field resources Resources Resources player may spend on upgrades
+---@field entities GameEntity[] Things in the game world
+---@field guys Guy[] Guys aka units
+---@field player Guy A guy controlled by the player
+---@field time number Time of day in seconds, max is 24*60
+---@field squad Squad A bunch of guys that follows player's movement
+---@field visionSourcesCo fun(): VisionSource Coroutine that will yield all vision sources in the game world
+---@field texts Text[] Text objects in the game world
+---# Meta
+---@field isFocused boolean True if focus mode is on
 ---@field onLost (fun(): nil) | nil
----@field visionSourcesCo fun(): VisionSource
+---# UI
+---@field consoleMessages ConsoleMessage[] Messages in the bottom console
+---@field recruitCircle number | nil Radius of a circle thing used to recruit units
+---@field ui UI User interface script
+---@field cursorPos Vector Points to a square player's cursor is aimed at
+---# GFX
+---@field magnificationFactor number How much the camera is zoomed in
 ---@field isFrozen fun(guy: Guy): boolean
 ---@field mayRecruit fun(guy: Guy): boolean
 ---@field isReadyForOrder fun(self: Game): boolean
 ---@field init fun(self: Game): nil
 ---@field update fun(self: Game, dt: number): nil
-
----@class GameEntity
----@field type string
----@field object any
-
----@class BuildingGameEntity
----@field type 'building'
----@field object Building
-
----@class BattleGameEntity
----@field type 'battle'
----@field object Battle
 
 local whiteColor = { 1, 1, 1, 1 }
 local whitePanelColor = { r = 1, g = 1, b = 1, a = 1 }
@@ -524,7 +528,7 @@ local function killGuy(game, guy)
 end
 
 ---@param game Game
----@param entity BattleGameEntity
+---@param entity GameEntity_Battle
 ---@param dt number
 local function updateBattle(game, entity, dt)
   local battle = entity.object
@@ -737,9 +741,10 @@ return {
   orderChop = orderChop,
   orderMove = orderMove,
   echo = echo,
-  switogMagnleFswitllMagnw = toggleFollow,
+  toggleFollow = toggleFollow,
   updateGame = updateGame,
   orderFocus = orderFocus,
   beginRecruiting = beginRecruiting,
   endRecruiting = endRecruiting,
+  switchMagn = switchMagn,
 }
