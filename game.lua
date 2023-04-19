@@ -15,7 +15,7 @@ local ability = require('./ability')
 local maybeDrop = require('./tbl').maybeDrop
 
 ---@class Building
----@field pos Vector
+---@field pos Vector Building's position
 
 ---@class Squad
 ---@field shouldFollow boolean
@@ -28,15 +28,15 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field stone integer
 
 ---@class Battle
----@field attacker Guy
----@field defender Guy
----@field pos Vector
----@field timer number
----@field round number
+---@field attacker Guy Who initiated the battle
+---@field defender Guy Who was attacked
+---@field pos Vector Battle's location
+---@field timer number Timer before current round finishes
+---@field round number Current round number
 
 ---@class ConsoleMessage
 ---@field text string
----@field lifetime number
+---@field lifetime number Seconds before message is faded out
 
 ---@class Text
 ---@field text string
@@ -80,41 +80,38 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field consoleMessages ConsoleMessage[] Messages in the bottom console
 ---@field recruitCircle number | nil Radius of a circle thing used to recruit units
 ---@field ui UI User interface script
+---@field activeTab integer Current active tab in the focus screen
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
 ---# GFX
 ---@field magnificationFactor number How much the camera is zoomed in
----@field isFrozen fun(guy: Guy): boolean
----@field mayRecruit fun(guy: Guy): boolean
----@field isReadyForOrder fun(self: Game): boolean
----@field init fun(self: Game): nil
----@field update fun(self: Game, dt: number): nil
 
-local whiteColor = { 1, 1, 1, 1 }
-local whitePanelColor = { r = 1, g = 1, b = 1, a = 1 }
-local blackPanelColor = { r = 0, g = 0, b = 0, a = 1 }
-local grayPanelColor = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
-local darkGrayPanelColor = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
-local evilSpawnLocation = { x = 281, y = 195 }
-local recruitCircleMaxRadius = 6
-local recruitCircleGrowthSpeed = 6
-local battleRoundDuration = 0.5
+local WHITE_COLOR = { 1, 1, 1, 1 }
+local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
+local BLACK_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 1 }
+local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
+local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
+---@type Vector
+local EVIL_SPAWN_LOCATION = { x = 281, y = 195 }
+local RECRUIT_CIRCLE_MAX_RADIUS = 6
+local RECRUIT_CIRCLE_GROWTH_SPEED = 6
+local BATTLE_ROUND_DURATION = 0.5
 
-local scoresTable = {
+local SCORES_TABLE = {
   killedAnEnemy = 100,
   builtAHouse = 500,
 }
 
 ---@type CollisionInfo
-local noneCollision = { type = 'none' }
-local terrainCollision = { type = 'terrain' }
-
-local activeTab = 0
+local NONE_COLLISION = { type = 'none' }
+---@type CollisionInfo
+local TERRAIN_COLLISION = { type = 'terrain' }
 
 ---@type Game
 local game
 game = {
   ---@type World
   world = nil,
+  activeTab = 0,
   score = 0,
   frozenGuys = tbl.weaken({}, 'k'),
   resources = {
@@ -154,10 +151,10 @@ game = {
   },
   ui = ui.makeRoot({}, {
     ---@type PanelUI
-    ui.makePanel(ui.origin(), 320, 8, grayPanelColor, {
+    ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
       coloredText = function ()
         return {
-          whiteColor,
+          WHITE_COLOR,
           string.format(
             'Score: %d | FPS: %.1f\n%02d:%02d',
             game.score,
@@ -169,7 +166,7 @@ game = {
       end
     }),
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 8), 88, 184, grayPanelColor, {
+    ui.makePanel(ui.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
       shouldDraw = function ()
         return game.isFocused
       end,
@@ -194,12 +191,12 @@ game = {
     }),
     -- Empty underlay for console
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, darkGrayPanelColor, {
+    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
       shouldDraw = function ()
         return game.isFocused
       end,
     }),
-    ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, blackPanelColor, {
+    ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
       shouldDraw = function ()
         return game.isFocused
       end,
@@ -240,13 +237,13 @@ game = {
 
         local header = '<- Tab ->\n\n'
         local tabs = { charSheet(game.player), controls }
-        local idx = 1 + (activeTab % #tabs)
+        local idx = 1 + (game.activeTab % #tabs)
 
         return header .. tabs[idx]()
       end,
     }),
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 192), 320, 8, grayPanelColor, {
+    ui.makePanel(ui.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
       text = function ()
         return string.format(
           'Wood: %s | Stone: %s | Pretzels: %s',
@@ -257,12 +254,12 @@ game = {
       end,
     }),
     -- Pause icon
-    ui.makePanel(ui.origin():translate(92, 132), 3, 8, whitePanelColor, {
+    ui.makePanel(ui.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
       shouldDraw = function ()
         return game.isFocused
       end,
     }),
-    ui.makePanel(ui.origin():translate(97, 132), 3, 8, whitePanelColor, {
+    ui.makePanel(ui.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
       shouldDraw = function ()
         return game.isFocused
       end,
@@ -292,9 +289,10 @@ local function unfreeze(guy)
   game.frozenGuys[guy] = nil
 end
 
+---@param game Game
 ---@param guy Guy
 ---@return boolean
-function game.isFrozen(guy)
+local function isFrozen(game, guy)
   return game.frozenGuys[guy] or false
 end
 
@@ -313,9 +311,9 @@ function game.collider(nothing, v)
     return { type = 'entity', entity = entity }
   end
   if isPassable(game.world, v) then
-    return noneCollision
+    return NONE_COLLISION
   end
-  return terrainCollision
+  return TERRAIN_COLLISION
 end
 
 ---@type GuyDelegate
@@ -331,7 +329,7 @@ local guyDelegate = {
         defender = defender,
         pos = defender.pos,
         round = 1,
-        timer = battleRoundDuration,
+        timer = BATTLE_ROUND_DURATION,
       }
     })
   end,
@@ -347,27 +345,28 @@ local guyDelegate = {
   collider = game.collider,
 }
 
-function game:init()
-  self.player = Guy.makeLeader({ x = 269, y = 231 })
-  self.player.name = 'Leader'
-  self.guys = {
-    self.player,
+---@param game Game
+local function init(game)
+  game.player = Guy.makeLeader({ x = 269, y = 231 })
+  game.player.name = 'Leader'
+  game.guys = {
+    game.player,
     Guy.makeGoodGuy({ x = 274, y = 231 }),
     Guy.makeGoodGuy({ x = 272, y = 231 }),
     Guy.makeGoodGuy({ x = 274, y = 229 }),
     Guy.makeGoodGuy({ x = 272, y = 229 }),
   }
-  self.buildings = {
+  game.buildings = {
     { pos = { x = 277, y = 233 } }
   }
-  self.world = loadWorld('map.png')
-  self.squad = {
+  game.world = loadWorld('map.png')
+  game.squad = {
     shouldFollow = true,
     ---@type Guy[]
     followers = tbl.weaken({}, 'k'),
   }
-  self.cursorPos = self.player.pos
-  self.consoleMessages = {
+  game.cursorPos = game.player.pos
+  game.consoleMessages = {
     {
       text = 'Welcome to Kobold Princess Simulator.',
       lifetime = 10,
@@ -379,9 +378,10 @@ function game:init()
   }
 end
 
+---@param game Game
 ---@param guy Guy
 ---@return boolean
- function game.mayRecruit(guy)
+local function mayRecruit(game, guy)
   if not game.recruitCircle then return false end
   if guy == game.player then return false end
   if game.squad.followers[guy] then return false end
@@ -406,7 +406,7 @@ end
 
 local function endRecruiting(game)
   for _, guy in tbl.ifilter(game.guys, function (guy)
-    return game.mayRecruit(guy)
+    return mayRecruit(game, guy)
   end) do
     game.squad.followers[guy] = true
   end
@@ -414,8 +414,9 @@ local function endRecruiting(game)
   game.recruitCircle = nil
 end
 
-function game:isReadyForOrder()
-  return self.player.mayMove
+---@param game Game
+local function isReadyForOrder(game)
+  return game.player.mayMove
 end
 
 ---@param game Game
@@ -426,12 +427,12 @@ local function orderMove(game, vec)
 
   if game.squad.shouldFollow then
     for guy in pairs(game.squad.followers) do
-      if not game.isFrozen(guy) then
+      if not isFrozen(game, guy) then
         moveGuy(guy, vec, guyDelegate)
       end
     end
   end
-  if not game.isFrozen(game.player) then
+  if not isFrozen(game, game.player) then
     if moveGuy(game.player, vec, guyDelegate) then
       return 'shouldStop'
     end
@@ -519,7 +520,7 @@ local function killGuy(game, guy)
 
   if guy.team == 'evil' then
     game.resources.pretzels = game.resources.pretzels + 1
-    game.score = game.score + scoresTable.killedAnEnemy
+    game.score = game.score + SCORES_TABLE.killedAnEnemy
   end
 
   if guy == game.player and game.onLost then
@@ -547,7 +548,7 @@ local function updateBattle(game, entity, dt)
 
     if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
       -- Keep fighting
-      battle.timer = battleRoundDuration
+      battle.timer = BATTLE_ROUND_DURATION
     else
       -- Fight is over
       maybeDrop(game.entities, entity)
@@ -577,7 +578,7 @@ end
 ---@param dt number
 local function updateGuys(game, dt)
   for _, guy in ipairs(game.guys) do
-    if not game.isFrozen(guy) then
+    if not isFrozen(game, guy) then
       updateGuy(guy, dt, guyDelegate)
     end
   end
@@ -589,8 +590,8 @@ local function updateRecruitCircle(game, dt)
   if game.recruitCircle == nil then return end
 
   game.recruitCircle = math.min(
-    game.recruitCircle + dt * recruitCircleGrowthSpeed,
-    recruitCircleMaxRadius
+    game.recruitCircle + dt * RECRUIT_CIRCLE_GROWTH_SPEED,
+    RECRUIT_CIRCLE_MAX_RADIUS
   )
 end
 
@@ -620,14 +621,14 @@ local function orderFocus(game)
 end
 
 local function maybeChop(guy)
-  if game.isFrozen(guy) then return end
+  if isFrozen(game, guy) then return end
 
   local pos = guy.pos
-  local t = getTile(game.world, pos)
-  if t == 'forest' then
+  local tile = getTile(game.world, pos)
+  if tile == 'forest' then
     game.resources.wood = game.resources.wood + 1
     setTile(game.world, pos, 'grass')
-    table.insert(game.guys, Guy.makeEvilGuy(evilSpawnLocation))
+    table.insert(game.guys, Guy.makeEvilGuy(EVIL_SPAWN_LOCATION))
   end
 end
 
@@ -662,7 +663,7 @@ local function orderBuild(game)
   local t = getTile(game.world, pos)
   if t == 'rock' then
     game.resources.stone = game.resources.stone + 1
-    table.insert(game.guys, Guy.makeStrongEvilGuy(evilSpawnLocation))
+    table.insert(game.guys, Guy.makeStrongEvilGuy(EVIL_SPAWN_LOCATION))
     setTile(game.world, pos, 'sand')
   end
   game.resources.wood = game.resources.wood - 5
@@ -670,7 +671,7 @@ local function orderBuild(game)
     type = 'building',
     object = { pos = pos }
   })
-  game.score = game.score + scoresTable.builtAHouse
+  game.score = game.score + SCORES_TABLE.builtAHouse
   game.isFocused = false
 end
 
@@ -719,7 +720,7 @@ end
 ---@param scancode string
 local function handleInput(game, scancode)
   if scancode == 'tab' then
-    activeTab = activeTab + 1
+    game.activeTab = game.activeTab + 1
   elseif scancode == 'b' then
     orderBuild(game)
   elseif scancode == 'm' then
@@ -747,4 +748,8 @@ return {
   beginRecruiting = beginRecruiting,
   endRecruiting = endRecruiting,
   switchMagn = switchMagn,
+  isFrozen = isFrozen,
+  mayRecruit = mayRecruit,
+  isReadyForOrder = isReadyForOrder,
+  init = init,
 }

@@ -10,6 +10,8 @@ local util = require('./util')
 local withColor = require('./util').withColor
 local withLineWidth = require('./util').withLineWidth
 local withTransform = require('./util').withTransform
+local isFrozen = require('./game').isFrozen
+local mayRecruit = require('./game').mayRecruit
 
 -- Constants
 
@@ -536,7 +538,7 @@ local function drawGame(game)
     -- Draw guys
 
     for _, guy in ipairs(guysClone) do
-      if not game.isFrozen(guy) then
+      if not isFrozen(game, guy) then
         if not drawn[guy] and isVisible(
           vd2,
           posX, posY,
@@ -554,7 +556,7 @@ local function drawGame(game)
   if game.recruitCircle then
     recruitCircle(game.cursorPos, game.recruitCircle)
     for _, guy in tbl.ifilter(game.guys, function (guy)
-      return game.mayRecruit(guy)
+      return mayRecruit(game, guy)
     end) do
       recruitableHighlight(guy.pos)
     end

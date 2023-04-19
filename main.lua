@@ -3,6 +3,7 @@ math.randomseed(os.time())
 
 local draw = require('./draw')
 local game = require('./game').game
+local initGame = require('./game').init
 local orderMove = require('./game').orderMove
 local drawGame = require('./draw').drawGame
 local handleInput = require('./game').handleInput
@@ -14,6 +15,7 @@ local orderChop = require('./game').orderChop
 local orderFocus = require('./game').orderFocus
 local beginRecruiting = require('./game').beginRecruiting
 local endRecruiting = require('./game').endRecruiting
+local isReadyForOrder = require('./game').isReadyForOrder
 local tbl = require('./tbl')
 local vector = require('./vector')
 local gameover = require('./gameover')
@@ -23,7 +25,7 @@ local state = 'game'
 
 function love.load()
   draw.init()
-  game:init()
+  initGame(game)
   game.onLost = function ()
     state = 'dead'
   end
@@ -52,7 +54,7 @@ function love.update(dt)
       end
     end
 
-    if game:isReadyForOrder() and #directions > 0 then
+    if isReadyForOrder(game) and #directions > 0 then
       for _ = 1, #directions do
         alternatingKeyIndex = (alternatingKeyIndex + 1) % (#directions)
         if orderMove(
