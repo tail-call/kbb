@@ -8,7 +8,6 @@ local drawGame = require('./draw').drawGame
 local handleInput = require('./game').handleInput
 local switchMagn = require('./game').switchMagn
 local updateGame = require('./game').updateGame
-local toggleFollow = require('./game').toggleFollow
 local dismissSquad = require('./game').dismissSquad
 local orderChop = require('./game').orderChop
 local orderFocus = require('./game').orderFocus
@@ -88,7 +87,7 @@ function love.keypressed(key, scancode, isrepeat)
     handleInput(game, scancode)
   else
     if scancode == 'f' then
-      toggleFollow(game)
+      game:toggleFollow()
     end
 
     if scancode == 'g' then

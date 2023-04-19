@@ -18,8 +18,12 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field pos Vector Building's position
 
 ---@class Squad
----@field shouldFollow boolean
----@field followers { [Guy]: true }
+---@field shouldFollow boolean True if guys should follow the player
+---@field followers { [Guy]: true } Guys in the squad
+---# Methods
+---@field remove fun(self: Squad, guy: Guy) Removes a guy from the squad
+---@field add fun(self: Squad, guy: Guy) Adds a guy to the squad
+---@field startFollowing fun(self: Squad) Squad will begin following the player
 
 ---@class Resources
 ---@field pretzels integer
@@ -91,6 +95,10 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
 ---# GFX
 ---@field magnificationFactor number How much the camera is zoomed in
+---# Methods
+---@field toggleFollow fun(self: Game): nil
+---@field resetRecruitCircle fun(self: Game): nil
+---@field clearRecruitCircle fun(self: Game): nil
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -434,6 +442,15 @@ local function init()
     squad = {
       followers = {},
       shouldFollow = false,
+      remove = function(self, guy)
+        self.followers[guy] = nil
+      end,
+      add = function(self, guy)
+        self.followers[guy] = true
+      end,
+      startFollowing = function(self)
+        self.shouldFollow = true
+      end,
     },
     recruitCircle = nil,
     onLost = nil,
@@ -444,6 +461,15 @@ local function init()
     visionSourcesCo = visionSourcesCo,
     collider = collider,
     ui = makeUI(uiDelegate),
+    toggleFollow = function(self)
+      self.squad.shouldFollow = not self.squad.shouldFollow
+    end,
+    resetRecruitCircle = function(self)
+      self.recruitCircle = 0
+    end,
+    clearRecruitCircle = function(self)
+      self.recruitCircle = nil
+    end,
   }
   return game
 end
@@ -482,47 +508,25 @@ end
 -- Writers
 
 ---@param game Game
-local function toggleFollow__(game)
-  game.squad.shouldFollow = not game.squad.shouldFollow
-end
-
----@param squad Squad
----@param guy Guy
-local function removeGuyFromSquad__(squad, guy)
-  squad.followers[guy] = nil
-end
-
----@param game Game
-local function resetRecruitCircle__(game)
-  game.recruitCircle = 0
-end
-
----@param squad Squad
----@param guy Guy
-local function addGuyToSquad__(squad, guy)
-  squad.followers[guy] = true
-end
-
----@param game Game
 local function dismissSquad(game)
   for guy in pairs(game.squad.followers) do
-    removeGuyFromSquad__(game.squad, guy)
+    game.squad:remove(guy)
   end
 end
 
 local function beginRecruiting(game)
   if game.isFocused then return end
-  resetRecruitCircle__(game)
+  game:resetRecruitCircle()
 end
 
 local function endRecruiting(game)
   for _, guy in tbl.ifilter(game.guys, function (guy)
     return mayRecruit(game, guy)
   end) do
-    addGuyToSquad__(game.squad, guy)
+    game.squad:add(guy)
   end
-  game.squad.shouldFollow = true
-  game.recruitCircle = nil
+  game.squad:startFollowing()
+  game:clearRecruitCircle()
 end
 
 ---@param game Game
@@ -839,7 +843,6 @@ return {
   orderChop = orderChop,
   orderMove = orderMove,
   echo = echo,
-  toggleFollow = toggleFollow__,
   updateGame = updateGame,
   orderFocus = orderFocus,
   beginRecruiting = beginRecruiting,
