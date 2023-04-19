@@ -2,7 +2,6 @@
 math.randomseed(os.time())
 
 local draw = require('./draw')
-local game = require('./game').game
 local initGame = require('./game').init
 local orderMove = require('./game').orderMove
 local drawGame = require('./draw').drawGame
@@ -22,10 +21,12 @@ local gameover = require('./gameover')
 
 ---@type 'game' | 'dead'
 local state = 'game'
+---@type Game
+local game
 
 function love.load()
   draw.init()
-  initGame(game)
+  game = initGame()
   game.onLost = function ()
     state = 'dead'
   end
@@ -80,7 +81,7 @@ function love.keypressed(key, scancode, isrepeat)
   end
 
   if scancode == 'z' then
-    switchMagn()
+    switchMagn(game)
   end
 
   if game.isFocused then

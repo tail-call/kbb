@@ -62,6 +62,7 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@class Game
 ---# Simulation
 ---@field world World Game world
+---@field guyDelegate GuyDelegate Object that talks to guys
 ---@field collider Collider Object that performs collision checks between game world objects
 ---@field score integer Score the player has accumulated
 ---@field frozenGuys { [Guy]: true } Guys that shouldn't be rendered nor updated
@@ -106,167 +107,6 @@ local NONE_COLLISION = { type = 'none' }
 ---@type CollisionInfo
 local TERRAIN_COLLISION = { type = 'terrain' }
 
----@type Game
-local game
-game = {
-  ---@type World
-  world = nil,
-  activeTab = 0,
-  score = 0,
-  frozenGuys = tbl.weaken({}, 'k'),
-  resources = {
-    pretzels = 0,
-    wood = 0,
-    stone = 0,
-  },
-  guys = {},
-  time = math.random() * 24 * 60,
-  entities = {},
-  ---@type Guy
-  player = nil,
-  squad = {
-    frozenGuys = tbl.weaken({}, 'k'),
-    followers = {},
-    shouldFollow = false,
-  },
-  buildings = {},
-  recruitCircle = nil,
-  ---@type fun(): nil
-  onLost = nil,
-  ---@type Vector
-  cursorPos = { x = 0, y = 0 },
-  magnificationFactor = 1,
-  isFocused = false,
-  texts = {
-    {
-      text = 'Build house on rock.',
-      pos = { x = 269, y = 228 },
-      maxWidth = 9,
-    },
-    {
-      text = '\nGARDEN\n  o\n   f\n EDEN',
-      pos = { x = 280, y = 194 },
-      maxWidth = 8,
-    },
-  },
-  ui = ui.makeRoot({}, {
-    ---@type PanelUI
-    ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
-      coloredText = function ()
-        return {
-          WHITE_COLOR,
-          string.format(
-            'Score: %d | FPS: %.1f\n%02d:%02d',
-            game.score,
-            love.timer.getFPS(),
-            math.floor(game.time / 60),
-            math.floor(game.time % 60)
-          ),
-        }
-      end
-    }),
-    ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-      text = function ()
-        local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
-        return string.format(
-          ''
-            .. 'Time: %02d:%02d\n (paused)\n'
-            .. 'Terrain:\n %s'
-            .. '\nCoords:\n %sX %sY'
-            .. '\nB] build\n (5 wood)'
-            .. '\nM] message'
-            .. '\nR] ritual'
-            .. '\nT] warp',
-          math.floor(game.time / 60),
-          math.floor(game.time % 60),
-          tileUnderCursor,
-          game.cursorPos.x,
-          game.cursorPos.y
-        )
-      end
-    }),
-    -- Empty underlay for console
-    ---@type PanelUI
-    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-    }),
-    ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-      text = function ()
-        local function charSheet(guy)
-          return function ()
-            return string.format(
-              ''
-                .. 'Name:\n %s\n'
-                .. 'Rank:\n Harmless\n'
-                .. 'Coords:\n %sX %sY\n'
-                .. 'HP:\n %s/%s\n'
-                .. 'Action:\n %.2f/%.2f\n',
-              guy.name,
-              guy.pos.x,
-              guy.pos.y,
-              guy.stats.hp,
-              guy.stats.maxHp,
-              guy.time,
-              guy.speed
-            )
-          end
-        end
-
-        local function controls()
-          return ''
-            .. ' CONTROLS  \n'
-            .. 'WASD:  move\n'
-            .. 'LMB:recruit\n'
-            .. 'Spc:  focus\n'
-            .. '1234: scale\n'
-            .. 'F:   follow\n'
-            .. 'G:  dismiss\n'
-            .. 'C:     chop\n'
-            .. 'Z:     zoom\n'
-        end
-
-
-        local header = '<- Tab ->\n\n'
-        local tabs = { charSheet(game.player), controls }
-        local idx = 1 + (game.activeTab % #tabs)
-
-        return header .. tabs[idx]()
-      end,
-    }),
-    ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
-      text = function ()
-        return string.format(
-          'Wood: %s | Stone: %s | Pretzels: %s',
-          game.resources.wood,
-          game.resources.stone,
-          game.resources.pretzels
-        )
-      end,
-    }),
-    -- Pause icon
-    ui.makePanel(ui.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-    }),
-    ui.makePanel(ui.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-    }),
-  })
-}
-
 ---@param game Game
 ---@param text string
 local function echo(game, text)
@@ -279,13 +119,15 @@ local function echo(game, text)
   end
 end
 
+---@param game Game
 ---@param guy Guy
-local function freeze(guy)
+local function freeze(game, guy)
   game.frozenGuys[guy] = true
 end
 
+---@param game Game
 ---@param guy Guy
-local function unfreeze(guy)
+local function unfreeze(game, guy)
   game.frozenGuys[guy] = nil
 end
 
@@ -296,57 +138,236 @@ local function isFrozen(game, guy)
   return game.frozenGuys[guy] or false
 end
 
----@type Collider
-function game.collider(nothing, v)
-  local otherGuy = tbl.find(game.guys, function (guy)
-    return vector.equal(guy.pos, v)
-  end)
-  if otherGuy then
-    return { type = 'guy', guy = otherGuy }
-  end
-  local entity = tbl.find(game.entities, function (entity)
-    return vector.equal(entity.object.pos, v)
-  end)
-  if entity then
-    return { type = 'entity', entity = entity }
-  end
-  if isPassable(game.world, v) then
-    return NONE_COLLISION
-  end
-  return TERRAIN_COLLISION
-end
+---@return Game
+local function init()
+  local game
 
----@type GuyDelegate
-local guyDelegate = {
-  beginBattle = function (attacker, defender)
-    freeze(attacker)
-    freeze(defender)
+  ---@type GuyDelegate
+  local guyDelegate = {
+    beginBattle = function (attacker, defender)
+      freeze(game, attacker)
+      freeze(game, defender)
 
-    table.insert(game.entities, {
-      type = 'battle',
-      object = {
-        attacker = attacker,
-        defender = defender,
-        pos = defender.pos,
-        round = 1,
-        timer = BATTLE_ROUND_DURATION,
-      }
+      table.insert(game.entities, {
+        type = 'battle',
+        object = {
+          attacker = attacker,
+          defender = defender,
+          pos = defender.pos,
+          round = 1,
+          timer = BATTLE_ROUND_DURATION,
+        }
+      })
+    end,
+    enterHouse = function (guy, entity)
+      if guy.stats.hp >= guy.stats.maxHp then
+        return false
+      end
+      guy.stats.hp = guy.stats.maxHp
+      local idx = tbl.indexOf(game.entities, entity)
+      table.remove(game.entities, idx)
+      return true
+    end,
+  }
+
+  game = {
+    ---@type World
+    world = nil,
+    guyDelegate = guyDelegate,
+    activeTab = 0,
+    score = 0,
+    frozenGuys = tbl.weaken({}, 'k'),
+    resources = {
+      pretzels = 0,
+      wood = 0,
+      stone = 0,
+    },
+    guys = {},
+    time = math.random() * 24 * 60,
+    entities = {},
+    ---@type Guy
+    player = nil,
+    squad = {
+      frozenGuys = tbl.weaken({}, 'k'),
+      followers = {},
+      shouldFollow = false,
+    },
+    buildings = {},
+    recruitCircle = nil,
+    ---@type fun(): nil
+    onLost = nil,
+    ---@type Vector
+    cursorPos = { x = 0, y = 0 },
+    magnificationFactor = 1,
+    isFocused = false,
+    texts = {
+      {
+        text = 'Build house on rock.',
+        pos = { x = 269, y = 228 },
+        maxWidth = 9,
+      },
+      {
+        text = '\nGARDEN\n  o\n   f\n EDEN',
+        pos = { x = 280, y = 194 },
+        maxWidth = 8,
+      },
+    },
+    ui = ui.makeRoot({}, {
+      ---@type PanelUI
+      ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
+        coloredText = function ()
+          return {
+            WHITE_COLOR,
+            string.format(
+              'Score: %d | FPS: %.1f\n%02d:%02d',
+              game.score,
+              love.timer.getFPS(),
+              math.floor(game.time / 60),
+              math.floor(game.time % 60)
+            ),
+          }
+        end
+      }),
+      ---@type PanelUI
+      ui.makePanel(ui.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
+        shouldDraw = function ()
+          return game.isFocused
+        end,
+        text = function ()
+          local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
+          return string.format(
+            ''
+              .. 'Time: %02d:%02d\n (paused)\n'
+              .. 'Terrain:\n %s'
+              .. '\nCoords:\n %sX %sY'
+              .. '\nB] build\n (5 wood)'
+              .. '\nM] message'
+              .. '\nR] ritual'
+              .. '\nT] warp',
+            math.floor(game.time / 60),
+            math.floor(game.time % 60),
+            tileUnderCursor,
+            game.cursorPos.x,
+            game.cursorPos.y
+          )
+        end
+      }),
+      -- Empty underlay for console
+      ---@type PanelUI
+      ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
+        shouldDraw = function ()
+          return game.isFocused
+        end,
+      }),
+      ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
+        shouldDraw = function ()
+          return game.isFocused
+        end,
+        text = function ()
+          local function charSheet(guy)
+            return function ()
+              return string.format(
+                ''
+                  .. 'Name:\n %s\n'
+                  .. 'Rank:\n Harmless\n'
+                  .. 'Coords:\n %sX %sY\n'
+                  .. 'HP:\n %s/%s\n'
+                  .. 'Action:\n %.2f/%.2f\n',
+                guy.name,
+                guy.pos.x,
+                guy.pos.y,
+                guy.stats.hp,
+                guy.stats.maxHp,
+                guy.time,
+                guy.speed
+              )
+            end
+          end
+
+          local function controls()
+            return ''
+              .. ' CONTROLS  \n'
+              .. 'WASD:  move\n'
+              .. 'LMB:recruit\n'
+              .. 'Spc:  focus\n'
+              .. '1234: scale\n'
+              .. 'F:   follow\n'
+              .. 'G:  dismiss\n'
+              .. 'C:     chop\n'
+              .. 'Z:     zoom\n'
+          end
+
+
+          local header = '<- Tab ->\n\n'
+          local tabs = { charSheet(game.player), controls }
+          local idx = 1 + (game.activeTab % #tabs)
+
+          return header .. tabs[idx]()
+        end,
+      }),
+      ---@type PanelUI
+      ui.makePanel(ui.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
+        text = function ()
+          return string.format(
+            'Wood: %s | Stone: %s | Pretzels: %s',
+            game.resources.wood,
+            game.resources.stone,
+            game.resources.pretzels
+          )
+        end,
+      }),
+      -- Pause icon
+      ui.makePanel(ui.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
+        shouldDraw = function ()
+          return game.isFocused
+        end,
+      }),
+      ui.makePanel(ui.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
+        shouldDraw = function ()
+          return game.isFocused
+        end,
+      }),
     })
-  end,
-  enterHouse = function (guy, entity)
-    if guy.stats.hp >= guy.stats.maxHp then
-      return false
-    end
-    guy.stats.hp = guy.stats.maxHp
-    local idx = tbl.indexOf(game.entities, entity)
-    table.remove(game.entities, idx)
-    return true
-  end,
-  collider = game.collider,
-}
+  }
 
----@param game Game
-local function init(game)
+  function game.visionSourcesCo()
+    coroutine.yield({ pos = game.player.pos, sight = 10 })
+
+    for _, guy in ipairs(game.guys) do
+      if guy.team == 'good' then
+        coroutine.yield({ pos = guy.pos, sight = 8 })
+      end
+    end
+
+    return {
+      pos = game.cursorPos,
+      sight = math.max(2, game.recruitCircle or 0),
+    }
+  end
+
+
+  ---@type Collider
+  function game.collider(nothing, v)
+    local otherGuy = tbl.find(game.guys, function (guy)
+      return vector.equal(guy.pos, v)
+    end)
+    if otherGuy then
+      return { type = 'guy', guy = otherGuy }
+    end
+    local entity = tbl.find(game.entities, function (entity)
+      return vector.equal(entity.object.pos, v)
+    end)
+    if entity then
+      return { type = 'entity', entity = entity }
+    end
+    if isPassable(game.world, v) then
+      return NONE_COLLISION
+    end
+    return TERRAIN_COLLISION
+  end
+
+  guyDelegate.collider = game.collider
+
   game.player = Guy.makeLeader({ x = 269, y = 231 })
   game.player.name = 'Leader'
   game.guys = {
@@ -376,6 +397,7 @@ local function init(game)
       lifetime = 16,
     }
   }
+  return game
 end
 
 ---@param game Game
@@ -428,31 +450,16 @@ local function orderMove(game, vec)
   if game.squad.shouldFollow then
     for guy in pairs(game.squad.followers) do
       if not isFrozen(game, guy) then
-        moveGuy(guy, vec, guyDelegate)
+        moveGuy(guy, vec, game.guyDelegate)
       end
     end
   end
   if not isFrozen(game, game.player) then
-    if moveGuy(game.player, vec, guyDelegate) then
+    if moveGuy(game.player, vec, game.guyDelegate) then
       return 'shouldStop'
     end
   end
   return 'shouldRetryOtherDirection'
-end
-
-function game.visionSourcesCo()
-  coroutine.yield({ pos = game.player.pos, sight = 10 })
-
-  for _, guy in ipairs(game.guys) do
-    if guy.team == 'good' then
-      coroutine.yield({ pos = guy.pos, sight = 8 })
-    end
-  end
-
-  return {
-    pos = game.cursorPos,
-    sight = math.max(2, game.recruitCircle or 0),
-  }
 end
 
 ---@param game Game
@@ -554,8 +561,8 @@ local function updateBattle(game, entity, dt)
       maybeDrop(game.entities, entity)
       maybeDie(battle.attacker)
       maybeDie(battle.defender)
-      unfreeze(battle.attacker)
-      unfreeze(battle.defender)
+      unfreeze(game, battle.attacker)
+      unfreeze(game, battle.defender)
     end
 
     -- Next round
@@ -579,7 +586,7 @@ end
 local function updateGuys(game, dt)
   for _, guy in ipairs(game.guys) do
     if not isFrozen(game, guy) then
-      updateGuy(guy, dt, guyDelegate)
+      updateGuy(guy, dt, game.guyDelegate)
     end
   end
 end
@@ -620,7 +627,9 @@ local function orderFocus(game)
   game.isFocused = not game.isFocused
 end
 
-local function maybeChop(guy)
+---@param game Game
+---@param guy Guy
+local function maybeChop(game, guy)
   if isFrozen(game, guy) then return end
 
   local pos = guy.pos
@@ -633,13 +642,14 @@ local function maybeChop(guy)
 end
 
 local function orderChop(game)
-  maybeChop(game.player)
+  maybeChop(game, game.player)
   for guy in pairs(game.squad.followers) do
-    maybeChop(guy)
+    maybeChop(game, guy)
   end
 end
 
-local function switchMagn()
+---@param game Game
+local function switchMagn(game)
   if game.magnificationFactor == 1 then
     game.magnificationFactor = 2/3
   elseif game.magnificationFactor == 2/3 then
@@ -737,7 +747,6 @@ end
 
 return {
   dismissSquad = dismissSquad,
-  game = game,
   handleInput = handleInput,
   orderChop = orderChop,
   orderMove = orderMove,
