@@ -160,10 +160,221 @@ local function removeEntity(game, entity)
   table.remove(game.entities, idx)
 end
 
+---@param game Game
+local function topPanelText(game)
+  return {
+    WHITE_COLOR,
+    string.format(
+      'Score: %d | FPS: %.1f\n%02d:%02d',
+      game.score,
+      love.timer.getFPS(),
+      math.floor(game.time / 60),
+      math.floor(game.time % 60)
+    ),
+  }
+end
+
+---@param game Game
+local function leftPanelText(game)
+  local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
+  return string.format(
+    ''
+      .. 'Time: %02d:%02d\n (paused)\n'
+      .. 'Terrain:\n %s'
+      .. '\nCoords:\n %sX %sY'
+      .. '\nB] build\n (5 wood)'
+      .. '\nM] message'
+      .. '\nR] ritual'
+      .. '\nT] warp',
+    math.floor(game.time / 60),
+    math.floor(game.time % 60),
+    tileUnderCursor,
+    game.cursorPos.x,
+    game.cursorPos.y
+  )
+end
+
+---@param game Game
+local function rightPanelText(game)
+  local function charSheet(guy)
+    return function ()
+      return string.format(
+        ''
+          .. 'Name:\n %s\n'
+          .. 'Rank:\n Harmless\n'
+          .. 'Coords:\n %sX %sY\n'
+          .. 'HP:\n %s/%s\n'
+          .. 'Action:\n %.2f/%.2f\n',
+        guy.name,
+        guy.pos.x,
+        guy.pos.y,
+        guy.stats.hp,
+        guy.stats.maxHp,
+        guy.time,
+        guy.speed
+      )
+    end
+  end
+
+  local function controls()
+    return ''
+      .. ' CONTROLS  \n'
+      .. 'WASD:  move\n'
+      .. 'LMB:recruit\n'
+      .. 'Spc:  focus\n'
+      .. '1234: scale\n'
+      .. 'F:   follow\n'
+      .. 'G:  dismiss\n'
+      .. 'C:     chop\n'
+      .. 'Z:     zoom\n'
+  end
+
+  local header = '<- Tab ->\n\n'
+  local tabs = { charSheet(game.player), controls }
+  local idx = 1 + (game.activeTab % #tabs)
+
+  return header .. tabs[idx]()
+end
+
+---@param game Game
+local function bottomPanelText(game)
+  return string.format(
+    'Wood: %s | Stone: %s | Pretzels: %s',
+    game.resources.wood,
+    game.resources.stone,
+    game.resources.pretzels
+  )
+end
+
+---@param game Game
+local function makeUI(game)
+  return ui.makeRoot({}, {
+    ---@type PanelUI
+    ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
+      coloredText = function ()
+        return topPanelText(game)
+      end
+    }),
+    ---@type PanelUI
+    ui.makePanel(ui.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+      text = function ()
+        return leftPanelText(game)
+      end
+    }),
+    -- Empty underlay for console
+    ---@type PanelUI
+    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+    }),
+    ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+      text = function ()
+        return rightPanelText(game)
+      end,
+    }),
+    ---@type PanelUI
+    ui.makePanel(ui.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
+      text = function ()
+        return bottomPanelText(game)
+      end,
+    }),
+    -- Pause icon
+    ui.makePanel(ui.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+    }),
+    ui.makePanel(ui.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
+      shouldDraw = function ()
+        return game.isFocused
+      end,
+    }),
+  })
+
+end
+
 ---@return Game
 local function init()
   ---@type Game
   local game
+
+  local player = Guy.makeLeader({ x = 269, y = 231 })
+  player.name = 'Leader'
+
+  local guys = {
+    player,
+    Guy.makeGoodGuy({ x = 274, y = 231 }),
+    Guy.makeGoodGuy({ x = 272, y = 231 }),
+    Guy.makeGoodGuy({ x = 274, y = 229 }),
+    Guy.makeGoodGuy({ x = 272, y = 229 }),
+  }
+
+  ---@type ConsoleMessage[]
+  local consoleMessages = {
+    {
+      text = 'Welcome to Kobold Princess Simulator.',
+      lifetime = 10,
+    },
+    {
+      text = 'This is day 1 of your reign.',
+      lifetime = 16,
+    }
+  }
+
+  local texts = {
+    {
+      text = 'Build house on rock.',
+      pos = { x = 269, y = 228 },
+      maxWidth = 9,
+    },
+    {
+      text = '\nGARDEN\n  o\n   f\n EDEN',
+      pos = { x = 280, y = 194 },
+      maxWidth = 8,
+    },
+  }
+
+  local function visionSourcesCo()
+    coroutine.yield({ pos = game.player.pos, sight = 10 })
+
+    for _, guy in ipairs(game.guys) do
+      if guy.team == 'good' then
+        coroutine.yield({ pos = guy.pos, sight = 8 })
+      end
+    end
+
+    return {
+      pos = game.cursorPos,
+      sight = math.max(2, game.recruitCircle or 0),
+    }
+  end
+
+  ---@type Collider
+  local function collider(nothing, v)
+    local otherGuy = tbl.find(game.guys, function (guy)
+      return vector.equal(guy.pos, v)
+    end)
+    if otherGuy then
+      return { type = 'guy', guy = otherGuy }
+    end
+    local entity = tbl.find(game.entities, function (entity)
+      return vector.equal(entity.object.pos, v)
+    end)
+    if entity then
+      return { type = 'entity', entity = entity }
+    end
+    if isPassable(game.world, v) then
+      return NONE_COLLISION
+    end
+    return TERRAIN_COLLISION
+  end
 
   ---@type GuyDelegate
   local guyDelegate = {
@@ -190,147 +401,8 @@ local function init()
       removeEntity(game, entity)
       return true
     end,
+    collider = collider,
   }
-
-  local player = Guy.makeLeader({ x = 269, y = 231 })
-  player.name = 'Leader'
-
-  local guys = {
-    player,
-    Guy.makeGoodGuy({ x = 274, y = 231 }),
-    Guy.makeGoodGuy({ x = 272, y = 231 }),
-    Guy.makeGoodGuy({ x = 274, y = 229 }),
-    Guy.makeGoodGuy({ x = 272, y = 229 }),
-  }
-
-  local texts = {
-    {
-      text = 'Build house on rock.',
-      pos = { x = 269, y = 228 },
-      maxWidth = 9,
-    },
-    {
-      text = '\nGARDEN\n  o\n   f\n EDEN',
-      pos = { x = 280, y = 194 },
-      maxWidth = 8,
-    },
-  }
-
-  local ui = ui.makeRoot({}, {
-    ---@type PanelUI
-    ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
-      coloredText = function ()
-        return {
-          WHITE_COLOR,
-          string.format(
-            'Score: %d | FPS: %.1f\n%02d:%02d',
-            game.score,
-            love.timer.getFPS(),
-            math.floor(game.time / 60),
-            math.floor(game.time % 60)
-          ),
-        }
-      end
-    }),
-    ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-      text = function ()
-        local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
-        return string.format(
-          ''
-            .. 'Time: %02d:%02d\n (paused)\n'
-            .. 'Terrain:\n %s'
-            .. '\nCoords:\n %sX %sY'
-            .. '\nB] build\n (5 wood)'
-            .. '\nM] message'
-            .. '\nR] ritual'
-            .. '\nT] warp',
-          math.floor(game.time / 60),
-          math.floor(game.time % 60),
-          tileUnderCursor,
-          game.cursorPos.x,
-          game.cursorPos.y
-        )
-      end
-    }),
-    -- Empty underlay for console
-    ---@type PanelUI
-    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-    }),
-    ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-      text = function ()
-        local function charSheet(guy)
-          return function ()
-            return string.format(
-              ''
-                .. 'Name:\n %s\n'
-                .. 'Rank:\n Harmless\n'
-                .. 'Coords:\n %sX %sY\n'
-                .. 'HP:\n %s/%s\n'
-                .. 'Action:\n %.2f/%.2f\n',
-              guy.name,
-              guy.pos.x,
-              guy.pos.y,
-              guy.stats.hp,
-              guy.stats.maxHp,
-              guy.time,
-              guy.speed
-            )
-          end
-        end
-
-        local function controls()
-          return ''
-            .. ' CONTROLS  \n'
-            .. 'WASD:  move\n'
-            .. 'LMB:recruit\n'
-            .. 'Spc:  focus\n'
-            .. '1234: scale\n'
-            .. 'F:   follow\n'
-            .. 'G:  dismiss\n'
-            .. 'C:     chop\n'
-            .. 'Z:     zoom\n'
-        end
-
-        local header = '<- Tab ->\n\n'
-        local tabs = { charSheet(game.player), controls }
-        local idx = 1 + (game.activeTab % #tabs)
-
-        return header .. tabs[idx]()
-      end,
-    }),
-    ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
-      text = function ()
-        return string.format(
-          'Wood: %s | Stone: %s | Pretzels: %s',
-          game.resources.wood,
-          game.resources.stone,
-          game.resources.pretzels
-        )
-      end,
-    }),
-    -- Pause icon
-    ui.makePanel(ui.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-    }),
-    ui.makePanel(ui.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-    }),
-  })
 
   ---@type Game
   game = {
@@ -341,6 +413,7 @@ local function init()
     buildings = {
       { pos = { x = 277, y = 233 } }
     },
+    consoleMessages = consoleMessages,
     frozenGuys = tbl.weaken({}, 'k'),
     resources = {
       pretzels = 0,
@@ -350,7 +423,6 @@ local function init()
     guys = guys,
     time = math.random() * 24 * 60,
     entities = {},
-    ---@type Guy
     player = player,
     squad = {
       followers = {},
@@ -358,62 +430,17 @@ local function init()
     },
     recruitCircle = nil,
     onLost = nil,
-    ---@type Vector
-    cursorPos = { x = 0, y = 0 },
+    cursorPos = player.pos,
     magnificationFactor = 1,
     isFocused = false,
     texts = texts,
-    ui = ui,
+    visionSourcesCo = visionSourcesCo,
+    collider = collider,
   }
 
-  function game.visionSourcesCo()
-    coroutine.yield({ pos = game.player.pos, sight = 10 })
+  game.ui = makeUI(game)
 
-    for _, guy in ipairs(game.guys) do
-      if guy.team == 'good' then
-        coroutine.yield({ pos = guy.pos, sight = 8 })
-      end
-    end
 
-    return {
-      pos = game.cursorPos,
-      sight = math.max(2, game.recruitCircle or 0),
-    }
-  end
-
-  ---@type Collider
-  function game.collider(nothing, v)
-    local otherGuy = tbl.find(game.guys, function (guy)
-      return vector.equal(guy.pos, v)
-    end)
-    if otherGuy then
-      return { type = 'guy', guy = otherGuy }
-    end
-    local entity = tbl.find(game.entities, function (entity)
-      return vector.equal(entity.object.pos, v)
-    end)
-    if entity then
-      return { type = 'entity', entity = entity }
-    end
-    if isPassable(game.world, v) then
-      return NONE_COLLISION
-    end
-    return TERRAIN_COLLISION
-  end
-
-  guyDelegate.collider = game.collider
-
-  game.cursorPos = game.player.pos
-  game.consoleMessages = {
-    {
-      text = 'Welcome to Kobold Princess Simulator.',
-      lifetime = 10,
-    },
-    {
-      text = 'This is day 1 of your reign.',
-      lifetime = 16,
-    }
-  }
   return game
 end
 
