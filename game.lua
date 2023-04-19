@@ -43,8 +43,8 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field maxWidth number
 
 ---@class VisionSource
----@field pos Vector
----@field sight integer
+---@field pos Vector Vision source's position
+---@field sight integer Vision source's radius of sight
 
 ---@class GameEntity
 ---@field type string
@@ -57,6 +57,13 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@class GameEntity_Battle: GameEntity
 ---@field type 'battle'
 ---@field object Battle
+
+---@class UIDelegate
+---@field topPanelText fun(): table Love2D colored text for top panel
+---@field leftPanelText fun(): string Left panel text
+---@field rightPanelText fun(): string Right panel text
+---@field bottomPanelText fun(): string Bottom panel text
+---@field shouldDrawFocusModeUI fun(): boolean True if should draw focus mode UI
 
 ---@class Game
 ---# Simulation
@@ -160,144 +167,62 @@ local function removeEntity(game, entity)
   table.remove(game.entities, idx)
 end
 
----@param game Game
-local function topPanelText(game)
-  return {
-    WHITE_COLOR,
-    string.format(
-      'Score: %d | FPS: %.1f\n%02d:%02d',
-      game.score,
-      love.timer.getFPS(),
-      math.floor(game.time / 60),
-      math.floor(game.time % 60)
-    ),
-  }
+---@param guy Guy
+local function isGoodGuy(guy)
+  return guy.team == 'good'
 end
 
 ---@param game Game
-local function leftPanelText(game)
-  local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
-  return string.format(
-    ''
-      .. 'Time: %02d:%02d\n (paused)\n'
-      .. 'Terrain:\n %s'
-      .. '\nCoords:\n %sX %sY'
-      .. '\nB] build\n (5 wood)'
-      .. '\nM] message'
-      .. '\nR] ritual'
-      .. '\nT] warp',
-    math.floor(game.time / 60),
-    math.floor(game.time % 60),
-    tileUnderCursor,
-    game.cursorPos.x,
-    game.cursorPos.y
-  )
+---@param pos Vector
+---@return Guy | nil
+local function findGuyAtPos(game, pos)
+  return tbl.find(game.guys, function (guy)
+    return vector.equal(guy.pos, pos)
+  end)
 end
 
 ---@param game Game
-local function rightPanelText(game)
-  local function charSheet(guy)
-    return function ()
-      return string.format(
-        ''
-          .. 'Name:\n %s\n'
-          .. 'Rank:\n Harmless\n'
-          .. 'Coords:\n %sX %sY\n'
-          .. 'HP:\n %s/%s\n'
-          .. 'Action:\n %.2f/%.2f\n',
-        guy.name,
-        guy.pos.x,
-        guy.pos.y,
-        guy.stats.hp,
-        guy.stats.maxHp,
-        guy.time,
-        guy.speed
-      )
-    end
-  end
-
-  local function controls()
-    return ''
-      .. ' CONTROLS  \n'
-      .. 'WASD:  move\n'
-      .. 'LMB:recruit\n'
-      .. 'Spc:  focus\n'
-      .. '1234: scale\n'
-      .. 'F:   follow\n'
-      .. 'G:  dismiss\n'
-      .. 'C:     chop\n'
-      .. 'Z:     zoom\n'
-  end
-
-  local header = '<- Tab ->\n\n'
-  local tabs = { charSheet(game.player), controls }
-  local idx = 1 + (game.activeTab % #tabs)
-
-  return header .. tabs[idx]()
+---@param pos Vector
+---@return GameEntity | nil
+local function findEntityAtPos(game, pos)
+  return tbl.find(game.entities, function (entity)
+    return vector.equal(entity.object.pos, pos)
+  end)
 end
 
----@param game Game
-local function bottomPanelText(game)
-  return string.format(
-    'Wood: %s | Stone: %s | Pretzels: %s',
-    game.resources.wood,
-    game.resources.stone,
-    game.resources.pretzels
-  )
-end
-
----@param game Game
-local function makeUI(game)
+---@param delegate UIDelegate
+local function makeUI(delegate)
   return ui.makeRoot({}, {
     ---@type PanelUI
     ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
-      coloredText = function ()
-        return topPanelText(game)
-      end
+      coloredText = delegate.topPanelText,
     }),
     ---@type PanelUI
     ui.makePanel(ui.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-      text = function ()
-        return leftPanelText(game)
-      end
+      shouldDraw = delegate.shouldDrawFocusModeUI,
+      text = delegate.leftPanelText,
     }),
     -- Empty underlay for console
     ---@type PanelUI
     ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
+      shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
     ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
-      text = function ()
-        return rightPanelText(game)
-      end,
+      shouldDraw = delegate.shouldDrawFocusModeUI,
+      text = delegate.rightPanelText,
     }),
     ---@type PanelUI
     ui.makePanel(ui.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
-      text = function ()
-        return bottomPanelText(game)
-      end,
+      text = delegate.bottomPanelText,
     }),
     -- Pause icon
     ui.makePanel(ui.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
+      shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
     ui.makePanel(ui.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
-      shouldDraw = function ()
-        return game.isFocused
-      end,
+      shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
   })
-
 end
 
 ---@return Game
@@ -307,6 +232,91 @@ local function init()
 
   local player = Guy.makeLeader({ x = 269, y = 231 })
   player.name = 'Leader'
+
+  ---@type UIDelegate
+  local uiDelegate = {
+    topPanelText = function()
+      return {
+        WHITE_COLOR,
+        string.format(
+          'Score: %d | FPS: %.1f\n%02d:%02d',
+          game.score,
+          love.timer.getFPS(),
+          math.floor(game.time / 60),
+          math.floor(game.time % 60)
+        ),
+      }
+    end,
+    leftPanelText = function ()
+      local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
+      return string.format(
+        ''
+          .. 'Time: %02d:%02d\n (paused)\n'
+          .. 'Terrain:\n %s'
+          .. '\nCoords:\n %sX %sY'
+          .. '\nB] build\n (5 wood)'
+          .. '\nM] message'
+          .. '\nR] ritual'
+          .. '\nT] warp',
+        math.floor(game.time / 60),
+        math.floor(game.time % 60),
+        tileUnderCursor,
+        game.cursorPos.x,
+        game.cursorPos.y
+      )
+    end,
+    rightPanelText = function ()
+      local function charSheet(guy)
+        return function ()
+          return string.format(
+            ''
+              .. 'Name:\n %s\n'
+              .. 'Rank:\n Harmless\n'
+              .. 'Coords:\n %sX %sY\n'
+              .. 'HP:\n %s/%s\n'
+              .. 'Action:\n %.2f/%.2f\n',
+            guy.name,
+            guy.pos.x,
+            guy.pos.y,
+            guy.stats.hp,
+            guy.stats.maxHp,
+            guy.time,
+            guy.speed
+          )
+        end
+      end
+
+      local function controls()
+        return ''
+          .. ' CONTROLS  \n'
+          .. 'WASD:  move\n'
+          .. 'LMB:recruit\n'
+          .. 'Spc:  focus\n'
+          .. '1234: scale\n'
+          .. 'F:   follow\n'
+          .. 'G:  dismiss\n'
+          .. 'C:     chop\n'
+          .. 'Z:     zoom\n'
+      end
+
+      local header = '<- Tab ->\n\n'
+      local tabs = { charSheet(player), controls }
+      local idx = 1 + (game.activeTab % #tabs)
+
+      return header .. tabs[idx]()
+    end,
+    bottomPanelText = function ()
+      return string.format(
+        'Wood: %s | Stone: %s | Pretzels: %s',
+        game.resources.wood,
+        game.resources.stone,
+        game.resources.pretzels
+      )
+    end,
+    shouldDrawFocusModeUI = function()
+      return game.isFocused
+    end,
+  }
 
   local guys = {
     player,
@@ -341,11 +351,12 @@ local function init()
     },
   }
 
+  ---@return VisionSource
   local function visionSourcesCo()
     coroutine.yield({ pos = game.player.pos, sight = 10 })
 
     for _, guy in ipairs(game.guys) do
-      if guy.team == 'good' then
+      if isGoodGuy(guy) then
         coroutine.yield({ pos = guy.pos, sight = 8 })
       end
     end
@@ -358,17 +369,13 @@ local function init()
 
   ---@type Collider
   local function collider(nothing, v)
-    local otherGuy = tbl.find(game.guys, function (guy)
-      return vector.equal(guy.pos, v)
-    end)
-    if otherGuy then
-      return { type = 'guy', guy = otherGuy }
+    local someoneThere = findGuyAtPos(game, v)
+    if someoneThere then
+      return { type = 'guy', guy = someoneThere }
     end
-    local entity = tbl.find(game.entities, function (entity)
-      return vector.equal(entity.object.pos, v)
-    end)
-    if entity then
-      return { type = 'entity', entity = entity }
+    local someEntityThere = findEntityAtPos(game, v)
+    if someEntityThere then
+      return { type = 'entity', entity = someEntityThere }
     end
     if isPassable(game.world, v) then
       return NONE_COLLISION
@@ -436,45 +443,83 @@ local function init()
     texts = texts,
     visionSourcesCo = visionSourcesCo,
     collider = collider,
+    ui = makeUI(uiDelegate),
   }
-
-  game.ui = makeUI(game)
-
-
   return game
+end
+
+---@param game Game
+---@return boolean
+local function isRecruitCircleActive(game)
+  return game.recruitCircle ~= nil
+end
+
+---@param game Game
+---@param guy Guy
+---@return boolean
+local function isGuyAPlayer(game, guy)
+  return guy == game.player
+end
+
+---@param game Game
+---@param guy Guy
+---@return boolean
+local function isGuyAFollower(game, guy)
+  return game.squad.followers[guy] or false
 end
 
 ---@param game Game
 ---@param guy Guy
 ---@return boolean
 local function mayRecruit(game, guy)
-  if not game.recruitCircle then return false end
-  if guy == game.player then return false end
-  if game.squad.followers[guy] then return false end
+  if not isRecruitCircleActive(game) then return false end
+  if isGuyAPlayer(game, guy) then return false end
+  if isGuyAFollower(game, guy) then return false end
   if not canRecruitGuy(guy) then return false end
   return vector.dist(guy.pos, game.cursorPos) < game.recruitCircle + 0.5
 end
 
-local function toggleFollow(game)
+-- Writers
+
+---@param game Game
+local function toggleFollow__(game)
   game.squad.shouldFollow = not game.squad.shouldFollow
 end
 
+---@param squad Squad
+---@param guy Guy
+local function removeGuyFromSquad__(squad, guy)
+  squad.followers[guy] = nil
+end
+
+---@param game Game
+local function resetRecruitCircle__(game)
+  game.recruitCircle = 0
+end
+
+---@param squad Squad
+---@param guy Guy
+local function addGuyToSquad__(squad, guy)
+  squad.followers[guy] = true
+end
+
+---@param game Game
 local function dismissSquad(game)
   for guy in pairs(game.squad.followers) do
-    game.squad.followers[guy] = nil
+    removeGuyFromSquad__(game.squad, guy)
   end
 end
 
 local function beginRecruiting(game)
   if game.isFocused then return end
-  game.recruitCircle = 0
+  resetRecruitCircle__(game)
 end
 
 local function endRecruiting(game)
   for _, guy in tbl.ifilter(game.guys, function (guy)
     return mayRecruit(game, guy)
   end) do
-    game.squad.followers[guy] = true
+    addGuyToSquad__(game.squad, guy)
   end
   game.squad.shouldFollow = true
   game.recruitCircle = nil
@@ -561,7 +606,6 @@ end
 local function advanceClock(game, dt)
   return (game.time + dt) % (24 * 60)
 end
-
 
 ---@param game Game
 ---@param guy Guy
@@ -795,7 +839,7 @@ return {
   orderChop = orderChop,
   orderMove = orderMove,
   echo = echo,
-  toggleFollow = toggleFollow,
+  toggleFollow = toggleFollow__,
   updateGame = updateGame,
   orderFocus = orderFocus,
   beginRecruiting = beginRecruiting,
