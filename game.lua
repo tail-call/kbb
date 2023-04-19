@@ -20,7 +20,6 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@class Squad
 ---@field shouldFollow boolean
 ---@field followers { [Guy]: true }
----@field frozenGuys { [Guy]: true }
 
 ---@class Resources
 ---@field pretzels integer
@@ -51,11 +50,11 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field type string
 ---@field object any
 
----@class GameEntity_Building
+---@class GameEntity_Building: GameEntity
 ---@field type 'building'
 ---@field object Building
 
----@class GameEntity_Battle
+---@class GameEntity_Battle: GameEntity
 ---@field type 'battle'
 ---@field object Battle
 
@@ -138,8 +137,32 @@ local function isFrozen(game, guy)
   return game.frozenGuys[guy] or false
 end
 
+---@param guy Guy
+local function healGuy(guy)
+  guy.stats.hp = guy.stats.maxHp
+end
+
+---@param guy Guy
+local function isAtFullHealth(guy)
+  return guy.stats.hp >= guy.stats.maxHp
+end
+
+---@param game Game
+---@param entity GameEntity
+local function addEntity(game, entity)
+  table.insert(game.entities, entity)
+end
+
+---@param game Game
+---@param entity GameEntity
+local function removeEntity(game, entity)
+  local idx = tbl.indexOf(game.entities, entity)
+  table.remove(game.entities, idx)
+end
+
 ---@return Game
 local function init()
+  ---@type Game
   local game
 
   ---@type GuyDelegate
@@ -148,7 +171,7 @@ local function init()
       freeze(game, attacker)
       freeze(game, defender)
 
-      table.insert(game.entities, {
+      addEntity(game, {
         type = 'battle',
         object = {
           attacker = attacker,
@@ -160,58 +183,70 @@ local function init()
       })
     end,
     enterHouse = function (guy, entity)
-      if guy.stats.hp >= guy.stats.maxHp then
+      if isAtFullHealth(guy) then
         return false
       end
-      guy.stats.hp = guy.stats.maxHp
-      local idx = tbl.indexOf(game.entities, entity)
-      table.remove(game.entities, idx)
+      healGuy(guy)
+      removeEntity(game, entity)
       return true
     end,
   }
 
+  local player = Guy.makeLeader({ x = 269, y = 231 })
+  player.name = 'Leader'
+
+  local guys = {
+    player,
+    Guy.makeGoodGuy({ x = 274, y = 231 }),
+    Guy.makeGoodGuy({ x = 272, y = 231 }),
+    Guy.makeGoodGuy({ x = 274, y = 229 }),
+    Guy.makeGoodGuy({ x = 272, y = 229 }),
+  }
+
+  local texts = {
+    {
+      text = 'Build house on rock.',
+      pos = { x = 269, y = 228 },
+      maxWidth = 9,
+    },
+    {
+      text = '\nGARDEN\n  o\n   f\n EDEN',
+      pos = { x = 280, y = 194 },
+      maxWidth = 8,
+    },
+  }
+
+  ---@type Game
   game = {
-    ---@type World
-    world = nil,
+    world = loadWorld('map.png'),
     guyDelegate = guyDelegate,
     activeTab = 0,
     score = 0,
+    buildings = {
+      { pos = { x = 277, y = 233 } }
+    },
     frozenGuys = tbl.weaken({}, 'k'),
     resources = {
       pretzels = 0,
       wood = 0,
       stone = 0,
     },
-    guys = {},
+    guys = guys,
     time = math.random() * 24 * 60,
     entities = {},
     ---@type Guy
-    player = nil,
+    player = player,
     squad = {
-      frozenGuys = tbl.weaken({}, 'k'),
       followers = {},
       shouldFollow = false,
     },
-    buildings = {},
     recruitCircle = nil,
-    ---@type fun(): nil
     onLost = nil,
     ---@type Vector
     cursorPos = { x = 0, y = 0 },
     magnificationFactor = 1,
     isFocused = false,
-    texts = {
-      {
-        text = 'Build house on rock.',
-        pos = { x = 269, y = 228 },
-        maxWidth = 9,
-      },
-      {
-        text = '\nGARDEN\n  o\n   f\n EDEN',
-        pos = { x = 280, y = 194 },
-        maxWidth = 8,
-      },
-    },
+    texts = texts,
     ui = ui.makeRoot({}, {
       ---@type PanelUI
       ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
@@ -345,7 +380,6 @@ local function init()
     }
   end
 
-
   ---@type Collider
   function game.collider(nothing, v)
     local otherGuy = tbl.find(game.guys, function (guy)
@@ -368,24 +402,6 @@ local function init()
 
   guyDelegate.collider = game.collider
 
-  game.player = Guy.makeLeader({ x = 269, y = 231 })
-  game.player.name = 'Leader'
-  game.guys = {
-    game.player,
-    Guy.makeGoodGuy({ x = 274, y = 231 }),
-    Guy.makeGoodGuy({ x = 272, y = 231 }),
-    Guy.makeGoodGuy({ x = 274, y = 229 }),
-    Guy.makeGoodGuy({ x = 272, y = 229 }),
-  }
-  game.buildings = {
-    { pos = { x = 277, y = 233 } }
-  }
-  game.world = loadWorld('map.png')
-  game.squad = {
-    shouldFollow = true,
-    ---@type Guy[]
-    followers = tbl.weaken({}, 'k'),
-  }
   game.cursorPos = game.player.pos
   game.consoleMessages = {
     {
