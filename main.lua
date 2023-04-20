@@ -65,11 +65,13 @@ function love.update(dt)
     end
 
     if isReadyForOrder(game) and #directions > 0 then
-      for _ = 1, #directions do
+      for i = 1, #directions do
         alternatingKeyIndex = (alternatingKeyIndex + 1) % (#directions)
-        if orderMove(
+        local command = orderMove(
           game, directions[alternatingKeyIndex + 1]
-        ) == 'shouldStop' then
+        )
+        print('i', i, 'com', command)
+        if command == 'shouldStop' then
           break
         end
       end

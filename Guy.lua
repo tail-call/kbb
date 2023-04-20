@@ -33,11 +33,9 @@ local Guy = {}
 ---@param guy Guy
 ---@param vec Vector
 ---@param delegate GuyDelegate
----@return boolean didMove
+---@return Vector newPosition
 local function moveGuy(guy, vec, delegate)
-  if not guy.mayMove then return false end
-
-  local didMove = false
+  if not guy.mayMove then return guy.pos end
 
   local stepForward = Vector.add(guy.pos, vec)
   local diagonalStepLeft = Vector.add(guy.pos,
@@ -47,20 +45,16 @@ local function moveGuy(guy, vec, delegate)
     Vector.add(vec, Vector.dotProd(vec, { x = 0, y = -1 }))
   )
 
-  ---@param pos Vector
-  local function move(pos)
-    didMove = true
-    guy:move(pos)
-  end
-
   for _, pos in ipairs{stepForward, diagonalStepLeft, diagonalStepRight} do
     local collision = delegate.collider(pos)
     if collision.type == 'none' then
-      move(pos)
+      guy:move(pos)
+      return pos
     elseif collision.type == 'guy' then
       if guy.team ~= collision.guy.team then
-        move(pos)
+        guy:move(pos)
         delegate.beginBattle(guy, collision.guy)
+        return pos
       end
     elseif collision.type == 'entity' then
       if collision.entity.type == 'building' then
@@ -70,16 +64,14 @@ local function moveGuy(guy, vec, delegate)
         ---@cast sameEntity GameEntity_Building
         local shouldMove = delegate.enterHouse(guy, sameEntity)
         if shouldMove == 'shouldMove' then
-          move(pos)
+          guy:move(pos)
+          return pos
         end
       end
     end
-    if didMove then
-      break
-    end
   end
 
-  return didMove
+  return guy.pos
 end
 
 local function warpGuy(guy, vec)
@@ -146,7 +138,7 @@ function Guy.new(opts)
       self.mayMove = false
       self.pos = pos
       self.pixie:move(self.pos)
-    end
+    end,
   }
 
   guy.pixie:move(guy.pos)

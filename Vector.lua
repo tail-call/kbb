@@ -101,4 +101,10 @@ function Vector.dotProd(v1, v2)
   }
 end
 
+---@param v Vector
+---@return string
+function Vector.format(v)
+  return ('%sx %sy'):format(v.x, v.y)
+end
+
 return Vector

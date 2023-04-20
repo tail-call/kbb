@@ -386,7 +386,9 @@ local function orderMove(game, vec)
     end
   end
   if not isFrozen(game, game.player) then
-    if moveGuy(game.player, vec, game.guyDelegate) then
+    local oldPos = game.player.pos
+    local newPos = moveGuy(game.player, vec, game.guyDelegate)
+    if not Vector.equal(newPos, oldPos) then
       return 'shouldStop'
     end
   end
