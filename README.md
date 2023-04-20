@@ -53,6 +53,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Tiles will change when a guy dies
  - [x] Gather command
  - [ ] Event system
+ - [ ] Arbitrary resolution tilemaps
  - [ ] You must build roads for guys to navigate freely
  - [ ] Friendly guys wander when not in squad
  - [ ] Each guy has wander area they may never leave when not in squad
@@ -62,6 +63,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Combine fog of war with FOV
  - [ ] Minimap fog of war
  - [ ] Flight ability
+ - [ ] Flying mountable dragon
  - [ ] Coroutines for animations
  - [ ] Items on the ground are 2D sprites rotating around Z axis
  - [ ] Skills: combat, defence, chopping, etc. All of these grant XP. +1 level means +1 weight in table and +1 to the effect.
