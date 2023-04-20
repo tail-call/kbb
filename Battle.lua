@@ -11,10 +11,12 @@
 
 local BATTLE_ROUND_DURATION = 0.5
 
+local Battle = {}
+
 ---@param attacker Guy
 ---@param defender Guy
 ---@return Battle
-local function makeBattle(attacker, defender)
+function Battle.makeBattle(attacker, defender)
   ---@type Battle
   local battle = {
     attacker = attacker,
@@ -36,6 +38,4 @@ local function makeBattle(attacker, defender)
   return battle
 end
 
-return {
-  makeBattle = makeBattle
-}
+return Battle
