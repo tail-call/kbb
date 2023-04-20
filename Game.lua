@@ -264,6 +264,24 @@ local function makeGame(tileset)
       self.squad:remove(guy)
       self.frozenGuys[guy] = nil
 
+      local tile = getTile(game.world, guy.pos)
+
+      if guy.team == 'evil' then
+        if tile == 'sand' then
+          setTile(game.world, guy.pos, 'grass')
+        elseif tile == 'grass' then
+          setTile(game.world, guy.pos, 'forest')
+        elseif tile == 'forest' then
+          setTile(game.world, guy.pos, 'water')
+        end
+      elseif guy.team == 'good' then
+        if tile == 'sand' then
+          setTile(game.world, guy.pos, 'rock')
+        else
+          setTile(game.world, guy.pos, 'sand')
+        end
+      end
+
       if guy == game.player and game.onLost then
         game.onLost()
       end
