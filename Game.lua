@@ -168,21 +168,22 @@ local function makeUIScript(delegate)
   })
 end
 
+---@param tileset Tileset 
 ---@return Game
-local function makeGame()
+local function makeGame(tileset)
   ---@type Game
   local game
 
-  local player = Guy.makeLeader({ x = 269, y = 231 })
+  local player = Guy.makeLeader(tileset, { x = 269, y = 231 })
   player:rename('Leader')
 
   ---@type Guy[]
   local guys = {
     player,
-    Guy.makeGoodGuy({ x = 274, y = 231 }),
-    Guy.makeGoodGuy({ x = 272, y = 231 }),
-    Guy.makeGoodGuy({ x = 274, y = 229 }),
-    Guy.makeGoodGuy({ x = 272, y = 229 }),
+    Guy.makeGoodGuy(tileset, { x = 274, y = 231 }),
+    Guy.makeGoodGuy(tileset, { x = 272, y = 231 }),
+    Guy.makeGoodGuy(tileset, { x = 274, y = 229 }),
+    Guy.makeGoodGuy(tileset, { x = 272, y = 229 }),
   }
 
   ---@type Game
@@ -521,9 +522,10 @@ local function orderFocus(game)
   game:toggleFocus()
 end
 
+---@param tileset Tileset
 ---@param game Game
 ---@param guy Guy
-local function maybeChop(game, guy)
+local function maybeChop(tileset, game, guy)
   if isFrozen(game, guy) then return end
 
   local pos = guy.pos
@@ -531,14 +533,16 @@ local function maybeChop(game, guy)
   if tile == 'forest' then
     game.resources:addWood(1)
     setTile(game.world, pos, 'grass')
-    game:addGuy(Guy.makeEvilGuy(EVIL_SPAWN_LOCATION))
+    game:addGuy(Guy.makeEvilGuy(tileset, EVIL_SPAWN_LOCATION))
   end
 end
 
-local function orderChop(game)
-  maybeChop(game, game.player)
+---@param tileset Tileset
+---@param game Game
+local function orderChop(tileset, game)
+  maybeChop(tileset, game, game.player)
   for guy in pairs(game.squad.followers) do
-    maybeChop(game, guy)
+    maybeChop(tileset, game, guy)
   end
 end
 
@@ -586,13 +590,14 @@ local function orderScribe(game)
 end
 
 ---@param game Game
-local function orderSummon(game)
+---@param tileset Tileset
+local function orderSummon(game, tileset)
   if game.resources.pretzels <= 0 then
     return
   end
 
   game.resources:addPretzels(-1)
-  local guy = Guy.makeGoodGuy({
+  local guy = Guy.makeGoodGuy(tileset, {
     x = game.cursorPos.x,
     y = game.cursorPos.y
   })
@@ -605,7 +610,8 @@ end
 
 ---@param game Game
 ---@param scancode string
-local function handleFocusModeInput(game, scancode)
+---@param tileset Tileset
+local function handleFocusModeInput(game, scancode, tileset)
   if scancode == 'tab' then
     game:nextTab()
   elseif scancode == 'b' then
@@ -613,7 +619,7 @@ local function handleFocusModeInput(game, scancode)
   elseif scancode == 'm' then
     orderScribe(game)
   elseif scancode == 'r' then
-    orderSummon(game)
+    orderSummon(game, tileset)
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
     game:disableFocus()
@@ -624,7 +630,8 @@ end
 
 ---@param game Game
 ---@param scancode string
-local function handleNormalModeInput(game, scancode)
+---@param tileset Tileset
+local function handleNormalModeInput(game, scancode, tileset)
   if scancode == 'f' then
     game.squad:toggleFollow()
   end
@@ -634,7 +641,7 @@ local function handleNormalModeInput(game, scancode)
   end
 
   if scancode == 'c' then
-    orderChop(game)
+    orderChop(tileset, game)
   end
 
   if scancode == 'space' then
@@ -642,15 +649,18 @@ local function handleNormalModeInput(game, scancode)
   end
 end
 
-local function handleInput(game, scancode)
+---@param game Game
+---@param scancode string
+---@param tileset Tileset
+local function handleInput(game, scancode, tileset)
   if scancode == 'z' then
     game:nextMagnificationFactor()
   end
 
   if game.isFocused then
-    handleFocusModeInput(game, scancode)
+    handleFocusModeInput(game, scancode, tileset)
   else
-    handleNormalModeInput(game, scancode)
+    handleNormalModeInput(game, scancode, tileset)
   end
 end
 

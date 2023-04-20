@@ -1,3 +1,8 @@
+---@class GuyOptions
+---@field pos Vector | nil
+---@field color number[] | nil
+---@field tileset Tileset
+
 ---@class Guy
 ---@field pos Vector
 ---@field name string
@@ -16,7 +21,6 @@
 local makePixie = require('Pixie').makePixie
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
-local getTileset = require('Tileset').getTileset
 local makeGuyStats = require('GuyStats').makeGuyStats
 
 ---@type Guy
@@ -115,45 +119,51 @@ local function updateGuy(guy, dt, delegate)
   end
 end
 
+---@param opts GuyOptions
 ---@return Guy
-function Guy.new(props)
+function Guy.new(opts)
   ---@type Guy
   local guy = {}
   setmetatable(guy, { __index = Guy })
-  guy.pos = props.pos or guy.pos
-  guy.pixie = makePixie('guy', getTileset())
-  guy.pixie.color = props.color or guy.pixie.color
+  guy.pos = opts.pos or guy.pos
+  guy.pixie = makePixie('guy', opts.tileset)
+  guy.pixie.color = opts.color or guy.pixie.color
   guy.pixie:move(guy.pos)
   guy.stats = makeGuyStats()
   guy.rename = function (self, name)
     self.name = name
   end
-  guy.pixie:spawn(props.pos)
+  guy.pixie:spawn(guy.pos)
   return guy
 end
 
+---@param tileset Tileset
 ---@param pos Vector
-function Guy.makeLeader(pos)
+function Guy.makeLeader(tileset, pos)
   local guy = Guy.new{
     pos = pos,
     color = { 1, 1, 0, 1 },
+    tileset = tileset,
   }
   return guy
 end
 
+---@param tileset Tileset
 ---@param pos Vector
-function Guy.makeGoodGuy(pos)
-  local guy = Guy.new{ pos = pos }
+function Guy.makeGoodGuy(tileset, pos)
+  local guy = Guy.new{ pos = pos, tileset = tileset }
   guy.team = 'good'
   guy.name = 'Good Guy'
   return guy
 end
 
+---@param tileset Tileset
 ---@param pos Vector
-function Guy.makeEvilGuy(pos)
+function Guy.makeEvilGuy(tileset, pos)
   local guy = Guy.new{
     pos = pos,
     color = { 1, 0, 0, 1 },
+    tileset = tileset,
   }
   guy.time = 0
   guy.speed = 0.5

@@ -31,9 +31,10 @@ function love.load()
   love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
   love.graphics.setLineStyle('rough')
   loadTileset()
-  drawState = makeDrawState(getTileset())
+  local tileset = getTileset()
+  drawState = makeDrawState(tileset)
   draw.init(drawState)
-  game = makeGame()
+  game = makeGame(tileset)
   game.onLost = function ()
     state = 'dead'
   end
@@ -88,7 +89,7 @@ function love.keypressed(key, scancode, isrepeat)
 
   if state ~= 'game' then return end
 
-  handleInput(game, scancode)
+  handleInput(game, scancode, drawState.tileset)
 end
 
 function love.mousepressed(x, y, button, presses)
