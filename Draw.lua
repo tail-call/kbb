@@ -5,7 +5,7 @@ local parallaxTile = require('Tileset').parallaxTile
 local regenerateTileset = require('Tileset').regenerate
 local loadFont = require('util').loadFont
 local tbl = require('tbl')
-local vector = require('vector')
+local Vector = require('Vector')
 local util = require('util')
 local withColor = require('util').withColor
 local withLineWidth = require('util').withLineWidth
@@ -22,9 +22,6 @@ local SCREEN_HEIGHT = 200
 local TILE_HEIGHT = 16
 local TILE_WIDTH = 16
 local CAMERA_LERP_SPEED = 10
-local CURSOR_TIMER_SPEED = 2
-local BATTLE_TIMER_SPEED = 2
-local WATER_TIMER_SPEED = 1/4
 local MINIMAP_SIZE = 72
 local HIGHLIGHT_CIRCLE_RADIUS = 10
 
@@ -48,7 +45,7 @@ local SKY_TABLE = {
 local drawState = makeDrawState()
 
 local function setZoom(z)
-  drawState.windowScale = z
+  drawState:setWindowScale(z)
   love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
   local w, h = love.window.getMode()
   if w ~= SCREEN_WIDTH * z and h ~= SCREEN_WIDTH * z then
@@ -119,21 +116,11 @@ end
 local function update(dt, lookingAt, magn, isAltCentering)
   local tileset = getTileset()
 
-  drawState.battleTimer = (
-    drawState.battleTimer + BATTLE_TIMER_SPEED * dt
-  ) % 1
-
-  drawState.waterTimer = (
-    drawState.waterTimer + WATER_TIMER_SPEED * dt
-  ) % (math.pi / 2)
-
-  drawState.cursorTimer = (
-    drawState.cursorTimer + CURSOR_TIMER_SPEED * dt
-  ) % (math.pi * 2)
+  drawState:advanceTime(dt)
 
   local yOffset = isAltCentering and SCREEN_HEIGHT/magn/8 or 0
-  local offset = vector.add(
-    vector.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }
+  local offset = Vector.add(
+    Vector.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }
   )
 
   drawState.camera = lerp3(
