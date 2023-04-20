@@ -24,25 +24,9 @@ local makeResources = require('./resources').makeResources
 local makeBattle = require('./battle').makeBattle
 local makeUIDelegate = require('./UIDelegate').makeUIDelegate
 local makeText = require('./Text').makeText
-
----@class Building
----@field pos Vector Building's position
-
----@class GameEntity
----@field type string
----@field object any
-
----@class GameEntity_Building: GameEntity
----@field type 'building'
----@field object Building
-
----@class GameEntity_Battle: GameEntity
----@field type 'battle'
----@field object Battle
---
----@class GameEntity_Text: GameEntity
----@field type 'text'
----@field object Text
+local makeBuilding = require('./Building').makeBuilding
+local makeBuildingEntity = require('./GameEntity').makeBuildingEntity
+local makeBattleEntity = require('./GameEntity').makeBattleEntity
 
 ---@class Game
 ---
@@ -341,10 +325,7 @@ local function makeGame()
       self:freezeGuy(attacker)
       self:freezeGuy(defender)
 
-      self:addEntity({
-        type = 'battle',
-        object = makeBattle(attacker, defender)
-      })
+      self:addEntity(makeBattleEntity(makeBattle(attacker, defender)))
     end
   }
 
@@ -615,10 +596,7 @@ local function orderBuild(game)
 
   -- Build
   game.resources:addWood(-5)
-  game:addEntity({
-    type = 'building',
-    object = { pos = pos }
-  })
+  game:addEntity(makeBuildingEntity(makeBuilding(pos)))
   game:addScore(SCORES_TABLE.builtAHouse)
   game:disableFocus()
 end
