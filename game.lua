@@ -23,14 +23,10 @@ local isGuyAFollower = require('./squad').isGuyAFollower
 local makeResources = require('./resources').makeResources
 local makeBattle = require('./battle').makeBattle
 local makeUIDelegate = require('./UIDelegate').makeUIDelegate
+local makeText = require('./Text').makeText
 
 ---@class Building
 ---@field pos Vector Building's position
-
----@class Text Text object displayed in the world
----@field text string Text content
----@field pos Vector Position in the world
----@field maxWidth number Maximum width of displayed text
 
 ---@class VisionSource
 ---@field pos Vector Vision source's position
@@ -194,19 +190,6 @@ local function makeUI(delegate)
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
   })
-end
-
----@param content string
----@param pos Vector
----@param maxWidth number
-local function makeText(content, pos, maxWidth)
-  ---@type Text
-  local text = {
-    text = content,
-    pos = pos,
-    maxWidth = maxWidth,
-  }
-  return text
 end
 
 ---@param game Game
