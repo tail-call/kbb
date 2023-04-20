@@ -538,10 +538,10 @@ local function beginRecruiting(game)
 end
 
 local function endRecruiting(game)
-  for _, guy in tbl.ifilter(game.guys, function (guy)
-    return mayRecruit(game, guy)
-  end) do
-    game.squad:add(guy)
+  for _, guy in ipairs(game.guys) do
+    if mayRecruit(game, guy) then
+      game.squad:add(guy)
+    end
   end
   game.squad:startFollowing()
   game.recruitCircle:clear()
