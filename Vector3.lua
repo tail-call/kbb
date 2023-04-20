@@ -1,6 +1,4 @@
 ---@class Vector3: Vector
----@field x number
----@field y number
 ---@field z number
 
 ---@param v1 Vector3
