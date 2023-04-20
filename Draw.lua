@@ -12,7 +12,6 @@ local withLineWidth = require('util').withLineWidth
 local withTransform = require('util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
-local lerp3 = require('Vector3').lerp3
 local makeDrawState = require('DrawState').makeDrawState
 
 -- Constants
@@ -21,9 +20,10 @@ local SCREEN_WIDTH = 320
 local SCREEN_HEIGHT = 200
 local TILE_HEIGHT = 16
 local TILE_WIDTH = 16
-local CAMERA_LERP_SPEED = 10
 local MINIMAP_SIZE = 72
 local HIGHLIGHT_CIRCLE_RADIUS = 10
+
+local CAMERA_LERP_SPEED = 10
 
 local WHITE_CURSOR_COLOR = { 1, 1, 1, 0.8 }
 local RED_COLOR = { 1, 0, 0, 0.8 }
@@ -123,12 +123,8 @@ local function update(dt, lookingAt, magn, isAltCentering)
     Vector.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }
   )
 
-  drawState.camera = lerp3(
-    drawState.camera,
-    { x = offset.x, y = offset.y, z = magn },
-    dt * CAMERA_LERP_SPEED
-  )
-
+  local z = dt * CAMERA_LERP_SPEED
+  drawState:setCamera(offset, z, magn)
   updateTileset(tileset, dt)
 end
 
