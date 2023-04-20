@@ -320,7 +320,7 @@ local function init()
   end
 
   ---@type Collider
-  local function collider(nothing, v)
+  local function collider(v)
     local someoneThere = findGuyAtPos(game, v)
     if someoneThere then
       return { type = 'guy', guy = someoneThere }

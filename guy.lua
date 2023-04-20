@@ -21,7 +21,7 @@ local abilities = require('./ability').abilities
 ---@field team 'good' | 'evil'
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
----@alias Collider fun(nothing: nil, v: Vector): CollisionInfo
+---@alias Collider fun(v: Vector): CollisionInfo
 
 ---@class GuyDelegate
 ---@field collider Collider
@@ -70,7 +70,7 @@ local function moveGuy(guy, vec, delegate)
   end
 
   for _, pos in ipairs{stepForward, diagonalStepLeft, diagonalStepRight} do
-    local collision = delegate.collider(nil, pos)
+    local collision = delegate.collider(pos)
     if collision.type == 'none' then
       move(pos)
     elseif collision.type == 'guy' then
