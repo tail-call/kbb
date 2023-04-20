@@ -11,6 +11,7 @@ local abilities = require('./ability').abilities
 ---@class Guy
 ---@field pos Vector
 ---@field name string
+---@field rename fun(self: Guy, name: string) Gives the guy a different name
 ---@field pixie Pixie
 ---@field stats GuyStats
 ---@field time number
@@ -143,6 +144,9 @@ function Guy.new(props)
       self.hp = self.hp + self.maxHp
     end
   }
+  guy.rename = function (self, name)
+    self.name = name
+  end
   guy.pixie:spawn(props.pos)
   return guy
 end

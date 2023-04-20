@@ -229,7 +229,7 @@ local function init()
   local game
 
   local player = Guy.makeLeader({ x = 269, y = 231 })
-  player.name = 'Leader'
+  player:rename('Leader')
 
   ---@type UIDelegate
   local uiDelegate = {
