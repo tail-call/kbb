@@ -449,6 +449,7 @@ local function init()
     removeGuy = function (self, guy)
       maybeDrop(self.guys, guy)
       self.squad:remove(guy)
+      self.frozenGuys[guy] = nil
 
       if guy == game.player and game.onLost then
         game.onLost()
@@ -645,17 +646,15 @@ local function updateBattle(game, entity, dt)
     battle:swapSides()
 
     ---@param guy Guy
-    local function maybeDie(guy)
-      if guy.stats.hp <= 0 then
-        say(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
+    local function die(guy)
+      say(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
 
-        if guy.team == 'evil' then
-          game.resources:addPretzels(1)
-          game:addScore(SCORES_TABLE.killedAnEnemy)
-        end
-
-        game:removeGuy(guy)
+      if guy.team == 'evil' then
+        game.resources:addPretzels(1)
+        game:addScore(SCORES_TABLE.killedAnEnemy)
       end
+
+      game:removeGuy(guy)
     end
 
     if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
@@ -663,9 +662,17 @@ local function updateBattle(game, entity, dt)
       battle:beginNewRound()
     else
       -- Fight is over
-      maybeDrop(game.entities, entity)
-      maybeDie(battle.attacker)
-      maybeDie(battle.defender)
+      game:removeEntity(entity)
+
+      -- TODO: use events to die
+      if battle.attacker.stats.hp <= 0 then
+        die(battle.attacker)
+      end
+
+      if battle.defender.stats.hp <= 0 then
+        die(battle.defender)
+      end
+
       game:unfreezeGuy(battle.attacker)
       game:unfreezeGuy(battle.defender)
     end
