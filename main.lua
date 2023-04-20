@@ -7,9 +7,6 @@ local orderMove = require('Game').orderMove
 local drawGame = require('Draw').drawGame
 local handleInput = require('Game').handleInput
 local updateGame = require('Game').updateGame
-local dismissSquad = require('Game').dismissSquad
-local orderChop = require('Game').orderChop
-local orderFocus = require('Game').orderFocus
 local beginRecruiting = require('Game').beginRecruiting
 local endRecruiting = require('Game').endRecruiting
 local isReadyForOrder = require('Game').isReadyForOrder
@@ -85,35 +82,13 @@ end
 ---@param scancode love.Scancode
 ---@param isrepeat boolean
 function love.keypressed(key, scancode, isrepeat)
-  if state ~= 'game' then return end
-
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
     draw.setZoom(drawState, tonumber(scancode) or 1)
   end
 
-  if scancode == 'z' then
-    game:nextMagnificationFactor()
-  end
+  if state ~= 'game' then return end
 
-  if game.isFocused then
-    handleInput(game, scancode)
-  else
-    if scancode == 'f' then
-      game.squad:toggleFollow()
-    end
-
-    if scancode == 'g' then
-      dismissSquad(game)
-    end
-
-    if scancode == 'c' then
-      orderChop(game)
-    end
-
-    if scancode == 'space' then
-      orderFocus(game)
-    end
-  end
+  handleInput(game, scancode)
 end
 
 function love.mousepressed(x, y, button, presses)

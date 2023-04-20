@@ -632,7 +632,7 @@ end
 
 ---@param game Game
 ---@param scancode string
-local function handleInput(game, scancode)
+local function handleFocusModeInput(game, scancode)
   if scancode == 'tab' then
     game:nextTab()
   elseif scancode == 'b' then
@@ -649,13 +649,43 @@ local function handleInput(game, scancode)
   end
 end
 
+---@param game Game
+---@param scancode string
+local function handleNormalModeInput(game, scancode)
+  if scancode == 'f' then
+    game.squad:toggleFollow()
+  end
+
+  if scancode == 'g' then
+    dismissSquad(game)
+  end
+
+  if scancode == 'c' then
+    orderChop(game)
+  end
+
+  if scancode == 'space' then
+    orderFocus(game)
+  end
+end
+
+local function handleInput(game, scancode)
+  if scancode == 'z' then
+    game:nextMagnificationFactor()
+  end
+
+  if game.isFocused then
+    handleFocusModeInput(game, scancode)
+  else
+    handleNormalModeInput(game, scancode)
+  end
+end
+
+
 return {
-  dismissSquad = dismissSquad,
   handleInput = handleInput,
-  orderChop = orderChop,
   orderMove = orderMove,
   updateGame = updateGame,
-  orderFocus = orderFocus,
   beginRecruiting = beginRecruiting,
   endRecruiting = endRecruiting,
   isFrozen = isFrozen,
