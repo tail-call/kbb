@@ -789,5 +789,5 @@ return {
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
   isReadyForOrder = isReadyForOrder,
-  init = makeGame,
+  makeGame = makeGame,
 }

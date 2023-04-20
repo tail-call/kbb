@@ -2,7 +2,7 @@
 math.randomseed(os.time())
 
 local draw = require('./draw')
-local initGame = require('./game').init
+local makeGame = require('./game').makeGame
 local orderMove = require('./game').orderMove
 local drawGame = require('./draw').drawGame
 local handleInput = require('./game').handleInput
@@ -25,7 +25,7 @@ local game
 
 function love.load()
   draw.init()
-  game = initGame()
+  game = makeGame()
   game.onLost = function ()
     state = 'dead'
   end
