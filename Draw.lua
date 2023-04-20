@@ -1,5 +1,4 @@
 local updateTileset = require('Tileset').update
-local getTileset = require('Tileset').getTileset
 local parallaxTile = require('Tileset').parallaxTile
 local regenerateTileset = require('Tileset').regenerate
 local tbl = require('tbl')
@@ -43,10 +42,8 @@ local function setZoom(drawState, z)
   if w ~= SCREEN_WIDTH * z and h ~= SCREEN_WIDTH * z then
     love.window.setMode(SCREEN_WIDTH * z, SCREEN_HEIGHT * z)
   end
-  local tileset = getTileset()
-  if tileset then
-    regenerateTileset(tileset)
-  end
+
+  regenerateTileset(drawState.tileset)
 end
 
 ---@param drawState DrawState
@@ -106,8 +103,6 @@ end
 ---@param magn number
 ---@param isAltCentering boolean
 local function update(drawState, dt, lookingAt, magn, isAltCentering)
-  local tileset = getTileset()
-
   drawState:advanceTime(dt)
 
   local yOffset = isAltCentering and SCREEN_HEIGHT/magn/8 or 0
@@ -116,7 +111,7 @@ local function update(drawState, dt, lookingAt, magn, isAltCentering)
   )
 
   drawState:setCamera(offset, dt, magn)
-  updateTileset(tileset, dt)
+  updateTileset(drawState.tileset, dt)
 end
 
 ---@param pos Vector
@@ -175,7 +170,6 @@ end
 local function drawBattle(drawState, battle)
   local posX = battle.pos.x * TILE_WIDTH
   local posY = battle.pos.y * TILE_HEIGHT
-  local tileset = getTileset()
 
   withColor(0, 0, 0, 0.5, function ()
     love.graphics.rectangle(
@@ -191,8 +185,8 @@ local function drawBattle(drawState, battle)
     local b = 0
     withColor(r, g, b, 1, function ()
       love.graphics.draw(
-        tileset.tiles,
-        tileset.quads.battle,
+        drawState.tileset.tiles,
+        drawState.tileset.quads.battle,
         posX, posY
       )
     end)
@@ -244,9 +238,9 @@ local function textAtTile(text, pos, maxWidth)
   )
 end
 
+---@param tileset Tileset
 ---@param pos Vector
-local function drawHouse(pos)
-  local tileset = getTileset()
+local function drawHouse(tileset, pos)
   love.graphics.draw(
     tileset.tiles,
     tileset.quads.house,
@@ -369,7 +363,6 @@ local function drawWorld(game, drawState, sky)
     end
   end)
 
-  local tileset = getTileset()
   local posX, posY = game.player.pos.x, game.player.pos.y
   local visionDistance = 21
   local voidTile = parallaxTile(0, 48, -drawState.camera.x/2, -drawState.camera.y/2)
@@ -381,13 +374,13 @@ local function drawWorld(game, drawState, sky)
       local idx = index(x, y)
       local fog = world.fogOfWar[idx] or 0
       local tileType = world.tileTypes[idx] or 'void'
-      local tile = tileset.quads[tileType]
+      local tile = drawState.tileset.quads[tileType]
 
       local function drawFragmentedTile(fragmentedTile)
         for _, fragment in ipairs(fragmentedTile) do
           withTransform(fragment.transform, function ()
             love.graphics.draw(
-              tileset.tiles, fragment.quad, x * TILE_WIDTH, y * TILE_HEIGHT
+              drawState.tileset.tiles, fragment.quad, x * TILE_WIDTH, y * TILE_HEIGHT
             )
           end)
         end
@@ -400,7 +393,7 @@ local function drawWorld(game, drawState, sky)
           drawFragmentedTile(waterTile)
         else
           love.graphics.draw(
-            tileset.tiles, tile, x * TILE_WIDTH, y * TILE_HEIGHT
+            drawState.tileset.tiles, tile, x * TILE_WIDTH, y * TILE_HEIGHT
           )
         end
       end)
@@ -496,7 +489,7 @@ local function drawGame(game, drawState)
           posX, posY,
           entity.object.pos.x, entity.object.pos.y
         ) then
-          drawHouse(entity.object.pos)
+          drawHouse(drawState.tileset, entity.object.pos)
           drawn[entity] = true
         end
       elseif entity.type == 'battle' then
@@ -630,7 +623,6 @@ end
 
 return {
   battle = drawBattle,
-  getTileset = getTileset,
   init = init,
   prepareFrame = prepareFrame,
   recruitableHighlight = recruitableHighlight,

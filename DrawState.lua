@@ -3,6 +3,8 @@
 ---@field windowScale number Window scale
 ---@field setWindowScale fun(self: DrawState, windowScale: number) Changes window scale
 ---
+---@field tileset Tileset Tileset used for drawing
+---
 ---@field camera Vector3 Camera position in the world
 ---@field setCamera fun(self: DrawState, offset: Vector, z: number, magn: number)
 ---
@@ -18,11 +20,13 @@ local BATTLE_TIMER_SPEED = 2
 local WATER_TIMER_SPEED = 1/4
 local CAMERA_LERP_SPEED = 10
 
+---@param tileset Tileset
 ---@return DrawState
-local function makeDrawState()
+local function makeDrawState(tileset)
   ---@type DrawState
   local drawState = {
     windowScale = 1,
+    tileset = tileset,
     setWindowScale = function (self, windowScale)
       self.windowScale = windowScale
     end,

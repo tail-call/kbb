@@ -19,6 +19,7 @@ local gameover = require('GameOver')
 local makeDrawState = require('DrawState').makeDrawState
 local loadTileset = require('Tileset').load
 local loadFont = require('util').loadFont
+local getTileset = require('Tileset').getTileset
 
 ---@type 'game' | 'dead'
 local state = 'game'
@@ -33,7 +34,7 @@ function love.load()
   love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
   love.graphics.setLineStyle('rough')
   loadTileset()
-  drawState = makeDrawState()
+  drawState = makeDrawState(getTileset())
   draw.init(drawState)
   game = makeGame()
   game.onLost = function ()
