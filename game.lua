@@ -113,7 +113,8 @@ local isGuyAFollower = require('./squad').isGuyAFollower
 ---@field toggleFocus fun(self: Game) Toggles focus mode
 ---@field disableFocus fun(self: Game) Toggles focus mode
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
----@field switchMagnificationFactor fun(self: Game) Switches magnification factor to a different one
+---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
+---@field nextTab fun(self: Game) Switches tab in the UI
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -480,7 +481,7 @@ local function init()
     advanceClock = function (self, dt)
       self.time = (self.time + dt) % (24 * 60)
     end,
-    switchMagnificationFactor = function (self)
+    nextMagnificationFactor = function (self)
       if self.magnificationFactor == 1 then
         self.magnificationFactor = 2/3
       elseif self.magnificationFactor == 2/3 then
@@ -491,6 +492,9 @@ local function init()
     end,
     addGuy = function (self, guy)
       table.insert(self.guys, guy)
+    end,
+    nextTab = function (self)
+      self.activeTab = self.activeTab + 1
     end
   }
 
@@ -788,7 +792,7 @@ end
 ---@param scancode string
 local function handleInput(game, scancode)
   if scancode == 'tab' then
-    game.activeTab = game.activeTab + 1
+    game:nextTab()
   elseif scancode == 'b' then
     orderBuild(game)
   elseif scancode == 'm' then
