@@ -53,10 +53,10 @@ local makeConsole = require('./console').makeConsole
 ---@field advanceTimer fun(self: Battle, dt: number) Makes battle timer go down
 ---@field beginNewRound fun(self: Battle) Reset round timer
 
----@class Text
----@field text string
----@field pos Vector
----@field maxWidth number
+---@class Text Text object displayed in the world
+---@field text string Text content
+---@field pos Vector Position in the world
+---@field maxWidth number Maximum width of displayed text
 
 ---@class VisionSource
 ---@field pos Vector Vision source's position
@@ -111,6 +111,7 @@ local makeConsole = require('./console').makeConsole
 ---@field toggleFollow fun(self: Game): nil
 ---@field addScore fun(self: Game, count: integer): nil
 ---@field removeGuy fun(self: Game, guy: Guy): nil
+---@field addText fun(self: Game, text: Text): nil
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -262,6 +263,19 @@ local function makeUI(delegate)
   })
 end
 
+---@param content string
+---@param pos Vector
+---@param maxWidth number
+local function makeText(content, pos, maxWidth)
+  ---@type Text
+  local text = {
+    text = content,
+    pos = pos,
+    maxWidth = maxWidth,
+  }
+  return text
+end
+
 ---@return Game
 local function init()
   ---@type Game
@@ -355,6 +369,7 @@ local function init()
     end,
   }
 
+  ---@type Guy[]
   local guys = {
     player,
     Guy.makeGoodGuy({ x = 274, y = 231 }),
@@ -369,17 +384,10 @@ local function init()
     makeConsoleMessage('This is day 1 of your reign.', 10),
   }
 
+  ---@type Text[]
   local texts = {
-    {
-      text = 'Build house on rock.',
-      pos = { x = 269, y = 228 },
-      maxWidth = 9,
-    },
-    {
-      text = '\nGARDEN\n  o\n   f\n EDEN',
-      pos = { x = 280, y = 194 },
-      maxWidth = 8,
-    },
+    makeText('Build house on rock.', { x = 269, y = 228 }, 9),
+    makeText('\nGARDEN\n  o\n   f\n EDEN', { x = 280, y = 194 }, 8),
   }
 
   ---@return VisionSource
@@ -510,6 +518,9 @@ local function init()
     visionSourcesCo = visionSourcesCo,
     collider = collider,
     ui = makeUI(uiDelegate),
+
+    -- Methods
+
     toggleFollow = function(self)
       self.squad.shouldFollow = not self.squad.shouldFollow
     end,
@@ -523,6 +534,9 @@ local function init()
       if guy == game.player and game.onLost then
         game.onLost()
       end
+    end,
+    addText = function (self, text)
+      table.insert(self.texts, text)
     end,
   }
   return game
@@ -820,17 +834,14 @@ end
 
 ---@param game Game
 local function orderScribe(game)
-  table.insert(game.texts, {
-    text = string.format(
-      '%c%c\n%c%c',
-      randomLetterCode(),
-      randomLetterCode(),
-      randomLetterCode(),
-      randomLetterCode()
-    ),
-    pos = game.cursorPos,
-    maxWidth = 4,
-  })
+  game:addText(makeText(string.format(
+    '%c%c\n%c%c',
+    randomLetterCode(),
+    randomLetterCode(),
+    randomLetterCode(),
+    randomLetterCode()
+  ), game.cursorPos, 4))
+
   game.isFocused = false
 end
 
