@@ -124,13 +124,15 @@ function Guy.new(opts)
     speed = 0.15,
     pos = opts.pos or { x = 0, y = 0 },
     stats = makeGuyStats(),
-    pixie = makePixie('guy', opts.tileset),
+    pixie = makePixie('guy', {
+      tileset = opts.tileset,
+      color = opts.color
+    }),
     rename = function (self, name)
       self.name = name
     end,
   }
 
-  guy.pixie.color = opts.color or guy.pixie.color
   guy.pixie:move(guy.pos)
   guy.pixie:spawn(guy.pos)
 

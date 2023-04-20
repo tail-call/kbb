@@ -14,11 +14,11 @@
 ---@field spawn fun(self: Pixie, pos: Vector): nil
 
 ---@param name string
----@param tileset Tileset
+---@param opts PixieOptions
 ---@return Pixie
-local function makePixie(name, tileset)
-  local texture = tileset.tiles
-  local quad = tileset.quads[name]
+local function makePixie(name, opts)
+  local texture = opts.tileset.tiles
+  local quad = opts.tileset.quads[name]
 
   ---@type Pixie
   local pixie = {
@@ -28,7 +28,7 @@ local function makePixie(name, tileset)
     flip = false,
     transform = love.math.newTransform(),
     transformSpeed = 1,
-    color = { 1, 1, 1, 1 },
+    color = opts.color or { 1, 1, 1, 1 },
     targetTransform = love.math.newTransform(),
     move = function (self, pos)
       self.transformSpeed = 24
