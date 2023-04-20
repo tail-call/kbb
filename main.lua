@@ -3,13 +3,12 @@ math.randomseed(os.time())
 
 local draw = require('Draw')
 local makeGame = require('Game').makeGame
-local orderMove = require('Game').orderMove
 local drawGame = require('Draw').drawGame
 local handleInput = require('Game').handleInput
+local handleMovementInput = require('Game').handleMovementInput
 local updateGame = require('Game').updateGame
 local beginRecruiting = require('Game').beginRecruiting
 local endRecruiting = require('Game').endRecruiting
-local isReadyForOrder = require('Game').isReadyForOrder
 local tbl = require('tbl')
 local vector = require('Vector')
 local gameover = require('GameOver')
@@ -40,8 +39,6 @@ function love.load()
   end
 end
 
-local alternatingKeyIndex = 0
-
 ---@param dt number
 function love.update(dt)
   draw.update(
@@ -64,18 +61,7 @@ function love.update(dt)
       end
     end
 
-    if isReadyForOrder(game) and #directions > 0 then
-      for i = 1, #directions do
-        alternatingKeyIndex = (alternatingKeyIndex + 1) % (#directions)
-        local command = orderMove(
-          game, directions[alternatingKeyIndex + 1]
-        )
-        print('i', i, 'com', command)
-        if command == 'shouldStop' then
-          break
-        end
-      end
-    end
+    handleMovementInput(game, directions)
 
     updateGame(game, dt)
   end

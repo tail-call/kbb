@@ -74,6 +74,8 @@ local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
 ---@field ui UI User interface root
 ---@field console Console Bottom console
 ---@field activeTab integer Current active tab in the focus screen
+---@field alternatingKeyIndex integer Diagonal movement reader head index
+---@field setAlternatingKeyIndex fun(self: Game, x: number) Moves diagonam movement reader head to a new location
 ---
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
@@ -200,6 +202,7 @@ local function makeGame(tileset)
     guys = guys,
     time = math.random() * 24 * 60,
     entities = {},
+    alternatingKeyIndex = 1,
     player = player,
     squad = makeSquad(),
     recruitCircle = makeRecruitCircle(),
@@ -298,6 +301,9 @@ local function makeGame(tileset)
       self:freezeGuy(defender)
 
       self:addEntity(makeBattleEntity(makeBattle(attacker, defender)))
+    end,
+    setAlternatingKeyIndex = function (self, x)
+      self.alternatingKeyIndex = x
     end
   }
 
@@ -368,16 +374,9 @@ local function endRecruiting(game)
 end
 
 ---@param game Game
-local function isReadyForOrder(game)
-  return game.player.mayMove
-end
-
----@param game Game
 ---@param vec Vector
 ---@return 'shouldRetryOtherDirection' | 'shouldStop'
 local function orderMove(game, vec)
-  if game.isFocused then return 'shouldStop' end
-
   if game.squad.shouldFollow then
     for guy in pairs(game.squad.followers) do
       if not isFrozen(game, guy) then
@@ -667,15 +666,34 @@ local function handleInput(game, scancode, tileset)
   end
 end
 
+---@param game Game
+---@param dirs Vector[]
+local function handleMovementInput(game, dirs)
+  if not (game.player.mayMove and #dirs > 0) then return end
+
+  for _ = 1, #dirs do
+    local index = (game.alternatingKeyIndex + 1) % (#dirs)
+    game:setAlternatingKeyIndex(index)
+    if not game.isFocused then
+      local command = orderMove(
+        game, dirs[index + 1]
+      )
+      if command == 'shouldStop' then
+        break
+      end
+    end
+  end
+end
+
+
 
 return {
   handleInput = handleInput,
-  orderMove = orderMove,
   updateGame = updateGame,
   beginRecruiting = beginRecruiting,
   endRecruiting = endRecruiting,
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
-  isReadyForOrder = isReadyForOrder,
   makeGame = makeGame,
+  handleMovementInput = handleMovementInput,
 }
