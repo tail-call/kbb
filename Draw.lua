@@ -12,6 +12,7 @@ local withLineWidth = require('./util').withLineWidth
 local withTransform = require('./util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
+local lerp3 = require('Vector3').lerp3
 
 -- Constants
 
@@ -141,7 +142,7 @@ local function update(dt, lookingAt, magn, isAltCentering)
     vector.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }
   )
 
-  drawState.camera = vector.lerp3(
+  drawState.camera = lerp3(
     drawState.camera,
     { x = offset.x, y = offset.y, z = magn },
     dt * CAMERA_LERP_SPEED

@@ -1,7 +1,5 @@
----@alias UIType 'none' | 'panel'
-
 ---@class UI
----@field type UIType
+---@field type 'none' | 'panel'
 ---@field transform love.Transform
 ---@field shouldDraw (fun(): boolean) | nil
 ---@field children UI[]
