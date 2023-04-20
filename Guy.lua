@@ -7,6 +7,8 @@
 ---@field pos Vector
 ---@field name string
 ---@field rename fun(self: Guy, name: string) Gives the guy a different name
+---@field team 'good' | 'evil'
+---@field reteam fun(self: Guy, team: 'good' | 'evil') Switches team of the guy
 ---@field pixie Pixie
 ---@field stats GuyStats
 ---@field time number
@@ -14,7 +16,7 @@
 ---@field speed number
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
----@field team 'good' | 'evil'
+---@field beginWandering fun(self: Guy): nil
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
 
@@ -131,6 +133,12 @@ function Guy.new(opts)
     rename = function (self, name)
       self.name = name
     end,
+    reteam = function (self, team)
+      self.team = team
+    end,
+    beginWandering = function (self)
+      self.behavior = 'wander'
+    end,
   }
 
   guy.pixie:move(guy.pos)
@@ -154,8 +162,8 @@ end
 ---@param pos Vector
 function Guy.makeGoodGuy(tileset, pos)
   local guy = Guy.new{ pos = pos, tileset = tileset }
-  guy.team = 'good'
-  guy.name = 'Good Guy'
+  guy:reteam('good')
+  guy:rename('Good Guy')
   return guy
 end
 
@@ -167,11 +175,10 @@ function Guy.makeEvilGuy(tileset, pos)
     color = { 1, 0, 0, 1 },
     tileset = tileset,
   }
-  guy.time = 0
   guy.speed = 0.5
-  guy.behavior = 'wander'
-  guy.team = 'evil'
-  guy.name = 'Evil Guy'
+  guy:beginWandering()
+  guy:reteam('evil')
+  guy:rename('Evil Guy')
   return guy
 end
 
@@ -181,7 +188,6 @@ function Guy.makeStrongEvilGuy(pos)
     pos = pos,
     color = { 1, 0, 1, 1 },
   }
-  guy.time = 0
   guy.stats.hp = 50
   guy.stats.maxHp = 50
   guy.speed = 0.25
