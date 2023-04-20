@@ -1,7 +1,3 @@
-local makePixie = require('./pixie').makePixie
-local vector = require('./vector')
-local abilities = require('./ability').abilities
-
 ---@class GuyStats
 ---@field hp number Current health points
 ---@field maxHp number Maximum health points
@@ -27,6 +23,11 @@ local abilities = require('./ability').abilities
 ---@field collider fun(v: Vector): CollisionInfo Function that performs collision checks between game world objects
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil
 ---@field enterHouse fun(guest: Guy, entity: GameEntity_Building): 'shouldMove' | 'shouldNotMove'
+
+local makePixie = require('./Pixie').makePixie
+local vector = require('./Vector')
+local abilities = require('./Ability').abilities
+local getTileset = require('./Tileset').getTileset
 
 ---@type Guy
 local Guy = {
@@ -130,7 +131,7 @@ function Guy.new(props)
   local guy = {}
   setmetatable(guy, { __index = Guy })
   guy.pos = props.pos or guy.pos
-  guy.pixie = makePixie('guy')
+  guy.pixie = makePixie('guy', getTileset())
   guy.pixie.color = props.color or guy.pixie.color
   guy.pixie:move(guy.pos)
   guy.stats = {

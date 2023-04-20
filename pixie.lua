@@ -13,12 +13,10 @@
 ---@field update fun(self: Pixie, dt: number): nil
 ---@field spawn fun(self: Pixie, pos: Vector): nil
 
-local getTileset = require('./Tileset').getTileset
-
 ---@param name string
+---@param tileset Tileset
 ---@return Pixie
-local function makePixie(name)
-  local tileset = getTileset()
+local function makePixie(name, tileset)
   local texture = tileset.tiles
   local quad = tileset.quads[name]
 
