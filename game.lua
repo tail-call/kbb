@@ -16,17 +16,11 @@ local maybeDrop = require('./tbl').maybeDrop
 local makeConsoleMessage = require('./console').makeConsoleMessage
 local makeConsole = require('./console').makeConsole
 local randomLetterCode = require('./util').randomLetterCode
+local makeRecruitCircle = require('./recruitcircle').makeRecruitCircle
+local isRecruitCircleActive = require('./recruitcircle').isRecruitCircleActive
 
 ---@class Building
 ---@field pos Vector Building's position
-
----@class RecruitCircle
----@field radius number | nil
----@field growthSpeed number
----@field maxRadius number
----@field maybeGrow fun(self: RecruitCircle, dt: number)
----@field reset fun(self: RecruitCircle)
----@field clear fun(self: RecruitCircle)
 
 ---@class Squad
 ---@field shouldFollow boolean True if guys should follow the player
@@ -120,6 +114,7 @@ local randomLetterCode = require('./util').randomLetterCode
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
 ---@field addEntity fun(self: Game, entity: GameEntity) Adds a building to the world
+---@field removeEntity fun(self: Game, entity: GameEntity) Adds a building to the world
 ---@field toggleFocus fun(self: Game) Toggles focus mode
 ---@field disableFocus fun(self: Game) Toggles focus mode
 
@@ -130,8 +125,6 @@ local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
 local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
 ---@type Vector
 local EVIL_SPAWN_LOCATION = { x = 281, y = 195 }
-local RECRUIT_CIRCLE_MAX_RADIUS = 6
-local RECRUIT_CIRCLE_GROWTH_SPEED = 6
 local BATTLE_ROUND_DURATION = 0.5
 
 local SCORES_TABLE = {
@@ -143,31 +136,6 @@ local SCORES_TABLE = {
 local NONE_COLLISION = { type = 'none' }
 ---@type CollisionInfo
 local TERRAIN_COLLISION = { type = 'terrain' }
-
----@return RecruitCircle
-local function makeRecruitCircle()
-  ---@type RecruitCircle
-  local recruitCircle = {
-    radius = nil,
-    maxRadius = RECRUIT_CIRCLE_MAX_RADIUS,
-    growthSpeed = RECRUIT_CIRCLE_GROWTH_SPEED,
-    reset = function(self)
-      self.radius = 0
-    end,
-    clear = function(self)
-      self.radius = nil
-    end,
-    maybeGrow = function (self, dt)
-      if self.radius == nil then return end
-
-      self.radius = math.min(
-        self.radius + dt * self.growthSpeed,
-        self.maxRadius
-      )
-    end
-  }
-  return recruitCircle
-end
 
 ---@return Resources
 local function makeResources()
@@ -242,13 +210,6 @@ end
 ---@param guy Guy
 local function isAtFullHealth(guy)
   return guy.stats.hp >= guy.stats.maxHp
-end
-
----@param game Game
----@param entity GameEntity
-local function removeEntity(game, entity)
-  local idx = tbl.indexOf(game.entities, entity)
-  table.remove(game.entities, idx)
 end
 
 ---@param guy Guy
@@ -491,7 +452,7 @@ local function init()
         return false
       end
       guy.stats:heal()
-      removeEntity(game, entity)
+      game:removeEntity(entity)
       return true
     end,
     collider = collider,
@@ -549,6 +510,10 @@ local function init()
     disableFocus = function (self)
       self.isFocused = false
     end,
+    removeEntity = function (self, entity)
+      local idx = tbl.indexOf(self.entities, entity)
+      table.remove(self.entities, idx)
+    end,
   }
 
   game:addText(
@@ -570,12 +535,6 @@ local function init()
 end
 
 ---@param game Game
----@return boolean
-local function isRecruitCircleActive(game)
-  return game.recruitCircle.radius ~= nil
-end
-
----@param game Game
 ---@param guy Guy
 ---@return boolean
 local function isGuyAPlayer(game, guy)
@@ -593,7 +552,7 @@ end
 ---@param guy Guy
 ---@return boolean
 local function mayRecruit(game, guy)
-  if not isRecruitCircleActive(game) then return false end
+  if not isRecruitCircleActive(game.recruitCircle) then return false end
   if isGuyAPlayer(game, guy) then return false end
   if isGuyAFollower(game, guy) then return false end
   if not canRecruitGuy(guy) then return false end
