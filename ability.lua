@@ -1,53 +1,26 @@
----@class Effect
----@field name string
-
----@type { [string]: Effect }
-local combatEffects = {
-  miss = { name = "Miss" },
-  normalAttack = { name = "Normal Attack" },
-  criticalAttack = { name = "Critical Attack" },
-}
-
----@type { [string]: Effect }
-local defenceEffects = {
-  takeDamage = { name = "Take Damage" },
-  parry = { name = "Parry" },
-}
-
----@type { [string]: Effect }
-local treeCutEffects = {
-  loiter = { name = "Loiter" },
-  normalChop = { name = "Normal Chop" },
-  criticalChop = { name = "Critical Chop" },
-}
-
-local effects = {
-  combat = combatEffects,
-  defence = defenceEffects,
-  treeCut = treeCutEffects,
-}
-
 ---@class Ability
----@field combat Effect
----@field defence Effect
----@field treeCut Effect
+---@field combat AbilityEffect
+---@field defence AbilityEffect
+---@field treeCut AbilityEffect
+
+local Effect = require('AbilityEffect')
 
 ---@type { [string]: Ability }
 local abilities = {
   normalFail = {
-    combat = effects.combat.miss,
-    defence = effects.defence.takeDamage,
-    treeCut = effects.treeCut.loiter,
+    combat = Effect.combat.miss,
+    defence = Effect.defence.takeDamage,
+    treeCut = Effect.treeCut.loiter,
   },
   normalSuccess = {
-    combat = effects.combat.normalAttack,
-    defence = effects.defence.takeDamage,
-    treeCut = effects.treeCut.normalChop,
+    combat = Effect.combat.normalAttack,
+    defence = Effect.defence.takeDamage,
+    treeCut = Effect.treeCut.normalChop,
   },
   normalCriticalSuccess = {
-    combat = effects.combat.criticalAttack,
-    defence = effects.defence.parry,
-    treeCut = effects.treeCut.criticalChop,
+    combat = Effect.combat.criticalAttack,
+    defence = Effect.defence.parry,
+    treeCut = Effect.treeCut.criticalChop,
   },
 }
 
@@ -63,6 +36,6 @@ end
 
 return {
   abilities = abilities,
-  effects = effects,
+  effects = Effect,
   pickAbility = pickAbility,
 }

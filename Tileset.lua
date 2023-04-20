@@ -1,5 +1,3 @@
-local withCanvas = require('./util').withCanvas
-
 ---@class TilesetQuads
 ---@field guy love.Quad
 ---@field grass love.Quad
@@ -18,6 +16,8 @@ local withCanvas = require('./util').withCanvas
 ---@field timer number
 ---@field waterFrame integer
 ---@field quads TilesetQuads
+
+local withCanvas = require('util').withCanvas
 
 local timerCeil = 0.3
 

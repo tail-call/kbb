@@ -24,10 +24,10 @@
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil
 ---@field enterHouse fun(guest: Guy, entity: GameEntity_Building): 'shouldMove' | 'shouldNotMove'
 
-local makePixie = require('./Pixie').makePixie
-local Vector = require('./Vector')
-local abilities = require('./Ability').abilities
-local getTileset = require('./Tileset').getTileset
+local makePixie = require('Pixie').makePixie
+local Vector = require('Vector')
+local abilities = require('Ability').abilities
+local getTileset = require('Tileset').getTileset
 
 ---@type Guy
 local Guy = {
