@@ -21,20 +21,10 @@ local isRecruitCircleActive = require('./recruitcircle').isRecruitCircleActive
 local makeSquad = require('./squad').makeSquad
 local isGuyAFollower = require('./squad').isGuyAFollower
 local makeResources = require('./resources').makeResources
+local makeBattle = require('./battle').makeBattle
 
 ---@class Building
 ---@field pos Vector Building's position
-
----@class Battle
----@field attacker Guy Who initiated the battle
----@field defender Guy Who was attacked
----@field pos Vector Battle's location
----@field timer number Time before current round finishes
----@field round number Current round number
----# Methods
----@field swapSides fun(self: Battle) Swap attacker and defender
----@field advanceTimer fun(self: Battle, dt: number) Makes battle timer go down
----@field beginNewRound fun(self: Battle) Reset round timer
 
 ---@class Text Text object displayed in the world
 ---@field text string Text content
@@ -116,7 +106,6 @@ local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
 local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
 ---@type Vector
 local EVIL_SPAWN_LOCATION = { x = 281, y = 195 }
-local BATTLE_ROUND_DURATION = 0.5
 
 local SCORES_TABLE = {
   killedAnEnemy = 100,
@@ -133,31 +122,6 @@ local TERRAIN_COLLISION = { type = 'terrain' }
 ---@return boolean
 local function isFrozen(game, guy)
   return game.frozenGuys[guy] or false
-end
-
----@param attacker Guy
----@param defender Guy
----@return Battle
-local function makeBattle(attacker, defender)
-  ---@type Battle
-  local battle = {
-    attacker = attacker,
-    defender = defender,
-    pos = defender.pos,
-    round = 1,
-    timer = BATTLE_ROUND_DURATION,
-    swapSides = function (self)
-      self.attacker, self.defender = self.defender, self.attacker
-    end,
-    advanceTimer = function (self, dt)
-      self.timer = self.timer - dt
-    end,
-    beginNewRound = function (self)
-      self.timer = BATTLE_ROUND_DURATION
-      self.round = self.round + 1
-    end
-  }
-  return battle
 end
 
 ---@param guy Guy
