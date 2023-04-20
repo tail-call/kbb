@@ -649,5 +649,4 @@ return {
   getCursorCoords = getCursorCoords,
   cursor = drawCursor,
   drawGame = drawGame,
-  getDrawState = getDrawState,
 }
