@@ -50,6 +50,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Guys should attempt diagonal movement when moving forward doesn't work
  - [x] Order guys to chop trees
  - [x] Fog of war
+ - [ ] Event system
  - [ ] Map reveal percent stat
  - [ ] Combine fog of war with FOV
  - [ ] Minimap fog of war
