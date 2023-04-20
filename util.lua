@@ -120,6 +120,13 @@ local function weightedRandom (pool)
   return pool[1]
  end
 
+---@param value number
+---@param from number
+---@param to number
+local function clamped(value, from, to)
+  return math.min(math.max(value, from), to)
+end
+
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,
@@ -129,4 +136,5 @@ return {
   randomLetterCode = randomLetterCode,
   loadFont = loadFont,
   weightedRandom = weightedRandom,
+  clamped = clamped,
 }

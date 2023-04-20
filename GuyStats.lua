@@ -6,7 +6,9 @@
 ---@field hurt fun(self: GuyStats, damage: number) Decreases health points
 ---@field heal fun(self: GuyStats) Sets health points eqal max health points
 ---@field setMaxHp fun(self: GuyStats, maxHp: number) Sets maximum health points and fully heals
----@field increaseMoves fun(self: GuyStats) Increases moves by 1
+---@field addMoves fun(self: GuyStats, amount: number) Adds moves
+
+local clamped = require('Util').clamped
 
 local GuyStats = {}
 
@@ -27,8 +29,8 @@ function GuyStats.makeGuyStats()
       self.hp = maxHp
       self.maxHp = maxHp
     end,
-    increaseMoves = function (self)
-      self.moves = math.min(self.moves + 1, self.maxMoves)
+    addMoves = function (self, amount)
+      self.moves = clamped(self.moves + amount, 0, self.maxMoves)
     end,
   }
   return guyStats

@@ -45,30 +45,32 @@ local function makeUIDelegate(game, player)
       )
     end,
     rightPanelText = function ()
-      local function charSheet(guy)
-        return function ()
-          return string.format(
-            ''
-              .. 'Name:\n %s\n'
-              .. 'Rank:\n Harmless\n'
-              .. 'Coords:\n %sX %sY\n'
-              .. 'HP:\n %s/%s\n'
-              .. 'Action:\n %.2f/%.2f\n'
-              .. 'Moves:\n  %s\n',
-            guy.name,
-            guy.pos.x,
-            guy.pos.y,
-            guy.stats.hp,
-            guy.stats.maxHp,
-            guy.time,
-            guy.speed,
-            guy.stats.moves
-          )
-        end
-      end
+      local header = '<- Tab ->\n\n'
 
-      local function controls()
+      local idx = 1 + (game.activeTab % 2)
+
+      if idx == 1 then
+        return string.format(
+          ''
+            .. header
+            .. 'Name:\n %s\n'
+            .. 'Rank:\n Harmless\n'
+            .. 'Coords:\n %sX %sY\n'
+            .. 'HP:\n %s/%s\n'
+            .. 'Action:\n %.2f/%.2f\n'
+            .. 'Moves:\n  %s\n',
+          game.player.name,
+          game.player.pos.x,
+          game.player.pos.y,
+          game.player.stats.hp,
+          game.player.stats.maxHp,
+          game.player.timer,
+          game.player.speed,
+          game.player.stats.moves
+        )
+      elseif idx == 2 then
         return ''
+            .. header
           .. ' CONTROLS  \n'
           .. 'WASD:  move\n'
           .. 'LMB:recruit\n'
@@ -79,12 +81,7 @@ local function makeUIDelegate(game, player)
           .. 'C:     chop\n'
           .. 'Z:     zoom\n'
       end
-
-      local header = '<- Tab ->\n\n'
-      local tabs = { charSheet(player), controls }
-      local idx = 1 + (game.activeTab % #tabs)
-
-      return header .. tabs[idx]()
+      return ''
     end,
     bottomPanelText = function ()
       return string.format(

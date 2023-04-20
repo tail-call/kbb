@@ -5,6 +5,7 @@
 
 ---@class Guy
 ---@field pos Vector Guy's position in the world
+---@field mayMove boolean True if may move
 ---@field move fun(self: Guy, pos: Vector) Changes guy's position
 ---@field name string Guy's name
 ---@field rename fun(self: Guy, name: string) Gives the guy a different name
@@ -13,7 +14,7 @@
 ---@field reteam fun(self: Guy, team: 'good' | 'evil') Switches team of the guy
 ---@field pixie Pixie Graphical representation of the guy
 ---@field stats GuyStats RPG stats
----@field time number
+---@field timer number Move timer
 ---@field speed number Delay in seconds between moves
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
@@ -34,7 +35,7 @@ local Guy = {}
 ---@param delegate GuyDelegate
 ---@return Vector newPosition
 local function moveGuy(guy, vec, delegate)
-  if guy.stats.moves == 0 then return guy.pos end
+  if not guy.mayMove or guy.stats.moves < 1 then return guy.pos end
 
   local stepForward = Vector.add(guy.pos, vec)
   local diagonalStepLeft = Vector.add(guy.pos,
@@ -83,11 +84,12 @@ end
 ---@param delegate GuyDelegate
 local function updateGuy(guy, dt, delegate)
   guy.pixie:update(dt)
-  guy.time = guy.time + dt
+  guy.timer = guy.timer + dt
 
-  while guy.time >= guy.speed do
-    guy.time = guy.time % guy.speed
-    guy.stats:increaseMoves()
+  while guy.timer >= guy.speed do
+    guy.mayMove = true
+    guy.timer = guy.timer % guy.speed
+    guy.stats:addMoves(1)
   end
 
   if guy.behavior == 'wander' then
@@ -106,7 +108,7 @@ function Guy.new(opts)
   ---@type Guy
   local guy = {
     name = 'Unnamed',
-    time = 0,
+    timer = 0,
     behavior = 'none',
     abilities = {
       { ability = abilities.normalSuccess, weight = 4 },
@@ -114,7 +116,7 @@ function Guy.new(opts)
       { ability = abilities.normalFail, weight = 1 },
     },
     team = 'good',
-    moves = 0,
+    mayMove = false,
     speed = 0.15,
     pos = opts.pos or { x = 0, y = 0 },
     stats = makeGuyStats(),
@@ -135,7 +137,8 @@ function Guy.new(opts)
       self.speed = speed
     end,
     move = function (self, pos)
-      self.stats.moves = 0
+      self.mayMove = false
+      self.stats:addMoves(-2)
       self.pos = pos
       self.pixie:move(self.pos)
     end,
