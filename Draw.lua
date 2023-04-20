@@ -1,9 +1,7 @@
-local loadTileset = require('Tileset').load
 local updateTileset = require('Tileset').update
 local getTileset = require('Tileset').getTileset
 local parallaxTile = require('Tileset').parallaxTile
 local regenerateTileset = require('Tileset').regenerate
-local loadFont = require('util').loadFont
 local tbl = require('tbl')
 local Vector = require('Vector')
 local util = require('util')
@@ -41,7 +39,6 @@ local SKY_TABLE = {
 ---@param z number
 local function setZoom(drawState, z)
   drawState:setWindowScale(z)
-  love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
   local w, h = love.window.getMode()
   if w ~= SCREEN_WIDTH * z and h ~= SCREEN_WIDTH * z then
     love.window.setMode(SCREEN_WIDTH * z, SCREEN_HEIGHT * z)
@@ -55,10 +52,6 @@ end
 ---@param drawState DrawState
 local function init(drawState)
   setZoom(drawState, 3)
-  love.graphics.setDefaultFilter('linear', 'nearest')
-  love.graphics.setFont(loadFont('cga8.png', 8, 8, true))
-  love.graphics.setLineStyle('rough')
-  loadTileset()
   return drawState
 end
 

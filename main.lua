@@ -17,6 +17,8 @@ local tbl = require('tbl')
 local vector = require('Vector')
 local gameover = require('GameOver')
 local makeDrawState = require('DrawState').makeDrawState
+local loadTileset = require('Tileset').load
+local loadFont = require('util').loadFont
 
 ---@type 'game' | 'dead'
 local state = 'game'
@@ -27,6 +29,10 @@ local game
 local drawState
 
 function love.load()
+  love.graphics.setDefaultFilter('linear', 'nearest')
+  love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
+  love.graphics.setLineStyle('rough')
+  loadTileset()
   drawState = makeDrawState()
   draw.init(drawState)
   game = makeGame()
