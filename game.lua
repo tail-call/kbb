@@ -7,11 +7,11 @@ local loadWorld = require('World').loadWorld
 local setTile = require('World').setTile
 local getTile = require('World').getTile
 local isPassable = require('World').isPassable
-local ui = require('UI')
+local UI = require('UI')
 local tbl = require('tbl')
-local vector = require('Vector')
+local Vector = require('Vector')
 local weightedRandom = require('util').weightedRandom
-local ability = require('Ability')
+local Ability = require('Ability')
 local maybeDrop = require('tbl').maybeDrop
 local makeConsoleMessage = require('ConsoleMessage').makeConsoleMessage
 local makeConsole = require('Console').makeConsole
@@ -124,7 +124,7 @@ end
 ---@return Guy | nil
 local function findGuyAtPos(game, pos)
   return tbl.find(game.guys, function (guy)
-    return vector.equal(guy.pos, pos)
+    return Vector.equal(guy.pos, pos)
   end)
 end
 
@@ -133,40 +133,40 @@ end
 ---@return GameEntity | nil
 local function findEntityAtPos(game, pos)
   return tbl.find(game.entities, function (entity)
-    return vector.equal(entity.object.pos, pos)
+    return Vector.equal(entity.object.pos, pos)
   end)
 end
 
 ---@param delegate UIDelegate
 local function makeUIScript(delegate)
-  return ui.makeRoot({}, {
+  return UI.makeRoot({}, {
     ---@type PanelUI
-    ui.makePanel(ui.origin(), 320, 8, GRAY_PANEL_COLOR, {
+    UI.makePanel(UI.origin(), 320, 8, GRAY_PANEL_COLOR, {
       coloredText = delegate.topPanelText,
     }),
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
+    UI.makePanel(UI.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
       text = delegate.leftPanelText,
     }),
     -- Empty underlay for console
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
+    UI.makePanel(UI.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
-    ui.makePanel(ui.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
+    UI.makePanel(UI.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
       text = delegate.rightPanelText,
     }),
     ---@type PanelUI
-    ui.makePanel(ui.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
+    UI.makePanel(UI.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
       text = delegate.bottomPanelText,
     }),
     -- Pause icon
-    ui.makePanel(ui.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
+    UI.makePanel(UI.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
-    ui.makePanel(ui.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
+    UI.makePanel(UI.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
   })
@@ -364,7 +364,7 @@ local function mayRecruit(game, guy)
   if isGuyAPlayer(game, guy) then return false end
   if isGuyAFollower(game.squad, guy) then return false end
   if not canRecruitGuy(guy) then return false end
-  return vector.dist(guy.pos, game.cursorPos) < game.recruitCircle.radius + 0.5
+  return Vector.dist(guy.pos, game.cursorPos) < game.recruitCircle.radius + 0.5
 end
 
 -- Writers
@@ -443,25 +443,25 @@ local function fight(game, attacker, defender, damageModifier)
     say(game, string.format('%s got %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
   end
 
-  if defenderEffect == ability.effects.defence.parry then
-    if attackerEffect == ability.effects.combat.normalAttack then
+  if defenderEffect == Ability.effects.defence.parry then
+    if attackerEffect == Ability.effects.combat.normalAttack then
       say(game, '%s attacked, but %s parried!')
       dealDamage(defender, 0)
-    elseif attackerEffect == ability.effects.combat.miss then
+    elseif attackerEffect == Ability.effects.combat.miss then
       say(game, '%s attacked and missed, %s gets an extra turn!')
       fight(game, defender, attacker, damageModifier)
-    elseif attackerEffect == ability.effects.combat.criticalAttack then
+    elseif attackerEffect == Ability.effects.combat.criticalAttack then
       say(game, '%s did a critical attack, but %s parried! They strike back with %sx damage.')
       fight(game, defender, attacker, damageModifier * 2)
     end
-  elseif defenderEffect == ability.effects.defence.takeDamage then
-    if attackerEffect == ability.effects.combat.normalAttack then
+  elseif defenderEffect == Ability.effects.defence.takeDamage then
+    if attackerEffect == Ability.effects.combat.normalAttack then
       say(game, '%s attacked! %s takes damage.')
       dealDamage(defender, attackerAction.weight)
-    elseif attackerEffect == ability.effects.combat.miss then
+    elseif attackerEffect == Ability.effects.combat.miss then
       say(game, '%s attacked but missed!')
       dealDamage(defender, 0)
-    elseif attackerEffect == ability.effects.combat.criticalAttack then
+    elseif attackerEffect == Ability.effects.combat.criticalAttack then
       say(game, '%s did a critical attack! %s takes %sx damage.')
       dealDamage(defender, attackerAction.weight * 2)
     end
@@ -580,7 +580,7 @@ local function orderBuild(game)
 
   -- Check if no other entities
   for _, entity in ipairs(game.entities) do
-    if vector.equal(entity.object.pos, pos) then
+    if Vector.equal(entity.object.pos, pos) then
       return
     end
   end
