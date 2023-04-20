@@ -7,7 +7,7 @@
 ---@field messages ConsoleMessage[] List of displayed messages
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
 ---@field removeTopMessage fun(self: Console) Removes a topmost message
---
+
 ---@param text string
 ---@param lifetime number
 ---@return ConsoleMessage
