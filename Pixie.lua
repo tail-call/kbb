@@ -1,5 +1,5 @@
 -- A pixie is a texture + quad + transform with animation support
-local getTileset = require('./tileset').getTileset
+local getTileset = require('./Tileset').getTileset
 
 ---@class Pixie
 ---@field texture love.Texture
