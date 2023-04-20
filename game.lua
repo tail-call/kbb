@@ -59,46 +59,61 @@ local makeBattle = require('./battle').makeBattle
 ---@field shouldDrawFocusModeUI fun(): boolean True if should draw focus mode UI
 
 ---@class Game
+---
 ---# Simulation
+---
 ---@field world World Game world
----@field guyDelegate GuyDelegate Object that talks to guys
----@field collider Collider Object that performs collision checks between game world objects
----@field score integer Score the player has accumulated
----@field frozenGuys { [Guy]: true } Guys that shouldn't be rendered nor updated
----@field resources Resources Resources player may spend on upgrades
----@field entities GameEntity[] Things in the game world
----@field guys Guy[] Guys aka units
----@field player Guy A guy controlled by the player
 ---@field time number Time of day in seconds, max is 24*60
----@field squad Squad A bunch of guys that follows player's movement
----@field texts Text[] Text objects in the game world
----# Game flow
----@field isFocused boolean True if focus mode is on
----@field onLost (fun(): nil) | nil
----# UI
----@field console Console Bottom console
----@field recruitCircle RecruitCircle Circle thing used to recruit units
----@field ui UI User interface script
----@field activeTab integer Current active tab in the focus screen
----@field cursorPos Vector Points to a square player's cursor is aimed at
----# GFX
----@field makeVisionSourcesCo fun(self: Game): fun(): VisionSource Returns a coroutine function that will yield all vision sources in the game world
----@field magnificationFactor number How much the camera is zoomed in
----# Methods
+---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
+---@field resources Resources Resources player may spend on upgrades
+---
+---@field score integer Score the player has accumulated
 ---@field addScore fun(self: Game, count: integer) Increases score count
+---
+---@field squad Squad A bunch of guys that follows player's movement
+---
+---@field player Guy A guy controlled by the player
+---@field guyDelegate GuyDelegate Object that talks to guys
+---@field frozenGuys { [Guy]: true } Guys that shouldn't be rendered nor updated
+---@field guys Guy[] Guys aka units
 ---@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
 ---@field freezeGuy fun(self: Game, guy: Guy) Freezes a guy
 ---@field unfreezeGuy fun(self: Game, guy: Guy) Unfreezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
+---
+---@field texts Text[] Text objects in the game world
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
+---@field entities GameEntity[] Things in the game world
 ---@field addEntity fun(self: Game, entity: GameEntity) Adds a building to the world
 ---@field removeEntity fun(self: Game, entity: GameEntity) Adds a building to the world
----@field toggleFocus fun(self: Game) Toggles focus mode
----@field disableFocus fun(self: Game) Toggles focus mode
----@field advanceClock fun(self: Game, dt: number) Advances in-game clock
----@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
----@field nextTab fun(self: Game) Switches tab in the UI
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy): nil
+---
+---@field collider Collider Function that performs collision checks between game world objects
+---
+---# Game flow
+---
+---@field isFocused boolean True if focus mode is on
+---@field onLost (fun(): nil) | nil Called when game is lost
+---
+---@field toggleFocus fun(self: Game) Toggles focus mode
+---@field disableFocus fun(self: Game) Turns focus mode off
+---
+---# UI
+---
+---@field ui UI User interface root
+---@field console Console Bottom console
+---@field activeTab integer Current active tab in the focus screen
+---
+---@field cursorPos Vector Points to a square player's cursor is aimed at
+---@field recruitCircle RecruitCircle Circle thing used to recruit units
+---@field nextTab fun(self: Game) Switches tab in the UI
+---
+---# GFX
+---
+---@field makeVisionSourcesCo fun(self: Game): fun(): VisionSource Returns a coroutine function that will yield all vision sources in the game world
+---
+---@field magnificationFactor number How much the camera is zoomed in
+---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
