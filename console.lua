@@ -23,12 +23,11 @@ local function makeConsoleMessage(text, lifetime)
   return message
 end
 
----@param messages ConsoleMessage[]
 ---@return Console
-local function makeConsole(messages)
+local function makeConsole()
   ---@type Console
   local console = {
-    messages = messages,
+    messages = {},
     say = function (self, message)
       table.insert(self.messages, message)
     end,

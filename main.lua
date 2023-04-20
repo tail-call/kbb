@@ -87,7 +87,7 @@ function love.keypressed(key, scancode, isrepeat)
     handleInput(game, scancode)
   else
     if scancode == 'f' then
-      game:toggleFollow()
+      game.squad:toggleFollow()
     end
 
     if scancode == 'g' then

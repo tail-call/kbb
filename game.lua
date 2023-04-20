@@ -34,6 +34,7 @@ local makeConsole = require('./console').makeConsole
 ---@field remove fun(self: Squad, guy: Guy) Removes a guy from the squad
 ---@field add fun(self: Squad, guy: Guy) Adds a guy to the squad
 ---@field startFollowing fun(self: Squad) Squad will begin following the player
+---@field toggleFollow fun(self: Squad) Toggle follow mode for squad
 
 ---@class Resources
 ---@field pretzels integer Amount of pretzels owned
@@ -114,10 +115,10 @@ local makeConsole = require('./console').makeConsole
 ---# GFX
 ---@field magnificationFactor number How much the camera is zoomed in
 ---# Methods
----@field toggleFollow fun(self: Game): nil Toggles follow mode on or off
 ---@field addScore fun(self: Game, count: integer): nil Increases score count
 ---@field removeGuy fun(self: Game, guy: Guy): nil Removes the guy from the game
 ---@field addText fun(self: Game, text: Text): nil Adds the text in the game world
+---@field addBuilding fun(self: Game, pos: Vector): nil Adds a building to the world
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -183,6 +184,28 @@ local function makeResources()
     end,
   }
   return resources
+end
+
+---@return Squad
+local function makeSquad()
+  ---@type Squad
+  local squad = {
+    followers = {},
+    shouldFollow = false,
+    remove = function(self, guy)
+      self.followers[guy] = nil
+    end,
+    add = function(self, guy)
+      self.followers[guy] = true
+    end,
+    startFollowing = function(self)
+      self.shouldFollow = true
+    end,
+    toggleFollow = function(self)
+      self.shouldFollow = not self.shouldFollow
+    end,
+  }
+  return squad
 end
 
 ---@param game Game
@@ -409,12 +432,6 @@ local function init()
     Guy.makeGoodGuy({ x = 272, y = 229 }),
   }
 
-  ---@type ConsoleMessage[]
-  local messages = {
-    makeConsoleMessage('Welcome to Kobold Princess Simulator.', 10),
-    makeConsoleMessage('This is day 1 of your reign.', 10),
-  }
-
   ---@return VisionSource
   local function visionSourcesCo()
     coroutine.yield({ pos = game.player.pos, sight = 10 })
@@ -496,26 +513,14 @@ local function init()
     buildings = {
       { pos = { x = 277, y = 233 } }
     },
-    console = makeConsole(messages),
+    console = makeConsole(),
     frozenGuys = tbl.weaken({}, 'k'),
     resources = makeResources(),
     guys = guys,
     time = math.random() * 24 * 60,
     entities = {},
     player = player,
-    squad = {
-      followers = {},
-      shouldFollow = false,
-      remove = function(self, guy)
-        self.followers[guy] = nil
-      end,
-      add = function(self, guy)
-        self.followers[guy] = true
-      end,
-      startFollowing = function(self)
-        self.shouldFollow = true
-      end,
-    },
+    squad = makeSquad(),
     recruitCircle = makeRecruitCircle(),
     onLost = nil,
     cursorPos = player.pos,
@@ -528,9 +533,6 @@ local function init()
 
     -- Methods
 
-    toggleFollow = function(self)
-      self.squad.shouldFollow = not self.squad.shouldFollow
-    end,
     addScore = function(self, count)
       self.score = self.score + count
     end,
@@ -547,8 +549,20 @@ local function init()
     end,
   }
 
-  game:addText(makeText('Build house on rock.', { x = 269, y = 228 }, 9))
-  game:addText(makeText('\nGARDEN\n  o\n   f\n EDEN', { x = 280, y = 194 }, 8))
+  game:addText(
+    makeText('Build house on rock.', { x = 269, y = 228 }, 9)
+  )
+
+  game:addText(
+    makeText('\nGARDEN\n  o\n   f\n EDEN', { x = 280, y = 194 }, 8)
+  )
+
+  game.console:say(
+    makeConsoleMessage('Welcome to Kobold Princess Simulator.', 10)
+  )
+  game.console:say(
+    makeConsoleMessage('This is day 1 of your reign.', 10)
+  )
 
   return game
 end
