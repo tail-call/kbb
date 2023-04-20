@@ -25,7 +25,7 @@
 ---@field enterHouse fun(guest: Guy, entity: GameEntity_Building): 'shouldMove' | 'shouldNotMove'
 
 local makePixie = require('./Pixie').makePixie
-local vector = require('./Vector')
+local Vector = require('./Vector')
 local abilities = require('./Ability').abilities
 local getTileset = require('./Tileset').getTileset
 
@@ -54,12 +54,12 @@ local function moveGuy(guy, vec, delegate)
 
   local didMove = false
 
-  local stepForward = vector.add(guy.pos, vec)
-  local diagonalStepLeft = vector.add(guy.pos,
-    vector.add(vec, vector.dotProd(vec, { x = 0, y = 1 }))
+  local stepForward = Vector.add(guy.pos, vec)
+  local diagonalStepLeft = Vector.add(guy.pos,
+    Vector.add(vec, Vector.dotProd(vec, { x = 0, y = 1 }))
   )
-  local diagonalStepRight = vector.add(guy.pos,
-    vector.add(vec, vector.dotProd(vec, { x = 0, y = -1 }))
+  local diagonalStepRight = Vector.add(guy.pos,
+    Vector.add(vec, Vector.dotProd(vec, { x = 0, y = -1 }))
   )
 
   ---@param pos Vector
@@ -117,10 +117,10 @@ local function updateGuy(guy, dt, delegate)
 
   if guy.behavior == 'wander' then
     moveGuy(guy, ({
-      vector.dir.up,
-      vector.dir.down,
-      vector.dir.left,
-      vector.dir.right,
+      Vector.dir.up,
+      Vector.dir.down,
+      Vector.dir.left,
+      Vector.dir.right,
     })[math.random(1, 4)], delegate)
   end
 end
