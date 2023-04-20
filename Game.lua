@@ -27,6 +27,7 @@ local makeText = require('Text').makeText
 local makeBuilding = require('Building').makeBuilding
 local makeBuildingEntity = require('GameEntity').makeBuildingEntity
 local makeBattleEntity = require('GameEntity').makeBattleEntity
+local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
 
 ---@class Game
 ---
@@ -110,11 +111,6 @@ local function isFrozen(game, guy)
 end
 
 ---@param guy Guy
-local function isAtFullHealth(guy)
-  return guy.stats.hp >= guy.stats.maxHp
-end
-
----@param guy Guy
 local function isGoodGuy(guy)
   return guy.team == 'good'
 end
@@ -170,29 +166,6 @@ local function makeUIScript(delegate)
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
   })
-end
-
----@param game Game
----@return GuyDelegate
-local function makeGuyDelegate(game)
-  ---@type GuyDelegate
-  local guyDelegate = {
-    beginBattle = function (attacker, defender)
-      game:beginBattle(attacker, defender)
-    end,
-    enterHouse = function (guy, entity)
-      if isAtFullHealth(guy) then
-        return 'shouldNotMove'
-      end
-      guy.stats:heal()
-      game:removeEntity(entity)
-      return 'shouldMove'
-    end,
-    collider = function (pos)
-      return game:collider(pos)
-    end,
-  }
-  return guyDelegate
 end
 
 ---@return Game

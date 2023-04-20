@@ -19,11 +19,6 @@
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
 
----@class GuyDelegate
----@field collider fun(v: Vector): CollisionInfo Function that performs collision checks between game world objects
----@field beginBattle fun(attacker: Guy, defender: Guy): nil
----@field enterHouse fun(guest: Guy, entity: GameEntity_Building): 'shouldMove' | 'shouldNotMove'
-
 local makePixie = require('Pixie').makePixie
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
