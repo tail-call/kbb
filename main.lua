@@ -80,7 +80,7 @@ function love.keypressed(key, scancode, isrepeat)
   end
 
   if scancode == 'z' then
-    switchMagn(game)
+    game:switchMagnificationFactor()
   end
 
   if game.isFocused then

@@ -112,6 +112,7 @@ local isGuyAFollower = require('./squad').isGuyAFollower
 ---@field toggleFocus fun(self: Game) Toggles focus mode
 ---@field disableFocus fun(self: Game) Toggles focus mode
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
+---@field switchMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -476,7 +477,16 @@ local function init()
       self.frozenGuys[guy] = true
     end,
     advanceClock = function (self, dt)
-      self.time = (game.time + dt) % (24 * 60)
+      self.time = (self.time + dt) % (24 * 60)
+    end,
+    switchMagnificationFactor = function (self)
+      if self.magnificationFactor == 1 then
+        self.magnificationFactor = 2/3
+      elseif self.magnificationFactor == 2/3 then
+        self.magnificationFactor = 2
+      else
+        self.magnificationFactor = 1
+      end
     end
   }
 
@@ -714,17 +724,6 @@ local function orderChop(game)
 end
 
 ---@param game Game
-local function switchMagn(game)
-  if game.magnificationFactor == 1 then
-    game.magnificationFactor = 2/3
-  elseif game.magnificationFactor == 2/3 then
-    game.magnificationFactor = 2
-  else
-    game.magnificationFactor = 1
-  end
-end
-
----@param game Game
 local function orderBuild(game)
   if game.resources.wood < 5 then
     return
@@ -809,7 +808,6 @@ return {
   orderFocus = orderFocus,
   beginRecruiting = beginRecruiting,
   endRecruiting = endRecruiting,
-  switchMagn = switchMagn,
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
   isReadyForOrder = isReadyForOrder,
