@@ -496,6 +496,28 @@ local function updateBattle(game, entity, dt)
   end
 end
 
+---@param game Game
+local function orderGather(game)
+  for guy in pairs(game.squad.followers) do
+    local destination = { x = 0, y = 0 }
+    local guyDist = Vector.dist(guy.pos, game.player.pos)
+    for _, direction in ipairs{
+      Vector.dir.up,
+      Vector.dir.down,
+      Vector.dir.left,
+      Vector.dir.right,
+    } do
+      local pos = Vector.add(direction, guy.pos)
+      local posDist = Vector.dist(game.player.pos, pos)
+      if posDist < guyDist then
+        destination = direction
+      end
+    end
+    moveGuy(guy, destination, game.guyDelegate)
+  end
+end
+
+
 ---@param game Game -- Game object
 ---@param dt number -- Time since last update
 ---@param movementDirections Vector[] -- Momentarily pressed movement directions
@@ -508,6 +530,7 @@ local function updateGame(game, dt, movementDirections)
   if game.isFocused then return end
 
   -- Handle input
+
   if game.player.stats.moves > 0 and #movementDirections > 0 then
     for _ = 1, #movementDirections do
       local index = (game.alternatingKeyIndex + 1) % (#movementDirections)
@@ -531,6 +554,10 @@ local function updateGame(game, dt, movementDirections)
         end
       end
     end
+  end
+
+  if love.keyboard.isDown('q') then
+    orderGather(game)
   end
 
   -- Handle game logic

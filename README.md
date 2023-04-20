@@ -51,6 +51,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Order guys to chop trees
  - [x] Fog of war
  - [x] Tiles will change when a guy dies
+ - [x] Gather command
  - [ ] Event system
  - [ ] You must build roads for guys to navigate freely
  - [ ] Friendly guys wander when not in squad
