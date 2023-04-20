@@ -546,8 +546,9 @@ local function orderChop(tileset, game)
   end
 end
 
+---@param tileset Tileset
 ---@param game Game
-local function orderBuild(game)
+local function orderBuild(tileset, game)
   -- Check if has enough resources
   if game.resources.wood < 5 then
     return
@@ -565,7 +566,7 @@ local function orderBuild(game)
   -- Is building on rock?
   if getTile(game.world, pos) == 'rock' then
     game.resources:addStone(1)
-    game:addGuy(Guy.makeStrongEvilGuy(EVIL_SPAWN_LOCATION))
+    game:addGuy(Guy.makeStrongEvilGuy(tileset, EVIL_SPAWN_LOCATION))
     setTile(game.world, pos, 'sand')
   end
 
@@ -615,7 +616,7 @@ local function handleFocusModeInput(game, scancode, tileset)
   if scancode == 'tab' then
     game:nextTab()
   elseif scancode == 'b' then
-    orderBuild(game)
+    orderBuild(tileset, game)
   elseif scancode == 'm' then
     orderScribe(game)
   elseif scancode == 'r' then

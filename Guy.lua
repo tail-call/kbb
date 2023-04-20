@@ -182,11 +182,13 @@ function Guy.makeEvilGuy(tileset, pos)
   return guy
 end
 
+---@param tileset Tileset
 ---@param pos Vector
-function Guy.makeStrongEvilGuy(pos)
+function Guy.makeStrongEvilGuy(tileset, pos)
   local guy = Guy.new{
     pos = pos,
     color = { 1, 0, 1, 1 },
+    tileset = tileset,
   }
   guy.stats.hp = 50
   guy.stats.maxHp = 50
