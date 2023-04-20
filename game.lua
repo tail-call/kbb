@@ -20,18 +20,10 @@ local makeRecruitCircle = require('./recruitcircle').makeRecruitCircle
 local isRecruitCircleActive = require('./recruitcircle').isRecruitCircleActive
 local makeSquad = require('./squad').makeSquad
 local isGuyAFollower = require('./squad').isGuyAFollower
+local makeResources = require('./resources').makeResources
 
 ---@class Building
 ---@field pos Vector Building's position
-
----@class Resources
----@field pretzels integer Amount of pretzels owned
----@field wood integer Amount of wood owned
----@field stone integer Amount of stone owned
----# Methods
----@field addPretzels fun(self: Resources, count: integer) Get more pretzels
----@field addWood fun(self: Resources, count: integer) Get more wood
----@field addStone fun(self: Resources, count: integer) Get more stone
 
 ---@class Battle
 ---@field attacker Guy Who initiated the battle
@@ -135,26 +127,6 @@ local SCORES_TABLE = {
 local NONE_COLLISION = { type = 'none' }
 ---@type CollisionInfo
 local TERRAIN_COLLISION = { type = 'terrain' }
-
----@return Resources
-local function makeResources()
-  ---@type Resources
-  local resources = {
-    pretzels = 1,
-    wood = 0,
-    stone = 0,
-    addPretzels = function (self, count)
-      self.pretzels = self.pretzels + count
-    end,
-    addWood = function (self, count)
-      self.wood = self.wood + count
-    end,
-    addStone = function (self, count)
-      self.stone = self.stone + count
-    end,
-  }
-  return resources
-end
 
 ---@param game Game
 ---@param guy Guy
