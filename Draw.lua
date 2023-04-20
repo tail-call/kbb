@@ -40,9 +40,17 @@ local SKY_TABLE = {
 
 -- Variables
 
-local drawState = makeDrawState()
+---@type DrawState
+local drawState
 
-local function setZoom(z)
+
+local function getDrawState()
+  return drawState
+end
+
+---@param drawState DrawState
+---@param z number
+local function setZoom(drawState, z)
   drawState:setWindowScale(z)
   love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
   local w, h = love.window.getMode()
@@ -56,7 +64,8 @@ local function setZoom(z)
 end
 
 local function init()
-  setZoom(3)
+  drawState = makeDrawState()
+  setZoom(drawState, 3)
   love.graphics.setDefaultFilter('linear', 'nearest')
   love.graphics.setFont(loadFont('cga8.png', 8, 8, true))
   love.graphics.setLineStyle('rough')
@@ -643,4 +652,5 @@ return {
   getCursorCoords = getCursorCoords,
   cursor = drawCursor,
   drawGame = drawGame,
+  getDrawState = getDrawState,
 }

@@ -75,7 +75,7 @@ function love.keypressed(key, scancode, isrepeat)
   if state ~= 'game' then return end
 
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
-    draw.setZoom(tonumber(scancode))
+    draw.setZoom(draw.getDrawState(), tonumber(scancode) or 1)
   end
 
   if scancode == 'z' then
