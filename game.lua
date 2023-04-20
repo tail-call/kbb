@@ -44,10 +44,12 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field startFollowing fun(self: Squad) Squad will begin following the player
 
 ---@class Resources
----@field pretzels integer
----@field wood integer
----@field stone integer
----@field addPretzels fun(self: Resources, count: integer)
+---@field pretzels integer Amount of pretzels owned
+---@field wood integer Amount of wood owned
+---@field stone integer Amount of stone owned
+---@field addPretzels fun(self: Resources, count: integer) Get more pretzels
+---@field addWood fun(self: Resources, count: integer) Get more wood
+---@field addStone fun(self: Resources, count: integer) Get more stone
 
 ---@class Battle
 ---@field attacker Guy Who initiated the battle
@@ -168,6 +170,26 @@ local function makeConsole(messages)
     end
   }
   return console
+end
+
+---@return Resources
+local function makeResources()
+  ---@type Resources
+  local resources = {
+    pretzels = 0,
+    wood = 0,
+    stone = 0,
+    addPretzels = function (self, count)
+      self.pretzels = self.pretzels + count
+    end,
+    addWood = function (self, count)
+      self.wood = self.wood + count
+    end,
+    addStone = function (self, count)
+      self.stone = self.stone + count
+    end,
+  }
+  return resources
 end
 
 ---@param game Game
@@ -482,14 +504,7 @@ local function init()
     },
     console = makeConsole(messages),
     frozenGuys = tbl.weaken({}, 'k'),
-    resources = {
-      pretzels = 0,
-      wood = 0,
-      stone = 0,
-      addPretzels = function (self, count)
-        self.pretzels = self.pretzels + count
-      end
-    },
+    resources = makeResources(),
     guys = guys,
     time = math.random() * 24 * 60,
     entities = {},
@@ -785,7 +800,7 @@ local function maybeChop(game, guy)
   local pos = guy.pos
   local tile = getTile(game.world, pos)
   if tile == 'forest' then
-    game.resources.wood = game.resources.wood + 1
+    game.resources:addWood(1)
     setTile(game.world, pos, 'grass')
     table.insert(game.guys, Guy.makeEvilGuy(EVIL_SPAWN_LOCATION))
   end
@@ -822,11 +837,11 @@ local function orderBuild(game)
   end
   local t = getTile(game.world, pos)
   if t == 'rock' then
-    game.resources.stone = game.resources.stone + 1
+    game.resources:addStone(1)
     table.insert(game.guys, Guy.makeStrongEvilGuy(EVIL_SPAWN_LOCATION))
     setTile(game.world, pos, 'sand')
   end
-  game.resources.wood = game.resources.wood - 5
+  game.resources:addWood(-5)
   table.insert(game.entities, {
     type = 'building',
     object = { pos = pos }
@@ -864,7 +879,7 @@ local function orderSummon(game)
     return
   end
 
-  game.resources.pretzels = game.resources.pretzels - 1
+  game.resources:addPretzels(-1)
   local guy = Guy.makeGoodGuy({
     x = game.cursorPos.x,
     y = game.cursorPos.y
