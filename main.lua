@@ -22,8 +22,11 @@ local state = 'game'
 ---@type Game
 local game
 
+---@type DrawState
+local drawState
+
 function love.load()
-  draw.init()
+  drawState = draw.init()
   game = makeGame()
   game.onLost = function ()
     state = 'dead'
@@ -35,6 +38,7 @@ local alternatingKeyIndex = 0
 ---@param dt number
 function love.update(dt)
   draw.update(
+    drawState,
     dt,
     game.isFocused
       and vector.add(game.cursorPos, { x = 0, y = 0 })
@@ -75,7 +79,7 @@ function love.keypressed(key, scancode, isrepeat)
   if state ~= 'game' then return end
 
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
-    draw.setZoom(draw.getDrawState(), tonumber(scancode) or 1)
+    draw.setZoom(drawState, tonumber(scancode) or 1)
   end
 
   if scancode == 'z' then
@@ -122,8 +126,8 @@ function love.keyreleased(key, scancode)
 end
 
 function love.draw()
-  draw.prepareFrame()
-  drawGame(game)
+  draw.prepareFrame(drawState)
+  drawGame(game, drawState)
   if state == 'dead' then
     gameover.draw()
   end

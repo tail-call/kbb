@@ -38,16 +38,6 @@ local SKY_TABLE = {
   { r = 1.0, g = 0.7, b = 0.7, },
 }
 
--- Variables
-
----@type DrawState
-local drawState
-
-
-local function getDrawState()
-  return drawState
-end
-
 ---@param drawState DrawState
 ---@param z number
 local function setZoom(drawState, z)
@@ -64,12 +54,13 @@ local function setZoom(drawState, z)
 end
 
 local function init()
-  drawState = makeDrawState()
+  local drawState = makeDrawState()
   setZoom(drawState, 3)
   love.graphics.setDefaultFilter('linear', 'nearest')
   love.graphics.setFont(loadFont('cga8.png', 8, 8, true))
   love.graphics.setLineStyle('rough')
   loadTileset()
+  return drawState
 end
 
 ---@param ui UI
@@ -112,15 +103,17 @@ local function drawUI(ui)
 end
 
 --- Should be called at the start of love.draw
-local function prepareFrame()
+---@param drawState DrawState
+local function prepareFrame(drawState)
   love.graphics.scale(drawState.windowScale)
 end
 
+---@param drawState DrawState
 ---@param dt number
 ---@param lookingAt Vector
 ---@param magn number
 ---@param isAltCentering boolean
-local function update(dt, lookingAt, magn, isAltCentering)
+local function update(drawState, dt, lookingAt, magn, isAltCentering)
   local tileset = getTileset()
 
   drawState:advanceTime(dt)
@@ -185,8 +178,9 @@ local function drawRecruitCircle(pos, radius)
   )
 end
 
+---@param drawState DrawState
 ---@param battle Battle
-local function drawBattle(battle)
+local function drawBattle(drawState, battle)
   local posX = battle.pos.x * TILE_WIDTH
   local posY = battle.pos.y * TILE_HEIGHT
   local tileset = getTileset()
@@ -278,9 +272,10 @@ local function getCursorCoords()
   return math.floor(x / TILE_WIDTH), math.floor(y / TILE_HEIGHT)
 end
 
+---@param drawState DrawState
 ---@param pos Vector
 ---@param isFocused boolean
-local function drawCursor(pos, isFocused)
+local function drawCursor(drawState, pos, isFocused)
   local invSqrt2 = 1/math.sqrt(2)
   local mInvSqrt2 = 1 - invSqrt2
 
@@ -343,8 +338,9 @@ local function skyColorAtTime(time)
 end
 
 ---@param game Game
+---@param drawState DrawState
 ---@param sky { r: number, b: number, g: number }
-local function drawWorld(game, sky)
+local function drawWorld(game, drawState, sky)
   local world = game.world
   local function index(x, y) return world.width * (y - 1) + x end
 
@@ -421,7 +417,8 @@ local function drawWorld(game, sky)
 end
 
 ---@param game Game
-local function drawGame(game)
+---@param drawState DrawState
+local function drawGame(game, drawState)
   love.graphics.push('transform')
 
   -- Setup camera
@@ -441,7 +438,7 @@ local function drawGame(game)
   -- Draw visible terrain
 
   local colorOfSky = skyColorAtTime(game.time)
-  drawWorld(game, colorOfSky)
+  drawWorld(game, drawState, colorOfSky)
 
   -- Draw in-game objects
 
@@ -513,7 +510,7 @@ local function drawGame(game)
       elseif entity.type == 'battle' then
         local battle = entity.object
         if not drawn[entity] then
-          drawBattle(battle)
+          drawBattle(drawState, battle)
           drawn[entity] = true
         end
       end
@@ -572,7 +569,7 @@ local function drawGame(game)
 
     local r, g, b, a = unpack(cursorColor)
     withColor(r, g, b, a, function ()
-      drawCursor(game.cursorPos, game.isFocused)
+      drawCursor(drawState, game.cursorPos, game.isFocused)
     end)
   end
 
