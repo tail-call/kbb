@@ -3,9 +3,10 @@ local vector = require('./vector')
 local abilities = require('./ability').abilities
 
 ---@class GuyStats
----@field hp number
----@field maxHp number
----@field hurt fun(self: GuyStats, damage: number): nil
+---@field hp number Current health points
+---@field maxHp number Maximum health points
+---@field hurt fun(self: GuyStats, damage: number): nil Decreases health points
+---@field heal fun(self: GuyStats): nil Sets health points eqal max health points
 
 ---@class Guy
 ---@field pos Vector
@@ -137,6 +138,9 @@ function Guy.new(props)
     maxHp = 10,
     hurt = function (self, damage)
       self.hp = self.hp - damage
+    end,
+    heal = function (self)
+      self.hp = self.hp + self.maxHp
     end
   }
   guy.pixie:spawn(props.pos)

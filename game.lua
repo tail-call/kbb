@@ -240,19 +240,8 @@ local function isFrozen(game, guy)
 end
 
 ---@param guy Guy
-local function healGuy(guy)
-  guy.stats.hp = guy.stats.maxHp
-end
-
----@param guy Guy
 local function isAtFullHealth(guy)
   return guy.stats.hp >= guy.stats.maxHp
-end
-
----@param game Game
----@param entity GameEntity
-local function addEntity(game, entity)
-  table.insert(game.entities, entity)
 end
 
 ---@param game Game
@@ -492,7 +481,7 @@ local function init()
         end
       }
 
-      addEntity(game, {
+      game:addEntity({
         type = 'battle',
         object = battle
       })
@@ -501,7 +490,7 @@ local function init()
       if isAtFullHealth(guy) then
         return false
       end
-      healGuy(guy)
+      guy.stats:heal()
       removeEntity(game, entity)
       return true
     end,
