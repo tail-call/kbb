@@ -556,7 +556,7 @@ local function drawGame(game, drawState)
 
     local r, g, b, a = unpack(cursorColor)
     withColor(r, g, b, a, function ()
-      drawCursor(drawState, game.cursorPos, game.isFocused, game.player.moves)
+      drawCursor(drawState, game.cursorPos, game.isFocused, game.player.stats.moves)
     end)
   end
 

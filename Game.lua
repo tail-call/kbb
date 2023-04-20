@@ -479,7 +479,7 @@ local function updateGame(game, dt, movementDirections)
   if game.isFocused then return end
 
   -- Handle input
-  if game.player.moves > 0 and #movementDirections > 0 then
+  if game.player.stats.moves > 0 and #movementDirections > 0 then
     for _ = 1, #movementDirections do
       local index = (game.alternatingKeyIndex + 1) % (#movementDirections)
       game:setAlternatingKeyIndex(index)

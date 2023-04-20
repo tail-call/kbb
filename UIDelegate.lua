@@ -62,7 +62,7 @@ local function makeUIDelegate(game, player)
             guy.stats.maxHp,
             guy.time,
             guy.speed,
-            guy.moves
+            guy.stats.moves
           )
         end
       end
