@@ -52,6 +52,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Fog of war
  - [x] Tiles will change when a guy dies
  - [ ] Event system
+ - [ ] You must build roads for guys to navigate freely
  - [ ] Friendly guys wander when not in squad
  - [ ] Each guy has wander area they may never leave when not in squad
  - [ ] Wander area moves as guy moves with the player
