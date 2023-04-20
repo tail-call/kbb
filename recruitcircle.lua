@@ -2,9 +2,9 @@
 ---@field radius number | nil
 ---@field growthSpeed number
 ---@field maxRadius number
----@field maybeGrow fun(self: RecruitCircle, dt: number)
----@field reset fun(self: RecruitCircle)
----@field clear fun(self: RecruitCircle)
+---@field maybeGrow fun(self: RecruitCircle, dt: number) -- Increase recruit circle radius if active
+---@field reset fun(self: RecruitCircle) -- Activates recruit circle
+---@field clear fun(self: RecruitCircle) -- Deactivates recruit circle
 
 local RECRUIT_CIRCLE_MAX_RADIUS = 6
 local RECRUIT_CIRCLE_GROWTH_SPEED = 6

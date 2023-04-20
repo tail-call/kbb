@@ -6,7 +6,6 @@
 ---@class Console Bottom console
 ---@field messages ConsoleMessage[] List of displayed messages
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
----@field removeTopMessage fun(self: Console) Removes a topmost message
 
 ---@param text string
 ---@param lifetime number
@@ -30,10 +29,10 @@ local function makeConsole()
     messages = {},
     say = function (self, message)
       table.insert(self.messages, message)
+      while #self.messages >= 8 do
+        table.remove(self.messages, 1)
+      end
     end,
-    removeTopMessage = function (self)
-      table.remove(self.messages, 1)
-    end
   }
   return console
 end

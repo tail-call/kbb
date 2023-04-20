@@ -111,6 +111,7 @@ local isGuyAFollower = require('./squad').isGuyAFollower
 ---@field removeEntity fun(self: Game, entity: GameEntity) Adds a building to the world
 ---@field toggleFocus fun(self: Game) Toggles focus mode
 ---@field disableFocus fun(self: Game) Toggles focus mode
+---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -149,15 +150,6 @@ local function makeResources()
     end,
   }
   return resources
-end
-
----@param game Game
----@param text string
-local function echo(game, text)
-  game.console:say(makeConsoleMessage(text, 6))
-  while #game.console.messages >= 8 do
-    game.console:removeTopMessage()
-  end
 end
 
 ---@param game Game
@@ -483,6 +475,9 @@ local function init()
     freezeGuy = function (self, guy)
       self.frozenGuys[guy] = true
     end,
+    advanceClock = function (self, dt)
+      self.time = (game.time + dt) % (24 * 60)
+    end
   }
 
   game:addText(
@@ -537,6 +532,7 @@ local function beginRecruiting(game)
   game.recruitCircle:reset()
 end
 
+---@param game Game
 local function endRecruiting(game)
   for _, guy in ipairs(game.guys) do
     if mayRecruit(game, guy) then
@@ -574,6 +570,12 @@ local function orderMove(game, vec)
 end
 
 ---@param game Game
+---@param text string
+local function say(game, text)
+  game.console:say(makeConsoleMessage(text, 6))
+end
+
+---@param game Game
 ---@param attacker Guy
 ---@param defender Guy
 ---@param damageModifier number
@@ -588,45 +590,32 @@ local function fight(game, attacker, defender, damageModifier)
   ---@param damage number
   local function dealDamage(guy, damage)
     guy.stats:hurt(damage * damageModifier)
-    echo(game, string.format('%s got %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
-  end
-
-  local function say(message)
-    echo(game, string.format(
-      message,
-      attacker.name, defender.name, damageModifier
-    ))
+    say(game, string.format('%s got %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
   end
 
   if defenderEffect == ability.effects.defence.parry then
     if attackerEffect == ability.effects.combat.normalAttack then
-      say('%s attacked, but %s parried!')
+      say(game, '%s attacked, but %s parried!')
       dealDamage(defender, 0)
     elseif attackerEffect == ability.effects.combat.miss then
-      say('%s attacked and missed, %s gets an extra turn!')
+      say(game, '%s attacked and missed, %s gets an extra turn!')
       fight(game, defender, attacker, damageModifier)
     elseif attackerEffect == ability.effects.combat.criticalAttack then
-      say('%s did a critical attack, but %s parried! They strike back with %sx damage.')
+      say(game, '%s did a critical attack, but %s parried! They strike back with %sx damage.')
       fight(game, defender, attacker, damageModifier * 2)
     end
   elseif defenderEffect == ability.effects.defence.takeDamage then
     if attackerEffect == ability.effects.combat.normalAttack then
-      say('%s attacked! %s takes damage.')
+      say(game, '%s attacked! %s takes damage.')
       dealDamage(defender, attackerAction.weight)
     elseif attackerEffect == ability.effects.combat.miss then
-      say('%s attacked but missed!')
+      say(game, '%s attacked but missed!')
       dealDamage(defender, 0)
     elseif attackerEffect == ability.effects.combat.criticalAttack then
-      say('%s did a critical attack! %s takes %sx damage.')
+      say(game, '%s did a critical attack! %s takes %sx damage.')
       dealDamage(defender, attackerAction.weight * 2)
     end
   end
-end
-
----@param game Game
----@param dt number
-local function advanceClock(game, dt)
-  return (game.time + dt) % (24 * 60)
 end
 
 ---@param game Game
@@ -642,7 +631,7 @@ local function updateBattle(game, entity, dt)
     ---@param guy Guy
     local function maybeDie(guy)
       if guy.stats.hp <= 0 then
-        echo(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
+        say(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
 
         if guy.team == 'evil' then
           game.resources:addPretzels(1)
@@ -667,27 +656,6 @@ local function updateBattle(game, entity, dt)
   end
 end
 
----@param game Game
----@param dt number
-local function updateBattles(game, dt)
-  for _, entity in ipairs(game.entities) do
-    if entity.type == 'battle' then
-      ---@cast entity any
-      updateBattle(game, entity, dt)
-    end
-  end
-end
-
----@param game Game
----@param dt number
-local function updateGuys(game, dt)
-  for _, guy in ipairs(game.guys) do
-    if not isFrozen(game, guy) then
-      updateGuy(guy, dt, game.guyDelegate)
-    end
-  end
-end
-
 ---@param console Console
 ---@param dt number
 local function updateConsole(console, dt)
@@ -704,9 +672,20 @@ local function updateGame(game, dt)
 
   if game.isFocused then return end
 
-  game.time = advanceClock(game, dt)
-  updateBattles(game, dt)
-  updateGuys(game, dt)
+  game:advanceClock(dt)
+
+  for _, entity in ipairs(game.entities) do
+    if entity.type == 'battle' then
+      ---@cast entity any
+      updateBattle(game, entity, dt)
+    end
+  end
+
+  for _, guy in ipairs(game.guys) do
+    if not isFrozen(game, guy) then
+      updateGuy(guy, dt, game.guyDelegate)
+    end
+  end
 end
 
 local function orderFocus(game)
@@ -795,7 +774,7 @@ local function orderSummon(game)
     x = game.cursorPos.x,
     y = game.cursorPos.y
   })
-  echo(game, ('%s was summonned.'):format(guy.name))
+  say(game, ('%s was summonned.'):format(guy.name))
   table.insert(game.guys, guy)
   game.squad:add(guy)
 
@@ -826,7 +805,6 @@ return {
   handleInput = handleInput,
   orderChop = orderChop,
   orderMove = orderMove,
-  echo = echo,
   updateGame = updateGame,
   orderFocus = orderFocus,
   beginRecruiting = beginRecruiting,
