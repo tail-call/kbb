@@ -3,10 +3,10 @@
 
 local vector
 
-local up = { x =  0, y = -1 }
-local down = { x =  0, y =  1 }
-local left = { x = -1, y =  0 }
-local right = { x =  1, y =  0 }
+local UP = { x =  0, y = -1 }
+local DOWN = { x =  0, y =  1 }
+local LEFT = { x = -1, y =  0 }
+local RIGHT = { x =  1, y =  0 }
 
 vector = {
   ---@param v1 Vector
@@ -98,18 +98,18 @@ vector = {
   end,
 
   dir = {
-    up = up,
-    down = down,
-    left = left,
-    right = right,
-    w = up,
-    a = left,
-    s = down,
-    d = right,
-    h = left,
-    j = down,
-    k = up,
-    ['l'] = right,
+    up = UP,
+    down = DOWN,
+    left = LEFT,
+    right = RIGHT,
+    w = UP,
+    a = LEFT,
+    s = DOWN,
+    d = RIGHT,
+    h = LEFT,
+    j = DOWN,
+    k = UP,
+    ['l'] = RIGHT,
   },
 }
 

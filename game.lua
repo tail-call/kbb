@@ -10,7 +10,7 @@ local isPassable = require('./World').isPassable
 local ui = require('./UI')
 local tbl = require('./tbl')
 local vector = require('./Vector')
-local rng = require('./rng')
+local weightedRandom = require('./util').weightedRandom
 local ability = require('./Ability')
 local maybeDrop = require('./tbl').maybeDrop
 local makeConsoleMessage = require('./ConsoleMessage').makeConsoleMessage
@@ -430,8 +430,8 @@ end
 ---@param defender Guy
 ---@param damageModifier number
 local function fight(game, attacker, defender, damageModifier)
-  local attackerAction = rng.weightedRandom(attacker.abilities)
-  local defenderAction = rng.weightedRandom(attacker.abilities)
+  local attackerAction = weightedRandom(attacker.abilities)
+  local defenderAction = weightedRandom(attacker.abilities)
 
   local attackerEffect = attackerAction.ability.combat
   local defenderEffect = defenderAction.ability.defence

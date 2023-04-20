@@ -5,7 +5,7 @@
 ---@field bottomPanelText fun(): string Bottom panel text
 ---@field shouldDrawFocusModeUI fun(): boolean True if should draw focus mode UI
 
-local getTile = require('./world').getTile
+local getTile = require('./World').getTile
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 

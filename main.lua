@@ -14,7 +14,7 @@ local beginRecruiting = require('Game').beginRecruiting
 local endRecruiting = require('Game').endRecruiting
 local isReadyForOrder = require('Game').isReadyForOrder
 local tbl = require('./tbl')
-local vector = require('./vector')
+local vector = require('./Vector')
 local gameover = require('GameOver')
 
 ---@type 'game' | 'dead'
