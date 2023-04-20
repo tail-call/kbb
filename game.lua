@@ -15,6 +15,7 @@ local ability = require('./ability')
 local maybeDrop = require('./tbl').maybeDrop
 local makeConsoleMessage = require('./console').makeConsoleMessage
 local makeConsole = require('./console').makeConsole
+local randomLetterCode = require('./util').randomLetterCode
 
 ---@class Building
 ---@field pos Vector Building's position
@@ -115,10 +116,12 @@ local makeConsole = require('./console').makeConsole
 ---# GFX
 ---@field magnificationFactor number How much the camera is zoomed in
 ---# Methods
----@field addScore fun(self: Game, count: integer): nil Increases score count
----@field removeGuy fun(self: Game, guy: Guy): nil Removes the guy from the game
----@field addText fun(self: Game, text: Text): nil Adds the text in the game world
----@field addBuilding fun(self: Game, pos: Vector): nil Adds a building to the world
+---@field addScore fun(self: Game, count: integer) Increases score count
+---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
+---@field addText fun(self: Game, text: Text) Adds the text in the game world
+---@field addEntity fun(self: Game, entity: GameEntity) Adds a building to the world
+---@field toggleFocus fun(self: Game) Toggles focus mode
+---@field disableFocus fun(self: Game) Toggles focus mode
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -170,7 +173,7 @@ end
 local function makeResources()
   ---@type Resources
   local resources = {
-    pretzels = 0,
+    pretzels = 1,
     wood = 0,
     stone = 0,
     addPretzels = function (self, count)
@@ -191,7 +194,7 @@ local function makeSquad()
   ---@type Squad
   local squad = {
     followers = {},
-    shouldFollow = false,
+    shouldFollow = true,
     remove = function(self, guy)
       self.followers[guy] = nil
     end,
@@ -485,6 +488,7 @@ local function init()
         end,
         beginNewRound = function (self)
           self.timer = BATTLE_ROUND_DURATION
+          self.round = self.round + 1
         end
       }
 
@@ -546,6 +550,15 @@ local function init()
     end,
     addText = function (self, text)
       table.insert(self.texts, text)
+    end,
+    addEntity = function (self, entity)
+      table.insert(self.entities, entity)
+    end,
+    toggleFocus = function (self)
+      self.isFocused = not self.isFocused
+    end,
+    disableFocus = function (self)
+      self.isFocused = false
     end,
   }
 
@@ -740,9 +753,6 @@ local function updateBattle(game, entity, dt)
       unfreeze(game, battle.attacker)
       unfreeze(game, battle.defender)
     end
-
-    -- Next round
-    battle.round = battle.round + 1
   end
 end
 
@@ -789,7 +799,7 @@ local function updateGame(game, dt)
 end
 
 local function orderFocus(game)
-  game.isFocused = not game.isFocused
+  game:toggleFocus()
 end
 
 ---@param game Game
@@ -842,19 +852,12 @@ local function orderBuild(game)
     setTile(game.world, pos, 'sand')
   end
   game.resources:addWood(-5)
-  table.insert(game.entities, {
+  game:addEntity({
     type = 'building',
     object = { pos = pos }
   })
   game:addScore(SCORES_TABLE.builtAHouse)
-  game.isFocused = false
-end
-
----@return integer
-local function randomLetterCode()
-  local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  local idx = math.random(#letters)
-  return string.byte(letters, idx)
+  game:disableFocus()
 end
 
 ---@param game Game
@@ -867,7 +870,7 @@ local function orderScribe(game)
     randomLetterCode()
   ), game.cursorPos, 4))
 
-  game.isFocused = false
+  game:disableFocus()
 end
 
 ---@param game Game
@@ -883,9 +886,9 @@ local function orderSummon(game)
   })
   echo(game, ('%s was summonned.'):format(guy.name))
   table.insert(game.guys, guy)
-  game.squad.followers[guy] = true
+  game.squad:add(guy)
 
-  game.isFocused = not game.isFocused
+  game:toggleFocus()
 end
 
 ---@param game Game

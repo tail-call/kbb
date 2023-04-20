@@ -51,10 +51,18 @@ local function withTransform(transform, cb)
   love.graphics.pop()
 end
 
+---@return integer
+local function randomLetterCode()
+  local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  local idx = math.random(#letters)
+  return string.byte(letters, idx)
+end
+
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,
   withColor = withColor,
   withLineWidth = withLineWidth,
   withTransform = withTransform,
+  randomLetterCode = randomLetterCode,
 }
