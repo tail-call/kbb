@@ -71,7 +71,7 @@ local makeBattle = require('./battle').makeBattle
 ---@field player Guy A guy controlled by the player
 ---@field time number Time of day in seconds, max is 24*60
 ---@field squad Squad A bunch of guys that follows player's movement
----@field visionSourcesCo fun(): VisionSource Coroutine that will yield all vision sources in the game world
+---@field makeVisionSourcesCo fun(self: Game): fun(): VisionSource Returns a coroutine function that will yield all vision sources in the game world
 ---@field texts Text[] Text objects in the game world
 ---# Game flow
 ---@field isFocused boolean True if focus mode is on
@@ -330,22 +330,6 @@ local function makeGame()
     Guy.makeGoodGuy({ x = 272, y = 229 }),
   }
 
-  ---@return VisionSource
-  local function visionSourcesCo()
-    coroutine.yield({ pos = game.player.pos, sight = 10 })
-
-    for _, guy in ipairs(game.guys) do
-      if isGoodGuy(guy) then
-        coroutine.yield({ pos = guy.pos, sight = 8 })
-      end
-    end
-
-    return {
-      pos = game.cursorPos,
-      sight = math.max(2, game.recruitCircle.radius or 0),
-    }
-  end
-
   ---@type Collider
   local function collider(v)
     local someoneThere = findGuyAtPos(game, v)
@@ -384,7 +368,22 @@ local function makeGame()
     magnificationFactor = 1,
     isFocused = false,
     texts = {},
-    visionSourcesCo = visionSourcesCo,
+    makeVisionSourcesCo = function (self)
+      return function ()
+        coroutine.yield({ pos = self.player.pos, sight = 10 })
+
+        for _, guy in ipairs(self.guys) do
+          if isGoodGuy(guy) then
+            coroutine.yield({ pos = guy.pos, sight = 8 })
+          end
+        end
+
+        return {
+          pos = self.cursorPos,
+          sight = math.max(2, self.recruitCircle.radius or 0),
+        }
+      end
+    end,
     collider = collider,
 
     -- Methods

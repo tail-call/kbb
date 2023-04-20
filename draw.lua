@@ -370,7 +370,7 @@ local function drawWorld(game, sky)
   end
 
   -- Reveal fog of war
-  util.exhaust(game.visionSourcesCo, function (visionSource)
+  util.exhaust(game:makeVisionSourcesCo(), function (visionSource)
     local pos = visionSource.pos
     local visionDistance = calcVisionDistance(visionSource)
     local vd2 = visionDistance ^ 2
@@ -496,7 +496,7 @@ local function drawGame(game)
 
   -- Draw visible objects
 
-  util.exhaust(game.visionSourcesCo, function (visionSource)
+  util.exhaust(game:makeVisionSourcesCo(), function (visionSource)
     local vd2 = (visionSource.sight * colorOfSky.b) ^ 2
     local posX = visionSource.pos.x
     local posY = visionSource.pos.y
