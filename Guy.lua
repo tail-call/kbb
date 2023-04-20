@@ -4,19 +4,21 @@
 ---@field tileset Tileset
 
 ---@class Guy
----@field pos Vector
----@field name string
+---@field pos Vector Guy's position in the world
+---@field move fun(self: Guy, pos: Vector) Changes guy's position
+---@field name string Guy's name
 ---@field rename fun(self: Guy, name: string) Gives the guy a different name
+---@field setSpeed fun(self: Guy, speed: number) Sets how quickly may move again after moving
 ---@field team 'good' | 'evil'
 ---@field reteam fun(self: Guy, team: 'good' | 'evil') Switches team of the guy
----@field pixie Pixie
----@field stats GuyStats
+---@field pixie Pixie Graphical representation of the guy
+---@field stats GuyStats RPG stats
 ---@field time number
----@field mayMove boolean
----@field speed number
+---@field mayMove boolean True if may move
+---@field speed number Delay in seconds between moves
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
----@field beginWandering fun(self: Guy): nil
+---@field beginWandering fun(self: Guy)
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
 
@@ -48,9 +50,7 @@ local function moveGuy(guy, vec, delegate)
   ---@param pos Vector
   local function move(pos)
     didMove = true
-    guy.mayMove = false
-    guy.pos = pos
-    guy.pixie:move(guy.pos)
+    guy:move(pos)
   end
 
   for _, pos in ipairs{stepForward, diagonalStepLeft, diagonalStepRight} do
@@ -139,6 +139,14 @@ function Guy.new(opts)
     beginWandering = function (self)
       self.behavior = 'wander'
     end,
+    setSpeed = function (self, speed)
+      self.speed = speed
+    end,
+    move = function (self, pos)
+      self.mayMove = false
+      self.pos = pos
+      self.pixie:move(self.pos)
+    end
   }
 
   guy.pixie:move(guy.pos)
@@ -175,7 +183,7 @@ function Guy.makeEvilGuy(tileset, pos)
     color = { 1, 0, 0, 1 },
     tileset = tileset,
   }
-  guy.speed = 0.5
+  guy:setSpeed(0.5)
   guy:beginWandering()
   guy:reteam('evil')
   guy:rename('Evil Guy')
@@ -190,8 +198,7 @@ function Guy.makeStrongEvilGuy(tileset, pos)
     color = { 1, 0, 1, 1 },
     tileset = tileset,
   }
-  guy.stats.hp = 50
-  guy.stats.maxHp = 50
+  guy.stats:setMaxHp(50)
   guy.speed = 0.25
   guy.behavior = 'wander'
   guy.team = 'evil'

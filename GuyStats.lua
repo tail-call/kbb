@@ -1,8 +1,9 @@
 ---@class GuyStats
 ---@field hp number Current health points
 ---@field maxHp number Maximum health points
----@field hurt fun(self: GuyStats, damage: number): nil Decreases health points
----@field heal fun(self: GuyStats): nil Sets health points eqal max health points
+---@field hurt fun(self: GuyStats, damage: number) Decreases health points
+---@field heal fun(self: GuyStats) Sets health points eqal max health points
+---@field setMaxHp fun(self: GuyStats, maxHp: number) Sets maximum health points and fully heals
 
 local GuyStats = {}
 
@@ -15,7 +16,11 @@ function GuyStats.makeGuyStats()
     end,
     heal = function (self)
       self.hp = self.hp + self.maxHp
-    end
+    end,
+    setMaxHp = function (self, maxHp)
+      self.hp = maxHp
+      self.maxHp = maxHp
+    end,
   }
   return guyStats
 end
