@@ -39,6 +39,7 @@ local makeConsole = require('./console').makeConsole
 ---@field pretzels integer Amount of pretzels owned
 ---@field wood integer Amount of wood owned
 ---@field stone integer Amount of stone owned
+---# Methods
 ---@field addPretzels fun(self: Resources, count: integer) Get more pretzels
 ---@field addWood fun(self: Resources, count: integer) Get more wood
 ---@field addStone fun(self: Resources, count: integer) Get more stone
@@ -49,6 +50,7 @@ local makeConsole = require('./console').makeConsole
 ---@field pos Vector Battle's location
 ---@field timer number Time before current round finishes
 ---@field round number Current round number
+---# Methods
 ---@field swapSides fun(self: Battle) Swap attacker and defender
 ---@field advanceTimer fun(self: Battle, dt: number) Makes battle timer go down
 ---@field beginNewRound fun(self: Battle) Reset round timer
@@ -73,6 +75,10 @@ local makeConsole = require('./console').makeConsole
 ---@class GameEntity_Battle: GameEntity
 ---@field type 'battle'
 ---@field object Battle
+--
+---@class GameEntity_Text: GameEntity
+---@field type 'text'
+---@field object Text
 
 ---@class UIDelegate
 ---@field topPanelText fun(): table Love2D colored text for top panel
@@ -96,7 +102,7 @@ local makeConsole = require('./console').makeConsole
 ---@field squad Squad A bunch of guys that follows player's movement
 ---@field visionSourcesCo fun(): VisionSource Coroutine that will yield all vision sources in the game world
 ---@field texts Text[] Text objects in the game world
----# Meta
+---# Game flow
 ---@field isFocused boolean True if focus mode is on
 ---@field onLost (fun(): nil) | nil
 ---# UI
@@ -108,10 +114,10 @@ local makeConsole = require('./console').makeConsole
 ---# GFX
 ---@field magnificationFactor number How much the camera is zoomed in
 ---# Methods
----@field toggleFollow fun(self: Game): nil
----@field addScore fun(self: Game, count: integer): nil
----@field removeGuy fun(self: Game, guy: Guy): nil
----@field addText fun(self: Game, text: Text): nil
+---@field toggleFollow fun(self: Game): nil Toggles follow mode on or off
+---@field addScore fun(self: Game, count: integer): nil Increases score count
+---@field removeGuy fun(self: Game, guy: Guy): nil Removes the guy from the game
+---@field addText fun(self: Game, text: Text): nil Adds the text in the game world
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -133,6 +139,31 @@ local SCORES_TABLE = {
 local NONE_COLLISION = { type = 'none' }
 ---@type CollisionInfo
 local TERRAIN_COLLISION = { type = 'terrain' }
+
+---@return RecruitCircle
+local function makeRecruitCircle()
+  ---@type RecruitCircle
+  local recruitCircle = {
+    radius = nil,
+    maxRadius = RECRUIT_CIRCLE_MAX_RADIUS,
+    growthSpeed = RECRUIT_CIRCLE_GROWTH_SPEED,
+    reset = function(self)
+      self.radius = 0
+    end,
+    clear = function(self)
+      self.radius = nil
+    end,
+    maybeGrow = function (self, dt)
+      if self.radius == nil then return end
+
+      self.radius = math.min(
+        self.radius + dt * self.growthSpeed,
+        self.maxRadius
+      )
+    end
+  }
+  return recruitCircle
+end
 
 ---@return Resources
 local function makeResources()
@@ -384,12 +415,6 @@ local function init()
     makeConsoleMessage('This is day 1 of your reign.', 10),
   }
 
-  ---@type Text[]
-  local texts = {
-    makeText('Build house on rock.', { x = 269, y = 228 }, 9),
-    makeText('\nGARDEN\n  o\n   f\n EDEN', { x = 280, y = 194 }, 8),
-  }
-
   ---@return VisionSource
   local function visionSourcesCo()
     coroutine.yield({ pos = game.player.pos, sight = 10 })
@@ -491,30 +516,12 @@ local function init()
         self.shouldFollow = true
       end,
     },
-    recruitCircle = {
-      radius = nil,
-      maxRadius = RECRUIT_CIRCLE_MAX_RADIUS,
-      growthSpeed = RECRUIT_CIRCLE_GROWTH_SPEED,
-      reset = function(self)
-        self.radius = 0
-      end,
-      clear = function(self)
-        self.radius = nil
-      end,
-      maybeGrow = function (self, dt)
-        if self.radius == nil then return end
-
-        self.radius = math.min(
-          self.radius + dt * self.growthSpeed,
-          self.maxRadius
-        )
-      end
-    },
+    recruitCircle = makeRecruitCircle(),
     onLost = nil,
     cursorPos = player.pos,
     magnificationFactor = 1,
     isFocused = false,
-    texts = texts,
+    texts = {},
     visionSourcesCo = visionSourcesCo,
     collider = collider,
     ui = makeUI(uiDelegate),
@@ -539,6 +546,10 @@ local function init()
       table.insert(self.texts, text)
     end,
   }
+
+  game:addText(makeText('Build house on rock.', { x = 269, y = 228 }, 9))
+  game:addText(makeText('\nGARDEN\n  o\n   f\n EDEN', { x = 280, y = 194 }, 8))
+
   return game
 end
 
