@@ -13,6 +13,7 @@ local withTransform = require('util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
 local lerp3 = require('Vector3').lerp3
+local makeDrawState = require('DrawState').makeDrawState
 
 -- Constants
 
@@ -44,17 +45,10 @@ local SKY_TABLE = {
 
 -- Variables
 
-local drawState = {
-  zoom = 1,
-  ---@type Vector3
-  camera = { x = 266 * 16, y = 229 * 16, z = 0.01 },
-  cursorTimer = 0,
-  battleTimer = 0,
-  waterTimer = 0,
-}
+local drawState = makeDrawState()
 
 local function setZoom(z)
-  drawState.zoom = z
+  drawState.windowScale = z
   love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
   local w, h = love.window.getMode()
   if w ~= SCREEN_WIDTH * z and h ~= SCREEN_WIDTH * z then
@@ -115,7 +109,7 @@ end
 
 --- Should be called at the start of love.draw
 local function prepareFrame()
-  love.graphics.scale(drawState.zoom)
+  love.graphics.scale(drawState.windowScale)
 end
 
 ---@param dt number
