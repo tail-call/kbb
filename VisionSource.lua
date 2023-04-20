@@ -1,0 +1,3 @@
+---@class VisionSource
+---@field pos Vector Vision source's position
+---@field sight integer Vision source's radius of sight

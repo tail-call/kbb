@@ -28,10 +28,6 @@ local makeText = require('./Text').makeText
 ---@class Building
 ---@field pos Vector Building's position
 
----@class VisionSource
----@field pos Vector Vision source's position
----@field sight integer Vision source's radius of sight
-
 ---@class GameEntity
 ---@field type string
 ---@field object any
