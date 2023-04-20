@@ -725,7 +725,7 @@ local function maybeChop(game, guy)
   if tile == 'forest' then
     game.resources:addWood(1)
     setTile(game.world, pos, 'grass')
-    table.insert(game.guys, Guy.makeEvilGuy(EVIL_SPAWN_LOCATION))
+    game:addGuy(Guy.makeEvilGuy(EVIL_SPAWN_LOCATION))
   end
 end
 
@@ -738,21 +738,28 @@ end
 
 ---@param game Game
 local function orderBuild(game)
+  -- Check if has enough resources
   if game.resources.wood < 5 then
     return
   end
+
   local pos = game.cursorPos
+
+  -- Check if no other entities
   for _, entity in ipairs(game.entities) do
     if vector.equal(entity.object.pos, pos) then
       return
     end
   end
-  local t = getTile(game.world, pos)
-  if t == 'rock' then
+
+  -- Is building on rock?
+  if getTile(game.world, pos) == 'rock' then
     game.resources:addStone(1)
-    table.insert(game.guys, Guy.makeStrongEvilGuy(EVIL_SPAWN_LOCATION))
+    game:addGuy(Guy.makeStrongEvilGuy(EVIL_SPAWN_LOCATION))
     setTile(game.world, pos, 'sand')
   end
+
+  -- Build
   game.resources:addWood(-5)
   game:addEntity({
     type = 'building',
