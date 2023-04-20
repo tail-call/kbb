@@ -165,7 +165,7 @@ local function recruitableHighlight(pos)
 end
 
 ---@param pos Vector
-local function recruitCircle(pos, radius)
+local function drawRecruitCircle(pos, radius)
   -- Concentric circles
   for i = 1, radius + 2 do
     local alpha = 0.6 * (1 - (i / (2 + radius)) ^ 2)
@@ -553,8 +553,8 @@ local function drawGame(game)
 
   -- Draw recruit circle
 
-  if game.recruitCircle then
-    recruitCircle(game.cursorPos, game.recruitCircle)
+  if game.recruitCircle.radius then
+    drawRecruitCircle(game.cursorPos, game.recruitCircle.radius)
     for _, guy in tbl.ifilter(game.guys, function (guy)
       return mayRecruit(game, guy)
     end) do
@@ -660,7 +660,6 @@ return {
   getTileset = getTileset,
   init = init,
   prepareFrame = prepareFrame,
-  recruitCircle = recruitCircle,
   recruitableHighlight = recruitableHighlight,
   setZoom = setZoom,
   update = update,

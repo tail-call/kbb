@@ -17,6 +17,14 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@class Building
 ---@field pos Vector Building's position
 
+---@class RecruitCircle
+---@field radius number | nil
+---@field growthSpeed number
+---@field maxRadius number
+---@field maybeGrow fun(self: RecruitCircle, dt: number)
+---@field reset fun(self: RecruitCircle)
+---@field clear fun(self: RecruitCircle)
+
 ---@class Squad
 ---@field shouldFollow boolean True if guys should follow the player
 ---@field followers { [Guy]: true } Guys in the squad
@@ -39,7 +47,7 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field round number Current round number
 ---@field swapSides fun(self: Battle) Swap attacker and defender
 ---@field advanceTimer fun(self: Battle, dt: number) Makes battle timer go down
----@field resetTimer fun(self: Battle) Reset round timer
+---@field beginNewRound fun(self: Battle) Reset round timer
 
 ---@class ConsoleMessage
 ---@field text string
@@ -93,7 +101,7 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field onLost (fun(): nil) | nil
 ---# UI
 ---@field consoleMessages ConsoleMessage[] Messages in the bottom console
----@field recruitCircle number | nil Radius of a circle thing used to recruit units
+---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field ui UI User interface script
 ---@field activeTab integer Current active tab in the focus screen
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
@@ -101,8 +109,6 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field magnificationFactor number How much the camera is zoomed in
 ---# Methods
 ---@field toggleFollow fun(self: Game): nil
----@field resetRecruitCircle fun(self: Game): nil
----@field clearRecruitCircle fun(self: Game): nil
 ---@field addScore fun(self: Game, count: integer): nil
 ---@field removeGuy fun(self: Game, guy: Guy): nil
 
@@ -377,7 +383,7 @@ local function init()
 
     return {
       pos = game.cursorPos,
-      sight = math.max(2, game.recruitCircle or 0),
+      sight = math.max(2, game.recruitCircle.radius or 0),
     }
   end
 
@@ -415,6 +421,9 @@ local function init()
         end,
         advanceTimer = function (self, dt)
           self.timer = self.timer - dt
+        end,
+        beginNewRound = function (self)
+          self.timer = BATTLE_ROUND_DURATION
         end
       }
 
@@ -470,7 +479,25 @@ local function init()
         self.shouldFollow = true
       end,
     },
-    recruitCircle = nil,
+    recruitCircle = {
+      radius = nil,
+      maxRadius = RECRUIT_CIRCLE_MAX_RADIUS,
+      growthSpeed = RECRUIT_CIRCLE_GROWTH_SPEED,
+      reset = function(self)
+        self.radius = 0
+      end,
+      clear = function(self)
+        self.radius = nil
+      end,
+      maybeGrow = function (self, dt)
+        if self.radius == nil then return end
+
+        self.radius = math.min(
+          self.radius + dt * self.growthSpeed,
+          self.maxRadius
+        )
+      end
+    },
     onLost = nil,
     cursorPos = player.pos,
     magnificationFactor = 1,
@@ -481,12 +508,6 @@ local function init()
     ui = makeUI(uiDelegate),
     toggleFollow = function(self)
       self.squad.shouldFollow = not self.squad.shouldFollow
-    end,
-    resetRecruitCircle = function(self)
-      self.recruitCircle = 0
-    end,
-    clearRecruitCircle = function(self)
-      self.recruitCircle = nil
     end,
     addScore = function(self, count)
       self.score = self.score + count
@@ -506,7 +527,7 @@ end
 ---@param game Game
 ---@return boolean
 local function isRecruitCircleActive(game)
-  return game.recruitCircle ~= nil
+  return game.recruitCircle.radius ~= nil
 end
 
 ---@param game Game
@@ -531,7 +552,7 @@ local function mayRecruit(game, guy)
   if isGuyAPlayer(game, guy) then return false end
   if isGuyAFollower(game, guy) then return false end
   if not canRecruitGuy(guy) then return false end
-  return vector.dist(guy.pos, game.cursorPos) < game.recruitCircle + 0.5
+  return vector.dist(guy.pos, game.cursorPos) < game.recruitCircle.radius + 0.5
 end
 
 -- Writers
@@ -543,9 +564,10 @@ local function dismissSquad(game)
   end
 end
 
+---@param game Game
 local function beginRecruiting(game)
   if game.isFocused then return end
-  game:resetRecruitCircle()
+  game.recruitCircle:reset()
 end
 
 local function endRecruiting(game)
@@ -555,7 +577,7 @@ local function endRecruiting(game)
     game.squad:add(guy)
   end
   game.squad:startFollowing()
-  game:clearRecruitCircle()
+  game.recruitCircle:clear()
 end
 
 ---@param game Game
@@ -666,7 +688,7 @@ local function updateBattle(game, entity, dt)
 
     if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
       -- Keep fighting
-      battle.timer = BATTLE_ROUND_DURATION
+      battle:beginNewRound()
     else
       -- Fight is over
       maybeDrop(game.entities, entity)
@@ -702,17 +724,6 @@ local function updateGuys(game, dt)
   end
 end
 
----@param game Game
----@param dt number
-local function updateRecruitCircle(game, dt)
-  if game.recruitCircle == nil then return end
-
-  game.recruitCircle = math.min(
-    game.recruitCircle + dt * RECRUIT_CIRCLE_GROWTH_SPEED,
-    RECRUIT_CIRCLE_MAX_RADIUS
-  )
-end
-
 ---@param consoleMessages ConsoleMessage[]
 ---@param dt number
 local function updateConsole(consoleMessages, dt)
@@ -725,7 +736,7 @@ end
 ---@param dt number
 local function updateGame(game, dt)
   updateConsole(game.consoleMessages, dt)
-  updateRecruitCircle(game, dt)
+  game.recruitCircle:maybeGrow(dt)
 
   if game.isFocused then return end
 
