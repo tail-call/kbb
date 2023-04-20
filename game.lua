@@ -104,6 +104,7 @@ local isGuyAFollower = require('./squad').isGuyAFollower
 ---@field magnificationFactor number How much the camera is zoomed in
 ---# Methods
 ---@field addScore fun(self: Game, count: integer) Increases score count
+---@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
 ---@field freezeGuy fun(self: Game, guy: Guy) Freezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
@@ -487,6 +488,9 @@ local function init()
       else
         self.magnificationFactor = 1
       end
+    end,
+    addGuy = function (self, guy)
+      table.insert(self.guys, guy)
     end
   }
 
@@ -774,7 +778,7 @@ local function orderSummon(game)
     y = game.cursorPos.y
   })
   say(game, ('%s was summonned.'):format(guy.name))
-  table.insert(game.guys, guy)
+  game:addGuy(guy)
   game.squad:add(guy)
 
   game:toggleFocus()
@@ -793,7 +797,7 @@ local function handleInput(game, scancode)
     orderSummon(game)
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
-    game.isFocused = false
+    game:disableFocus()
   elseif scancode == 'space' then
     orderFocus(game)
   end
