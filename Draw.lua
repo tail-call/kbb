@@ -23,8 +23,6 @@ local TILE_WIDTH = 16
 local MINIMAP_SIZE = 72
 local HIGHLIGHT_CIRCLE_RADIUS = 10
 
-local CAMERA_LERP_SPEED = 10
-
 local WHITE_CURSOR_COLOR = { 1, 1, 1, 0.8 }
 local RED_COLOR = { 1, 0, 0, 0.8 }
 local YELLOW_COLOR = { 1, 1, 0, 0.8 }
@@ -123,8 +121,7 @@ local function update(dt, lookingAt, magn, isAltCentering)
     Vector.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }
   )
 
-  local z = dt * CAMERA_LERP_SPEED
-  drawState:setCamera(offset, z, magn)
+  drawState:setCamera(offset, dt, magn)
   updateTileset(tileset, dt)
 end
 

@@ -16,6 +16,7 @@ local lerp3 = require('Vector3').lerp3
 local CURSOR_TIMER_SPEED = 2
 local BATTLE_TIMER_SPEED = 2
 local WATER_TIMER_SPEED = 1/4
+local CAMERA_LERP_SPEED = 10
 
 ---@return DrawState
 local function makeDrawState()
@@ -42,11 +43,11 @@ local function makeDrawState()
         self.cursorTimer + CURSOR_TIMER_SPEED * dt
       ) % (math.pi * 2)
     end,
-    setCamera = function (self, offset, z, magn)
+    setCamera = function (self, offset, dt, magn)
       self.camera = lerp3(
         self.camera,
         { x = offset.x, y = offset.y, z = magn },
-        z
+        dt * CAMERA_LERP_SPEED
       )
     end
   }
