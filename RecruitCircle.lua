@@ -2,7 +2,7 @@
 ---@field radius number | nil
 ---@field growthSpeed number
 ---@field maxRadius number
----@field maybeGrow fun(self: RecruitCircle, dt: number) -- Increase recruit circle radius if active
+---@field grow fun(self: RecruitCircle, dt: number) -- Increase recruit circle radius if active
 ---@field reset fun(self: RecruitCircle) -- Activates recruit circle
 ---@field clear fun(self: RecruitCircle) -- Deactivates recruit circle
 
@@ -22,9 +22,7 @@ local function makeRecruitCircle()
     clear = function(self)
       self.radius = nil
     end,
-    maybeGrow = function (self, dt)
-      if self.radius == nil then return end
-
+    grow = function (self, dt)
       self.radius = math.min(
         self.radius + dt * self.growthSpeed,
         self.maxRadius

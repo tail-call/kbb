@@ -15,6 +15,7 @@ local Ability = require('Ability')
 local maybeDrop = require('tbl').maybeDrop
 local makeConsoleMessage = require('ConsoleMessage').makeConsoleMessage
 local makeConsole = require('Console').makeConsole
+local updateConsole = require('Console').updateConsole
 local randomLetterCode = require('util').randomLetterCode
 local makeRecruitCircle = require('RecruitCircle').makeRecruitCircle
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
@@ -304,7 +305,7 @@ local function makeGame(tileset)
     end,
     setAlternatingKeyIndex = function (self, x)
       self.alternatingKeyIndex = x
-    end
+    end,
   }
 
   game.ui = makeUIScript(makeUIDelegate(game, player))
@@ -371,27 +372,6 @@ local function endRecruiting(game)
   end
   game.squad:startFollowing()
   game.recruitCircle:clear()
-end
-
----@param game Game
----@param vec Vector
----@return 'shouldRetryOtherDirection' | 'shouldStop'
-local function orderMove(game, vec)
-  if game.squad.shouldFollow then
-    for guy in pairs(game.squad.followers) do
-      if not isFrozen(game, guy) then
-        moveGuy(guy, vec, game.guyDelegate)
-      end
-    end
-  end
-  if not isFrozen(game, game.player) then
-    local oldPos = game.player.pos
-    local newPos = moveGuy(game.player, vec, game.guyDelegate)
-    if not Vector.equal(newPos, oldPos) then
-      return 'shouldStop'
-    end
-  end
-  return 'shouldRetryOtherDirection'
 end
 
 ---@param game Game
@@ -487,24 +467,46 @@ local function updateBattle(game, entity, dt)
   end
 end
 
----@param console Console
----@param dt number
-local function updateConsole(console, dt)
-  for _, message in ipairs(console.messages) do
-    message:fadeOut(dt)
-  end
-end
-
----@param game Game
----@param dt number
-local function updateGame(game, dt)
+---@param game Game -- Game object
+---@param dt number -- Time since last update
+---@param movementDirections Vector[] -- Momentarily pressed movement directions
+local function updateGame(game, dt, movementDirections)
   updateConsole(game.console, dt)
-  game.recruitCircle:maybeGrow(dt)
+  if isRecruitCircleActive(game.recruitCircle) then
+    game.recruitCircle:grow(dt)
+  end
 
   if game.isFocused then return end
 
-  game:advanceClock(dt)
+  -- Handle input
+  if game.player.moves > 0 and #movementDirections > 0 then
+    for _ = 1, #movementDirections do
+      local index = (game.alternatingKeyIndex + 1) % (#movementDirections)
+      game:setAlternatingKeyIndex(index)
 
+      local vec = movementDirections[index + 1]
+
+      if game.squad.shouldFollow then
+        for guy in pairs(game.squad.followers) do
+          if not isFrozen(game, guy) then
+            moveGuy(guy, vec, game.guyDelegate)
+          end
+        end
+      end
+
+      if not isFrozen(game, game.player) then
+        local oldPos = game.player.pos
+        local newPos = moveGuy(game.player, vec, game.guyDelegate)
+        if not Vector.equal(newPos, oldPos) then
+          break
+        end
+      end
+    end
+  end
+
+  -- Handle game logic
+
+  game:advanceClock(dt)
   for _, entity in ipairs(game.entities) do
     if entity.type == 'battle' then
       ---@cast entity any
@@ -666,25 +668,6 @@ local function handleInput(game, scancode, tileset)
   end
 end
 
----@param game Game
----@param dirs Vector[]
-local function handleMovementInput(game, dirs)
-  if not (game.player.mayMove and #dirs > 0) then return end
-
-  for _ = 1, #dirs do
-    local index = (game.alternatingKeyIndex + 1) % (#dirs)
-    game:setAlternatingKeyIndex(index)
-    if not game.isFocused then
-      local command = orderMove(
-        game, dirs[index + 1]
-      )
-      if command == 'shouldStop' then
-        break
-      end
-    end
-  end
-end
-
 
 
 return {
@@ -695,5 +678,4 @@ return {
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
   makeGame = makeGame,
-  handleMovementInput = handleMovementInput,
 }

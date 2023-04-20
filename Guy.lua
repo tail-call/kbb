@@ -14,7 +14,7 @@
 ---@field pixie Pixie Graphical representation of the guy
 ---@field stats GuyStats RPG stats
 ---@field time number
----@field mayMove boolean True if may move
+---@field moves number Number of moves the unit has accumulated
 ---@field speed number Delay in seconds between moves
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
@@ -35,7 +35,7 @@ local Guy = {}
 ---@param delegate GuyDelegate
 ---@return Vector newPosition
 local function moveGuy(guy, vec, delegate)
-  if not guy.mayMove then return guy.pos end
+  if guy.moves == 0 then return guy.pos end
 
   local stepForward = Vector.add(guy.pos, vec)
   local diagonalStepLeft = Vector.add(guy.pos,
@@ -85,9 +85,10 @@ end
 local function updateGuy(guy, dt, delegate)
   guy.pixie:update(dt)
   guy.time = guy.time + dt
+
   while guy.time >= guy.speed do
     guy.time = guy.time % guy.speed
-    guy.mayMove = true
+    guy.moves = guy.moves + 1
   end
 
   if guy.behavior == 'wander' then
@@ -114,7 +115,7 @@ function Guy.new(opts)
       { ability = abilities.normalFail, weight = 1 },
     },
     team = 'good',
-    mayMove = false,
+    moves = 0,
     speed = 0.15,
     pos = opts.pos or { x = 0, y = 0 },
     stats = makeGuyStats(),
@@ -135,7 +136,7 @@ function Guy.new(opts)
       self.speed = speed
     end,
     move = function (self, pos)
-      self.mayMove = false
+      self.moves = 0
       self.pos = pos
       self.pixie:move(self.pos)
     end,

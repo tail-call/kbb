@@ -5,7 +5,6 @@ local draw = require('Draw')
 local makeGame = require('Game').makeGame
 local drawGame = require('Draw').drawGame
 local handleInput = require('Game').handleInput
-local handleMovementInput = require('Game').handleMovementInput
 local updateGame = require('Game').updateGame
 local beginRecruiting = require('Game').beginRecruiting
 local endRecruiting = require('Game').endRecruiting
@@ -61,9 +60,7 @@ function love.update(dt)
       end
     end
 
-    handleMovementInput(game, directions)
-
-    updateGame(game, dt)
+    updateGame(game, dt, directions)
   end
 end
 

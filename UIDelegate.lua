@@ -53,14 +53,16 @@ local function makeUIDelegate(game, player)
               .. 'Rank:\n Harmless\n'
               .. 'Coords:\n %sX %sY\n'
               .. 'HP:\n %s/%s\n'
-              .. 'Action:\n %.2f/%.2f\n',
+              .. 'Action:\n %.2f/%.2f\n'
+              .. 'Moves:\n  %s\n',
             guy.name,
             guy.pos.x,
             guy.pos.y,
             guy.stats.hp,
             guy.stats.maxHp,
             guy.time,
-            guy.speed
+            guy.speed,
+            guy.moves
           )
         end
       end
