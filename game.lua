@@ -58,7 +58,7 @@ local makeBattleEntity = require('./GameEntity').makeBattleEntity
 ---@field removeEntity fun(self: Game, entity: GameEntity) Adds a building to the world
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy): nil
 ---
----@field collider Collider Function that performs collision checks between game world objects
+---@field collider fun(self: Game, v: Vector): CollisionInfo Function that performs collision checks between game world objects
 ---
 ---# Game flow
 ---
@@ -173,9 +173,8 @@ local function makeUI(delegate)
 end
 
 ---@param game Game
----@param collider Collider
 ---@return GuyDelegate
-local function makeGuyDelegate(game, collider)
+local function makeGuyDelegate(game)
   ---@type GuyDelegate
   local guyDelegate = {
     beginBattle = function (attacker, defender)
@@ -189,7 +188,9 @@ local function makeGuyDelegate(game, collider)
       game:removeEntity(entity)
       return 'shouldMove'
     end,
-    collider = collider,
+    collider = function (pos)
+      return game:collider(pos)
+    end,
   }
   return guyDelegate
 end
@@ -210,22 +211,6 @@ local function makeGame()
     Guy.makeGoodGuy({ x = 274, y = 229 }),
     Guy.makeGoodGuy({ x = 272, y = 229 }),
   }
-
-  ---@type Collider
-  local function collider(v)
-    local someoneThere = findGuyAtPos(game, v)
-    if someoneThere then
-      return { type = 'guy', guy = someoneThere }
-    end
-    local someEntityThere = findEntityAtPos(game, v)
-    if someEntityThere then
-      return { type = 'entity', entity = someEntityThere }
-    end
-    if isPassable(game.world, v) then
-      return NONE_COLLISION
-    end
-    return TERRAIN_COLLISION
-  end
 
   ---@type Game
   game = {
@@ -265,7 +250,20 @@ local function makeGame()
         }
       end
     end,
-    collider = collider,
+    collider = function(self, v)
+      local someoneThere = findGuyAtPos(self, v)
+      if someoneThere then
+        return { type = 'guy', guy = someoneThere }
+      end
+      local someEntityThere = findEntityAtPos(self, v)
+      if someEntityThere then
+        return { type = 'entity', entity = someEntityThere }
+      end
+      if isPassable(self.world, v) then
+        return NONE_COLLISION
+      end
+      return TERRAIN_COLLISION
+    end,
 
     -- Methods
 
@@ -330,7 +328,7 @@ local function makeGame()
   }
 
   game.ui = makeUI(makeUIDelegate(game, player))
-  game.guyDelegate = makeGuyDelegate(game, collider)
+  game.guyDelegate = makeGuyDelegate(game)
 
   game:addText(
     makeText('Build house on rock.', { x = 269, y = 228 }, 9)

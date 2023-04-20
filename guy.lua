@@ -22,10 +22,9 @@ local abilities = require('./ability').abilities
 ---@field team 'good' | 'evil'
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
----@alias Collider fun(v: Vector): CollisionInfo
 
 ---@class GuyDelegate
----@field collider Collider
+---@field collider fun(v: Vector): CollisionInfo Function that performs collision checks between game world objects
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil
 ---@field enterHouse fun(guest: Guy, entity: GameEntity_Building): 'shouldMove' | 'shouldNotMove'
 
