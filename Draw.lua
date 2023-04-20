@@ -12,7 +12,6 @@ local withLineWidth = require('util').withLineWidth
 local withTransform = require('util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
-local makeDrawState = require('DrawState').makeDrawState
 
 -- Constants
 
@@ -53,8 +52,8 @@ local function setZoom(drawState, z)
   end
 end
 
-local function init()
-  local drawState = makeDrawState()
+---@param drawState DrawState
+local function init(drawState)
   setZoom(drawState, 3)
   love.graphics.setDefaultFilter('linear', 'nearest')
   love.graphics.setFont(loadFont('cga8.png', 8, 8, true))

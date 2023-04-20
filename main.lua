@@ -16,6 +16,7 @@ local isReadyForOrder = require('Game').isReadyForOrder
 local tbl = require('tbl')
 local vector = require('Vector')
 local gameover = require('GameOver')
+local makeDrawState = require('DrawState').makeDrawState
 
 ---@type 'game' | 'dead'
 local state = 'game'
@@ -26,7 +27,8 @@ local game
 local drawState
 
 function love.load()
-  drawState = draw.init()
+  drawState = makeDrawState()
+  draw.init(drawState)
   game = makeGame()
   game.onLost = function ()
     state = 'dead'
