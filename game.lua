@@ -104,6 +104,7 @@ local isGuyAFollower = require('./squad').isGuyAFollower
 ---@field magnificationFactor number How much the camera is zoomed in
 ---# Methods
 ---@field addScore fun(self: Game, count: integer) Increases score count
+---@field freezeGuy fun(self: Game, guy: Guy) Freezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
 ---@field addEntity fun(self: Game, entity: GameEntity) Adds a building to the world
@@ -157,12 +158,6 @@ local function echo(game, text)
   while #game.console.messages >= 8 do
     game.console:removeTopMessage()
   end
-end
-
----@param game Game
----@param guy Guy
-local function freeze(game, guy)
-  game.frozenGuys[guy] = true
 end
 
 ---@param game Game
@@ -391,8 +386,8 @@ local function init()
   ---@type GuyDelegate
   local guyDelegate = {
     beginBattle = function (attacker, defender)
-      freeze(game, attacker)
-      freeze(game, defender)
+      game:freezeGuy(attacker)
+      game:freezeGuy(defender)
 
         ---@type Battle
       local battle = {
@@ -484,6 +479,9 @@ local function init()
     removeEntity = function (self, entity)
       local idx = tbl.indexOf(self.entities, entity)
       table.remove(self.entities, idx)
+    end,
+    freezeGuy = function (self, guy)
+      self.frozenGuys[guy] = true
     end,
   }
 
