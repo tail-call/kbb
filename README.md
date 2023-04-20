@@ -51,6 +51,10 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Order guys to chop trees
  - [x] Fog of war
  - [ ] Event system
+ - [ ] Friendly guys wander when not in squad
+ - [ ] Each guy has wander area they may never leave when not in squad
+ - [ ] Wander area moves as guy moves with the player
+ - [ ] Wander areas of guys are resizable
  - [ ] Map reveal percent stat
  - [ ] Combine fog of war with FOV
  - [ ] Minimap fog of war
