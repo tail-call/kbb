@@ -18,18 +18,11 @@ local makeConsole = require('./console').makeConsole
 local randomLetterCode = require('./util').randomLetterCode
 local makeRecruitCircle = require('./recruitcircle').makeRecruitCircle
 local isRecruitCircleActive = require('./recruitcircle').isRecruitCircleActive
+local makeSquad = require('./squad').makeSquad
+local isGuyAFollower = require('./squad').isGuyAFollower
 
 ---@class Building
 ---@field pos Vector Building's position
-
----@class Squad
----@field shouldFollow boolean True if guys should follow the player
----@field followers { [Guy]: true } Guys in the squad
----# Methods
----@field remove fun(self: Squad, guy: Guy) Removes a guy from the squad
----@field add fun(self: Squad, guy: Guy) Adds a guy to the squad
----@field startFollowing fun(self: Squad) Squad will begin following the player
----@field toggleFollow fun(self: Squad) Toggle follow mode for squad
 
 ---@class Resources
 ---@field pretzels integer Amount of pretzels owned
@@ -155,28 +148,6 @@ local function makeResources()
     end,
   }
   return resources
-end
-
----@return Squad
-local function makeSquad()
-  ---@type Squad
-  local squad = {
-    followers = {},
-    shouldFollow = true,
-    remove = function(self, guy)
-      self.followers[guy] = nil
-    end,
-    add = function(self, guy)
-      self.followers[guy] = true
-    end,
-    startFollowing = function(self)
-      self.shouldFollow = true
-    end,
-    toggleFollow = function(self)
-      self.shouldFollow = not self.shouldFollow
-    end,
-  }
-  return squad
 end
 
 ---@param game Game
@@ -541,12 +512,6 @@ local function isGuyAPlayer(game, guy)
   return guy == game.player
 end
 
----@param game Game
----@param guy Guy
----@return boolean
-local function isGuyAFollower(game, guy)
-  return game.squad.followers[guy] or false
-end
 
 ---@param game Game
 ---@param guy Guy
@@ -554,7 +519,7 @@ end
 local function mayRecruit(game, guy)
   if not isRecruitCircleActive(game.recruitCircle) then return false end
   if isGuyAPlayer(game, guy) then return false end
-  if isGuyAFollower(game, guy) then return false end
+  if isGuyAFollower(game.squad, guy) then return false end
   if not canRecruitGuy(guy) then return false end
   return vector.dist(guy.pos, game.cursorPos) < game.recruitCircle.radius + 0.5
 end
