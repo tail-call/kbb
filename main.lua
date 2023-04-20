@@ -1,12 +1,11 @@
 -- Need to do this before anything else is executed
 math.randomseed(os.time())
 
-local draw = require('./draw')
+local draw = require('Draw')
 local makeGame = require('Game').makeGame
 local orderMove = require('Game').orderMove
-local drawGame = require('./draw').drawGame
+local drawGame = require('Draw').drawGame
 local handleInput = require('Game').handleInput
-local switchMagn = require('Game').switchMagn
 local updateGame = require('Game').updateGame
 local dismissSquad = require('Game').dismissSquad
 local orderChop = require('Game').orderChop
@@ -16,7 +15,7 @@ local endRecruiting = require('Game').endRecruiting
 local isReadyForOrder = require('Game').isReadyForOrder
 local tbl = require('./tbl')
 local vector = require('./vector')
-local gameover = require('./gameover')
+local gameover = require('GameOver')
 
 ---@type 'game' | 'dead'
 local state = 'game'
