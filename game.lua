@@ -201,6 +201,28 @@ local function makeText(content, pos, maxWidth)
   return text
 end
 
+---@param game Game
+---@param collider Collider
+---@return GuyDelegate
+local function makeGuyDelegate(game, collider)
+  ---@type GuyDelegate
+  local guyDelegate = {
+    beginBattle = function (attacker, defender)
+      game:beginBattle(attacker, defender)
+    end,
+    enterHouse = function (guy, entity)
+      if isAtFullHealth(guy) then
+        return 'shouldNotMove'
+      end
+      guy.stats:heal()
+      game:removeEntity(entity)
+      return 'shouldMove'
+    end,
+    collider = collider,
+  }
+  return guyDelegate
+end
+
 ---@return Game
 local function init()
   ---@type Game
@@ -335,26 +357,10 @@ local function init()
     return TERRAIN_COLLISION
   end
 
-  ---@type GuyDelegate
-  local guyDelegate = {
-    beginBattle = function (attacker, defender)
-      game:beginBattle(attacker, defender)
-    end,
-    enterHouse = function (guy, entity)
-      if isAtFullHealth(guy) then
-        return 'shouldNotMove'
-      end
-      guy.stats:heal()
-      game:removeEntity(entity)
-      return 'shouldMove'
-    end,
-    collider = collider,
-  }
 
   ---@type Game
   game = {
     world = loadWorld('map.png'),
-    guyDelegate = guyDelegate,
     activeTab = 0,
     score = 0,
     buildings = {
@@ -442,6 +448,8 @@ local function init()
       })
     end
   }
+
+  game.guyDelegate = makeGuyDelegate(game, collider)
 
   game:addText(
     makeText('Build house on rock.', { x = 269, y = 228 }, 9)
