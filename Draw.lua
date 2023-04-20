@@ -261,7 +261,8 @@ end
 ---@param drawState DrawState
 ---@param pos Vector
 ---@param isFocused boolean
-local function drawCursor(drawState, pos, isFocused)
+---@param moves number
+local function drawCursor(drawState, pos, isFocused, moves)
   local invSqrt2 = 1/math.sqrt(2)
   local mInvSqrt2 = 1 - invSqrt2
 
@@ -283,18 +284,19 @@ local function drawCursor(drawState, pos, isFocused)
     )
   end)
 
-  -- FOCUS text: four sides
+  transform
+    :translate(TILE_WIDTH/2, TILE_HEIGHT/2)
+    :rotate(-drawState.cursorTimer)
+    :translate(-7.5, -TILE_HEIGHT/4)
 
-  if isFocused then
-    withTransform(transform:scale(1/2.5, 1/2.5), function ()
-      love.graphics.print('FOCUS', 0, 48)
-    end)
-    for _ = 1, 3 do
-      withTransform(transform:rotate(math.rad(90)):translate(0,-42), function ()
-        love.graphics.print('FOCUS', 0, 48)
-      end)
+  withTransform(transform, function ()
+    love.graphics.print(
+      ('%02d'):format(moves), 0, 0
+    )
+    if isFocused then
+      love.graphics.print('FOCUS', -11, -16)
     end
-  end
+  end)
 end
 
 ---Returns true if the target should be directly visible from the point
@@ -554,7 +556,7 @@ local function drawGame(game, drawState)
 
     local r, g, b, a = unpack(cursorColor)
     withColor(r, g, b, a, function ()
-      drawCursor(drawState, game.cursorPos, game.isFocused)
+      drawCursor(drawState, game.cursorPos, game.isFocused, game.player.moves)
     end)
   end
 
