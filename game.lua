@@ -135,6 +135,31 @@ local function isFrozen(game, guy)
   return game.frozenGuys[guy] or false
 end
 
+---@param attacker Guy
+---@param defender Guy
+---@return Battle
+local function makeBattle(attacker, defender)
+  ---@type Battle
+  local battle = {
+    attacker = attacker,
+    defender = defender,
+    pos = defender.pos,
+    round = 1,
+    timer = BATTLE_ROUND_DURATION,
+    swapSides = function (self)
+      self.attacker, self.defender = self.defender, self.attacker
+    end,
+    advanceTimer = function (self, dt)
+      self.timer = self.timer - dt
+    end,
+    beginNewRound = function (self)
+      self.timer = BATTLE_ROUND_DURATION
+      self.round = self.round + 1
+    end
+  }
+  return battle
+end
+
 ---@param guy Guy
 local function isAtFullHealth(guy)
   return guy.stats.hp >= guy.stats.maxHp
@@ -351,28 +376,9 @@ local function init()
       game:freezeGuy(attacker)
       game:freezeGuy(defender)
 
-        ---@type Battle
-      local battle = {
-        attacker = attacker,
-        defender = defender,
-        pos = defender.pos,
-        round = 1,
-        timer = BATTLE_ROUND_DURATION,
-        swapSides = function (self)
-          self.attacker, self.defender = self.defender, self.attacker
-        end,
-        advanceTimer = function (self, dt)
-          self.timer = self.timer - dt
-        end,
-        beginNewRound = function (self)
-          self.timer = BATTLE_ROUND_DURATION
-          self.round = self.round + 1
-        end
-      }
-
       game:addEntity({
         type = 'battle',
-        object = battle
+        object = makeBattle(attacker, defender)
       })
     end,
     enterHouse = function (guy, entity)
