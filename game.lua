@@ -223,14 +223,9 @@ local function makeGuyDelegate(game, collider)
   return guyDelegate
 end
 
----@return Game
-local function init()
-  ---@type Game
-  local game
-
-  local player = Guy.makeLeader({ x = 269, y = 231 })
-  player:rename('Leader')
-
+---@param game Game
+---@param player Guy
+local function makeUIDelegate(game, player)
   ---@type UIDelegate
   local uiDelegate = {
     topPanelText = function()
@@ -315,6 +310,16 @@ local function init()
       return game.isFocused
     end,
   }
+  return uiDelegate
+end
+
+---@return Game
+local function makeGame()
+  ---@type Game
+  local game
+
+  local player = Guy.makeLeader({ x = 269, y = 231 })
+  player:rename('Leader')
 
   ---@type Guy[]
   local guys = {
@@ -357,7 +362,6 @@ local function init()
     return TERRAIN_COLLISION
   end
 
-
   ---@type Game
   game = {
     world = loadWorld('map.png'),
@@ -382,7 +386,6 @@ local function init()
     texts = {},
     visionSourcesCo = visionSourcesCo,
     collider = collider,
-    ui = makeUI(uiDelegate),
 
     -- Methods
 
@@ -449,6 +452,7 @@ local function init()
     end
   }
 
+  game.ui = makeUI(makeUIDelegate(game, player))
   game.guyDelegate = makeGuyDelegate(game, collider)
 
   game:addText(
@@ -785,5 +789,5 @@ return {
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
   isReadyForOrder = isReadyForOrder,
-  init = init,
+  init = makeGame,
 }
