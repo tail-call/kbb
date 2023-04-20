@@ -71,7 +71,6 @@ local makeBattle = require('./battle').makeBattle
 ---@field player Guy A guy controlled by the player
 ---@field time number Time of day in seconds, max is 24*60
 ---@field squad Squad A bunch of guys that follows player's movement
----@field makeVisionSourcesCo fun(self: Game): fun(): VisionSource Returns a coroutine function that will yield all vision sources in the game world
 ---@field texts Text[] Text objects in the game world
 ---# Game flow
 ---@field isFocused boolean True if focus mode is on
@@ -83,6 +82,7 @@ local makeBattle = require('./battle').makeBattle
 ---@field activeTab integer Current active tab in the focus screen
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
 ---# GFX
+---@field makeVisionSourcesCo fun(self: Game): fun(): VisionSource Returns a coroutine function that will yield all vision sources in the game world
 ---@field magnificationFactor number How much the camera is zoomed in
 ---# Methods
 ---@field addScore fun(self: Game, count: integer) Increases score count
