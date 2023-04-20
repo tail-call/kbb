@@ -8,6 +8,7 @@
 local getTile = require('World').getTile
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
+local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 
 ---@param game Game
 ---@param player Guy
@@ -18,12 +19,24 @@ local function makeUIDelegate(game, player)
       return {
         WHITE_COLOR,
         string.format(
-          'Score: %d | FPS: %.1f\n%02d:%02d',
+          'Score: %d | FPS: %.1f\n%02d:%02d\n',
           game.score,
           love.timer.getFPS(),
           math.floor(game.time / 60),
           math.floor(game.time % 60)
         ),
+        WHITE_COLOR,
+        'F] follow\n',
+        player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
+        'G] dismiss 1t\n',
+        player.stats.moves >= 5 and WHITE_COLOR or GRAY_COLOR,
+        't] warp 5t\n',
+        player.stats.moves >= 10 and WHITE_COLOR or GRAY_COLOR,
+        'C] chop 10t\n',
+        player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
+        'R] ritual 25t 1p\n',
+        player.stats.moves >= 50 and game.resources.wood >= 5 and WHITE_COLOR or GRAY_COLOR,
+        'B] build 50t 5w\n',
       }
     end,
     leftPanelText = function ()
@@ -33,10 +46,7 @@ local function makeUIDelegate(game, player)
           .. 'Time: %02d:%02d\n (paused)\n'
           .. 'Terrain:\n %s'
           .. '\nCoords:\n %sX %sY'
-          .. '\nB] build\n (5 wood)'
-          .. '\nM] message'
-          .. '\nR] ritual'
-          .. '\nT] warp',
+          .. '\nM] message',
         math.floor(game.time / 60),
         math.floor(game.time % 60),
         tileUnderCursor,
@@ -76,9 +86,6 @@ local function makeUIDelegate(game, player)
           .. 'LMB:recruit\n'
           .. 'Spc:  focus\n'
           .. '1234: scale\n'
-          .. 'F:   follow\n'
-          .. 'G:  dismiss\n'
-          .. 'C:     chop\n'
           .. 'Z:     zoom\n'
       end
       return ''

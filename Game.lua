@@ -90,7 +90,7 @@ local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
-local BLACK_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 1 }
+local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
 local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
 local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
 ---@type Vector
@@ -100,6 +100,17 @@ local SCORES_TABLE = {
   killedAnEnemy = 100,
   builtAHouse = 500,
 }
+
+local MOVE_COSTS_TABLE = {
+  follow = 0,
+  dismissSquad = 1,
+  warp = 5,
+  chopTree = 10,
+  summon = 25,
+  build = 50,
+}
+
+local BUILDING_COST = 5
 
 ---@type CollisionInfo
 local NONE_COLLISION = { type = 'none' }
@@ -153,7 +164,7 @@ local function makeUIScript(delegate)
     UI.makePanel(UI.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
-    UI.makePanel(UI.origin():translate(320-88, 8), 88, 200-16-52+4, BLACK_PANEL_COLOR, {
+    UI.makePanel(UI.origin():translate(320-88, 8), 88, 200-16-52+4, TRANSPARENT_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
       text = delegate.rightPanelText,
     }),
@@ -531,10 +542,13 @@ end
 local function maybeChop(tileset, game, guy)
   if isFrozen(game, guy) then return end
 
+  if guy.stats.moves < MOVE_COSTS_TABLE.chopTree then return end
+
   local pos = guy.pos
   local tile = getTile(game.world, pos)
   if tile == 'forest' then
     game.resources:addWood(1)
+    guy.stats:addMoves(-MOVE_COSTS_TABLE.chopTree)
     setTile(game.world, pos, 'grass')
     game:addGuy(Guy.makeEvilGuy(tileset, EVIL_SPAWN_LOCATION))
   end
@@ -553,9 +567,8 @@ end
 ---@param game Game
 local function orderBuild(tileset, game)
   -- Check if has enough resources
-  if game.resources.wood < 5 then
-    return
-  end
+  if game.resources.wood < BUILDING_COST then return end
+  if game.player.stats.moves < MOVE_COSTS_TABLE.build then return end
 
   local pos = game.cursorPos
 
@@ -574,7 +587,8 @@ local function orderBuild(tileset, game)
   end
 
   -- Build
-  game.resources:addWood(-5)
+  game.resources:addWood(-BUILDING_COST)
+  game.player.stats:addMoves(-MOVE_COSTS_TABLE.build)
   game:addEntity(makeBuildingEntity(makeBuilding(pos)))
   game:addScore(SCORES_TABLE.builtAHouse)
   game:disableFocus()
@@ -596,11 +610,11 @@ end
 ---@param game Game
 ---@param tileset Tileset
 local function orderSummon(game, tileset)
-  if game.resources.pretzels <= 0 then
-    return
-  end
+  if game.resources.pretzels <= 0 then return end
+  if game.player.stats.moves <= MOVE_COSTS_TABLE.summon then return end
 
   game.resources:addPretzels(-1)
+  game.player.stats:addMoves(-MOVE_COSTS_TABLE.summon)
   local guy = Guy.makeGoodGuy(tileset, {
     x = game.cursorPos.x,
     y = game.cursorPos.y
@@ -608,8 +622,6 @@ local function orderSummon(game, tileset)
   say(game, ('%s was summonned.'):format(guy.name))
   game:addGuy(guy)
   game.squad:add(guy)
-
-  game:toggleFocus()
 end
 
 ---@param game Game
@@ -618,15 +630,8 @@ end
 local function handleFocusModeInput(game, scancode, tileset)
   if scancode == 'tab' then
     game:nextTab()
-  elseif scancode == 'b' then
-    orderBuild(tileset, game)
   elseif scancode == 'm' then
     orderScribe(game)
-  elseif scancode == 'r' then
-    orderSummon(game, tileset)
-  elseif scancode == 't' then
-    warpGuy(game.player, game.cursorPos)
-    game:disableFocus()
   elseif scancode == 'space' then
     orderFocus(game)
   end
@@ -637,19 +642,28 @@ end
 ---@param tileset Tileset
 local function handleNormalModeInput(game, scancode, tileset)
   if scancode == 'f' then
-    game.squad:toggleFollow()
-  end
-
-  if scancode == 'g' then
-    dismissSquad(game)
-  end
-
-  if scancode == 'c' then
+    if game.player.stats.moves >= MOVE_COSTS_TABLE.follow then
+      game.player.stats:addMoves(-MOVE_COSTS_TABLE.follow)
+      game.squad:toggleFollow()
+    end
+  elseif scancode == 'g' then
+    if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
+      game.player.stats:addMoves(-MOVE_COSTS_TABLE.dismissSquad)
+      dismissSquad(game)
+    end
+  elseif scancode == 'c' then
     orderChop(tileset, game)
-  end
-
-  if scancode == 'space' then
+  elseif scancode == 'b' then
+    orderBuild(tileset, game)
+  elseif scancode == 'r' then
+    orderSummon(game, tileset)
+  elseif scancode == 'space' then
     orderFocus(game)
+  elseif scancode == 't' then
+    if game.player.stats.moves >= MOVE_COSTS_TABLE.warp then
+      game.player.stats:addMoves(-MOVE_COSTS_TABLE.warp)
+      warpGuy(game.player, game.cursorPos)
+    end
   end
 end
 
