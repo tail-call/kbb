@@ -10,8 +10,8 @@ local util = require('./util')
 local withColor = require('./util').withColor
 local withLineWidth = require('./util').withLineWidth
 local withTransform = require('./util').withTransform
-local isFrozen = require('./game').isFrozen
-local mayRecruit = require('./game').mayRecruit
+local isFrozen = require('Game').isFrozen
+local mayRecruit = require('Game').mayRecruit
 
 -- Constants
 
