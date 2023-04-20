@@ -106,6 +106,7 @@ local isGuyAFollower = require('./squad').isGuyAFollower
 ---@field addScore fun(self: Game, count: integer) Increases score count
 ---@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
 ---@field freezeGuy fun(self: Game, guy: Guy) Freezes a guy
+---@field unfreezeGuy fun(self: Game, guy: Guy) Unfreezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
 ---@field addEntity fun(self: Game, entity: GameEntity) Adds a building to the world
@@ -153,12 +154,6 @@ local function makeResources()
     end,
   }
   return resources
-end
-
----@param game Game
----@param guy Guy
-local function unfreeze(game, guy)
-  game.frozenGuys[guy] = nil
 end
 
 ---@param game Game
@@ -495,7 +490,10 @@ local function init()
     end,
     nextTab = function (self)
       self.activeTab = self.activeTab + 1
-    end
+    end,
+    unfreezeGuy =function (self, guy)
+      self.frozenGuys[guy] = nil
+    end,
   }
 
   game:addText(
@@ -668,8 +666,8 @@ local function updateBattle(game, entity, dt)
       maybeDrop(game.entities, entity)
       maybeDie(battle.attacker)
       maybeDie(battle.defender)
-      unfreeze(game, battle.attacker)
-      unfreeze(game, battle.defender)
+      game:unfreezeGuy(battle.attacker)
+      game:unfreezeGuy(battle.defender)
     end
   end
 end
