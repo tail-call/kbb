@@ -98,6 +98,7 @@ local makeBattle = require('./battle').makeBattle
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 ---@field nextTab fun(self: Game) Switches tab in the UI
+---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy): nil
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
@@ -337,21 +338,15 @@ local function init()
   ---@type GuyDelegate
   local guyDelegate = {
     beginBattle = function (attacker, defender)
-      game:freezeGuy(attacker)
-      game:freezeGuy(defender)
-
-      game:addEntity({
-        type = 'battle',
-        object = makeBattle(attacker, defender)
-      })
+      game:beginBattle(attacker, defender)
     end,
     enterHouse = function (guy, entity)
       if isAtFullHealth(guy) then
-        return false
+        return 'shouldNotMove'
       end
       guy.stats:heal()
       game:removeEntity(entity)
-      return true
+      return 'shouldMove'
     end,
     collider = collider,
   }
@@ -434,9 +429,18 @@ local function init()
     nextTab = function (self)
       self.activeTab = self.activeTab + 1
     end,
-    unfreezeGuy =function (self, guy)
+    unfreezeGuy = function (self, guy)
       self.frozenGuys[guy] = nil
     end,
+    beginBattle = function (self, attacker, defender)
+      self:freezeGuy(attacker)
+      self:freezeGuy(defender)
+
+      self:addEntity({
+        type = 'battle',
+        object = makeBattle(attacker, defender)
+      })
+    end
   }
 
   game:addText(
