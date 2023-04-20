@@ -1,9 +1,3 @@
----@class GuyStats
----@field hp number Current health points
----@field maxHp number Maximum health points
----@field hurt fun(self: GuyStats, damage: number): nil Decreases health points
----@field heal fun(self: GuyStats): nil Sets health points eqal max health points
-
 ---@class Guy
 ---@field pos Vector
 ---@field name string
@@ -23,6 +17,7 @@ local makePixie = require('Pixie').makePixie
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
 local getTileset = require('Tileset').getTileset
+local makeGuyStats = require('GuyStats').makeGuyStats
 
 ---@type Guy
 local Guy = {
@@ -129,16 +124,7 @@ function Guy.new(props)
   guy.pixie = makePixie('guy', getTileset())
   guy.pixie.color = props.color or guy.pixie.color
   guy.pixie:move(guy.pos)
-  guy.stats = {
-    hp = 10,
-    maxHp = 10,
-    hurt = function (self, damage)
-      self.hp = self.hp - damage
-    end,
-    heal = function (self)
-      self.hp = self.hp + self.maxHp
-    end
-  }
+  guy.stats = makeGuyStats()
   guy.rename = function (self, name)
     self.name = name
   end
