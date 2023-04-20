@@ -442,20 +442,22 @@ local function drawGame(game, drawState)
   for guy in pairs(game.squad.followers) do
     local guyHealth = guy.stats.hp / guy.stats.maxHp
     withColor(1, guyHealth, guyHealth, 0.5, function ()
-      local playerX = game.player.pos.x * TILE_WIDTH + TILE_WIDTH / 2
-      local playerY = game.player.pos.y * TILE_HEIGHT + TILE_HEIGHT
-      local guyX = guy.pos.x * TILE_WIDTH + TILE_WIDTH / 2
-      local guyY = guy.pos.y * TILE_HEIGHT + TILE_HEIGHT
 
       if not game.squad.shouldFollow then
         love.graphics.setColor(0.3, 0.3, 0.4, 0.5)
       end
 
-      love.graphics.line(playerX, playerY, guyX, guyY)
+      local playerX, playerY = game.player.pixie.transform:transformPoint(8, 16)
+      local guyX, guyY = guy.pixie.transform:transformPoint(8, 16)
+
+      love.graphics.line(
+        playerX, playerY,
+        guyX, guyY
+      )
       love.graphics.ellipse(
         'line',
-        guy.pos.x * TILE_WIDTH + TILE_WIDTH / 2,
-        guy.pos.y * TILE_HEIGHT + TILE_HEIGHT,
+        guyX,
+        guyY,
         TILE_WIDTH / 1.9,
         TILE_HEIGHT / 8
       )
