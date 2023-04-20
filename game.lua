@@ -25,6 +25,16 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field reset fun(self: RecruitCircle)
 ---@field clear fun(self: RecruitCircle)
 
+---@class ConsoleMessage Message in the bottom console
+---@field text string Message text
+---@field lifetime number Seconds before message is faded out
+---@field fadeOut fun(self: ConsoleMessage, dt: number) Applies fade out to the message
+
+---@class Console Bottom console
+---@field messages ConsoleMessage[] List of displayed messages
+---@field say fun(self: Console, message: ConsoleMessage) Displays a message
+---@field removeTopMessage fun(self: Console) Removes a topmost message
+
 ---@class Squad
 ---@field shouldFollow boolean True if guys should follow the player
 ---@field followers { [Guy]: true } Guys in the squad
@@ -48,10 +58,6 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field swapSides fun(self: Battle) Swap attacker and defender
 ---@field advanceTimer fun(self: Battle, dt: number) Makes battle timer go down
 ---@field beginNewRound fun(self: Battle) Reset round timer
-
----@class ConsoleMessage
----@field text string
----@field lifetime number Seconds before message is faded out
 
 ---@class Text
 ---@field text string
@@ -100,7 +106,7 @@ local maybeDrop = require('./tbl').maybeDrop
 ---@field isFocused boolean True if focus mode is on
 ---@field onLost (fun(): nil) | nil
 ---# UI
----@field consoleMessages ConsoleMessage[] Messages in the bottom console
+---@field console Console Bottom console
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field ui UI User interface script
 ---@field activeTab integer Current active tab in the focus screen
@@ -133,15 +139,43 @@ local NONE_COLLISION = { type = 'none' }
 ---@type CollisionInfo
 local TERRAIN_COLLISION = { type = 'terrain' }
 
+---@param text string
+---@param lifetime number
+---@return ConsoleMessage
+local function makeConsoleMessage(text, lifetime)
+  ---@type ConsoleMessage
+  local message = {
+    text = text,
+    lifetime = lifetime,
+    fadeOut = function (self, dt)
+      self.lifetime = math.max(self.lifetime - dt, 0)
+    end,
+  }
+  return message
+end
+
+---@param messages ConsoleMessage[]
+---@return Console
+local function makeConsole(messages)
+  ---@type Console
+  local console = {
+    messages = messages,
+    say = function (self, message)
+      table.insert(self.messages, message)
+    end,
+    removeTopMessage = function (self)
+      table.remove(self.messages, 1)
+    end
+  }
+  return console
+end
+
 ---@param game Game
 ---@param text string
 local function echo(game, text)
-  table.insert(game.consoleMessages, {
-    text = text,
-    lifetime = 6,
-  })
-  while #game.consoleMessages >= 8 do
-    table.remove(game.consoleMessages, 1)
+  game.console:say(makeConsoleMessage(text, 6))
+  while #game.console.messages >= 8 do
+    game.console:removeTopMessage()
   end
 end
 
@@ -347,15 +381,9 @@ local function init()
   }
 
   ---@type ConsoleMessage[]
-  local consoleMessages = {
-    {
-      text = 'Welcome to Kobold Princess Simulator.',
-      lifetime = 10,
-    },
-    {
-      text = 'This is day 1 of your reign.',
-      lifetime = 16,
-    }
+  local messages = {
+    makeConsoleMessage('Welcome to Kobold Princess Simulator.', 10),
+    makeConsoleMessage('This is day 1 of your reign.', 10),
   }
 
   local texts = {
@@ -452,7 +480,7 @@ local function init()
     buildings = {
       { pos = { x = 277, y = 233 } }
     },
-    consoleMessages = consoleMessages,
+    console = makeConsole(messages),
     frozenGuys = tbl.weaken({}, 'k'),
     resources = {
       pretzels = 0,
@@ -724,18 +752,18 @@ local function updateGuys(game, dt)
   end
 end
 
----@param consoleMessages ConsoleMessage[]
+---@param console Console
 ---@param dt number
-local function updateConsole(consoleMessages, dt)
-  for _, message in ipairs(consoleMessages) do
-    message.lifetime = math.max(message.lifetime - dt, 0)
+local function updateConsole(console, dt)
+  for _, message in ipairs(console.messages) do
+    message:fadeOut(dt)
   end
 end
 
 ---@param game Game
 ---@param dt number
 local function updateGame(game, dt)
-  updateConsole(game.consoleMessages, dt)
+  updateConsole(game.console, dt)
   game.recruitCircle:maybeGrow(dt)
 
   if game.isFocused then return end
