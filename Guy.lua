@@ -24,20 +24,7 @@ local abilities = require('Ability').abilities
 local makeGuyStats = require('GuyStats').makeGuyStats
 
 ---@type Guy
-local Guy = {
-  pos = { x = 0, y = 0 },
-  name = 'Good Guy',
-  time = 0,
-  behavior = 'none',
-  abilities = {
-    { ability = abilities.normalSuccess, weight = 4 },
-    { ability = abilities.normalCriticalSuccess, weight = 1 },
-    { ability = abilities.normalFail, weight = 1 },
-  },
-  team = 'good',
-  mayMove = false,
-  speed = 0.15,
-}
+local Guy = {}
 
 ---@param guy Guy
 ---@param vec Vector
@@ -123,17 +110,30 @@ end
 ---@return Guy
 function Guy.new(opts)
   ---@type Guy
-  local guy = {}
-  setmetatable(guy, { __index = Guy })
-  guy.pos = opts.pos or guy.pos
-  guy.pixie = makePixie('guy', opts.tileset)
+  local guy = {
+    name = 'Unnamed',
+    time = 0,
+    behavior = 'none',
+    abilities = {
+      { ability = abilities.normalSuccess, weight = 4 },
+      { ability = abilities.normalCriticalSuccess, weight = 1 },
+      { ability = abilities.normalFail, weight = 1 },
+    },
+    team = 'good',
+    mayMove = false,
+    speed = 0.15,
+    pos = opts.pos or { x = 0, y = 0 },
+    stats = makeGuyStats(),
+    pixie = makePixie('guy', opts.tileset),
+    rename = function (self, name)
+      self.name = name
+    end,
+  }
+
   guy.pixie.color = opts.color or guy.pixie.color
   guy.pixie:move(guy.pos)
-  guy.stats = makeGuyStats()
-  guy.rename = function (self, name)
-    self.name = name
-  end
   guy.pixie:spawn(guy.pos)
+
   return guy
 end
 
