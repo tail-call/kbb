@@ -55,6 +55,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Game is a GuyDelegate
  - [ ] Event system
  - [ ] Timer type
+ - [ ] Lerp cursor
  - [ ] Arbitrary resolution tilemaps
  - [ ] You must build roads for guys to navigate freely
  - [ ] Friendly guys wander when not in squad
