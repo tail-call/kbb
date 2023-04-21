@@ -36,4 +36,11 @@ function GuyStats.makeGuyStats()
   return guyStats
 end
 
+
+---@param stats GuyStats
+---@return boolean
+function GuyStats.isAtFullHealth(stats)
+  return stats.hp >= stats.maxHp
+end
+
 return GuyStats

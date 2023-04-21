@@ -52,6 +52,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Fog of war
  - [x] Tiles will change when a guy dies
  - [x] Gather command
+ - [ ] Game is a GuyDelegate
  - [ ] Event system
  - [ ] Arbitrary resolution tilemaps
  - [ ] You must build roads for guys to navigate freely

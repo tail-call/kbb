@@ -3,13 +3,9 @@
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil Begins a battle between an attacker and defender
 ---@field enterHouse fun(guest: Guy, entity: GameEntity_Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
 
+local isAtFullHealth = require('GuyStats').isAtFullHealth
+
 local GuyDelegate = {}
-
----@param guy Guy
-local function isAtFullHealth(guy)
-  return guy.stats.hp >= guy.stats.maxHp
-end
-
 ---@param game Game
 ---@return GuyDelegate
 function GuyDelegate.makeGuyDelegate(game)
@@ -19,7 +15,7 @@ function GuyDelegate.makeGuyDelegate(game)
       game:beginBattle(attacker, defender)
     end,
     enterHouse = function (guy, entity)
-      if isAtFullHealth(guy) then
+      if isAtFullHealth(guy.stats) then
         return 'shouldNotMove'
       end
       guy.stats:heal()
