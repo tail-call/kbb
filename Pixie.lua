@@ -6,6 +6,7 @@
 ---@field pos Vector
 ---@field flip boolean
 ---@field transform love.Transform
+---@field isRightStep boolean
 ---@field transformSpeed number
 ---@field targetTransform love.Transform
 ---@field color number[]
@@ -21,6 +22,7 @@ local function makePixie(quad, texture, opts)
   local pixie = {
     texture = texture,
     quad = quad,
+    isRightStep = false,
     pos = { x = 0, y = 0 },
     flip = false,
     transform = love.math.newTransform(),
@@ -28,6 +30,7 @@ local function makePixie(quad, texture, opts)
     color = opts.color or { 1, 1, 1, 1 },
     targetTransform = love.math.newTransform(),
     move = function (self, pos)
+      self.isRightStep = not self.isRightStep
       self.transformSpeed = 12
       self.targetTransform:setTransformation(
         pos.x * 16, pos.y * 16
@@ -44,10 +47,18 @@ local function makePixie(quad, texture, opts)
       local vDirection = pos.y - self.pos.y
       -- Moving horizontally
       if hDirection ~= 0 then
-        self.transform:translate(0, -8)
       end
-      if not (vDirection == 0) then
-        self.transform:scale(0.5, 1.5)
+      -- Moving vertically
+      if vDirection < 0 then
+        self.transform:scale(1, 1.1)
+      else
+        self.transform:scale(1, 0.9)
+      end
+      -- Moving vertically
+      if self.isRightStep then
+        self.transform:rotate(0.1)
+      else
+        self.transform:rotate(-0.1)
       end
       self.pos = pos
     end,
