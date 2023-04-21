@@ -9,6 +9,8 @@ local withLineWidth = require('util').withLineWidth
 local withTransform = require('util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
+local calcVisionDistance = require('VisionSource').calcVisionDistance
+local getWorldIndex = require('World').getWorldIndex
 
 -- Constants
 
@@ -326,21 +328,13 @@ local function skyColorAtTime(time)
 end
 
 ---@param game Game
----@param drawState DrawState
----@param sky { r: number, b: number, g: number }
-local function drawWorld(game, drawState, sky)
-  local world = game.world
-  local function index(x, y) return world.width * (y - 1) + x end
-
-  ---@param visionSource VisionSource
-  local function calcVisionDistance(visionSource)
-    return math.floor(visionSource.sight * sky.g)
-  end
-
+---@param light number
+local function revealFogOfWar(game, light)
   -- Reveal fog of war
+  local world = game.world
   util.exhaust(game:makeVisionSourcesCo(), function (visionSource)
     local pos = visionSource.pos
-    local visionDistance = calcVisionDistance(visionSource)
+    local visionDistance = calcVisionDistance(visionSource, light)
     local vd2 = visionDistance ^ 2
     local posX = pos.x
     local posY = pos.y
@@ -359,11 +353,19 @@ local function drawWorld(game, drawState, sky)
         else
           alpha = 0
         end
-        local idx = index(x,y)
+        local idx = getWorldIndex(world, x, y)
         world.fogOfWar[idx] = math.max(alpha, world.fogOfWar[idx] or 0)
       end
     end
   end)
+end
+
+---@param game Game
+---@param drawState DrawState
+---@param sky { r: number, b: number, g: number }
+---@param globalLight number
+local function drawWorld(game, drawState, sky, globalLight)
+  revealFogOfWar(game, globalLight)
 
   local posX, posY = game.player.pos.x, game.player.pos.y
   local visionDistance = 21
@@ -373,7 +375,8 @@ local function drawWorld(game, drawState, sky)
 
   for y = posY - visionDistance, posY + visionDistance do
     for x = posX - visionDistance, posX + visionDistance do
-      local idx = index(x, y)
+      local world = game.world
+      local idx = getWorldIndex(world, x, y)
       local fog = world.fogOfWar[idx] or 0
       local tileType = world.tileTypes[idx] or 'void'
       local tile = drawState.tileset.quads[tileType]
@@ -425,7 +428,7 @@ local function drawGame(game, drawState)
   -- Draw visible terrain
 
   local colorOfSky = skyColorAtTime(game.time)
-  drawWorld(game, drawState, colorOfSky)
+  drawWorld(game, drawState, colorOfSky, colorOfSky.g)
 
   -- Draw in-game objects
 

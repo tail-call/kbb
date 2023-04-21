@@ -99,10 +99,19 @@ local function getTile(world, v)
   return world.tileTypes[vToTile(world, v)]
 end
 
+---@param world World
+---@param x number
+---@param y number
+---@return number index
+local function getWorldIndex(world, x, y)
+  return world.width * (y - 1) + x
+end
+
 return {
   newWorld = newWorld,
   isPassable = isPassable,
   setTile = setTile,
   getTile = getTile,
   loadWorld = loadWorld,
+  getWorldIndex = getWorldIndex,
 }
