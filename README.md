@@ -54,6 +54,12 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Gather command
  - [x] Only player and cursor reveal the map
  - [x] Everything in revealed fog of war is visible
+ - [x] ~~Fade in / fade out objects within FOV~~
+ - [x] ~~Combine fog of war with FOV~~
+ - [x] Map reveal percent stat
+ - [x] ~~Catch enemies into houses to recruit them~~
+ - [x] Parallax out-of-border background
+ - [x] Destroy rocks
  - [ ] Game is a GuyDelegate
  - [ ] Event system
  - [ ] Timer type
@@ -64,8 +70,6 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Each guy has wander area they may never leave when not in squad
  - [ ] Wander area moves as guy moves with the player
  - [ ] Wander areas of guys are resizable
- - [ ] Map reveal percent stat
- - [ ] Combine fog of war with FOV
  - [ ] Minimap fog of war
  - [ ] Flight ability
  - [ ] Flying mountable dragon
@@ -76,19 +80,16 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Chest for treasures
  - [ ] Different types of tiles yield different movement speeds
  - [ ] Travelling through void is veeeeery slow but possible, even outside of the map
- - [ ] Catch enemies into houses to recruit them
  - [ ] Teleport a group of guys
  - [ ] Multi-layer parallax pseudo 3D of world
  - [ ] Constantly lower HP in the area of enemy's spawn
- - [ ] Parallax out-of-border background
- - [ ] Pixies visibly jump when they walk
+ - [ ] Pixies visibly jump when they walk (shadow stays on the ground)
  - [ ] Damage numbers will display as damage is dealt
  - [ ] Add units to highlight continuously as button is held
- - [ ] Unit and terrain are stacked like cards
+ - [ ] Focus mode: unit and terrain are stacked like cards
  - [ ] Cards have actions
  - [ ] Command for bringing your troops closer to you
  - [ ] Underworld
- - [ ] Fade in / fade out objects within FOV
  - [ ] Chopping wood is performed like combat
  - [ ] Mining stone is performed like combat
  - [ ] Fishing is performed like combat
@@ -104,7 +105,8 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] A group of units must carry foundation to its place
  - [ ] Then unit carries wood to the site and builds the thing
  - [ ] Wolves
- - [ ] Destroy rocks
+ - [ ] Dragons
+ - [ ] Unicorns
  - [ ] Circle shaped cursor when pointing to unit/building
  - [ ] All guys have ability rings: they're being spinned during the battle to determine next action. Player is invited to optimize the ability rings towards most preferable outcome.
  - [ ] Ability rings has non-combat use, too: they may affect the outcome of other tasks such as gathering wood
