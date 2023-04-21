@@ -115,7 +115,7 @@ local MOVE_COSTS_TABLE = {
 }
 
 local BUILDING_COST = 5
-local FOG_OF_WAR_TIMER_LIMIT = 0.5
+local FOG_OF_WAR_TIMER_LIMIT = 1/3
 
 ---@type CollisionInfo
 local NONE_COLLISION = { type = 'none' }
@@ -316,9 +316,6 @@ local function makeGame(tileset)
       self.fogOfWarTimer = self.fogOfWarTimer + dt
       if self.fogOfWarTimer > FOG_OF_WAR_TIMER_LIMIT then
         self.fogOfWarTimer = self.fogOfWarTimer % FOG_OF_WAR_TIMER_LIMIT
-        exhaust(self:makeVisionSourcesCo(), function (visionSource)
-          revealFogOfWar(self.world, visionSource, skyColorAtTime(self.time).g)
-        end)
       end
     end,
     nextMagnificationFactor = function (self)
@@ -534,6 +531,9 @@ end
 ---@param dt number -- Time since last update
 ---@param movementDirections Vector[] -- Momentarily pressed movement directions
 local function updateGame(game, dt, movementDirections)
+  exhaust(game:makeVisionSourcesCo(), function (visionSource)
+    revealFogOfWar(game.world, visionSource, skyColorAtTime(game.time).g, dt)
+  end)
   updateConsole(game.console, dt)
   if isRecruitCircleActive(game.recruitCircle) then
     game.recruitCircle:grow(dt)

@@ -19,8 +19,10 @@ local function makeUIDelegate(game, player)
       return {
         WHITE_COLOR,
         string.format(
-          'Score: %d | FPS: %.1f\n%02d:%02d\n',
+          'Score: %d | Revealed: %d/%d %0.ffps\n%02d:%02d\n',
           game.score,
+          game.world.revealedTilesCount,
+          game.world.height * game.world.width,
           love.timer.getFPS(),
           math.floor(game.time / 60),
           math.floor(game.time % 60)

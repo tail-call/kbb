@@ -4,27 +4,15 @@
 ---@field width integer
 ---@field height integer
 ---@field image love.Image
+---@field revealedTilesCount number
 ---@field tileTypes WorldTile[]
 ---@field fogOfWar number[] Number from 0 to 1
 
-local getTileset = require('./tileset').getTileset
+local FOG_REVEAL_SPEED = 1
+local SQUARE_REVEAL_VALUE = 0.5
+
 local calcVisionDistance = require('VisionSource').calcVisionDistance
 local isVisible = require('VisionSource').isVisible
-
----@return World
-local function newWorld()
-  local width = 40
-  local height = 26
-
-  ---@type World
-  local world = {
-    width = width,
-    height = height,
-    tileTypes = {}
-  }
-
-  return world
-end
 
 ---@param filename string
 ---@return World
@@ -40,6 +28,7 @@ local function loadWorld(filename)
     width = width,
     height = height,
     image = image,
+    revealedTilesCount = 0,
     tileTypes = {},
     fogOfWar = {}
   }
@@ -102,7 +91,8 @@ end
 ---@param world World
 ---@param visionSource VisionSource
 ---@param light number
-local function revealFogOfWar(world, visionSource, light)
+---@param dt number
+local function revealFogOfWar(world, visionSource, light, dt)
   local pos = visionSource.pos
   local visionDistance = calcVisionDistance(visionSource, light)
   local vd2 = visionDistance ^ 2
@@ -127,14 +117,18 @@ local function revealFogOfWar(world, visionSource, light)
       end
       tmpVec.x, tmpVec.y = x, y
       local idx = vectorToLinearIndex(world, tmpVec)
-      world.fogOfWar[idx] = math.max(alpha, world.fogOfWar[idx] or 0)
+      local oldValue = world.fogOfWar[idx] or 0
+      local newValue = oldValue + alpha * dt * FOG_REVEAL_SPEED
+      world.fogOfWar[idx] = math.max(newValue, oldValue)
+      if oldValue < SQUARE_REVEAL_VALUE and newValue > SQUARE_REVEAL_VALUE then
+        world.revealedTilesCount = world.revealedTilesCount + 1
+      end
     end
   end
 end
 
 
 return {
-  newWorld = newWorld,
   isPassable = isPassable,
   setTile = setTile,
   getTile = getTile,
