@@ -1,3 +1,14 @@
+local SKY_TABLE = {
+  -- 00:00
+  { r = 0.3, g = 0.3, b = 0.6, },
+  -- 06:00
+  { r = 1.0, g = 0.9, b = 0.8, },
+  -- 12:00
+  { r = 1, g = 1, b = 1, },
+  -- 18:00
+  { r = 1.0, g = 0.7, b = 0.7, },
+}
+
 ---@generic T
 ---@param fun fun(): T
 ---@param cb fun(value: T): nil
@@ -127,6 +138,21 @@ local function clamped(value, from, to)
   return math.min(math.max(value, from), to)
 end
 
+---@param time number
+---@return { r: number, g: number, b: number }
+local function skyColorAtTime(time)
+  local length = #SKY_TABLE
+  local offset, blendFactor = math.modf((time) / (24 * 60) * length)
+  local colorA = SKY_TABLE[1 + (offset + 0) % length]
+  local colorB = SKY_TABLE[1 + (offset + 1) % length]
+  -- Blend colors together
+  return {
+    r = colorA.r + (colorB.r - colorA.r) * blendFactor,
+    g = colorA.g + (colorB.g - colorA.g) * blendFactor,
+    b = colorA.b + (colorB.b - colorA.b) * blendFactor,
+  }
+end
+
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,
@@ -137,4 +163,5 @@ return {
   loadFont = loadFont,
   weightedRandom = weightedRandom,
   clamped = clamped,
+  skyColorAtTime = skyColorAtTime,
 }

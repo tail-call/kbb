@@ -29,6 +29,9 @@ local makeBuilding = require('Building').makeBuilding
 local makeBuildingEntity = require('GameEntity').makeBuildingEntity
 local makeBattleEntity = require('GameEntity').makeBattleEntity
 local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
+local revealFogOfWar = require('World').revealFogOfWar
+local skyColorAtTime = require('util').skyColorAtTime
+local exhaust = require('util').exhaust
 
 ---@class Game
 ---
@@ -522,6 +525,10 @@ end
 ---@param dt number -- Time since last update
 ---@param movementDirections Vector[] -- Momentarily pressed movement directions
 local function updateGame(game, dt, movementDirections)
+  exhaust(game:makeVisionSourcesCo(), function (visionSource)
+    revealFogOfWar(game, visionSource, skyColorAtTime(game.time).g)
+  end)
+
   updateConsole(game.console, dt)
   if isRecruitCircleActive(game.recruitCircle) then
     game.recruitCircle:grow(dt)

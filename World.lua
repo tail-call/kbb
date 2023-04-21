@@ -1,5 +1,3 @@
-local getTileset = require('./tileset').getTileset
-
 ---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand' | 'void'
 
 ---@class World
@@ -8,6 +6,10 @@ local getTileset = require('./tileset').getTileset
 ---@field image love.Image
 ---@field tileTypes WorldTile[]
 ---@field fogOfWar number[] Number from 0 to 1
+
+local getTileset = require('./tileset').getTileset
+local calcVisionDistance = require('VisionSource').calcVisionDistance
+local isVisible = require('VisionSource').isVisible
 
 ---@return World
 local function newWorld()
@@ -107,6 +109,38 @@ local function getWorldIndex(world, x, y)
   return world.width * (y - 1) + x
 end
 
+---@param game Game
+---@param visionSource VisionSource
+---@param light number
+local function revealFogOfWar(game, visionSource, light)
+  local world = game.world
+  local pos = visionSource.pos
+  local visionDistance = calcVisionDistance(visionSource, light)
+  local vd2 = visionDistance ^ 2
+  local posX = pos.x
+  local posY = pos.y
+  for y = posY - visionDistance, posY + visionDistance do
+    for x = posX - visionDistance, posX + visionDistance do
+      local alpha = 1
+      if isVisible(vd2, visionSource, x, y) then
+        -- Neighbor based shading
+        for dy = -1, 1 do
+          for dx = -1, 1 do
+            if not isVisible(vd2, visionSource, x + dx, y + dy) then
+              alpha = alpha - 1/8
+            end
+          end
+        end
+      else
+        alpha = 0
+      end
+      local idx = getWorldIndex(world, x, y)
+      world.fogOfWar[idx] = math.max(alpha, world.fogOfWar[idx] or 0)
+    end
+  end
+end
+
+
 return {
   newWorld = newWorld,
   isPassable = isPassable,
@@ -114,4 +148,5 @@ return {
   getTile = getTile,
   loadWorld = loadWorld,
   getWorldIndex = getWorldIndex,
+  revealFogOfWar = revealFogOfWar,
 }

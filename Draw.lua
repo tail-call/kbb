@@ -9,8 +9,9 @@ local withLineWidth = require('util').withLineWidth
 local withTransform = require('util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
-local calcVisionDistance = require('VisionSource').calcVisionDistance
 local getWorldIndex = require('World').getWorldIndex
+local skyColorAtTime = require('util').skyColorAtTime
+local isVisible = require('VisionSource').isVisible
 
 -- Constants
 
@@ -24,17 +25,6 @@ local HIGHLIGHT_CIRCLE_RADIUS = 10
 local WHITE_CURSOR_COLOR = { 1, 1, 1, 0.8 }
 local RED_COLOR = { 1, 0, 0, 0.8 }
 local YELLOW_COLOR = { 1, 1, 0, 0.8 }
-
-local SKY_TABLE = {
-  -- 00:00
-  { r = 0.3, g = 0.3, b = 0.6, },
-  -- 06:00
-  { r = 1.0, g = 0.9, b = 0.8, },
-  -- 12:00
-  { r = 1, g = 1, b = 1, },
-  -- 18:00
-  { r = 1.0, g = 0.7, b = 0.7, },
-}
 
 ---@param drawState DrawState
 ---@param z number
@@ -301,72 +291,11 @@ local function drawCursor(drawState, pos, isFocused, moves)
   end)
 end
 
----Returns true if the target should be directly visible from the point
----@param vd2 number Square of vision's distance
----@param ox number Origin's X coordinate
----@param oy number Origin's Y coordinate
----@param tx number Target's X coordinate
----@param ty number Target's Y coordinate
----@return boolean
-local function isVisible(vd2, ox, oy, tx, ty)
-  return vd2 + 2 - (ox - tx) ^ 2 - (oy - ty) ^ 2 > 0
-end
-
----@param time number
----@return { r: number, g: number, b: number }
-local function skyColorAtTime(time)
-  local length = #SKY_TABLE
-  local offset, blendFactor = math.modf((time) / (24 * 60) * length)
-  local colorA = SKY_TABLE[1 + (offset + 0) % length]
-  local colorB = SKY_TABLE[1 + (offset + 1) % length]
-  -- Blend colors together
-  return {
-    r = colorA.r + (colorB.r - colorA.r) * blendFactor,
-    g = colorA.g + (colorB.g - colorA.g) * blendFactor,
-    b = colorA.b + (colorB.b - colorA.b) * blendFactor,
-  }
-end
-
----@param game Game
----@param light number
-local function revealFogOfWar(game, light)
-  -- Reveal fog of war
-  local world = game.world
-  util.exhaust(game:makeVisionSourcesCo(), function (visionSource)
-    local pos = visionSource.pos
-    local visionDistance = calcVisionDistance(visionSource, light)
-    local vd2 = visionDistance ^ 2
-    local posX = pos.x
-    local posY = pos.y
-    for y = posY - visionDistance, posY + visionDistance do
-      for x = posX - visionDistance, posX + visionDistance do
-        local alpha = 1
-        if isVisible(vd2, posX, posY, x, y) then
-          -- Neighbor based shading
-          for dy = -1, 1 do
-            for dx = -1, 1 do
-              if not isVisible(vd2, posX, posY, x + dx, y + dy) then
-                alpha = alpha - 1/8
-              end
-            end
-          end
-        else
-          alpha = 0
-        end
-        local idx = getWorldIndex(world, x, y)
-        world.fogOfWar[idx] = math.max(alpha, world.fogOfWar[idx] or 0)
-      end
-    end
-  end)
-end
-
 ---@param game Game
 ---@param drawState DrawState
 ---@param sky { r: number, b: number, g: number }
 ---@param globalLight number
 local function drawWorld(game, drawState, sky, globalLight)
-  revealFogOfWar(game, globalLight)
-
   local posX, posY = game.player.pos.x, game.player.pos.y
   local visionDistance = 21
   local voidTile = parallaxTile(0, 48, -drawState.camera.x/2, -drawState.camera.y/2)
@@ -471,15 +400,13 @@ local function drawGame(game, drawState)
 
   util.exhaust(game:makeVisionSourcesCo(), function (visionSource)
     local vd2 = (visionSource.sight * colorOfSky.b) ^ 2
-    local posX = visionSource.pos.x
-    local posY = visionSource.pos.y
 
     -- Draw texts
 
     for _, text in ipairs(game.texts) do
       if not drawn[text] and isVisible(
         vd2,
-        posX, posY,
+        visionSource,
         text.pos.x, text.pos.y
       ) then
         textAtTile(text.text, text.pos, text.maxWidth)
@@ -493,7 +420,7 @@ local function drawGame(game, drawState)
       if entity.type == 'building' then
         if not drawn[entity] and isVisible(
           vd2,
-          posX, posY,
+          visionSource,
           entity.object.pos.x, entity.object.pos.y
         ) then
           drawHouse(drawState.tileset, entity.object.pos)
@@ -514,7 +441,7 @@ local function drawGame(game, drawState)
       if not isFrozen(game, guy) then
         if not drawn[guy] and isVisible(
           vd2,
-          posX, posY,
+          visionSource,
           guy.pos.x, guy.pos.y
         ) then
           drawGuy(guy)
