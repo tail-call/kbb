@@ -14,7 +14,8 @@
 ---@field reteam fun(self: Guy, team: 'good' | 'evil') Switches team of the guy
 ---@field pixie Pixie Graphical representation of the guy
 ---@field stats GuyStats RPG stats
----@field timer number Move timer
+---@field timer number Movement timer
+---@field advanceTimer fun(self: Guy, dt: number)
 ---@field speed number Delay in seconds between moves
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
@@ -82,15 +83,11 @@ end
 ---@param guy Guy
 ---@param dt number
 ---@param delegate GuyDelegate
-local function updateGuy(guy, dt, delegate)
-  guy.pixie:update(dt)
-  guy.timer = guy.timer + dt
+---@param isFrozen boolean
+local function updateGuy(guy, dt, delegate, isFrozen)
+  guy:advanceTimer(dt)
 
-  while guy.timer >= guy.speed do
-    guy.mayMove = true
-    guy.timer = guy.timer % guy.speed
-    guy.stats:addMoves(1)
-  end
+  if isFrozen then return end
 
   if guy.behavior == 'wander' then
     moveGuy(guy, ({
@@ -142,6 +139,16 @@ function Guy.new(opts)
       self.pos = pos
       self.pixie:move(self.pos)
     end,
+    advanceTimer = function (self, dt)
+      self.pixie:update(dt)
+      self.timer = self.timer + dt
+
+      while self.timer >= self.speed do
+        self.mayMove = true
+        self.timer = self.timer % self.speed
+        self.stats:addMoves(1)
+      end
+    end
   }
 
   guy.pixie:move(guy.pos)

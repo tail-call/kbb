@@ -122,6 +122,7 @@ local NONE_COLLISION = { type = 'none' }
 ---@type CollisionInfo
 local TERRAIN_COLLISION = { type = 'terrain' }
 
+---Returns true if guy is marked as frozen
 ---@param game Game
 ---@param guy Guy
 ---@return boolean
@@ -583,9 +584,7 @@ local function updateGame(game, dt, movementDirections)
   end
 
   for _, guy in ipairs(game.guys) do
-    if not isFrozen(game, guy) then
-      updateGuy(guy, dt, game.guyDelegate)
-    end
+    updateGuy(guy, dt, game.guyDelegate, isFrozen(game, guy))
   end
 end
 
