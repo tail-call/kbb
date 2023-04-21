@@ -9,6 +9,9 @@
 ---@field sand love.Quad
 ---@field void love.Quad
 ---@field human love.Quad
+---@field snow love.Quad
+---@field cave love.Quad
+---@field wall love.Quad
 ---@field waterFrames love.Quad[]
 
 ---@class Tileset
@@ -130,6 +133,9 @@ local function load()
       sand = tile(3, 2),
       void = tile(0, 3),
       human = tile2h(4, 0),
+      snow = tile(3, 3),
+      cave = tile(1, 3),
+      wall = tile(2, 3),
       waterFrames = {
         tile(0, 1),
         tile(1, 1),

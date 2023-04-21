@@ -1,4 +1,4 @@
----@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand' | 'void'
+---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand' | 'void' | 'snow' | 'cave' | 'wall'
 
 ---@class World
 ---@field width integer
@@ -34,6 +34,9 @@ local function loadWorld(filename)
   }
 
   local tileColors = {
+    ['1,1,1'] = 'snow',
+    ['0.5,0,0.5'] = 'wall',
+    ['0,0.5,0.5'] = 'cave',
     ['0,0,1'] = 'water',
     ['0,0.5,0'] = 'forest',
     ['0.5,0.5,0.5'] = 'rock',
@@ -70,7 +73,7 @@ end
 ---@param v Vector
 local function isPassable(world, v)
   local t = world.tileTypes[vectorToLinearIndex(world, v)]
-  return t == 'grass' or t == 'forest' or t == 'sand' or t == 'void'
+  return t == 'grass' or t == 'forest' or t == 'sand' or t == 'void' or t == 'cave' or t == 'snow'
 end
 
 ---@param world World

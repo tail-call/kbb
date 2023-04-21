@@ -68,6 +68,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] You must build roads for guys to navigate freely
  - [ ] Friendly guys wander when not in squad
  - [ ] Each guy has wander area they may never leave when not in squad
+ - [ ] Humans don't have fast diagonal movement
  - [ ] Wander area moves as guy moves with the player
  - [ ] Wander areas of guys are resizable
  - [ ] Minimap fog of war
