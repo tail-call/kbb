@@ -362,6 +362,7 @@ local function makeGame(tileset)
   )
 
   game:addGuy(Guy.makeHuman(tileset, { x = 312, y = 183 }))
+  game:addGuy(Guy.makeEvilGuy(tileset, { x = 301, y = 184 }))
 
   return game
 end

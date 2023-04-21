@@ -530,8 +530,8 @@ local function drawGame(game, drawState)
     -- Units
     for _, guy in ipairs(game.guys) do
       local color = guy.pixie.color
-      local pointX = guy.pos.x - offsetX
-      local pointY = guy.pos.y - offsetY
+      local pointX = guy.pos.x - 1 - offsetX
+      local pointY = guy.pos.y - 1 - offsetY
       if pointX >= 0
         and pointX < MINIMAP_SIZE
         and pointY >= 0
