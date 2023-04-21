@@ -407,8 +407,13 @@ local function drawGame(game, drawState)
     if drawn[obj] then return end
     drawn[obj] = true
 
-    for k, v in pairs(obj) do
-      print(k, v)
+    -- Is within screen?
+    local ox, oy = obj.pos.x, obj.pos.y
+    local px, py = game.player.pos.x, game.player.pos.y
+    local d = 16
+
+    if ox < px - d or ox > px + d or oy < py - d or oy > py + d then
+      return
     end
 
     local fog = getFog(game.world, obj.pos)

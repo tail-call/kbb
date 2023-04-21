@@ -53,7 +53,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Tiles will change when a guy dies
  - [x] Gather command
  - [x] Only player and cursor reveal the map
- - [ ] Everything in revealed fog of war is visible
+ - [x] Everything in revealed fog of war is visible
  - [ ] Game is a GuyDelegate
  - [ ] Event system
  - [ ] Timer type
