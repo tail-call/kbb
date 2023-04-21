@@ -31,24 +31,23 @@ local function makePixie(name, opts)
     color = opts.color or { 1, 1, 1, 1 },
     targetTransform = love.math.newTransform(),
     move = function (self, pos)
-      self.transformSpeed = 24
+      self.transformSpeed = 12
       self.targetTransform:setTransformation(
         pos.x * 16, pos.y * 16
       )
-      local direction = pos.x - self.pos.x
-      if direction < 0 and self.flip then
+      local hDirection = pos.x - self.pos.x
+      if hDirection < 0 and self.flip then
         self.flip = false
       end
-      if direction > 0 or self.flip then
+      if hDirection > 0 or self.flip then
         self.targetTransform:scale(-1, 1)
         self.targetTransform:translate(-16, 0)
         self.flip = true
       end
       local vDirection = pos.y - self.pos.y
-      if direction ~= 0 then
-        self.transform:translate(16, 4)
-        self.transform:scale(1.5, 0.5)
-        self.transform:translate(-16, 0)
+      -- Moving horizontally
+      if hDirection ~= 0 then
+        self.transform:translate(0, -8)
       end
       if not (vDirection == 0) then
         self.transform:scale(0.5, 1.5)
