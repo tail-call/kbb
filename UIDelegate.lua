@@ -28,11 +28,10 @@ local function makeUIDelegate(game, player)
           math.floor(game.time % 60)
         ),
         WHITE_COLOR,
-        'F] follow\nQ] gather\n',
+        'N] noon\nF] follow\nQ] gather\nT] warp\n',
         player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
         'G] dismiss 1t\n',
         player.stats.moves >= 5 and WHITE_COLOR or GRAY_COLOR,
-        't] warp 5t\n',
         player.stats.moves >= 10 and WHITE_COLOR or GRAY_COLOR,
         'C] chop 10t\n',
         player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,

@@ -108,7 +108,6 @@ local SCORES_TABLE = {
 local MOVE_COSTS_TABLE = {
   follow = 0,
   dismissSquad = 1,
-  warp = 5,
   chopTree = 10,
   summon = 25,
   build = 50,
@@ -713,11 +712,10 @@ local function handleNormalModeInput(game, scancode, tileset)
     orderSummon(game, tileset)
   elseif scancode == 'space' then
     orderFocus(game)
+  elseif scancode == 'n' then
+    game.time = 12 * 60
   elseif scancode == 't' then
-    if game.player.stats.moves >= MOVE_COSTS_TABLE.warp then
-      game.player.stats:addMoves(-MOVE_COSTS_TABLE.warp)
-      warpGuy(game.player, game.cursorPos)
-    end
+    warpGuy(game.player, game.cursorPos)
   end
 end
 
