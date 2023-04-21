@@ -2,6 +2,7 @@
 ---@field pos Vector | nil
 ---@field color number[] | nil
 ---@field tileset Tileset
+---@field quad love.Quad
 
 ---@class Guy
 ---@field pos Vector Guy's position in the world
@@ -117,8 +118,7 @@ function Guy.new(opts)
     speed = 0.15,
     pos = opts.pos or { x = 0, y = 0 },
     stats = makeGuyStats(),
-    pixie = makePixie('guy', {
-      tileset = opts.tileset,
+    pixie = makePixie(opts.quad, opts.tileset.tiles, {
       color = opts.color
     }),
     rename = function (self, name)
@@ -161,6 +161,7 @@ end
 ---@param pos Vector
 function Guy.makeLeader(tileset, pos)
   local guy = Guy.new{
+    quad = tileset.quads.human,
     pos = pos,
     color = { 1, 1, 0, 1 },
     tileset = tileset,
@@ -171,7 +172,11 @@ end
 ---@param tileset Tileset
 ---@param pos Vector
 function Guy.makeGoodGuy(tileset, pos)
-  local guy = Guy.new{ pos = pos, tileset = tileset }
+  local guy = Guy.new{
+    quad = tileset.quads.guy,
+    pos = pos,
+    tileset = tileset
+  }
   guy:reteam('good')
   guy:rename('Good Guy')
   return guy
@@ -181,6 +186,7 @@ end
 ---@param pos Vector
 function Guy.makeEvilGuy(tileset, pos)
   local guy = Guy.new{
+    quad = tileset.quads.guy,
     pos = pos,
     color = { 1, 0, 0, 1 },
     tileset = tileset,
@@ -196,6 +202,7 @@ end
 ---@param pos Vector
 function Guy.makeStrongEvilGuy(tileset, pos)
   local guy = Guy.new{
+    quad = tileset.quads.human,
     pos = pos,
     color = { 1, 0, 1, 1 },
     tileset = tileset,

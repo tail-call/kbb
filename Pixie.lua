@@ -13,13 +13,10 @@
 ---@field update fun(self: Pixie, dt: number): nil
 ---@field spawn fun(self: Pixie, pos: Vector): nil
 
----@param name string
----@param opts PixieOptions
+---@param quad love.Quad
+---@param texture love.Texture
 ---@return Pixie
-local function makePixie(name, opts)
-  local texture = opts.tileset.tiles
-  local quad = opts.tileset.quads[name]
-
+local function makePixie(quad, texture, opts)
   ---@type Pixie
   local pixie = {
     texture = texture,

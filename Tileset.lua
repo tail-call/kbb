@@ -8,6 +8,7 @@
 ---@field forest love.Quad
 ---@field sand love.Quad
 ---@field void love.Quad
+---@field human love.Quad
 ---@field waterFrames love.Quad[]
 
 ---@class Tileset
@@ -105,6 +106,13 @@ local function load()
     )
   end
 
+  local function tile2h(x, y)
+    return love.graphics.newQuad(
+      x * 16, y * 16, 16, 32,
+      image:getDimensions()
+    )
+  end
+
   ---@type Tileset
   local aTileset = {
     timer = 1,
@@ -121,6 +129,7 @@ local function load()
       forest = tile(2, 2),
       sand = tile(3, 2),
       void = tile(0, 3),
+      human = tile2h(4, 0),
       waterFrames = {
         tile(0, 1),
         tile(1, 1),

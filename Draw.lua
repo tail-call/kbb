@@ -195,14 +195,17 @@ end
 ---@param pixie Pixie
 local function drawPixie(pixie)
   local ambR, ambG, ambB, ambA = love.graphics.getColor()
-  withTransform(pixie.transform, function()
+  local _, _, _, h = pixie.quad:getViewport()
+  local extraHeight = 16 - h
+  local transform = pixie.transform:clone():translate(0, extraHeight)
+  withTransform(transform, function()
     -- Shadow
     withColor(0, 0, 0, 0.5, function ()
-      love.graphics.ellipse('fill', 8, 16, 4, 1.5)
+      love.graphics.ellipse('fill', 8, 16 - extraHeight, 4, 1.5)
     end)
 
     withColor(0, 0, 0, 0.25, function ()
-      love.graphics.ellipse('fill', 8, 16, 8, 3)
+      love.graphics.ellipse('fill', 8, 16 - extraHeight, 8, 3)
     end)
 
     -- Texture
