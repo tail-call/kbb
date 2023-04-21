@@ -234,12 +234,6 @@ local function makeGame(tileset)
       return function ()
         coroutine.yield({ pos = self.player.pos, sight = 10 })
 
-        for _, guy in ipairs(self.guys) do
-          if isGoodGuy(guy) then
-            coroutine.yield({ pos = guy.pos, sight = 8 })
-          end
-        end
-
         return {
           pos = self.cursorPos,
           sight = math.max(2, self.recruitCircle.radius or 0),
