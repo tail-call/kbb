@@ -60,6 +60,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] ~~Catch enemies into houses to recruit them~~
  - [x] Parallax out-of-border background
  - [x] Destroy rocks
+ - [x] Unfightable neutral NPCs
  - [ ] Game is a GuyDelegate
  - [ ] Event system
  - [ ] Timer type

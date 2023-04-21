@@ -1,3 +1,5 @@
+---@alias GuyTeam 'good' | 'evil' | 'neutral'
+
 ---@class GuyOptions
 ---@field pos Vector | nil
 ---@field color number[] | nil
@@ -11,8 +13,8 @@
 ---@field name string Guy's name
 ---@field rename fun(self: Guy, name: string) Gives the guy a different name
 ---@field setSpeed fun(self: Guy, speed: number) Sets how quickly may move again after moving
----@field team 'good' | 'evil'
----@field reteam fun(self: Guy, team: 'good' | 'evil') Switches team of the guy
+---@field team GuyTeam
+---@field reteam fun(self: Guy, team: GuyTeam) Switches team of the guy
 ---@field pixie Pixie Graphical representation of the guy
 ---@field stats GuyStats RPG stats
 ---@field timer number Movement timer
@@ -31,6 +33,14 @@ local makeGuyStats = require('GuyStats').makeGuyStats
 
 ---@type Guy
 local Guy = {}
+
+---@param team1 GuyTeam
+---@param team2 GuyTeam
+---@return boolean
+local function checkIfRivals(team1, team2)
+  return team1 == 'good' and team2 == 'evil'
+    or team1 == 'evil' and team2 == 'good'
+end
 
 ---@param guy Guy
 ---@param vec Vector
@@ -53,7 +63,7 @@ local function moveGuy(guy, vec, delegate)
       guy:move(pos)
       return pos
     elseif collision.type == 'guy' then
-      if guy.team ~= collision.guy.team then
+      if checkIfRivals(guy.team, collision.guy.team) then
         guy:move(pos)
         delegate.beginBattle(guy, collision.guy)
         return pos
@@ -161,11 +171,25 @@ end
 ---@param pos Vector
 function Guy.makeLeader(tileset, pos)
   local guy = Guy.new{
-    quad = tileset.quads.human,
+    quad = tileset.quads.guy,
     pos = pos,
     color = { 1, 1, 0, 1 },
     tileset = tileset,
   }
+  return guy
+end
+
+---@param tileset Tileset
+---@param pos Vector
+function Guy.makeHuman(tileset, pos)
+  local guy = Guy.new{
+    quad = tileset.quads.human,
+    pos = pos,
+    color = { 1, 1, 1, 1 },
+    tileset = tileset,
+  }
+  guy:reteam('neutral')
+  guy:rename('Maria')
   return guy
 end
 
