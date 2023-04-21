@@ -61,6 +61,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Parallax out-of-border background
  - [x] Destroy rocks
  - [x] Unfightable neutral NPCs
+ - [ ] Persistence system
  - [ ] Game is a GuyDelegate
  - [ ] Event system
  - [ ] Timer type
