@@ -89,6 +89,13 @@ local function getTile(world, v)
 end
 
 ---@param world World
+---@param v Vector
+---@return number transparency
+local function getFog(world, v)
+  return world.fogOfWar[vectorToLinearIndex(world, v)]
+end
+
+---@param world World
 ---@param visionSource VisionSource
 ---@param light number
 ---@param dt number
@@ -132,6 +139,7 @@ return {
   isPassable = isPassable,
   setTile = setTile,
   getTile = getTile,
+  getFog = getFog,
   loadWorld = loadWorld,
   revealFogOfWar = revealFogOfWar,
   vectorToLinearIndex = vectorToLinearIndex,

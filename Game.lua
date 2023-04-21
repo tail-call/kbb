@@ -211,9 +211,7 @@ local function makeGame(tileset)
     world = loadWorld('map.png'),
     activeTab = 0,
     score = 0,
-    buildings = {
-      { pos = { x = 277, y = 233 } }
-    },
+    buildings = {},
     console = makeConsole(),
     frozenGuys = tbl.weaken({}, 'k'),
     resources = makeResources(),
@@ -342,11 +340,13 @@ local function makeGame(tileset)
     end,
   }
 
+  game:addEntity(makeBuildingEntity(makeBuilding({ x = 276, y = 217 })))
+
   game.ui = makeUIScript(makeUIDelegate(game, player))
   game.guyDelegate = makeGuyDelegate(game)
 
   game:addText(
-    makeText('Build house on rock.', { x = 269, y = 228 }, 9)
+    makeText('-G\'day!', { x = 276, y = 216 }, 9)
   )
 
   game:addText(

@@ -3,7 +3,6 @@ local parallaxTile = require('Tileset').parallaxTile
 local regenerateTileset = require('Tileset').regenerate
 local tbl = require('tbl')
 local Vector = require('Vector')
-local util = require('util')
 local withColor = require('util').withColor
 local withLineWidth = require('util').withLineWidth
 local withTransform = require('util').withTransform
@@ -11,7 +10,7 @@ local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
 local vectorToLinearIndex = require('World').vectorToLinearIndex
 local skyColorAtTime = require('util').skyColorAtTime
-local isVisible = require('VisionSource').isVisible
+local getFog = require('World').getFog
 
 -- Constants
 
@@ -195,6 +194,7 @@ end
 
 ---@param pixie Pixie
 local function drawPixie(pixie)
+  local ambR, ambG, ambB, ambA = love.graphics.getColor()
   withTransform(pixie.transform, function()
     -- Shadow
     withColor(0, 0, 0, 0.5, function ()
@@ -207,7 +207,7 @@ local function drawPixie(pixie)
 
     -- Texture
     local r, g, b, a = unpack(pixie.color)
-    withColor(r, g, b, a, function ()
+    withColor(r * ambR, g * ambG, b * ambB, a * ambA, function ()
       love.graphics.draw(pixie.texture, pixie.quad, 0, 0)
     end)
   end)
@@ -402,46 +402,51 @@ local function drawGame(game, drawState)
 
   -- Draw visible objects
 
-  util.exhaust(game:makeVisionSourcesCo(), function (visionSource)
-    local vd2 = (visionSource.sight * colorOfSky.b) ^ 2
+  ---@param obj { pos: Vector }
+  local function cullAndShade(obj, cb)
+    if drawn[obj] then return end
+    drawn[obj] = true
 
-    -- Draw texts
-
-    for _, text in ipairs(game.texts) do
-      if not drawn[text] and isVisible(vd2, visionSource, text.pos) then
-        textAtTile(text.text, text.pos, text.maxWidth)
-        drawn[text] = true
-      end
+    for k, v in pairs(obj) do
+      print(k, v)
     end
 
-    -- Draw entities
+    local fog = getFog(game.world, obj.pos)
+    withColor(fog, fog, fog, 1, cb)
+  end
 
-    for _, entity in ipairs(game.entities) do
-      if entity.type == 'building' then
-        if not drawn[entity] and isVisible(vd2, visionSource, entity.object.pos) then
-          drawHouse(drawState.tileset, entity.object.pos)
-          drawn[entity] = true
-        end
-      elseif entity.type == 'battle' then
-        local battle = entity.object
-        if not drawn[entity] then
-          drawBattle(drawState, battle)
-          drawn[entity] = true
-        end
-      end
+  -- Draw texts
+
+  for _, text in ipairs(game.texts) do
+    cullAndShade(text, function ()
+      textAtTile(text.text, text.pos, text.maxWidth)
+    end)
+  end
+
+  -- Draw entities
+
+  for _, entity in ipairs(game.entities) do
+    if entity.type == 'building' then
+      cullAndShade(entity.object, function ()
+        drawHouse(drawState.tileset, entity.object.pos)
+      end)
+    elseif entity.type == 'battle' then
+      local battle = entity.object
+      cullAndShade(battle, function ()
+        drawBattle(drawState, battle)
+      end)
     end
+  end
 
-    -- Draw guys
+  -- Draw guys
 
-    for _, guy in ipairs(guysClone) do
-      if not isFrozen(game, guy) then
-        if not drawn[guy] and isVisible(vd2, visionSource, guy.pos) then
-          drawGuy(guy)
-          drawn[guy] = true
-        end
-      end
+  for _, guy in ipairs(guysClone) do
+    if not isFrozen(game, guy) then
+      cullAndShade(guy, function ()
+        drawGuy(guy)
+      end)
     end
-  end)
+  end
 
   -- Draw recruit circle
 
