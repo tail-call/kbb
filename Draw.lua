@@ -9,7 +9,7 @@ local withLineWidth = require('util').withLineWidth
 local withTransform = require('util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
-local getWorldIndex = require('World').getWorldIndex
+local vectorToLinearIndex = require('World').vectorToLinearIndex
 local skyColorAtTime = require('util').skyColorAtTime
 local isVisible = require('VisionSource').isVisible
 
@@ -302,10 +302,14 @@ local function drawWorld(game, drawState, sky, globalLight)
   local waterPhase = 16 * math.sin(drawState.waterTimer)
   local waterTile = parallaxTile(48, 0, -waterPhase, waterPhase)
 
+  local vec = { x = 0, y = 0 }
   for y = posY - visionDistance, posY + visionDistance do
     for x = posX - visionDistance, posX + visionDistance do
+      vec.x = x
+      vec.y = y
+
       local world = game.world
-      local idx = getWorldIndex(world, x, y)
+      local idx = vectorToLinearIndex(world, vec)
       local fog = world.fogOfWar[idx] or 0
       local tileType = world.tileTypes[idx] or 'void'
       local tile = drawState.tileset.quads[tileType]
@@ -404,11 +408,7 @@ local function drawGame(game, drawState)
     -- Draw texts
 
     for _, text in ipairs(game.texts) do
-      if not drawn[text] and isVisible(
-        vd2,
-        visionSource,
-        text.pos.x, text.pos.y
-      ) then
+      if not drawn[text] and isVisible(vd2, visionSource, text.pos) then
         textAtTile(text.text, text.pos, text.maxWidth)
         drawn[text] = true
       end
@@ -418,11 +418,7 @@ local function drawGame(game, drawState)
 
     for _, entity in ipairs(game.entities) do
       if entity.type == 'building' then
-        if not drawn[entity] and isVisible(
-          vd2,
-          visionSource,
-          entity.object.pos.x, entity.object.pos.y
-        ) then
+        if not drawn[entity] and isVisible(vd2, visionSource, entity.object.pos) then
           drawHouse(drawState.tileset, entity.object.pos)
           drawn[entity] = true
         end
@@ -439,11 +435,7 @@ local function drawGame(game, drawState)
 
     for _, guy in ipairs(guysClone) do
       if not isFrozen(game, guy) then
-        if not drawn[guy] and isVisible(
-          vd2,
-          visionSource,
-          guy.pos.x, guy.pos.y
-        ) then
+        if not drawn[guy] and isVisible(vd2, visionSource, guy.pos) then
           drawGuy(guy)
           drawn[guy] = true
         end

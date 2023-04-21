@@ -73,14 +73,14 @@ end
 ---@param world World
 ---@param v Vector
 ---@return integer
-local function vToTile(world, v)
+local function vectorToLinearIndex(world, v)
   return (v.y - 1) * world.width + v.x
 end
 
 ---@param world World
 ---@param v Vector
 local function isPassable(world, v)
-  local t = world.tileTypes[vToTile(world, v)]
+  local t = world.tileTypes[vectorToLinearIndex(world, v)]
   return t == 'grass' or t == 'forest' or t == 'sand' or t == 'void'
 end
 
@@ -88,9 +88,7 @@ end
 ---@param v Vector
 ---@param t WorldTile
 local function setTile(world, v, t)
-  local tileset = getTileset()
-
-  local id = vToTile(world, v)
+  local id = vectorToLinearIndex(world, v)
   world.tileTypes[id] = t
 end
 
@@ -98,35 +96,28 @@ end
 ---@param v Vector
 ---@return WorldTile
 local function getTile(world, v)
-  return world.tileTypes[vToTile(world, v)]
+  return world.tileTypes[vectorToLinearIndex(world, v)]
 end
 
 ---@param world World
----@param x number
----@param y number
----@return number index
-local function getWorldIndex(world, x, y)
-  return world.width * (y - 1) + x
-end
-
----@param game Game
 ---@param visionSource VisionSource
 ---@param light number
-local function revealFogOfWar(game, visionSource, light)
-  local world = game.world
+local function revealFogOfWar(world, visionSource, light)
   local pos = visionSource.pos
   local visionDistance = calcVisionDistance(visionSource, light)
   local vd2 = visionDistance ^ 2
   local posX = pos.x
   local posY = pos.y
+  local tmpVec = { x = 0, y = 0 }
   for y = posY - visionDistance, posY + visionDistance do
     for x = posX - visionDistance, posX + visionDistance do
       local alpha = 1
-      if isVisible(vd2, visionSource, x, y) then
+      if isVisible(vd2, visionSource, tmpVec) then
         -- Neighbor based shading
         for dy = -1, 1 do
           for dx = -1, 1 do
-            if not isVisible(vd2, visionSource, x + dx, y + dy) then
+            tmpVec.x, tmpVec.y = x + dx, y + dy
+            if not isVisible(vd2, visionSource, tmpVec) then
               alpha = alpha - 1/8
             end
           end
@@ -134,7 +125,8 @@ local function revealFogOfWar(game, visionSource, light)
       else
         alpha = 0
       end
-      local idx = getWorldIndex(world, x, y)
+      tmpVec.x, tmpVec.y = x, y
+      local idx = vectorToLinearIndex(world, tmpVec)
       world.fogOfWar[idx] = math.max(alpha, world.fogOfWar[idx] or 0)
     end
   end
@@ -147,6 +139,6 @@ return {
   setTile = setTile,
   getTile = getTile,
   loadWorld = loadWorld,
-  getWorldIndex = getWorldIndex,
   revealFogOfWar = revealFogOfWar,
+  vectorToLinearIndex = vectorToLinearIndex,
 }

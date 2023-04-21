@@ -526,7 +526,7 @@ end
 ---@param movementDirections Vector[] -- Momentarily pressed movement directions
 local function updateGame(game, dt, movementDirections)
   exhaust(game:makeVisionSourcesCo(), function (visionSource)
-    revealFogOfWar(game, visionSource, skyColorAtTime(game.time).g)
+    revealFogOfWar(game.world, visionSource, skyColorAtTime(game.time).g)
   end)
 
   updateConsole(game.console, dt)
