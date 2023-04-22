@@ -2,8 +2,8 @@
 ---@field saveGame fun(game: Game, filename: string, echo: fun(text: string))
 ---@field loadGame fun(game: Game, filename: string, echo: fun(text: string))
 
-local SAVE_FORMAT_MAJOR = '0'
-local SAVE_FORMAT_MINOR = '0'
+local SAVE_FORMAT_MAJOR = 0
+local SAVE_FORMAT_MINOR = 0
 
 ---@type SaveLoad
 local SaveLoad = {}
@@ -42,16 +42,19 @@ local commandHandler = {
   echo = nil,
   echoPrefix = '',
 
-  COM = function (self, major, minor)
+  COM_PARAMS = {},
+  COM = function (self)
     -- Is a comment, do nothing
   end,
 
+  KPSSVERSION_PARAMS = { 'number', 'number' },
   KPSSVERSION = function (self, major, minor)
     self.echo(('savefile format version %s %s'):format(major, minor))
     assert(major == SAVE_FORMAT_MAJOR, 'savefile major version mismatch')
     assert(minor == SAVE_FORMAT_MINOR, 'savefile major version mismatch')
   end,
 
+  BLOCK_PARAMS = { 'file', 'number', 'number' },
   BLOCK = function (self, file, blockSize, blockName)
     local compressedBytes = file:read(blockSize)
 
@@ -85,7 +88,35 @@ function SaveLoad.loadGame(game, filename, echo)
       commandHandler.echo = echo
 
       local nextWord = string.gmatch(line, '(%w+)')
-      local command = nextWord()
+      local commandName = nextWord()
+
+      if commandName == nil then
+        error(('%s:%s: no command'):format(filename, lineCounter))
+      end
+
+      local command = commandHandler[commandName]
+      local commandParams = commandHandler[commandName .. '_PARAMS']
+
+      if not command then
+        error(('%s:%s: unknown command "%s"'):format(filename, lineCounter, command))
+      end
+
+      -- Parse parameters
+
+      local parsedParams = {}
+      for _, commandParam in ipairs(commandParams) do
+        local param
+        if commandParam == 'number' then
+          param = tonumber(nextWord())
+        elseif commandParam == 'file' then
+          param = file
+        else
+          error(('%s:%s: bad param "%s"'):format(filename, lineCounter, commandParam))
+        end
+        table.insert(parsedParams, param)
+      end
+
+      command(commandHandler, unpack(parsedParams))
 
       if command == 'KPSSVERSION' then
         commandHandler:KPSSVERSION(nextWord(), nextWord())
@@ -101,10 +132,7 @@ function SaveLoad.loadGame(game, filename, echo)
         end
 
         commandHandler:BLOCK(file, blockSize, blockName)
-      elseif command == nil then
-        error(('%s:%s: no command'):format(filename, lineCounter))
       else
-        error(('%s:%s: unknown command "%s"'):format(filename, lineCounter, command))
       end
     end
     file:close()
