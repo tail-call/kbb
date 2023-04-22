@@ -18,8 +18,7 @@ function SaveLoad.saveGame(game, filename, echo)
     'COM kobold princess simulator save file\n',
     'COM every line is a command, COM is a comment command\n',
     'COM\n',
-    'COM fog data is a block: array of zlib-compressed bytes\n',
-    game.world:serialize(),
+    game:serialize(),
   }
 
   local file = io.open(filename, 'wb')

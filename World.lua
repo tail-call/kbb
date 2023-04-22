@@ -67,6 +67,9 @@ local function loadWorld(filename)
       )
 
       return table.concat {
+        'COM World: hey guys\n',
+        'COM World: fog data is a block\n',
+        'COM World: a block: array of zlib-compressed bytes\n',
         ---@cast fogCompressedData string
         'BLOCK fogOfWar ' .. fogCompressedData:len() .. '\n',
         fogCompressedData,

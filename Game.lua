@@ -1,3 +1,5 @@
+local X_Serializable = require('X_Serializable')
+
 local Guy = require('Guy').Guy
 local canRecruitGuy = require('Guy').canRecruitGuy
 local moveGuy = require('Guy').moveGuy
@@ -36,7 +38,7 @@ local saveGame = require('SaveLoad').saveGame
 local loadGame = require('SaveLoad').loadGame
 local behave = require('Guy').behave
 
----@class Game
+---@class Game: X_Serializable
 ---
 ---# Simulation
 ---
@@ -338,6 +340,14 @@ local function makeGame(tileset)
     setAlternatingKeyIndex = function (self, x)
       self.alternatingKeyIndex = x
     end,
+    X_Serializable = X_Serializable,
+    serialize = function (self)
+      return table.concat {
+        'COM Game: hello, this is Game speaking. how are we doing, World?\n',
+        'COM\n',
+        game.world:serialize(),
+      }
+    end
   }
 
   game:addEntity(makeBuildingEntity(makeBuilding({ x = 276, y = 217 })))
