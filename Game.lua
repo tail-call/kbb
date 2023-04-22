@@ -512,21 +512,23 @@ end
 ---@param game Game
 local function orderGather(game)
   for guy in pairs(game.squad.followers) do
-    local destination = { x = 0, y = 0 }
-    local guyDist = Vector.dist(guy.pos, game.player.pos)
-    for _, direction in ipairs{
-      Vector.dir.up,
-      Vector.dir.down,
-      Vector.dir.left,
-      Vector.dir.right,
-    } do
-      local pos = Vector.add(direction, guy.pos)
-      local posDist = Vector.dist(game.player.pos, pos)
-      if posDist < guyDist then
-        destination = direction
+    if not isFrozen(game, guy) then
+      local destination = { x = 0, y = 0 }
+      local guyDist = Vector.dist(guy.pos, game.player.pos)
+      for _, direction in ipairs{
+        Vector.dir.up,
+        Vector.dir.down,
+        Vector.dir.left,
+        Vector.dir.right,
+      } do
+        local pos = Vector.add(direction, guy.pos)
+        local posDist = Vector.dist(game.player.pos, pos)
+        if posDist < guyDist then
+          destination = direction
+        end
       end
+      moveGuy(guy, destination, game.guyDelegate)
     end
-    moveGuy(guy, destination, game.guyDelegate)
   end
 end
 

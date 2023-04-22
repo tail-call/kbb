@@ -61,6 +61,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Parallax out-of-border background
  - [x] Destroy rocks
  - [x] Unfightable neutral NPCs
+ - [x] Fix: gather command works on frozen units
  - [ ] Save/load
  - [ ] Lua console in focus mode
  - [ ] Game is a GuyDelegate
