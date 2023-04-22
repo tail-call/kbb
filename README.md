@@ -61,7 +61,8 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Parallax out-of-border background
  - [x] Destroy rocks
  - [x] Unfightable neutral NPCs
- - [ ] Persistence system
+ - [ ] Save/load
+ - [ ] Lua console in focus mode
  - [ ] Game is a GuyDelegate
  - [ ] Event system
  - [ ] Timer type
@@ -88,6 +89,8 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Constantly lower HP in the area of enemy's spawn
  - [ ] Pixies visibly jump when they walk (shadow stays on the ground)
  - [ ] Damage numbers will display as damage is dealt
+ - [ ] Remove from squad when too far
+ - [ ] Unit highlight line will begin blinking when this happens
  - [ ] Add units to highlight continuously as button is held
  - [ ] Focus mode: unit and terrain are stacked like cards
  - [ ] Cards have actions

@@ -414,7 +414,7 @@ end
 ---@param game Game
 ---@param text string
 local function say(game, text)
-  game.console:say(makeConsoleMessage(text, 6))
+  game.console:say(makeConsoleMessage(text, 60))
 end
 
 ---@param game Game
@@ -660,6 +660,54 @@ local function orderScribe(game)
   game:disableFocus()
 end
 
+-- Load/save
+
+local SAVE_FORMAT_MAGIC = 'KPSS'
+local SAVE_FORMAT_MAJOR = 0
+local SAVE_FORMAT_MINOR = 0
+
+---@param game Game
+local function orderSave(game)
+  local fogOfWar = game.world.fogOfWar
+  local input = SAVE_FORMAT_MAGIC
+    .. string.char(SAVE_FORMAT_MAJOR, SAVE_FORMAT_MINOR)
+
+  for _, fog in ipairs(fogOfWar) do
+    local char = math.floor(fog * 255)
+    input = input .. string.char(char)
+  end
+
+  local data = love.data.compress('string', 'zlib', input, 9)
+  local file = io.open('./kobo.sav', 'wb')
+
+  if file == nil then
+    say(game, 'failed to open for writing: kobo.sav')
+  else
+    say(game, ('Written %d bytes'):format(data:len()))
+    file:write('' .. data)
+    file:close()
+  end
+end
+
+local function orderLoad(game)
+  say(game, 'loading...')
+  local file = io.open('./kobo.sav', 'rb')
+  if file == nil then
+    say(game, 'failed to open for reading: kobo.sav')
+  else
+    say(game, 'file opened')
+    local bytes = file:read('*a')
+    ---@type string
+    local text = love.data.decompress('string', 'zlib', bytes)
+    local magic = text:sub(1, 4)
+    say(game, 'text size: ' .. #text)
+    say(game, ('magic: %d %d %d %d'):format(magic:byte(1), magic:byte(2), magic:byte(3), magic:byte(4)))
+    file:close()
+  end
+end
+
+-- End load/save
+
 ---@param game Game
 ---@param tileset Tileset
 local function orderSummon(game, tileset)
@@ -685,6 +733,10 @@ local function handleFocusModeInput(game, scancode, tileset)
     game:nextTab()
   elseif scancode == 'm' then
     orderScribe(game)
+  elseif scancode == 's' then
+    orderSave(game)
+  elseif scancode == 'l' then
+    orderLoad(game)
   elseif scancode == 'space' then
     orderFocus(game)
   end

@@ -1,18 +1,26 @@
 ---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand' | 'void' | 'snow' | 'cave' | 'wall'
 
 ---@class World
----@field width integer
----@field height integer
----@field image love.Image
----@field revealedTilesCount number
----@field tileTypes WorldTile[]
----@field fogOfWar number[] Number from 0 to 1
+---@field width integer World's width in squares
+---@field height integer World's height in squares
+---@field image love.Image Minimap image
+---@field revealedTilesCount number Number of tiles player had revealed
+---@field tileTypes WorldTile[] Tile types of each square in the world
+---@field fogOfWar number[] How visible is each square in the world. Numbers from 0 to 1
+---@field revealFogOfWar fun(self: World, pos: Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
 
 local FOG_REVEAL_SPEED = 1
-local SQUARE_REVEAL_VALUE = 0.5
+local SQUARE_REVEAL_THRESHOLD = 0.5
 
 local calcVisionDistance = require('VisionSource').calcVisionDistance
 local isVisible = require('VisionSource').isVisible
+
+---@param world World
+---@param v Vector
+---@return integer
+local function vectorToLinearIndex(world, v)
+  return (v.y - 1) * world.width + v.x
+end
 
 ---@param filename string
 ---@return World
@@ -30,7 +38,19 @@ local function loadWorld(filename)
     image = image,
     revealedTilesCount = 0,
     tileTypes = {},
-    fogOfWar = {}
+    fogOfWar = {},
+    revealFogOfWar = function (self, pos, value, dt)
+      local idx = vectorToLinearIndex(self, pos)
+      local oldValue = self.fogOfWar[idx] or 0
+      local newValue = oldValue + value * dt * FOG_REVEAL_SPEED
+      if newValue > 1 then
+        newValue = 1
+      end
+      self.fogOfWar[idx] = newValue
+      if oldValue < SQUARE_REVEAL_THRESHOLD and newValue > SQUARE_REVEAL_THRESHOLD then
+        self.revealedTilesCount = self.revealedTilesCount + 1
+      end
+    end,
   }
 
   local tileColors = {
@@ -60,13 +80,6 @@ local function loadWorld(filename)
   end
 
   return world
-end
-
----@param world World
----@param v Vector
----@return integer
-local function vectorToLinearIndex(world, v)
-  return (v.y - 1) * world.width + v.x
 end
 
 ---@param world World
@@ -126,13 +139,7 @@ local function revealFogOfWar(world, visionSource, light, dt)
         alpha = 0
       end
       tmpVec.x, tmpVec.y = x, y
-      local idx = vectorToLinearIndex(world, tmpVec)
-      local oldValue = world.fogOfWar[idx] or 0
-      local newValue = oldValue + alpha * dt * FOG_REVEAL_SPEED
-      world.fogOfWar[idx] = math.max(newValue, oldValue)
-      if oldValue < SQUARE_REVEAL_VALUE and newValue > SQUARE_REVEAL_VALUE then
-        world.revealedTilesCount = world.revealedTilesCount + 1
-      end
+      world:revealFogOfWar(tmpVec, alpha, dt)
     end
   end
 end

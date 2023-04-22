@@ -10,6 +10,7 @@ function Console.makeConsole()
   local console = {
     messages = {},
     say = function (self, message)
+      io.stdout:write(('\tEcho: %s\n'):format(message.text))
       table.insert(self.messages, message)
       while #self.messages >= 8 do
         table.remove(self.messages, 1)
