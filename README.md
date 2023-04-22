@@ -62,6 +62,20 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Destroy rocks
  - [x] Unfightable neutral NPCs
  - [x] Fix: gather command works on frozen units
+ - [ ] Object extension based on `['X_Foo']` tags
+       @class X_SaveToDisk:
+       @field X_SaveToDisk X_SaveToDisk
+       @field saveToDisk fun(diskSaver: DiskSaver)
+
+       @class GameEntity: X_SaveToDisk
+
+        X_SaveToDisk(entity).saveToDisk(diskSaver)
+
+        function X_SaveToDisk(obj)
+            return obj.X_SaveToDisk
+        end
+
+
  - [ ] Save/load
  - [ ] Lua console in focus mode
  - [ ] Game is a GuyDelegate

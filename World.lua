@@ -1,6 +1,6 @@
 ---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand' | 'void' | 'snow' | 'cave' | 'wall'
 
----@class World
+---@class World: X_Serializable
 ---@field width integer World's width in squares
 ---@field height integer World's height in squares
 ---@field image love.Image Minimap image
@@ -14,6 +14,7 @@ local SQUARE_REVEAL_THRESHOLD = 0.5
 
 local calcVisionDistance = require('VisionSource').calcVisionDistance
 local isVisible = require('VisionSource').isVisible
+local X_Serializable = require('X_Serializable')
 
 ---@param world World
 ---@param v Vector
@@ -50,6 +51,26 @@ local function loadWorld(filename)
       if oldValue < SQUARE_REVEAL_THRESHOLD and newValue > SQUARE_REVEAL_THRESHOLD then
         self.revealedTilesCount = self.revealedTilesCount + 1
       end
+    end,
+    X_Serializable = X_Serializable,
+    serialize = function (self)
+      ---@cast self World
+
+      local fogContents = {}
+      for _, fog in ipairs(self.fogOfWar) do
+        local char = math.floor(fog * 255)
+        table.insert(fogContents, string.char(char))
+      end
+
+      local fogCompressedData = love.data.compress(
+        'string', 'zlib', table.concat(fogContents), 9
+      )
+
+      return table.concat {
+        ---@cast fogCompressedData string
+        'BLOCK fogOfWar ' .. fogCompressedData:len() .. '\n',
+        fogCompressedData,
+      }
     end,
   }
 
