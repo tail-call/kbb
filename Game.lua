@@ -125,7 +125,7 @@ local NONE_COLLISION = { type = 'none' }
 local TERRAIN_COLLISION = { type = 'terrain' }
 
 ---Game save file name
-local SAVE_FILENAME = './kobo.sav'
+local SAVE_FILENAME = './kobo.kpss'
 
 ---Returns true if guy is marked as frozen
 ---@param game Game
