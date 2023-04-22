@@ -184,18 +184,8 @@ local deserialize = function (file, repeats)
   local world = loadWorld('map.png')
   for i = 1, repeats do
     executeCommand(file, '???', {
-      COM_PARAMS = {},
-      COM = function () end,
-      BLOCK_PARAMS = { 'file', 'string', 'number' },
-      BLOCK = function (self, file, blockName, blockSize)
-        print('im here', blockName, blockSize)
-        local compressedBytes = file:read(blockSize)
-        if compressedBytes == nil then
-          error(('no block data for block "%s"'):format(blockName))
-        end
-
-        local bytes = love.data.decompress('string', 'zlib', compressedBytes)
-
+      BLOCK_PARAMS = { 'file', 'string', 'block' },
+      BLOCK = function (self, file, blockName, bytes)
         ---@cast bytes string
         --say(game, ('%s: %s uncompressed bytes'):format(blockName, bytes:len()))
         if blockName == 'fogOfWar' then

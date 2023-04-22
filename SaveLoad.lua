@@ -67,6 +67,15 @@ function SaveLoad.executeCommand(file, filename, commandHandler, lineCounter)
       param = tonumber(nextWord())
     elseif commandParam == 'string' then
       param = nextWord()
+    elseif commandParam == 'block' then
+      local blockSize = tonumber(nextWord())
+      local compressedBytes = file:read(blockSize)
+
+      if compressedBytes == nil then
+        error('no block data')
+      end
+
+      param = love.data.decompress('string', 'zlib', compressedBytes)
     elseif commandParam == 'file' then
       param = file
     else
