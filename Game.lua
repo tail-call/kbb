@@ -715,33 +715,6 @@ local function orderLoad(game)
       assert(minor == SAVE_FORMAT_MINOR, 'savefile major version mismatch')
     end,
 
-    BLOCK_PARAMS = { 'file', 'string', 'number' },
-    BLOCK = function (self, file, blockName, blockSize)
-      local compressedBytes = file:read(blockSize)
-      if compressedBytes == nil then
-        error(('no block data for block "%s"'):format(blockName))
-      end
-
-      local bytes = love.data.decompress('string', 'zlib', compressedBytes)
-
-      ---@cast bytes string
-      say(game, ('%s: %s uncompressed bytes'):format(blockName, bytes:len()))
-      if blockName == 'fogOfWar' then
-        ---@cast bytes string
-        game.world.fogOfWar = makeFogOfWarFromBlock(bytes)
-      elseif blockName == 'tileTypes' then
-        game.world.tileTypes = {}
-        for tileType in string.gmatch(bytes, '(%w+)') do
-          table.insert(game.world.tileTypes, tileType)
-        end
-      end
-
-      ---@cast bytes string
-
-      -- Skip newline
-      file:read(1)
-    end,
-
     NUMBER_PARAMS = { 'string', 'number' },
     NUMBER = function (self, name, num)
       say(game, ('%s is %s'):format(name, num))
@@ -777,7 +750,7 @@ local function orderLoad(game)
     OBJECT = function (self, file, moduleName, name, propsCount)
       local module = require(moduleName)
 
-      say(game, ('Module %s'):format(module))
+      say(game, ('Module %s'):format(moduleName))
 
       if module == nil then
         error('no such module')
@@ -789,7 +762,7 @@ local function orderLoad(game)
         error('module not deserializable')
       end
 
-      game.resources = deserialize(file)
+      game[name] = deserialize(file, propsCount)
     end,
   }
   loadGame(game, SAVE_FILENAME, function (str)

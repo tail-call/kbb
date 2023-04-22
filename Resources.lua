@@ -42,10 +42,11 @@ local function makeResources()
 end
 
 ---@param file file*
+---@param repeats integer
 ---@return Resources
-local deserialize = function (file)
+local deserialize = function (file, repeats)
   local resources = makeResources()
-  for i = 1, 3 do
+  for i = 1, repeats do
     executeCommand(file, '???', {
       NUMBER_PARAMS = { 'string', 'number' },
       NUMBER = function (self, name, num)
