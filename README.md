@@ -76,7 +76,7 @@ You have psy abilities, so your cursor has FOV just like you do.
         end
 
 
- - [ ] Save/load
+ - [x] Save/load
  - [ ] Lua console in focus mode
  - [ ] Game is a GuyDelegate
  - [ ] Event system

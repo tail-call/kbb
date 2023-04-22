@@ -717,17 +717,26 @@ local function orderLoad(game)
 
     BLOCK_PARAMS = { 'file', 'string', 'number' },
     BLOCK = function (self, file, blockName, blockSize)
-      print(file, blockSize, blockName)
       local compressedBytes = file:read(blockSize)
-
       if compressedBytes == nil then
         error(('no block data for block "%s"'):format(blockName))
       end
 
       local bytes = love.data.decompress('string', 'zlib', compressedBytes)
+
       ---@cast bytes string
       say(game, ('%s: %s uncompressed bytes'):format(blockName, bytes:len()))
-      game.world.fogOfWar = makeFogOfWarFromBlock(bytes)
+      if blockName == 'fogOfWar' then
+        ---@cast bytes string
+        game.world.fogOfWar = makeFogOfWarFromBlock(bytes)
+      elseif blockName == 'tileTypes' then
+        game.world.tileTypes = {}
+        for tileType in string.gmatch(bytes, '(%w+)') do
+          table.insert(game.world.tileTypes, tileType)
+        end
+      end
+
+      ---@cast bytes string
 
       -- Skip newline
       file:read(1)
@@ -789,6 +798,7 @@ local function handleFocusModeInput(game, scancode, tileset)
     orderSave(game)
   elseif scancode == 'l' then
     orderLoad(game)
+    game:toggleFocus()
   elseif scancode == 'space' then
     orderFocus(game)
   end

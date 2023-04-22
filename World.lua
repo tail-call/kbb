@@ -77,13 +77,20 @@ local function loadWorld(filename)
         'string', 'zlib', table.concat(fogContents), 9
       )
 
+      local tileCompressedData = love.data.compress(
+        'string', 'zlib', table.concat(self.tileTypes, ' '), 9
+      )
+
       return table.concat {
         'COM World: hey guys\n',
         'COM World: fog data is a block\n',
         'COM World: a block: array of zlib-compressed bytes\n',
         ---@cast fogCompressedData string
         'BLOCK fogOfWar ' .. fogCompressedData:len() .. '\n',
-        fogCompressedData,
+        fogCompressedData, '\n',
+        ---@cast tileCompressedData string
+        'BLOCK tileTypes ' .. tileCompressedData:len() .. '\n',
+        tileCompressedData, '\n',
       }
     end,
   }
