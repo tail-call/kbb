@@ -345,8 +345,10 @@ local function makeGame(tileset)
     end,
     X_Serializable = X_Serializable,
     serialize = function (self)
+      ---@cast self Game
       return table.concat {
-        'COM Game: hello, this is Game speaking. how are we doing, World?\n',
+        'COM Game: hello current time is:\n',
+        ('NUMBER time %s\n'):format(self.time),
         'COM\n',
         game.world:serialize(),
       }
@@ -726,6 +728,12 @@ local function orderLoad(game)
       -- Skip newline
       file:read(1)
     end,
+
+    NUMBER_PARAMS = { 'string', 'number' },
+    NUMBER = function (self, name, time)
+      say(game, ('%s is %s'):format(name, time))
+      game.time = time
+    end
   }
   loadGame(game, SAVE_FILENAME, function (str)
     say(game, 'load: ' .. str)

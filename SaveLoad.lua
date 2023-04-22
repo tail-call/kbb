@@ -54,7 +54,7 @@ function SaveLoad.loadGame(game, filename, echo, commandHandler)
       commandHandler.echoPrefix = filename .. ':' .. lineCounter
       commandHandler.echo = echo
 
-      local nextWord = string.gmatch(line, '(%w+)')
+      local nextWord = string.gmatch(line, '([%w.]+)')
       local commandName = nextWord()
 
       if commandName == nil then
@@ -65,7 +65,7 @@ function SaveLoad.loadGame(game, filename, echo, commandHandler)
       local commandParams = commandHandler[commandName .. '_PARAMS']
 
       if not command then
-        error(('%s:%s: unknown command "%s"'):format(filename, lineCounter, command))
+        error(('%s:%s: unknown command "%s"'):format(filename, lineCounter, commandName))
       end
 
       -- Parse parameters
