@@ -1,46 +1,3 @@
-local X_Serializable = require('X_Serializable')
-
-local Guy = require('Guy').Guy
-local canRecruitGuy = require('Guy').canRecruitGuy
-local moveGuy = require('Guy').moveGuy
-local warpGuy = require('Guy').warpGuy
-local updateGuy = require('Guy').updateGuy
-local loadWorld = require('World').loadWorld
-local setTile = require('World').setTile
-local getTile = require('World').getTile
-local isPassable = require('World').isPassable
-local UI = require('UI')
-local tbl = require('tbl')
-local Vector = require('Vector')
-local weightedRandom = require('util').weightedRandom
-local Ability = require('Ability')
-local maybeDrop = require('tbl').maybeDrop
-local makeConsoleMessage = require('ConsoleMessage').makeConsoleMessage
-local makeConsole = require('Console').makeConsole
-local updateConsole = require('Console').updateConsole
-local randomLetterCode = require('util').randomLetterCode
-local makeRecruitCircle = require('RecruitCircle').makeRecruitCircle
-local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
-local makeSquad = require('Squad').makeSquad
-local isGuyAFollower = require('Squad').isGuyAFollower
-local makeResources = require('Resources').makeResources
-local makeBattle = require('Battle').makeBattle
-local makeUIDelegate = require('UIDelegate').makeUIDelegate
-local makeText = require('Text').makeText
-local makeBuilding = require('Building').makeBuilding
-local makeBuildingEntity = require('GameEntity').makeBuildingEntity
-local makeBattleEntity = require('GameEntity').makeBattleEntity
-local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
-local revealFogOfWar = require('World').revealFogOfWar
-local skyColorAtTime = require('util').skyColorAtTime
-local exhaust = require('util').exhaust
-local saveGame = require('SaveLoad').saveGame
-local loadGame = require('SaveLoad').loadGame
-local behave = require('Guy').behave
-local SAVE_FORMAT_MAJOR = require('SaveLoad').SAVE_FORMAT_MAJOR
-local SAVE_FORMAT_MINOR = require('SaveLoad').SAVE_FORMAT_MINOR
-local makeFogOfWarFromBlock = require('World').makeFogOfWarFromBlock
-
 ---@class Game: X_Serializable
 ---
 ---# Simulation
@@ -100,6 +57,49 @@ local makeFogOfWarFromBlock = require('World').makeFogOfWarFromBlock
 ---
 ---@field magnificationFactor number How much the camera is zoomed in
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
+
+local X_Serializable = require('X_Serializable')
+
+local Guy = require('Guy').Guy
+local canRecruitGuy = require('Guy').canRecruitGuy
+local moveGuy = require('Guy').moveGuy
+local warpGuy = require('Guy').warpGuy
+local updateGuy = require('Guy').updateGuy
+local loadWorld = require('World').loadWorld
+local setTile = require('World').setTile
+local getTile = require('World').getTile
+local isPassable = require('World').isPassable
+local UI = require('UI')
+local tbl = require('tbl')
+local Vector = require('Vector')
+local weightedRandom = require('util').weightedRandom
+local Ability = require('Ability')
+local maybeDrop = require('tbl').maybeDrop
+local makeConsoleMessage = require('ConsoleMessage').makeConsoleMessage
+local makeConsole = require('Console').makeConsole
+local updateConsole = require('Console').updateConsole
+local randomLetterCode = require('util').randomLetterCode
+local makeRecruitCircle = require('RecruitCircle').makeRecruitCircle
+local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
+local makeSquad = require('Squad').makeSquad
+local isGuyAFollower = require('Squad').isGuyAFollower
+local makeResources = require('Resources').makeResources
+local makeBattle = require('Battle').makeBattle
+local makeUIDelegate = require('UIDelegate').makeUIDelegate
+local makeText = require('Text').makeText
+local makeBuilding = require('Building').makeBuilding
+local makeBuildingEntity = require('GameEntity').makeBuildingEntity
+local makeBattleEntity = require('GameEntity').makeBattleEntity
+local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
+local revealFogOfWar = require('World').revealFogOfWar
+local skyColorAtTime = require('util').skyColorAtTime
+local exhaust = require('util').exhaust
+local saveGame = require('SaveLoad').saveGame
+local loadGame = require('SaveLoad').loadGame
+local behave = require('Guy').behave
+local SAVE_FORMAT_MAJOR = require('SaveLoad').SAVE_FORMAT_MAJOR
+local SAVE_FORMAT_MINOR = require('SaveLoad').SAVE_FORMAT_MINOR
+local makeFogOfWarFromBlock = require('World').makeFogOfWarFromBlock
 
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
 local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
@@ -347,9 +347,13 @@ local function makeGame(tileset)
     serialize = function (self)
       ---@cast self Game
       return table.concat {
-        'COM Game: hello current time is:\n',
+        'COM Game: hello i am is:\n',
         ('NUMBER time %s\n'):format(self.time),
-        'COM\n',
+        ('NUMBER wood %s\n'):format(self.resources.wood),
+        ('NUMBER stone %s\n'):format(self.resources.stone),
+        ('NUMBER pretzels %s\n'):format(self.resources.pretzels),
+        ('NUMBER revealedTilesCount %s\n'):format(self.world.revealedTilesCount),
+        ('NUMBER magnificationFactor %s\n'):format(self.magnificationFactor),
         game.world:serialize(),
       }
     end
@@ -730,10 +734,24 @@ local function orderLoad(game)
     end,
 
     NUMBER_PARAMS = { 'string', 'number' },
-    NUMBER = function (self, name, time)
-      say(game, ('%s is %s'):format(name, time))
-      game.time = time
-    end
+    NUMBER = function (self, name, num)
+      say(game, ('%s is %s'):format(name, num))
+      if name == 'time' then
+        game.time = num
+      elseif name == 'wood' then
+        game.resources.wood = num
+      elseif name == 'stone' then
+        game.resources.stone = num
+      elseif name == 'pretzels' then
+        game.resources.pretzels = num
+      elseif name == 'revealedTilesCount' then
+        game.world.revealedTilesCount = num
+      elseif name == 'magnificationFactor' then
+        game.magnificationFactor = num
+      else
+        error('what is ' .. name)
+      end
+    end,
   }
   loadGame(game, SAVE_FILENAME, function (str)
     say(game, 'load: ' .. str)
