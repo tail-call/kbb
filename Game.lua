@@ -701,73 +701,9 @@ end
 
 ---@param game Game
 local function orderLoad(game)
-  local commandHandler
-  commandHandler = {
-    COM_PARAMS = {},
-    COM = function (self)
-      -- Is a comment, do nothing
-    end,
-
-    KPSSVERSION_PARAMS = { 'number', 'number' },
-    KPSSVERSION = function (self, major, minor)
-      say(game, ('savefile format version %s %s'):format(major, minor))
-      assert(major == SAVE_FORMAT_MAJOR, 'savefile major version mismatch')
-      assert(minor == SAVE_FORMAT_MINOR, 'savefile major version mismatch')
-    end,
-
-    NUMBER_PARAMS = { 'string', 'number' },
-    NUMBER = function (self, name, num)
-      say(game, ('%s is %s'):format(name, num))
-      if name == 'time' then
-        game.time = num
-      elseif name == 'wood' then
-        game.resources.wood = num
-      elseif name == 'stone' then
-        game.resources.stone = num
-      elseif name == 'pretzels' then
-        game.resources.pretzels = num
-      elseif name == 'revealedTilesCount' then
-        game.world.revealedTilesCount = num
-      elseif name == 'magnificationFactor' then
-        game.magnificationFactor = num
-      else
-        error('what is ' .. name)
-      end
-    end,
-
-    VECTOR_PARAMS = { 'string', 'number', 'number' },
-    VECTOR = function (self, name, x, y)
-      say(game, ('%s is %sx %sy'):format(name, x, y))
-
-      if name == 'playerPos' then
-        game.player:move({ x = x, y = y })
-      else
-        error('what is ' .. name)
-      end
-    end,
-
-    OBJECT_PARAMS = { 'file', 'string', 'string', 'number' },
-    OBJECT = function (self, file, moduleName, name, propsCount)
-      local module = require(moduleName)
-
-      say(game, ('Module %s'):format(moduleName))
-
-      if module == nil then
-        error('no such module')
-      end
-
-      local deserialize = module.deserialize
-
-      if deserialize == nil then
-        error('module not deserializable')
-      end
-
-      game[name] = deserialize(file, propsCount)
-    end,
-  }
   loadGame(game, SAVE_FILENAME, function (str)
     say(game, 'load: ' .. str)
-  end, commandHandler)
+  end)
 end
 
 -- End load/save

@@ -38,6 +38,60 @@ function SaveLoad.saveGame(game, filename, echo)
   end
 end
 
+---@param obj Game
+function SaveLoad.makeCommandHandler(obj, echo)
+  local commandHandler = {
+    COM_PARAMS = {},
+    COM = function (self)
+      -- Is a comment, do nothing
+    end,
+
+    KPSSVERSION_PARAMS = { 'number', 'number' },
+    KPSSVERSION = function (self, major, minor)
+      echo(('savefile format version %s %s'):format(major, minor))
+      assert(major == SaveLoad.SAVE_FORMAT_MAJOR, 'savefile major version mismatch')
+      assert(minor == SaveLoad.SAVE_FORMAT_MINOR, 'savefile major version mismatch')
+    end,
+
+    NUMBER_PARAMS = { 'string', 'number' },
+    NUMBER = function (self, name, num)
+      echo(('%s is %s'):format(name, num))
+      obj[name] = num
+    end,
+
+    VECTOR_PARAMS = { 'string', 'number', 'number' },
+    VECTOR = function (self, name, x, y)
+      echo(('%s is %sx %sy'):format(name, x, y))
+
+      if name == 'playerPos' then
+        obj.player:move({ x = x, y = y })
+      else
+        error('what is ' .. name)
+      end
+    end,
+
+    OBJECT_PARAMS = { 'file', 'string', 'string', 'number' },
+    OBJECT = function (self, file, moduleName, name, propsCount)
+      local module = require(moduleName)
+
+      echo(('Module %s'):format(moduleName))
+
+      if module == nil then
+        error('no such module')
+      end
+
+      local deserialize = module.deserialize
+
+      if deserialize == nil then
+        error('module not deserializable')
+      end
+
+      obj[name] = deserialize(file, propsCount)
+    end,
+  }
+  return commandHandler
+end
+
 function SaveLoad.executeCommand(file, filename, commandHandler, lineCounter)
   local line = file:read('*l')
   if line == nil then return false end
@@ -88,13 +142,13 @@ function SaveLoad.executeCommand(file, filename, commandHandler, lineCounter)
   return true
 end
 
-function SaveLoad.loadGame(game, filename, echo, commandHandler)
+function SaveLoad.loadGame(game, filename, echo)
   echo(('now loading from %s'):format(filename))
   local file = io.open(filename, 'rb')
   if file == nil then
     echo('failed to open for reading: kobo.sav')
   else
-    commandHandler.echo = echo
+    local commandHandler = SaveLoad.makeCommandHandler(game, echo)
     local lineCounter = 1
     while SaveLoad.executeCommand(file, filename, commandHandler, lineCounter) do
       lineCounter = lineCounter + 1
