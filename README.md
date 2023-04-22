@@ -77,13 +77,13 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 
  - [x] Save/load
- - [ ] Lua console in focus mode
  - [ ] Load level immediately on game start
  - [ ] Save level immediately on game exit
  - [ ] Game is an editable image
- - [ ] Game is a GuyDelegate
  - [ ] Event system
+ - [ ] Lua console in focus mode
  - [ ] Timer type
+ - [ ] Game is a GuyDelegate
  - [ ] Lerp cursor
  - [ ] Arbitrary resolution tilemaps
  - [ ] You must build roads for guys to navigate freely
