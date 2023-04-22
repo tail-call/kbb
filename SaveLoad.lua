@@ -117,23 +117,6 @@ function SaveLoad.loadGame(game, filename, echo)
       end
 
       command(commandHandler, unpack(parsedParams))
-
-      if command == 'KPSSVERSION' then
-        commandHandler:KPSSVERSION(nextWord(), nextWord())
-      elseif command == 'COM' then
-        commandHandler:COM()
-      elseif command == 'BLOCK' then
-        local blockName = nextWord()
-        local blockSizeRaw = nextWord()
-        local blockSize = tonumber(blockSizeRaw)
-
-        if blockSize == nil then
-          error(('%s:%s: BLOCK: bad block size "%s"'):format(filename, lineCounter, blockSize))
-        end
-
-        commandHandler:BLOCK(file, blockSize, blockName)
-      else
-      end
     end
     file:close()
   end
