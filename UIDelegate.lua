@@ -47,9 +47,9 @@ local function makeUIDelegate(game, player)
           .. 'Time: %02d:%02d\n (paused)\n'
           .. 'Terrain:\n %s'
           .. '\nCoords:\n %sX %sY'
-          .. '\nM] message\n'
-          .. '\nS] save\n'
-          .. '\nL] load\n',
+          .. '\nM] message'
+          .. '\nS] save'
+          .. '\nL] load',
         math.floor(game.time / 60),
         math.floor(game.time % 60),
         tileUnderCursor,
