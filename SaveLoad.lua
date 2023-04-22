@@ -38,54 +38,57 @@ function SaveLoad.saveGame(game, filename, echo)
   end
 end
 
+function SaveLoad.executeCommand(file, filename, commandHandler, lineCounter)
+  local line = file:read('*l')
+  if line == nil then return false end
+
+  commandHandler.echoPrefix = filename .. ':' .. lineCounter
+
+  local nextWord = string.gmatch(line, '([%w.]+)')
+  local commandName = nextWord()
+
+  if commandName == nil then
+    error(('%s:%s: no command'):format(filename, lineCounter))
+  end
+
+  local command = commandHandler[commandName]
+  local commandParams = commandHandler[commandName .. '_PARAMS']
+
+  if not command then
+    error(('%s:%s: unknown command "%s"'):format(filename, lineCounter, commandName))
+  end
+
+  -- Parse parameters
+
+  local parsedParams = {}
+  for _, commandParam in ipairs(commandParams) do
+    local param
+    if commandParam == 'number' then
+      param = tonumber(nextWord())
+    elseif commandParam == 'string' then
+      param = nextWord()
+    elseif commandParam == 'file' then
+      param = file
+    else
+      error(('%s:%s: bad param "%s"'):format(filename, lineCounter, commandParam))
+    end
+    table.insert(parsedParams, param)
+  end
+
+  command(commandHandler, unpack(parsedParams))
+  return true
+end
+
 function SaveLoad.loadGame(game, filename, echo, commandHandler)
   echo(('now loading from %s'):format(filename))
   local file = io.open(filename, 'rb')
   if file == nil then
     echo('failed to open for reading: kobo.sav')
   else
-    local lineCounter = 0
-    while true do
-      local line = file:read('*l')
-      if line == nil then break end
-
+    commandHandler.echo = echo
+    local lineCounter = 1
+    while SaveLoad.executeCommand(file, filename, commandHandler, lineCounter) do
       lineCounter = lineCounter + 1
-
-      commandHandler.echoPrefix = filename .. ':' .. lineCounter
-      commandHandler.echo = echo
-
-      local nextWord = string.gmatch(line, '([%w.]+)')
-      local commandName = nextWord()
-
-      if commandName == nil then
-        error(('%s:%s: no command'):format(filename, lineCounter))
-      end
-
-      local command = commandHandler[commandName]
-      local commandParams = commandHandler[commandName .. '_PARAMS']
-
-      if not command then
-        error(('%s:%s: unknown command "%s"'):format(filename, lineCounter, commandName))
-      end
-
-      -- Parse parameters
-
-      local parsedParams = {}
-      for _, commandParam in ipairs(commandParams) do
-        local param
-        if commandParam == 'number' then
-          param = tonumber(nextWord())
-        elseif commandParam == 'string' then
-          param = nextWord()
-        elseif commandParam == 'file' then
-          param = file
-        else
-          error(('%s:%s: bad param "%s"'):format(filename, lineCounter, commandParam))
-        end
-        table.insert(parsedParams, param)
-      end
-
-      command(commandHandler, unpack(parsedParams))
     end
     file:close()
   end

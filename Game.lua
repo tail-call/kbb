@@ -701,7 +701,8 @@ end
 
 ---@param game Game
 local function orderLoad(game)
-  local commandHandler = {
+  local commandHandler
+  commandHandler = {
     COM_PARAMS = {},
     COM = function (self)
       -- Is a comment, do nothing
@@ -770,6 +771,25 @@ local function orderLoad(game)
       else
         error('what is ' .. name)
       end
+    end,
+
+    OBJECT_PARAMS = { 'file', 'string', 'string', 'number' },
+    OBJECT = function (self, file, moduleName, name, propsCount)
+      local module = require(moduleName)
+
+      say(game, ('Module %s'):format(module))
+
+      if module == nil then
+        error('no such module')
+      end
+
+      local deserialize = module.deserialize
+
+      if deserialize == nil then
+        error('module not deserializable')
+      end
+
+      game.resources = deserialize(file)
     end,
   }
   loadGame(game, SAVE_FILENAME, function (str)

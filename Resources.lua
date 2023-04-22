@@ -9,6 +9,8 @@
 ---@field stone integer Amount of stone owned
 ---@field addStone fun(self: Resources, count: integer) Get more stone
 
+local executeCommand = require('SaveLoad').executeCommand
+
 ---@return Resources
 local function makeResources()
   ---@type Resources
@@ -27,7 +29,9 @@ local function makeResources()
     end,
     X_Serializable = require('X_Serializable'),
     serialize = function(self)
+      ---@cast self Resources
       return table.concat {
+        'OBJECT Resources resources 3\n',
         ('NUMBER wood %s\n'):format(self.wood),
         ('NUMBER stone %s\n'):format(self.stone),
         ('NUMBER pretzels %s\n'):format(self.pretzels),
@@ -37,6 +41,22 @@ local function makeResources()
   return resources
 end
 
+---@param file file*
+---@return Resources
+local deserialize = function (file)
+  local resources = makeResources()
+  for i = 1, 3 do
+    executeCommand(file, '???', {
+      NUMBER_PARAMS = { 'string', 'number' },
+      NUMBER = function (self, name, num)
+        resources[name] = num
+      end,
+    }, i)
+  end
+  return resources
+end
+
 return {
   makeResources = makeResources,
+  deserialize = deserialize,
 }
