@@ -34,6 +34,7 @@ local skyColorAtTime = require('util').skyColorAtTime
 local exhaust = require('util').exhaust
 local saveGame = require('SaveLoad').saveGame
 local loadGame = require('SaveLoad').loadGame
+local behave = require('Guy').behave
 
 ---@class Game
 ---
@@ -51,7 +52,7 @@ local loadGame = require('SaveLoad').loadGame
 ---
 ---@field player Guy A guy controlled by the player
 ---@field guyDelegate GuyDelegate Object that talks to guys
----@field frozenGuys { [Guy]: true } Guys that shouldn't be rendered nor updated
+---@field frozenGuys { [Guy]: true } Guys that should be not rendered and should not behave
 ---@field guys Guy[] Guys aka units
 ---@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
 ---@field freezeGuy fun(self: Game, guy: Guy) Freezes a guy
@@ -588,7 +589,10 @@ local function updateGame(game, dt, movementDirections)
   end
 
   for _, guy in ipairs(game.guys) do
-    updateGuy(guy, dt, game.guyDelegate, isFrozen(game, guy))
+    updateGuy(guy, dt)
+    if not isFrozen(game, guy) then
+      behave(guy, game.guyDelegate)
+    end
   end
 end
 

@@ -93,13 +93,13 @@ end
 
 ---@param guy Guy
 ---@param dt number
----@param delegate GuyDelegate
----@param isFrozen boolean
-local function updateGuy(guy, dt, delegate, isFrozen)
+local function updateGuy(guy, dt)
   guy:advanceTimer(dt)
+end
 
-  if isFrozen then return end
-
+---@param guy Guy
+---@param delegate GuyDelegate
+local function behave(guy, delegate)
   if guy.behavior == 'wander' then
     moveGuy(guy, ({
       Vector.dir.up,
@@ -249,4 +249,5 @@ return {
   moveGuy = moveGuy,
   updateGuy = updateGuy,
   warpGuy = warpGuy,
+  behave = behave,
 }
