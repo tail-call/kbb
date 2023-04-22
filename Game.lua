@@ -37,6 +37,9 @@ local exhaust = require('util').exhaust
 local saveGame = require('SaveLoad').saveGame
 local loadGame = require('SaveLoad').loadGame
 local behave = require('Guy').behave
+local SAVE_FORMAT_MAJOR = require('SaveLoad').SAVE_FORMAT_MAJOR
+local SAVE_FORMAT_MINOR = require('SaveLoad').SAVE_FORMAT_MINOR
+local makeFogOfWarFromBlock = require('World').makeFogOfWarFromBlock
 
 ---@class Game: X_Serializable
 ---
@@ -690,11 +693,43 @@ local function orderSave(game)
   end)
 end
 
+
 ---@param game Game
 local function orderLoad(game)
+  local commandHandler = {
+    COM_PARAMS = {},
+    COM = function (self)
+      -- Is a comment, do nothing
+    end,
+
+    KPSSVERSION_PARAMS = { 'number', 'number' },
+    KPSSVERSION = function (self, major, minor)
+      say(game, ('savefile format version %s %s'):format(major, minor))
+      assert(major == SAVE_FORMAT_MAJOR, 'savefile major version mismatch')
+      assert(minor == SAVE_FORMAT_MINOR, 'savefile major version mismatch')
+    end,
+
+    BLOCK_PARAMS = { 'file', 'string', 'number' },
+    BLOCK = function (self, file, blockName, blockSize)
+      print(file, blockSize, blockName)
+      local compressedBytes = file:read(blockSize)
+
+      if compressedBytes == nil then
+        error(('no block data for block "%s"'):format(blockName))
+      end
+
+      local bytes = love.data.decompress('string', 'zlib', compressedBytes)
+      ---@cast bytes string
+      say(game, ('%s: %s uncompressed bytes'):format(blockName, bytes:len()))
+      game.world.fogOfWar = makeFogOfWarFromBlock(bytes)
+
+      -- Skip newline
+      file:read(1)
+    end,
+  }
   loadGame(game, SAVE_FILENAME, function (str)
     say(game, 'load: ' .. str)
-  end)
+  end, commandHandler)
 end
 
 -- End load/save

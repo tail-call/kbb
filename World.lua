@@ -12,15 +12,26 @@
 local FOG_REVEAL_SPEED = 1
 local SQUARE_REVEAL_THRESHOLD = 0.5
 
+local X_Serializable = require('X_Serializable')
+
 local calcVisionDistance = require('VisionSource').calcVisionDistance
 local isVisible = require('VisionSource').isVisible
-local X_Serializable = require('X_Serializable')
 
 ---@param world World
 ---@param v Vector
 ---@return integer
 local function vectorToLinearIndex(world, v)
   return (v.y - 1) * world.width + v.x
+end
+
+---@param block string Raw bytes of a block
+---@return number[] fogOfWar fog of war object
+local function makeFogOfWarFromBlock(block)
+  local fogOfWar = {}
+  for i = 1, block:len() do
+    table.insert(fogOfWar, block:byte(i) / 255)
+  end
+  return fogOfWar
 end
 
 ---@param filename string
@@ -168,7 +179,6 @@ local function revealFogOfWar(world, visionSource, light, dt)
   end
 end
 
-
 return {
   isPassable = isPassable,
   setTile = setTile,
@@ -177,4 +187,5 @@ return {
   loadWorld = loadWorld,
   revealFogOfWar = revealFogOfWar,
   vectorToLinearIndex = vectorToLinearIndex,
+  makeFogOfWarFromBlock = makeFogOfWarFromBlock,
 }

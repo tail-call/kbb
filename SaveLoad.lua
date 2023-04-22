@@ -1,12 +1,14 @@
 ---@class SaveLoad
+---@field SAVE_FORMAT_MAJOR 0
+---@field SAVE_FORMAT_MINOR 0
 ---@field saveGame fun(game: Game, filename: string, echo: fun(text: string))
----@field loadGame fun(game: Game, filename: string, echo: fun(text: string))
-
-local SAVE_FORMAT_MAJOR = 0
-local SAVE_FORMAT_MINOR = 0
+---@field loadGame fun(game: Game, filename: string, echo: fun(text: string), commandHandler: any)
 
 ---@type SaveLoad
 local SaveLoad = {}
+
+SaveLoad.SAVE_FORMAT_MAJOR = 0
+SaveLoad.SAVE_FORMAT_MINOR = 0
 
 function SaveLoad.saveGame(game, filename, echo)
   echo(('now saving to %s'):format(filename))
@@ -14,7 +16,7 @@ function SaveLoad.saveGame(game, filename, echo)
   -- Save fog of war
 
   local fileContents = {
-    ('KPSSVERSION %s %s\n'):format(SAVE_FORMAT_MAJOR, SAVE_FORMAT_MINOR),
+    ('KPSSVERSION %s %s\n'):format(SaveLoad.SAVE_FORMAT_MAJOR, SaveLoad.SAVE_FORMAT_MINOR),
     'COM kobold princess simulator save file\n',
     'COM every line is a command, COM is a comment command\n',
     'COM\n',
@@ -36,41 +38,7 @@ function SaveLoad.saveGame(game, filename, echo)
   end
 end
 
-local commandHandler = {
-  ---@type fun(text: string)
-  echo = nil,
-  echoPrefix = '',
-
-  COM_PARAMS = {},
-  COM = function (self)
-    -- Is a comment, do nothing
-  end,
-
-  KPSSVERSION_PARAMS = { 'number', 'number' },
-  KPSSVERSION = function (self, major, minor)
-    self.echo(('savefile format version %s %s'):format(major, minor))
-    assert(major == SAVE_FORMAT_MAJOR, 'savefile major version mismatch')
-    assert(minor == SAVE_FORMAT_MINOR, 'savefile major version mismatch')
-  end,
-
-  BLOCK_PARAMS = { 'file', 'number', 'number' },
-  BLOCK = function (self, file, blockSize, blockName)
-    local compressedBytes = file:read(blockSize)
-
-    if compressedBytes == nil then
-      error((self.echoPrefix .. 'no block data for block "%s"'):format(blockName))
-    end
-
-    local bytes = love.data.decompress('string', 'zlib', compressedBytes)
-    ---@cast bytes string
-    self.echo(('%s uncompressed bytes'):format(bytes:len()))
-
-    -- Skip newline
-    file:read(1)
-  end,
-}
-
-function SaveLoad.loadGame(game, filename, echo)
+function SaveLoad.loadGame(game, filename, echo, commandHandler)
   echo(('now loading from %s'):format(filename))
   local file = io.open(filename, 'rb')
   if file == nil then
@@ -107,6 +75,8 @@ function SaveLoad.loadGame(game, filename, echo)
         local param
         if commandParam == 'number' then
           param = tonumber(nextWord())
+        elseif commandParam == 'string' then
+          param = nextWord()
         elseif commandParam == 'file' then
           param = file
         else
