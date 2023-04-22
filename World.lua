@@ -96,14 +96,6 @@ local function loadWorld(filename)
   }
 
   local tileColors = {
-    ['1,1,1'] = 'snow',
-    ['0.5,0,0.5'] = 'wall',
-    ['0,0.5,0.5'] = 'cave',
-    ['0,0,1'] = 'water',
-    ['0,0.5,0'] = 'forest',
-    ['0.5,0.5,0.5'] = 'rock',
-    ['1,1,0'] = 'sand',
-    ['0.5,0,0'] = 'void',
     default = 'grass',
   }
 
