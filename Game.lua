@@ -354,6 +354,7 @@ local function makeGame(tileset)
         ('NUMBER pretzels %s\n'):format(self.resources.pretzels),
         ('NUMBER revealedTilesCount %s\n'):format(self.world.revealedTilesCount),
         ('NUMBER magnificationFactor %s\n'):format(self.magnificationFactor),
+        ('VECTOR playerPos %s %s\n'):format(self.player.pos.x, self.player.pos.y),
         game.world:serialize(),
       }
     end
@@ -757,6 +758,17 @@ local function orderLoad(game)
         game.world.revealedTilesCount = num
       elseif name == 'magnificationFactor' then
         game.magnificationFactor = num
+      else
+        error('what is ' .. name)
+      end
+    end,
+
+    VECTOR_PARAMS = { 'string', 'number', 'number' },
+    VECTOR = function (self, name, x, y)
+      say(game, ('%s is %sx %sy'):format(name, x, y))
+
+      if name == 'playerPos' then
+        game.player:move({ x = x, y = y })
       else
         error('what is ' .. name)
       end
