@@ -768,7 +768,6 @@ local function handleInput(game, scancode, tileset)
 end
 
 
-
 return {
   handleInput = handleInput,
   updateGame = updateGame,
