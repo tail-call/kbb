@@ -349,13 +349,11 @@ local function makeGame(tileset)
       return table.concat {
         'COM Game: hello i am is:\n',
         ('NUMBER time %s\n'):format(self.time),
-        ('NUMBER wood %s\n'):format(self.resources.wood),
-        ('NUMBER stone %s\n'):format(self.resources.stone),
-        ('NUMBER pretzels %s\n'):format(self.resources.pretzels),
         ('NUMBER revealedTilesCount %s\n'):format(self.world.revealedTilesCount),
         ('NUMBER magnificationFactor %s\n'):format(self.magnificationFactor),
         ('VECTOR playerPos %s %s\n'):format(self.player.pos.x, self.player.pos.y),
         game.world:serialize(),
+        game.resources:serialize(),
       }
     end
   }

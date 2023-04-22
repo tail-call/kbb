@@ -1,4 +1,4 @@
----@class Resources
+---@class Resources: X_Serializable
 ---
 ---@field pretzels integer Amount of pretzels owned
 ---@field addPretzels fun(self: Resources, count: integer) Get more pretzels
@@ -24,6 +24,14 @@ local function makeResources()
     end,
     addStone = function (self, count)
       self.stone = self.stone + count
+    end,
+    X_Serializable = require('X_Serializable'),
+    serialize = function(self)
+      return table.concat {
+        ('NUMBER wood %s\n'):format(self.wood),
+        ('NUMBER stone %s\n'):format(self.stone),
+        ('NUMBER pretzels %s\n'):format(self.pretzels),
+      }
     end,
   }
   return resources
