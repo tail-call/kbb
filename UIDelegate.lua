@@ -44,7 +44,7 @@ local function makeUIDelegate(game, player)
           .. '\nCoords:\n %s'
           .. '\n1234] scale'
           .. '\nM] message'
-          .. '\nS] save'
+          .. '\nRet] save'
           .. '\nL] load',
         tileUnderCursor,
         formatVector(game.cursorPos)

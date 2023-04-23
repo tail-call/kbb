@@ -110,8 +110,6 @@ function love.keypressed(key, scancode, isrepeat)
 
 
   if scancode == 'return' then
-    local lines = {}
-
     -- Write to file
     do
       local file = io.open(FILENAME, 'w+')

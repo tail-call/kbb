@@ -748,20 +748,6 @@ end
 -- Load/save
 
 ---@param game Game
-local function orderSave(game)
-  local file = io.open(SAVE_FILENAME, 'wb')
-  if file == nil then
-    return
-  end
-
-  KPSS.save(game, file, function (str)
-    say(game, 'save: ' .. str)
-  end)
-  file:close()
-end
-
-
----@param game Game
 local function orderLoad(game)
   local file = io.open(SAVE_FILENAME, 'rb')
   if file == nil then
@@ -808,8 +794,6 @@ local function handleFocusModeInput(game, scancode, tileset)
     game:nextTab()
   elseif scancode == 'm' then
     orderScribe(game)
-  elseif scancode == 's' then
-    orderSave(game)
   elseif scancode == 'l' then
     orderLoad(game)
     game:toggleFocus()
