@@ -716,6 +716,7 @@ local function orderLoad(game)
   end)
   game.time = tbl.game.time
   game.world = tbl.game.world
+  game.resources = tbl.game.resources
   game.magnificationFactor = tbl.game.magnificationFactor
   game.player:move(tbl.game.playerPos)
 
