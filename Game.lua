@@ -210,7 +210,7 @@ local function new(bak)
 
   ---@type Game
   game = {
-    world = bak.world or require('World').new(),
+    world = require('World').new(bak.world or {}),
     activeTab = 0,
     score = bak.score or 0,
     console = require('Console').new(),
@@ -372,7 +372,7 @@ local function new(bak)
           score = ]],tostring(self.score),[[,
           guys = ]],minidump(self.guys),[[,
           magnificationFactor = ]],tostring(self.magnificationFactor),[[,
-          world = ]],self.world:serialize1(),[[,
+          world = ]],minidump(self.world),[[,
           texts = ]],minidump(self.texts),[[,
           entities = ]],minidump(self.entities),[[,
           resources = Resources]],minidump(self.resources),[[,

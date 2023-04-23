@@ -1,12 +1,14 @@
----@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand' | 'void' | 'snow' | 'cave' | 'wall'
-
----@class World: X_Serializable
+---@class WorldBlueprint
 ---@field width integer World's width in squares
 ---@field height integer World's height in squares
----@field image love.Image Minimap image
 ---@field revealedTilesCount number Number of tiles player had revealed
 ---@field tileTypes WorldTile[] Tile types of each square in the world
 ---@field fogOfWar number[] How visible is each square in the world. Numbers from 0 to 1
+
+---@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand' | 'void' | 'snow' | 'cave' | 'wall'
+
+---@class World: WorldBlueprint, X_Serializable
+---@field image love.Image Minimap image
 ---@field revealFogOfWar fun(self: World, pos: Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
 
 local FOG_REVEAL_SPEED = 1
@@ -35,8 +37,11 @@ local function makeFogOfWarFromBlock(block)
   return fogOfWar
 end
 
+---@param bak WorldBlueprint
 ---@return World
-local function new()
+local function new(bak)
+  bak = bak or {}
+
   local data = love.image.newImageData('map.png')
   local image = love.graphics.newImage(data)
 
@@ -48,9 +53,9 @@ local function new()
     width = width,
     height = height,
     image = image,
-    revealedTilesCount = 0,
-    tileTypes = {},
-    fogOfWar = {},
+    revealedTilesCount = bak.revealedTilesCount or 0,
+    tileTypes = bak.tileTypes or {},
+    fogOfWar = bak.fogOfWar or {},
     revealFogOfWar = function (self, pos, value, dt)
       local idx = vectorToLinearIndex(self, pos)
       local oldValue = self.fogOfWar[idx] or 0

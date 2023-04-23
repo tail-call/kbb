@@ -87,9 +87,9 @@ function love.keypressed(key, scancode, isrepeat)
         end
       end
     end
+
     addLines(game:serialize1())
     local script = table.concat(lines)
-    print(script)
 
     local saveGameFunction, compileError = loadstring(script)
     if compileError then
@@ -102,7 +102,7 @@ function love.keypressed(key, scancode, isrepeat)
         if k == 'Quad' then
           return love.graphics.newQuad
         else
-          print('Loading from module '..k)
+          -- Loading from module k
           return require(k).new(props)
         end
       end
