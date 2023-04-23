@@ -12,7 +12,7 @@ local tbl = require('tbl')
 local vector = require('Vector')
 local gameover = require('GameOver')
 local loadTileset = require('Tileset').load
-local loadFont = require('util').loadFont
+local loadFont = require('Util').loadFont
 local orderLoad = require('Game').orderLoad
 
 ---@type 'game' | 'dead'

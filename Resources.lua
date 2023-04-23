@@ -71,16 +71,6 @@ function ResourcesModule.new(bak)
 
     X_Serializable = require('X_Serializable'),
     serialize = serializeResources,
-    serialize1 = function (self)
-      ---@cast self Resources
-      return {[[Resources{
-        wood = ]],''..self.wood,[[,
-        pretzels = ]],''..self.pretzels,[[,
-        stone = ]],''..self.stone,[[,
-        grass = ]],''..self.grass,[[,
-        water = ]],''..self.water,[[,
-      }]]}
-    end,
   }
   return resources
 end

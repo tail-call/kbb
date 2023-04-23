@@ -153,6 +153,16 @@ local function skyColorAtTime(time)
   }
 end
 
+local function dump(obj)
+local result = {}
+  for k, v in pairs(obj) do
+    if type(v) ~= 'function' then
+      table.insert(result, ('%s=%s,'):format(k, v))
+    end
+  end
+  return table.concat(result)
+end
+
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,
@@ -164,4 +174,5 @@ return {
   weightedRandom = weightedRandom,
   clamped = clamped,
   skyColorAtTime = skyColorAtTime,
+  dump = dump,
 }

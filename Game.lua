@@ -73,12 +73,12 @@ local getTile = require('World').getTile
 local isPassable = require('World').isPassable
 local tbl = require('tbl')
 local Vector = require('Vector')
-local weightedRandom = require('util').weightedRandom
+local weightedRandom = require('Util').weightedRandom
 local Ability = require('Ability')
 local maybeDrop = require('tbl').maybeDrop
 local makeConsoleMessage = require('ConsoleMessage').makeConsoleMessage
 local updateConsole = require('Console').updateConsole
-local randomLetterCode = require('util').randomLetterCode
+local randomLetterCode = require('Util').randomLetterCode
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
 local makeBattle = require('Battle').makeBattle
@@ -89,8 +89,8 @@ local makeBuildingEntity = require('GameEntity').makeBuildingEntity
 local makeBattleEntity = require('GameEntity').makeBattleEntity
 local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
 local revealFogOfWar = require('World').revealFogOfWar
-local skyColorAtTime = require('util').skyColorAtTime
-local exhaust = require('util').exhaust
+local skyColorAtTime = require('Util').skyColorAtTime
+local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
 local KPSS = require('KPSS')
 
@@ -355,6 +355,7 @@ local function new(bak)
     end,
     serialize1 = function (self)
       ---@cast self Game
+      local dump = require('Util').dump
       return {[[
         -- This is a Kobold Princess Simulator v0.2 savefile. You shouldn't run it.
         -- It was created at <%=fileCreationDate%>"))
@@ -363,7 +364,7 @@ local function new(bak)
           score = ]],tostring(self.score),[[,
           magnificationFactor = ]],tostring(self.magnificationFactor),[[,
           world = ]],self.world:serialize1(),[[,
-          resources = ]],self.resources:serialize1(),[[,
+          resources = Resources{]],dump(self.resources),[[},
         }
       ]]}
     end,

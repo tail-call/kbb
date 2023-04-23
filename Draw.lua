@@ -2,13 +2,13 @@ local updateTileset = require('Tileset').update
 local parallaxTile = require('Tileset').parallaxTile
 local tbl = require('tbl')
 local Vector = require('Vector')
-local withColor = require('util').withColor
-local withLineWidth = require('util').withLineWidth
-local withTransform = require('util').withTransform
+local withColor = require('Util').withColor
+local withLineWidth = require('Util').withLineWidth
+local withTransform = require('Util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
 local vectorToLinearIndex = require('World').vectorToLinearIndex
-local skyColorAtTime = require('util').skyColorAtTime
+local skyColorAtTime = require('Util').skyColorAtTime
 local getFog = require('World').getFog
 
 -- Constants
