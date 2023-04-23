@@ -13,7 +13,6 @@ local vector = require('Vector')
 local gameover = require('GameOver')
 local loadTileset = require('Tileset').load
 local loadFont = require('util').loadFont
-local setZoom = require('Draw').setZoom
 local orderLoad = require('Game').orderLoad
 
 ---@type 'game' | 'dead'

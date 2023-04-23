@@ -152,4 +152,47 @@ function KPSS.load(object, file, echo)
   end
 end
 
+---@param obj table
+---@return string
+function KPSS.dumpTable (obj, module, name, prefix)
+  local lines = {}
+  prefix = prefix or ''
+
+  for key, value in pairs(obj) do
+    local luaType = type(value)
+    local line = ('DIAG Failed to parse value "%s" of type "%s" at key "%s"\n'):format(value, luaType, key)
+    if type(key) == 'string' and luaType == 'function' then
+      if key:sub(1, 2) == 'X_' then
+        line = ('COM implements %s interface\n'):format(key)
+      else
+        line = ('COM method %s\n'):format(key)
+      end
+    elseif luaType == 'number' then
+      line = ('NUMBER %s %s\n'):format(key, value)
+    elseif luaType == 'boolean' then
+      line = ('BOOLEAN %s %s\n'):format(key, value)
+    elseif luaType == 'userdata' then
+      if value:typeOf('Transform') then
+        ---@cast value love.Transform
+        line = ('TRANSFORM %s ' .. ('%s'):rep(16, ' ') .. '\n' ):format(key, value:getMatrix())
+      elseif value:typeOf('Quad') then
+        ---@cast value love.Quad
+        local x, y, w, h = value:getViewport()
+        local sw, sh = value:getTextureDimensions()
+        line = ('QUAD %s %s %s %s %s %s %s\n'):format(key, x, y, w, h, sw, sh)
+      end
+    elseif luaType == 'table' then
+      line = KPSS.dumpTable(value, nil, key, ' ' .. prefix)
+    elseif luaType == 'string' then
+      line = ('STRING %s %q\n'):format(key, value)
+    end
+    table.insert(lines, ' ' .. prefix .. line)
+  end
+
+  local header = ('OBJECT %s %s %s\n'):format(module, name, #lines)
+  table.insert(lines, 1, header)
+
+  return table.concat(lines)
+end
+
 return KPSS

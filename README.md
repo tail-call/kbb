@@ -78,7 +78,14 @@ You have psy abilities, so your cursor has FOV just like you do.
 
  - [x] Save/load
  - [x] Tiles can be picked up like objects
- - [ ] Load level immediately on game start
+ - [x] Load level immediately on game start
+ - [ ] Stack machine based save language like PDF
+
+    10 20 30 \{ wood stone pretzels \} Resources \ld
+    1130 0.6 \v{262,180}
+    \{ time magnFactor playerPos \} Game \ld
+
+ 
  - [ ] Save level immediately on game exit
  - [ ] Game is an editable image
  - [ ] Event system

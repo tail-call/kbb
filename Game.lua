@@ -712,15 +712,15 @@ local function orderLoad(game)
     return
   end
 
-  local tbl = {}
-  KPSS.load(tbl, file, function (str)
+  local output = {}
+  KPSS.load(output, file, function (str)
     say(game, 'load: ' .. str)
   end)
-  game.time = tbl.game.time
-  game.world = tbl.game.world
-  game.resources = tbl.game.resources
-  game.magnificationFactor = tbl.game.magnificationFactor
-  game.player:move(tbl.game.playerPos)
+  game.time = output.game.time
+  game.world = output.game.world
+  game.resources = output.game.resources
+  game.magnificationFactor = output.game.magnificationFactor
+  game.player:move(output.game.playerPos)
 
   file:close()
 end
