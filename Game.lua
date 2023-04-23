@@ -197,7 +197,7 @@ local function new(bak)
   ---@type Game
   local game
 
-  local player = Guy.makeLeader(tileset, { x = 269, y = 231 })
+  local player = bak.player or Guy.makeLeader(tileset, { x = 269, y = 231 })
   player:rename('Leader')
 
   ---@type Guy[]
@@ -214,7 +214,6 @@ local function new(bak)
     world = bak.world or require('World').new(),
     activeTab = 0,
     score = bak.score or 0,
-    buildings = {},
     console = require('Console').new(),
     frozenGuys = tbl.weaken({}, 'k'),
     resources = bak.resources or require('Resources').new(),
@@ -372,6 +371,7 @@ local function new(bak)
         return Game{
           time = ]],tostring(self.time),[[,
           score = ]],tostring(self.score),[[,
+          player = Guy]],minidump(self.player),[[,
           magnificationFactor = ]],tostring(self.magnificationFactor),[[,
           world = ]],self.world:serialize1(),[[,
           texts = ]],minidump(self.texts),[[,
@@ -858,6 +858,5 @@ return {
   mayRecruit = mayRecruit,
   new = new,
   deserialize = deserialize,
-  deserialize1 = deserialize1,
   orderLoad = orderLoad
 }

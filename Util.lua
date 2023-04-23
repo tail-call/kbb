@@ -170,6 +170,9 @@ local function dump(obj)
   elseif type(obj) == 'string' then
     coroutine.yield(string.format('%q', obj))
   elseif type(obj) == 'table' then
+    if obj.__module then
+      coroutine.yield(obj.__module)
+    end
     coroutine.yield('{')
     for k, v in pairs(obj) do
       if type(k) == 'number' then
@@ -183,7 +186,23 @@ local function dump(obj)
       coroutine.yield(',')
     end
     coroutine.yield('}')
+  elseif type(obj) == 'userdata' then
+    if obj:type() == 'Quad' then
+      ---@cast obj love.Quad
+      coroutine.yield('Quad()(')
+      local x, y, w, h = obj:getViewport()
+      local sw, sh = obj:getTextureDimensions()
+      coroutine.yield(('%s,%s,%s,%s,%s,%s'):format(x, y, w, h, sw, sh))
+      coroutine.yield(')')
+    else
+      coroutine.yield(obj:type())
+    end
+  elseif type(obj) == 'function' then
+    coroutine.yield('3')
+  elseif type(obj) == 'boolean' then
+    coroutine.yield(tostring(obj))
   else
+    error(type(obj))
     coroutine.yield('nil')
   end
 end

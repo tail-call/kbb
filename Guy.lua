@@ -26,7 +26,7 @@
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
 
-local makePixie = require('Pixie').makePixie
+local makePixie = require('Pixie').new
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
 local makeGuyStats = require('GuyStats').makeGuyStats
@@ -110,9 +110,11 @@ local function behave(guy, delegate)
   end
 end
 
----@param opts GuyOptions
+---@param bak Guy
 ---@return Guy
-function Guy.new(opts)
+local function new(bak)
+  bak = bak or {}
+  bak.pixie = bak.pixie or {}
   ---@type Guy
   local guy = {
     name = 'Unnamed',
@@ -126,10 +128,10 @@ function Guy.new(opts)
     team = 'good',
     mayMove = false,
     speed = 0.15,
-    pos = opts.pos or { x = 0, y = 0 },
+    pos = bak.pos or { x = 0, y = 0 },
     stats = makeGuyStats(),
-    pixie = makePixie(opts.quad, opts.tileset.tiles, {
-      color = opts.color
+    pixie = makePixie(bak.pixie or {
+      quad = bak.pixie.quad
     }),
     rename = function (self, name)
       self.name = name
@@ -170,10 +172,12 @@ end
 ---@param tileset Tileset
 ---@param pos Vector
 function Guy.makeLeader(tileset, pos)
-  local guy = Guy.new{
-    quad = tileset.quads.guy,
+  local guy = new{
+    pixie = {
+      quad = tileset.quads.guy,
+      color = { 1, 1, 0, 1 },
+    },
     pos = pos,
-    color = { 1, 1, 0, 1 },
     tileset = tileset,
   }
   return guy
@@ -182,10 +186,12 @@ end
 ---@param tileset Tileset
 ---@param pos Vector
 function Guy.makeHuman(tileset, pos)
-  local guy = Guy.new{
-    quad = tileset.quads.human,
+  local guy = new{
+    pixie = {
+      quad = tileset.quads.human,
+      color = { 1, 1, 1, 1 },
+    },
     pos = pos,
-    color = { 1, 1, 1, 1 },
     tileset = tileset,
   }
   guy:reteam('neutral')
@@ -196,8 +202,10 @@ end
 ---@param tileset Tileset
 ---@param pos Vector
 function Guy.makeGoodGuy(tileset, pos)
-  local guy = Guy.new{
-    quad = tileset.quads.guy,
+  local guy = new{
+    pixie = {
+      quad = tileset.quads.guy
+    },
     pos = pos,
     tileset = tileset
   }
@@ -209,10 +217,12 @@ end
 ---@param tileset Tileset
 ---@param pos Vector
 function Guy.makeEvilGuy(tileset, pos)
-  local guy = Guy.new{
-    quad = tileset.quads.guy,
+  local guy = new{
+    pixie = {
+      quad = tileset.quads.guy,
+      color = { 1, 0, 0, 1 },
+    },
     pos = pos,
-    color = { 1, 0, 0, 1 },
     tileset = tileset,
   }
   guy:setSpeed(0.5)
@@ -225,10 +235,12 @@ end
 ---@param tileset Tileset
 ---@param pos Vector
 function Guy.makeStrongEvilGuy(tileset, pos)
-  local guy = Guy.new{
-    quad = tileset.quads.human,
+  local guy = new{
+    pixie = {
+      quad = tileset.quads.guy,
+      color = { 1, 0, 1, 1 },
+    },
     pos = pos,
-    color = { 1, 0, 1, 1 },
     tileset = tileset,
   }
   guy.stats:setMaxHp(50)
@@ -250,4 +262,5 @@ return {
   updateGuy = updateGuy,
   warpGuy = warpGuy,
   behave = behave,
+  new = new,
 }

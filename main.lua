@@ -99,8 +99,12 @@ function love.keypressed(key, scancode, isrepeat)
     local moduleLoader = {}
     setmetatable(moduleLoader, { __index = function(t, k)
       return function(props)
-        print('Loading from module '..k)
-        return require(k).new(props)
+        if k == 'Quad' then
+          return love.graphics.newQuad
+        else
+          print('Loading from module '..k)
+          return require(k).new(props)
+        end
       end
     end })
     setfenv(saveGameFunction, moduleLoader)

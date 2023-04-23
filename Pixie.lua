@@ -14,20 +14,22 @@
 ---@field update fun(self: Pixie, dt: number): nil
 ---@field spawn fun(self: Pixie, pos: Vector): nil
 
----@param quad love.Quad
----@param texture love.Texture
+---@param bak Pixie
 ---@return Pixie
-local function makePixie(quad, texture, opts)
+local function makePixie(bak)
+  bak = bak or {}
+
   ---@type Pixie
   local pixie = {
-    texture = texture,
-    quad = quad,
-    isRightStep = false,
+    __module = 'Pixie',
+    texture = require('Tileset').getTileset().image,
+    quad = bak.quad,
+    isRightStep = bak.isRightStep or false,
     pos = { x = 0, y = 0 },
     flip = false,
     transform = love.math.newTransform(),
     transformSpeed = 1,
-    color = opts.color or { 1, 1, 1, 1 },
+    color = bak.color or { 1, 1, 1, 1 },
     targetTransform = love.math.newTransform(),
     move = function (self, pos)
       self.isRightStep = not self.isRightStep
@@ -90,5 +92,5 @@ local function makePixie(quad, texture, opts)
 end
 
 return {
-  makePixie = makePixie,
+  new = makePixie,
 }
