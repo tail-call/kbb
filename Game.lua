@@ -197,12 +197,9 @@ local function new(bak)
   ---@type Game
   local game
 
-  local player = bak.player or Guy.makeLeader(tileset, { x = 269, y = 231 })
-  player:rename('Leader')
-
   ---@type Guy[]
-  local guys = {
-    player,
+  local guys = bak.guys or {
+    Guy.makeLeader(tileset, { x = 269, y = 231 }),
     Guy.makeGoodGuy(tileset, { x = 274, y = 231 }),
     Guy.makeGoodGuy(tileset, { x = 272, y = 231 }),
     Guy.makeGoodGuy(tileset, { x = 274, y = 229 }),
@@ -217,16 +214,16 @@ local function new(bak)
     console = require('Console').new(),
     frozenGuys = tbl.weaken({}, 'k'),
     resources = bak.resources or require('Resources').new(),
-    guys = guys,
+    guys = bak.guys or guys,
     time = bak.time or (12 * 60),
     entities = bak.entities or {},
     alternatingKeyIndex = 1,
-    player = player,
+    player = guys[1],
     squad = require('Squad').new(),
     recruitCircle = require('RecruitCircle').new(),
     onLost = nil,
     fogOfWarTimer = 0,
-    cursorPos = player.pos,
+    cursorPos = bak.cursorPos or { x = 0, y = 0 },
     magnificationFactor = bak.magnificationFactor or 1,
     isFocused = false,
     texts = bak.texts or {},
@@ -384,7 +381,7 @@ local function new(bak)
 
   game:addEntity(makeBuildingEntity(makeBuilding({ x = 276, y = 217 })))
 
-  game.ui = makeUIScript(makeUIDelegate(game, player))
+  game.ui = makeUIScript(makeUIDelegate(game, game.player))
   game.guyDelegate = makeGuyDelegate(game)
 
   game:addText(
