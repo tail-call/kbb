@@ -1,13 +1,20 @@
----@class Game: X_Serializable
+---@class GameBlueprint
+---@field world World Game world
+---@field resources Resources Resources player may spend on upgrades
+---@field texts Text[] Text objects in the game world
+---@field entities GameEntity[] Things in the game world
+---@field guys Guy[] Guys aka units
+---@field score integer Score the player has accumulated
+---@field time number Time of day in seconds, max is 24*60
+---@field cursorPos Vector Points to a square player's cursor is aimed at
+---@field magnificationFactor number How much the camera is zoomed in
+
+---@class Game: X_Serializable, GameBlueprint
 ---
 ---# Simulation
 ---
----@field world World Game world
----@field time number Time of day in seconds, max is 24*60
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
----@field resources Resources Resources player may spend on upgrades
 ---
----@field score integer Score the player has accumulated
 ---@field addScore fun(self: Game, count: integer) Increases score count
 ---
 ---@field squad Squad A bunch of guys that follows player's movement
@@ -15,15 +22,12 @@
 ---@field player Guy A guy controlled by the player
 ---@field guyDelegate GuyDelegate Object that talks to guys
 ---@field frozenGuys { [Guy]: true } Guys that should be not rendered and should not behave
----@field guys Guy[] Guys aka units
 ---@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
 ---@field freezeGuy fun(self: Game, guy: Guy) Freezes a guy
 ---@field unfreezeGuy fun(self: Game, guy: Guy) Unfreezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
 ---
----@field texts Text[] Text objects in the game world
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
----@field entities GameEntity[] Things in the game world
 ---@field addEntity fun(self: Game, entity: GameEntity) Adds a building to the world
 ---@field removeEntity fun(self: Game, entity: GameEntity) Adds a building to the world
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy): nil
@@ -46,7 +50,6 @@
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
 ---@field setAlternatingKeyIndex fun(self: Game, x: number) Moves diagonam movement reader head to a new location
 ---
----@field cursorPos Vector Points to a square player's cursor is aimed at
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field nextTab fun(self: Game) Switches tab in the UI
 ---
@@ -55,7 +58,6 @@
 ---@field makeVisionSourcesCo fun(self: Game): fun(): VisionSource Returns a coroutine function that will yield all vision sources in the game world
 ---@field fogOfWarTimer number
 ---
----@field magnificationFactor number How much the camera is zoomed in
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
 ---@class GameModule
@@ -188,7 +190,7 @@ local function makeUIScript(delegate)
   })
 end
 
----@param bak Game | nil
+---@param bak GameBlueprint | nil
 ---@return Game
 local function new(bak)
   bak = bak or {}
@@ -214,7 +216,7 @@ local function new(bak)
     console = require('Console').new(),
     frozenGuys = tbl.weaken({}, 'k'),
     resources = bak.resources or require('Resources').new(),
-    guys = bak.guys or guys,
+    guys = guys,
     time = bak.time or (12 * 60),
     entities = bak.entities or {},
     alternatingKeyIndex = 1,
@@ -368,7 +370,7 @@ local function new(bak)
         return Game{
           time = ]],tostring(self.time),[[,
           score = ]],tostring(self.score),[[,
-          player = Guy]],minidump(self.player),[[,
+          guys = ]],minidump(self.guys),[[,
           magnificationFactor = ]],tostring(self.magnificationFactor),[[,
           world = ]],self.world:serialize1(),[[,
           texts = ]],minidump(self.texts),[[,

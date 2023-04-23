@@ -117,6 +117,7 @@ local function new(bak)
   bak.pixie = bak.pixie or {}
   ---@type Guy
   local guy = {
+    __module = 'Guy',
     name = 'Unnamed',
     timer = 0,
     behavior = 'none',

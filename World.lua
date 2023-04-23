@@ -199,7 +199,7 @@ end
 ---@param repeats integer
 ---@return World
 local function deserialize(file, repeats)
-  local world = new('map.png')
+  local world = new()
   for i = 1, repeats do
     KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(world), i)
   end
