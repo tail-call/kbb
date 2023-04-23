@@ -426,20 +426,8 @@ local function new(bak)
     end,
   }
 
-  game:addEntity(makeBuildingEntity(makeBuilding({ x = 276, y = 217 })))
-
   game.ui = makeUIScript(makeUIDelegate(game, game.player))
   game.guyDelegate = makeGuyDelegate(game)
-
-  game:addText(
-    makeText('-G\'day!', { x = 276, y = 216 }, 9)
-  )
-
-  game:addGuy(Guy.makeHuman(tileset, { x = 276, y = 218 }))
-
-  game:addText(
-    makeText('\nGARDEN\n  o\n   f\n EDEN', { x = 280, y = 194 }, 8)
-  )
 
   game.console:say(
     makeConsoleMessage('Welcome to Kobold Princess Simulator.', 10)
@@ -448,13 +436,6 @@ local function new(bak)
   game.console:say(
     makeConsoleMessage('This is day 1 of your reign.', 10)
   )
-
-  game:addText(
-    makeText('I have neither intent nor desire to speak with a kobold.', { x = 308, y = 180 }, 5)
-  )
-
-  game:addGuy(Guy.makeHuman(tileset, { x = 312, y = 183 }))
-  game:addGuy(Guy.makeEvilGuy(tileset, EVIL_SPAWN_LOCATION))
 
   return game
 end
