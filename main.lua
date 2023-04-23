@@ -101,6 +101,13 @@ function love.keypressed(key, scancode, isrepeat)
       return function(props)
         if k == 'Quad' then
           return love.graphics.newQuad
+        elseif k == 'buf' then
+          return function(props)
+            local compressedData = love.data.decode('data', 'base64', props.base64)
+            local data = love.data.decompress('string', 'zlib', compressedData)
+            local array = loadstring(data)()
+            return array
+          end
         else
           -- Loading from module k
           return require(k).new(props)

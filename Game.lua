@@ -364,6 +364,36 @@ local function new(bak)
         return table.concat(result)
       end
 
+      game.world.fogOfWar.__dump = nil and function(dump)
+        dump('buf(){base64=[[')
+        local bytes = {}
+        local fog = game.world.fogOfWar
+        for _, v in ipairs(fog) do
+          table.insert(bytes, string.char(math.floor(v * 255)))
+        end
+        local data = table.concat(bytes)
+        local compressedData = love.data.compress('data', 'zlib', data)
+        local encodedData = love.data.encode('string', 'base64', compressedData)
+        dump(encodedData)
+        dump(']]}')
+      end
+
+
+      game.world.tileTypes.__dump = function(dump)
+        dump('buf(){base64=[[')
+        local words = {'return{'}
+        local tiles = game.world.tileTypes
+        for _, word in ipairs(tiles) do
+          table.insert(words, string.format('%q,', word))
+        end
+        table.insert(words, '}')
+        local data = table.concat(words, '\n')
+        local compressedData = love.data.compress('data', 'zlib', data)
+        local encodedData = love.data.encode('string', 'base64', compressedData)
+        dump(encodedData)
+        dump(']]}')
+      end
+
       return {[[
         -- This is a Kobold Princess Simulator v0.2 savefile. You shouldn't run it.
         -- It was created at <%=fileCreationDate%>
