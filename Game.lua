@@ -364,14 +364,27 @@ local function new(bak)
         return table.concat(result)
       end
 
-      game.world.fogOfWar.__dump = nil and function(dump)
+      game.world.fogOfWar.__dump = function(dump)
+        -- dump('buf(){base64=[[')
+        -- local bytes = {}
+        -- local fog = game.world.fogOfWar
+        -- for _, v in ipairs(fog) do
+          -- table.insert(bytes, string.char(math.floor(v * 255)))
+        -- end
+        -- local data = table.concat(bytes)
+        -- local compressedData = love.data.compress('data', 'zlib', data)
+        -- local encodedData = love.data.encode('string', 'base64', compressedData)
+        -- dump(encodedData)
+        -- dump(']]}')
+
         dump('buf(){base64=[[')
-        local bytes = {}
-        local fog = game.world.fogOfWar
-        for _, v in ipairs(fog) do
-          table.insert(bytes, string.char(math.floor(v * 255)))
+        local words = {'return{'}
+        local fogOfWar = game.world.fogOfWar
+        for _, word in ipairs(fogOfWar) do
+          table.insert(words, string.format('%.3f,', word))
         end
-        local data = table.concat(bytes)
+        table.insert(words, '}')
+        local data = table.concat(words, '\n')
         local compressedData = love.data.compress('data', 'zlib', data)
         local encodedData = love.data.encode('string', 'base64', compressedData)
         dump(encodedData)
