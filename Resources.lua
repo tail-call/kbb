@@ -11,8 +11,10 @@
 
 local KPSS = require('KPSS')
 
+local ResourcesModule = {}
+
 ---@return Resources
-local function makeResources()
+function ResourcesModule.new()
   ---@type Resources
   local resources = {
     pretzels = 1,
@@ -44,15 +46,12 @@ end
 ---@param file file*
 ---@param repeats integer
 ---@return Resources
-local deserialize = function (file, repeats)
-  local resources = makeResources()
+function ResourcesModule.deserialize (file, repeats)
+  local resources = ResourcesModule.new()
   for i = 1, repeats do
     KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(resources), i)
   end
   return resources
 end
 
-return {
-  makeResources = makeResources,
-  deserialize = deserialize,
-}
+return ResourcesModule

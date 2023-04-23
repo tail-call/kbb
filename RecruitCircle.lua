@@ -9,8 +9,10 @@
 local RECRUIT_CIRCLE_MAX_RADIUS = 6
 local RECRUIT_CIRCLE_GROWTH_SPEED = 6
 
+local RecruitCircleModule = {}
+
 ---@return RecruitCircle
-local function makeRecruitCircle()
+function RecruitCircleModule.new()
   ---@type RecruitCircle
   local recruitCircle = {
     radius = nil,
@@ -34,11 +36,8 @@ end
 
 ---@param recruitCircle RecruitCircle
 ---@return boolean
-local function isRecruitCircleActive(recruitCircle)
+function RecruitCircleModule.isRecruitCircleActive(recruitCircle)
   return recruitCircle.radius ~= nil
 end
 
-return {
-  makeRecruitCircle = makeRecruitCircle,
-  isRecruitCircleActive = isRecruitCircleActive,
-}
+return RecruitCircleModule

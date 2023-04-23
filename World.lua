@@ -37,7 +37,7 @@ end
 
 ---@param filename string
 ---@return World
-local function loadWorld(filename)
+local function new(filename)
   local data = love.image.newImageData(filename)
   local image = love.graphics.newImage(data)
 
@@ -194,7 +194,7 @@ end
 ---@param repeats integer
 ---@return World
 local function deserialize(file, repeats)
-  local world = loadWorld('map.png')
+  local world = new('map.png')
   for i = 1, repeats do
     KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(world), i)
   end
@@ -206,7 +206,7 @@ return {
   setTile = setTile,
   getTile = getTile,
   getFog = getFog,
-  loadWorld = loadWorld,
+  new = new,
   revealFogOfWar = revealFogOfWar,
   vectorToLinearIndex = vectorToLinearIndex,
   makeFogOfWarFromBlock = makeFogOfWarFromBlock,

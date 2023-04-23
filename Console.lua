@@ -2,10 +2,10 @@
 ---@field messages ConsoleMessage[] List of displayed messages
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
 
-local Console = {}
+local ConsoleModule = {}
 
 ---@return Console
-function Console.makeConsole()
+function ConsoleModule.new()
   ---@type Console
   local console = {
     messages = {},
@@ -22,10 +22,10 @@ end
 
 ---@param console Console
 ---@param dt number
-function Console.updateConsole(console, dt)
+function ConsoleModule.updateConsole(console, dt)
   for _, message in ipairs(console.messages) do
     message:fadeOut(dt)
   end
 end
 
-return Console
+return ConsoleModule

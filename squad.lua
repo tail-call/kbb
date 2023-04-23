@@ -7,8 +7,10 @@
 ---@field startFollowing fun(self: Squad) Squad will begin following the player
 ---@field toggleFollow fun(self: Squad) Toggle follow mode for squad
 
+local SquadModule = {}
+
 ---@return Squad
-local function makeSquad()
+function SquadModule.new()
   ---@type Squad
   local squad = {
     followers = {},
@@ -32,11 +34,8 @@ end
 ---@param squad Squad
 ---@param guy Guy
 ---@return boolean
-local function isGuyAFollower(squad, guy)
+function SquadModule.isGuyAFollower(squad, guy)
   return squad.followers[guy] or false
 end
 
-return {
-  makeSquad = makeSquad,
-  isGuyAFollower = isGuyAFollower,
-}
+return SquadModule
