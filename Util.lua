@@ -13,13 +13,12 @@ local SKY_TABLE = {
 ---@param fun fun(): T
 ---@param cb fun(value: T): nil
 local function exhaust(fun, cb, ...)
-  local stupidMessage = 'cannot resume dead coroutine'
-
   local crt = coroutine.create(fun)
   local isRunning, result = coroutine.resume(crt, ...)
 
-
   local function doStuff()
+    -- Crash if coroutine fails
+    local stupidMessage = 'cannot resume dead coroutine'
     if not isRunning and result ~= stupidMessage then
       error(result)
     end
