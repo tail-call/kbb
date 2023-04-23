@@ -167,28 +167,24 @@ end
 local function dump(obj)
   if type(obj) == 'number' then
     coroutine.yield(tostring(obj))
-  else
+  elseif type(obj) == 'string' then
+    coroutine.yield(string.format('%q', obj))
+  elseif type(obj) == 'table' then
     coroutine.yield('{')
     for k, v in pairs(obj) do
-      if type(v) ~= 'function' then
-        if type(v) == 'table' then
-          coroutine.yield('{')
-          for i, item in ipairs(v) do
-            local dumped = dump(item)
-            coroutine.yield(dumped)
-            coroutine.yield(',')
-          end
-          coroutine.yield('}')
-        elseif type(v) == 'userdata' then
-          -- Do nothing
-        else
-          coroutine.yield(k..'=')
-          dump(v)
-          coroutine.yield(',')
-        end
+      if type(k) == 'number' then
+        coroutine.yield('['..k..']')
+      else
+        coroutine.yield(k)
       end
+
+      coroutine.yield('=')
+      dump(v)
+      coroutine.yield(',')
     end
     coroutine.yield('}')
+  else
+    coroutine.yield('nil')
   end
 end
 

@@ -91,7 +91,10 @@ function love.keypressed(key, scancode, isrepeat)
     local script = table.concat(lines)
     print(script)
 
-    local saveGameFunction = loadstring(script)
+    local saveGameFunction, compileError = loadstring(script)
+    if compileError then
+      error(compileError)
+    end
 
     local moduleLoader = {}
     setmetatable(moduleLoader, { __index = function(t, k)
@@ -100,21 +103,6 @@ function love.keypressed(key, scancode, isrepeat)
         return require(k).new(props)
       end
     end })
-    setfenv(saveGameFunction, {
-      Game = function(props)
-        for k, v in pairs(props) do
-          game[k] = v
-        end
-        return game
-      end,
-      World = function(props)
-        local world = require('World').new('map.png')
-        for k, v in pairs(props) do
-          world[k] = v
-        end
-        return world
-      end
-    })
     setfenv(saveGameFunction, moduleLoader)
     game = saveGameFunction()
     if game == nil then

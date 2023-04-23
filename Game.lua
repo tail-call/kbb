@@ -230,7 +230,7 @@ local function new(bak)
     cursorPos = player.pos,
     magnificationFactor = bak.magnificationFactor or 1,
     isFocused = false,
-    texts = {},
+    texts = bak.texts or {},
     makeVisionSourcesCo = function (self)
       return function ()
         coroutine.yield({ pos = self.player.pos, sight = 10 })
@@ -374,6 +374,7 @@ local function new(bak)
           score = ]],tostring(self.score),[[,
           magnificationFactor = ]],tostring(self.magnificationFactor),[[,
           world = ]],self.world:serialize1(),[[,
+          texts = ]],minidump(self.texts),[[,
           resources = Resources]],minidump(self.resources),[[,
         }
       ]]}
@@ -388,6 +389,7 @@ local function new(bak)
   game:addText(
     makeText('-G\'day!', { x = 276, y = 216 }, 9)
   )
+
   game:addGuy(Guy.makeHuman(tileset, { x = 276, y = 218 }))
 
   game:addText(
@@ -841,16 +843,6 @@ local function deserialize(file, repeats)
   local game = new()
   for i = 1, repeats do
     KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(game), i)
-  end
-  return game
-end
-
----@param props Game
----@return Game
-local function deserialize1(props)
-  local game = new()
-  for k, v in pairs(props) do
-    game[k] = v
   end
   return game
 end
