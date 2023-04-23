@@ -154,10 +154,19 @@ local function skyColorAtTime(time)
 end
 
 local function dump(obj)
-local result = {}
+  local result = {}
   for k, v in pairs(obj) do
     if type(v) ~= 'function' then
-      table.insert(result, ('%s=%s,'):format(k, v))
+      if type(v) == 'table' then
+        local items = {}
+        for i, item in ipairs(v) do
+          table.insert(items, dump(item))
+        end
+      elseif type(v) == 'userdata' then
+        -- Do nothing
+      else
+        table.insert(result, ('%s=%s,'):format(k, v))
+      end
     end
   end
   return table.concat(result)

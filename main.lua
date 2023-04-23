@@ -1,6 +1,9 @@
 -- Need to do this before anything else is executed
 math.randomseed(os.time())
 
+-- Mock he table module
+table.new = function () return {} end
+
 local draw = require('Draw')
 local makeGame = require('Game').new
 local drawGame = require('Draw').drawGame
@@ -93,6 +96,7 @@ function love.keypressed(key, scancode, isrepeat)
     local moduleLoader = {}
     setmetatable(moduleLoader, { __index = function(t, k)
       return function(props)
+        print('Loading from module '..k)
         return require(k).new(props)
       end
     end })

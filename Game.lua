@@ -358,7 +358,7 @@ local function new(bak)
       local dump = require('Util').dump
       return {[[
         -- This is a Kobold Princess Simulator v0.2 savefile. You shouldn't run it.
-        -- It was created at <%=fileCreationDate%>"))
+        -- It was created at <%=fileCreationDate%>
         return Game{
           time = ]],tostring(self.time),[[,
           score = ]],tostring(self.score),[[,
