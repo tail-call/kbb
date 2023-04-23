@@ -84,7 +84,7 @@ local randomLetterCode = require('Util').randomLetterCode
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
 local makeBattle = require('Battle').new
-local makeUIDelegate = require('UIDelegate').makeUIDelegate
+local makeUIDelegate = require('UIDelegate').new
 local makeText = require('Text').makeText
 local makeBuilding = require('Building').makeBuilding
 local makeBuildingEntity = require('GameEntity').makeBuildingEntity
@@ -825,7 +825,9 @@ local function handleNormalModeInput(game, scancode, tileset)
   elseif scancode == 'space' then
     orderFocus(game)
   elseif scancode == 'n' then
-    game.time = 12 * 60
+    package.loaded['UIDelegate'] = nil
+    package.loaded['Draw'] = nil
+    game.ui = makeUIScript(require('UIDelegate').new(game, game.player))
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
   end

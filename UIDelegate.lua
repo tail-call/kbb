@@ -16,6 +16,7 @@ local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 local function makeUIDelegate(game, player)
   ---@type UIDelegate
   local uiDelegate = {
+    __module = 'UIDelegate',
     topPanelText = function()
       return {
         WHITE_COLOR,
@@ -27,7 +28,7 @@ local function makeUIDelegate(game, player)
           love.timer.getFPS()
         ),
         WHITE_COLOR,
-        'WASD] move\nSpc] focus\nLMB] recruit\nZ] zoom\nN] noon\nF] follow\nQ] gather\nT] warp\nC] collect\n',
+        'WASD] move\nSpc] focus\nLMB] recruit\nZ] zoom\nN] reload\nF] follow\nQ] gather\nT] warp\nC] collect\n',
         player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
         'G] dismiss 1t\n',
         player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
@@ -107,5 +108,5 @@ local function makeUIDelegate(game, player)
 end
 
 return {
-  makeUIDelegate = makeUIDelegate,
+  new = makeUIDelegate,
 }

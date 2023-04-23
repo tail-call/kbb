@@ -79,15 +79,16 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Save/load
  - [x] Tiles can be picked up like objects
  - [x] Load level immediately on game start
- - [ ] Stack machine based save language like PDF
+ - [x] ~~Stack machine based save language like PDF~~
 
     10 20 30 \{ wood stone pretzels \} Resources \ld
     1130 0.6 \v{262,180}
     \{ time magnFactor playerPos \} Game \ld
 
  
+ - [x] Game is an editable image
+ - [x] Object hot reloading
  - [ ] Save level immediately on game exit
- - [ ] Game is an editable image
  - [ ] Event system
  - [ ] Random terrain generation in a selected area
  - [ ] Lua console in focus mode

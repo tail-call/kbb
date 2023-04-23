@@ -147,8 +147,8 @@ function love.keyreleased(key, scancode)
 end
 
 function love.draw()
-  draw.prepareFrame(drawState)
-  drawGame(game, drawState)
+  require('Draw').prepareFrame(drawState)
+  require('Draw').drawGame(game, drawState)
   if state == 'dead' then
     gameover.draw()
   end

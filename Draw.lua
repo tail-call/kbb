@@ -341,16 +341,18 @@ local function drawGame(game, drawState)
 
   -- Setup camera
 
+  local screenW, screenH = love.window.getMode()
+  screenW = screenW / drawState.windowScale
+  screenH = screenH / drawState.windowScale
   do
     local pos = {
       x = 8 + drawState.camera.x,
       y = 8 + drawState.camera.y
     }
-    local w, h = love.window.getMode()
     love.graphics.scale(drawState.camera.z)
     love.graphics.translate(
-      math.floor(w / drawState.windowScale / 2 / drawState.camera.z - pos.x),
-      math.floor(h / drawState.windowScale / 2 / drawState.camera.z - pos.y)
+      math.floor(screenW / 2 / drawState.camera.z - pos.x),
+      math.floor(screenH / 2 / drawState.camera.z - pos.y)
     )
   end
 
@@ -498,7 +500,7 @@ local function drawGame(game, drawState)
 
   -- Draw minimap
 
-  withTransform(love.math.newTransform(8, SCREEN_HEIGHT - 16 - MINIMAP_SIZE), function ()
+  withTransform(love.math.newTransform(8, screenH - 16 - MINIMAP_SIZE), function ()
     local offsetX = game.player.pos.x - MINIMAP_SIZE / 2
     local offsetY = game.player.pos.y - MINIMAP_SIZE / 2
     local quad = love.graphics.newQuad(
