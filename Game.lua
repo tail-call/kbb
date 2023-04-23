@@ -105,7 +105,7 @@ local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
 local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
 local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
 ---@type Vector
-local EVIL_SPAWN_LOCATION = { x = 281, y = 195 }
+local EVIL_SPAWN_LOCATION = { x = 301, y = 184 }
 
 local SCORES_TABLE = {
   killedAnEnemy = 100,
@@ -344,7 +344,7 @@ local function makeGame()
     end,
     X_Serializable = X_Serializable,
     serialize = function (self)
-      ---@cast self Game
+      ---@cast self Gameve
       return table.concat {
         'OBJECT Game game 5\n',
         ('NUMBER time %s\n'):format(self.time),
@@ -383,7 +383,7 @@ local function makeGame()
   )
 
   game:addGuy(Guy.makeHuman(tileset, { x = 312, y = 183 }))
-  game:addGuy(Guy.makeEvilGuy(tileset, { x = 301, y = 184 }))
+  game:addGuy(Guy.makeEvilGuy(tileset, EVIL_SPAWN_LOCATION))
 
   return game
 end
@@ -710,14 +710,14 @@ local function orderLoad(game)
     return
   end
 
-  local parsed = {}
-  KPSS.load(parsed, file, function (str)
+  local tbl = {}
+  KPSS.load(tbl, file, function (str)
     say(game, 'load: ' .. str)
   end)
-  game.time = parsed.game.time
-  game.world = parsed.game.world
-  game.magnificationFactor = parsed.game.magnificationFactor
-  game.player:move(parsed.game.playerPos)
+  game.time = tbl.game.time
+  game.world = tbl.game.world
+  game.magnificationFactor = tbl.game.magnificationFactor
+  game.player:move(tbl.game.playerPos)
 
   file:close()
 end

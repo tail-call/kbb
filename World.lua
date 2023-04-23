@@ -83,7 +83,8 @@ local function loadWorld(filename)
       )
 
       return table.concat {
-        'OBJECT World world 2\n',
+        'OBJECT World world 3\n',
+        ('NUMBER revealedTilesCount %s\n'):format(self.revealedTilesCount),
         ---@cast fogCompressedData string
         'BLOCK fogOfWar ' .. fogCompressedData:len() .. '\n',
         fogCompressedData, '\n',
