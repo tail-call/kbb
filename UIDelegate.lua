@@ -28,12 +28,9 @@ local function makeUIDelegate(game, player)
           math.floor(game.time % 60)
         ),
         WHITE_COLOR,
-        'N] noon\nF] follow\nQ] gather\nT] warp\n',
+        'N] noon\nF] follow\nQ] gather\nT] warp\nC] collect\n',
         player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
         'G] dismiss 1t\n',
-        player.stats.moves >= 5 and WHITE_COLOR or GRAY_COLOR,
-        player.stats.moves >= 10 and WHITE_COLOR or GRAY_COLOR,
-        'C] chop 10t\n',
         player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
         'R] ritual 25t 1p\n',
         player.stats.moves >= 50 and game.resources.wood >= 5 and WHITE_COLOR or GRAY_COLOR,
@@ -95,10 +92,12 @@ local function makeUIDelegate(game, player)
     end,
     bottomPanelText = function ()
       return string.format(
-        'Wood: %s | Stone: %s | Pretzels: %s',
+        'Wd=%s St=%s Pr=%s Gr=%s Wt=%s',
         game.resources.wood,
         game.resources.stone,
-        game.resources.pretzels
+        game.resources.pretzels,
+        game.resources.grass,
+        game.resources.water
       )
     end,
     shouldDrawFocusModeUI = function()

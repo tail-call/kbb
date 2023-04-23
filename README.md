@@ -77,6 +77,7 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 
  - [x] Save/load
+ - [x] Tiles can be picked up like objects
  - [ ] Load level immediately on game start
  - [ ] Save level immediately on game exit
  - [ ] Game is an editable image

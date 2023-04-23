@@ -110,7 +110,6 @@ local SCORES_TABLE = {
 local MOVE_COSTS_TABLE = {
   follow = 0,
   dismissSquad = 1,
-  chopTree = 10,
   summon = 25,
   build = 50,
 }
@@ -614,27 +613,34 @@ end
 ---@param tileset Tileset
 ---@param game Game
 ---@param guy Guy
-local function maybeChop(tileset, game, guy)
+local function maybeCollect(tileset, game, guy)
   if isFrozen(game, guy) then return end
-
-  if guy.stats.moves < MOVE_COSTS_TABLE.chopTree then return end
 
   local pos = guy.pos
   local tile = getTile(game.world, pos)
   if tile == 'forest' then
     game.resources:addWood(1)
-    guy.stats:addMoves(-MOVE_COSTS_TABLE.chopTree)
     setTile(game.world, pos, 'grass')
     game:addGuy(Guy.makeEvilGuy(tileset, EVIL_SPAWN_LOCATION))
+  elseif tile == 'rock' then
+    game.resources:addStone(1)
+    setTile(game.world, pos, 'sand')
+    game:addGuy(Guy.makeStrongEvilGuy(tileset, EVIL_SPAWN_LOCATION))
+  elseif tile == 'grass' then
+    game.resources:addGrass(1)
+    setTile(game.world, pos, 'sand')
+  elseif tile == 'water' then
+    game.resources:addWater(1)
+    setTile(game.world, pos, 'sand')
   end
 end
 
 ---@param tileset Tileset
 ---@param game Game
 local function orderChop(tileset, game)
-  maybeChop(tileset, game, game.player)
+  maybeCollect(tileset, game, game.player)
   for guy in pairs(game.squad.followers) do
-    maybeChop(tileset, game, guy)
+    maybeCollect(tileset, game, guy)
   end
 end
 
@@ -657,7 +663,6 @@ local function orderBuild(tileset, game)
   -- Is building on rock?
   if getTile(game.world, pos) == 'rock' then
     game.resources:addStone(1)
-    game:addGuy(Guy.makeStrongEvilGuy(tileset, EVIL_SPAWN_LOCATION))
     setTile(game.world, pos, 'sand')
   end
 
