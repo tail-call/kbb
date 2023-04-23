@@ -827,7 +827,10 @@ local function handleNormalModeInput(game, scancode, tileset)
   elseif scancode == 'n' then
     package.loaded['UIDelegate'] = nil
     package.loaded['Draw'] = nil
+    package.loaded['Guy'] = nil
     game.ui = makeUIScript(require('UIDelegate').new(game, game.player))
+    game.player = require('Guy').new(game.player)
+    game.guys[1] = game.player
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
   end

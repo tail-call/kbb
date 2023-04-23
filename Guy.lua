@@ -151,7 +151,10 @@ local function new(bak)
     end,
     advanceTimer = function (self, dt)
       self.pixie:update(dt)
-      self.timer = self.timer + dt
+
+      if not self.mayMove then
+        self.timer = self.timer + dt
+      end
 
       while self.timer >= self.speed do
         self.mayMove = true
