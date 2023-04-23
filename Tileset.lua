@@ -170,7 +170,6 @@ end
 return {
   load = load,
   update = update,
-  regenerate = regenerate,
   getTileset = getTileset,
   parallaxTile = parallaxTile,
 }

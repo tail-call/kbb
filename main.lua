@@ -2,7 +2,7 @@
 math.randomseed(os.time())
 
 local draw = require('Draw')
-local makeGame = require('Game').makeGame
+local makeGame = require('Game').new
 local drawGame = require('Draw').drawGame
 local handleInput = require('Game').handleInput
 local updateGame = require('Game').updateGame
@@ -63,12 +63,59 @@ function love.update(dt)
   end
 end
 
+
 ---@param key love.KeyConstant
 ---@param scancode love.Scancode
 ---@param isrepeat boolean
 function love.keypressed(key, scancode, isrepeat)
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
     draw.setZoom(drawState, tonumber(scancode) or 1)
+  end
+
+
+  if scancode == 'return' then
+    local lines = {}
+    local function addLines(t)
+      for _, v in ipairs(t) do
+        if type(v) == 'string' then
+          table.insert(lines, v)
+        elseif type(v) == 'table' then
+          addLines(v)
+        end
+      end
+    end
+    addLines(game:serialize1())
+    local script = table.concat(lines)
+    print(script)
+
+    local saveGameFunction = loadstring(script)
+
+    local moduleLoader = {}
+    setmetatable(moduleLoader, { __index = function(t, k)
+      return function(props)
+        return require(k).new(props)
+      end
+    end })
+    setfenv(saveGameFunction, {
+      Game = function(props)
+        for k, v in pairs(props) do
+          game[k] = v
+        end
+        return game
+      end,
+      World = function(props)
+        local world = require('World').new('map.png')
+        for k, v in pairs(props) do
+          world[k] = v
+        end
+        return world
+      end
+    })
+    setfenv(saveGameFunction, moduleLoader)
+    game = saveGameFunction()
+    if game == nil then
+      error('no game')
+    end
   end
 
   if state ~= 'game' then return end

@@ -188,8 +188,11 @@ local function makeUIScript(delegate)
   })
 end
 
+---@param bak Game | nil
 ---@return Game
-local function makeGame()
+local function new(bak)
+  bak = bak or {}
+
   local tileset = require('Tileset').getTileset()
   ---@type Game
   local game
@@ -208,15 +211,15 @@ local function makeGame()
 
   ---@type Game
   game = {
-    world = require('World').new('map.png'),
+    world = bak.world or require('World').new(),
     activeTab = 0,
-    score = 0,
+    score = bak.score or 0,
     buildings = {},
     console = require('Console').new(),
     frozenGuys = tbl.weaken({}, 'k'),
-    resources = require('Resources').new(),
+    resources = bak.resources or require('Resources').new(),
     guys = guys,
-    time = math.random() * 24 * 60,
+    time = bak.time or (12 * 60),
     entities = {},
     alternatingKeyIndex = 1,
     player = player,
@@ -225,7 +228,7 @@ local function makeGame()
     onLost = nil,
     fogOfWarTimer = 0,
     cursorPos = player.pos,
-    magnificationFactor = 1,
+    magnificationFactor = bak.magnificationFactor or 1,
     isFocused = false,
     texts = {},
     makeVisionSourcesCo = function (self)
@@ -340,7 +343,7 @@ local function makeGame()
     end,
     X_Serializable = X_Serializable,
     serialize = function (self)
-      ---@cast self Gameve
+      ---@cast self Game
       return table.concat {
         'OBJECT Game game 5\n',
         ('NUMBER time %s\n'):format(self.time),
@@ -349,7 +352,21 @@ local function makeGame()
         game.world:serialize(),
         game.resources:serialize(),
       }
-    end
+    end,
+    serialize1 = function (self)
+      ---@cast self Game
+      return {[[
+        -- This is a Kobold Princess Simulator v0.2 savefile. You shouldn't run it.
+        -- It was created at <%=fileCreationDate%>"))
+        return Game{
+          time = ]],tostring(self.time),[[,
+          score = ]],tostring(self.score),[[,
+          magnificationFactor = ]],tostring(self.magnificationFactor),[[,
+          world = ]],self.world:serialize1(),[[,
+          resources = ]],self.resources:serialize1(),[[,
+        }
+      ]]}
+    end,
   }
 
   game:addEntity(makeBuildingEntity(makeBuilding({ x = 276, y = 217 })))
@@ -810,9 +827,19 @@ end
 ---@param repeats integer
 ---@return Game
 local function deserialize(file, repeats)
-  local game = makeGame()
+  local game = new()
   for i = 1, repeats do
     KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(game), i)
+  end
+  return game
+end
+
+---@param props Game
+---@return Game
+local function deserialize1(props)
+  local game = new()
+  for k, v in pairs(props) do
+    game[k] = v
   end
   return game
 end
@@ -825,7 +852,8 @@ return {
   endRecruiting = endRecruiting,
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
-  makeGame = makeGame,
+  new = new,
   deserialize = deserialize,
+  deserialize1 = deserialize1,
   orderLoad = orderLoad
 }

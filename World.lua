@@ -35,10 +35,9 @@ local function makeFogOfWarFromBlock(block)
   return fogOfWar
 end
 
----@param filename string
 ---@return World
-local function new(filename)
-  local data = love.image.newImageData(filename)
+local function new()
+  local data = love.image.newImageData('map.png')
   local image = love.graphics.newImage(data)
 
   local width = data:getWidth()
@@ -92,6 +91,12 @@ local function new(filename)
         'BLOCK tileTypes ' .. tileCompressedData:len() .. '\n',
         tileCompressedData, '\n',
       }
+    end,
+    serialize1 = function (self)
+      ---@cast self World
+      return {[[World{
+        revealedTilesCount = ]],tostring(self.revealedTilesCount),[[,
+      }]]}
     end,
     hack_parseBlock = function (self, blockName, bytes)
       ---@cast bytes string

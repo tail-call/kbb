@@ -37,37 +37,50 @@ local function serializeResources(resources)
   )
 end
 
+---@param bak Resources | nil
 ---@return Resources
-function ResourcesModule.new()
+function ResourcesModule.new(bak)
+  bak = bak or {}
+
   ---@type Resources
   local resources = {
-    pretzels = 1,
+    pretzels = bak.pretzels or 1,
     addPretzels = function (self, count)
       self.pretzels = self.pretzels + count
     end,
 
-    wood = 0,
+    wood = bak.wood or 0,
     addWood = function (self, count)
       self.wood = self.wood + count
     end,
 
-    stone = 0,
+    stone = bak.stone or 0,
     addStone = function (self, count)
       self.stone = self.stone + count
     end,
 
-    grass = 0,
+    grass = bak.grass or 0,
     addGrass = function (self, count)
       self.grass = self.grass + count
     end,
 
-    water = 0,
+    water = bak.water or 0,
     addWater = function (self, count)
       self.water = self.water + count
     end,
 
     X_Serializable = require('X_Serializable'),
     serialize = serializeResources,
+    serialize1 = function (self)
+      ---@cast self Resources
+      return {[[Resources{
+        wood = ]],''..self.wood,[[,
+        pretzels = ]],''..self.pretzels,[[,
+        stone = ]],''..self.stone,[[,
+        grass = ]],''..self.grass,[[,
+        water = ]],''..self.water,[[,
+      }]]}
+    end,
   }
   return resources
 end
