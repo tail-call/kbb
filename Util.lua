@@ -154,22 +154,27 @@ local function skyColorAtTime(time)
 end
 
 local function dump(obj)
-  local result = {}
-  for k, v in pairs(obj) do
-    if type(v) ~= 'function' then
-      if type(v) == 'table' then
-        local items = {}
-        for i, item in ipairs(v) do
-          table.insert(items, dump(item))
+  return function()
+    coroutine.yield('{')
+    for k, v in pairs(obj) do
+      if type(v) ~= 'function' then
+        if type(v) == 'table' then
+          coroutine.yield('{')
+          for i, item in ipairs(v) do
+            local dumped = dump(item)
+            coroutine.yield(dumped)
+            coroutine.yield(',')
+          end
+          coroutine.yield('}')
+        elseif type(v) == 'userdata' then
+          -- Do nothing
+        else
+          coroutine.yield(('%s=%s,'):format(k, v))
         end
-      elseif type(v) == 'userdata' then
-        -- Do nothing
-      else
-        table.insert(result, ('%s=%s,'):format(k, v))
       end
     end
+    coroutine.yield('}')
   end
-  return table.concat(result)
 end
 
 return {

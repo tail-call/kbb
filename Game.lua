@@ -356,6 +356,16 @@ local function new(bak)
     serialize1 = function (self)
       ---@cast self Game
       local dump = require('Util').dump
+      local exhaust = require('Util').exhaust
+
+      local function minidump(obj)
+        local result = {}
+        exhaust(dump(obj), function(part)
+          table.insert(result, part or '')
+        end)
+        return table.concat(result)
+      end
+
       return {[[
         -- This is a Kobold Princess Simulator v0.2 savefile. You shouldn't run it.
         -- It was created at <%=fileCreationDate%>
@@ -364,7 +374,7 @@ local function new(bak)
           score = ]],tostring(self.score),[[,
           magnificationFactor = ]],tostring(self.magnificationFactor),[[,
           world = ]],self.world:serialize1(),[[,
-          resources = Resources{]],dump(self.resources),[[},
+          resources = Resources]],minidump(self.resources),[[,
         }
       ]]}
     end,
