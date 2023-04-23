@@ -58,6 +58,9 @@
 ---@field magnificationFactor number How much the camera is zoomed in
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
+---@class GameModule
+---@field deserialize fun()
+
 local X_Serializable = require('X_Serializable')
 
 local Guy = require('Guy').Guy
@@ -189,9 +192,9 @@ local function makeUIScript(delegate)
   })
 end
 
----@param tileset Tileset 
 ---@return Game
-local function makeGame(tileset)
+local function makeGame()
+  local tileset = require('Tileset').getTileset()
   ---@type Game
   local game
 
@@ -707,9 +710,14 @@ local function orderLoad(game)
     return
   end
 
-  KPSS.load(game, file, function (str)
+  local parsed = {}
+  KPSS.load(parsed, file, function (str)
     say(game, 'load: ' .. str)
   end)
+  game.time = parsed.game.time
+  game.world = parsed.game.world
+  game.magnificationFactor = parsed.game.magnificationFactor
+  game.player:move(parsed.game.playerPos)
 
   file:close()
 end
@@ -795,7 +803,18 @@ local function handleInput(game, scancode, tileset)
   end
 end
 
+---@param file file*
+---@param repeats integer
+---@return Game
+local function deserialize(file, repeats)
+  local game = makeGame()
+  for i = 1, repeats do
+    KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(game), i)
+  end
+  return game
+end
 
+---@type GameModule
 return {
   handleInput = handleInput,
   updateGame = updateGame,
@@ -804,4 +823,5 @@ return {
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
   makeGame = makeGame,
+  deserialize = deserialize,
 }

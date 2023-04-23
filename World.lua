@@ -94,7 +94,6 @@ local function loadWorld(filename)
     end,
     hack_parseBlock = function (self, blockName, bytes)
       ---@cast bytes string
-      print('here')
       if blockName == 'fogOfWar' then
         ---@cast bytes string
         self.fogOfWar = makeFogOfWarFromBlock(bytes)

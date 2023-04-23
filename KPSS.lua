@@ -1,11 +1,11 @@
----@class KPSS
+---@class KPSSModule
 ---@field MAJOR_VERSION 0
 ---@field MINOR_VERSION 0
 ---@field save fun(object: X_Serializable, file: file*, echo: fun(text: string))
 ---@field load fun(object: X_Serializable, file: file*, echo: fun(text: string), commandHandler: any)
 ---@field executeCommand fun(file: file*, name: string, commandHandler: table, rep: number)
 
----@type KPSS
+---@type KPSSModule
 local KPSS = {}
 
 KPSS.MAJOR_VERSION = 0
@@ -58,11 +58,7 @@ function KPSS.makeCommandHandler(obj)
 
     VECTOR_PARAMS = { 'string', 'number', 'number' },
     VECTOR = function (self, name, x, y)
-      if name == 'playerPos' then
-        obj.player:move({ x = x, y = y })
-      else
-        error('what is ' .. name)
-      end
+      obj[name] = { x = x, y = y }
     end,
 
     OBJECT_PARAMS = { 'file', 'string', 'string', 'number' },
@@ -76,7 +72,7 @@ function KPSS.makeCommandHandler(obj)
       local deserialize = module.deserialize
 
       if deserialize == nil then
-        error('module not deserializable')
+        error(('module %s is not deserializable'):format(moduleName))
       end
 
       obj[name] = deserialize(file, propsCount)
