@@ -360,9 +360,9 @@ local function new(bak)
 
       local function minidump(obj)
         local result = {}
-        exhaust(dump(obj), function(part)
+        exhaust(dump, function(part)
           table.insert(result, part or '')
-        end)
+        end, obj)
         return table.concat(result)
       end
 
