@@ -114,26 +114,23 @@ end
 ---@return Guy
 local function new(bak)
   bak = bak or {}
-  bak.pixie = bak.pixie or {}
   ---@type Guy
   local guy = {
     __module = 'Guy',
     name = 'Unnamed',
     timer = 0,
-    behavior = 'none',
+    behavior = bak.behavior or 'none',
     abilities = {
       { ability = abilities.normalSuccess, weight = 4 },
       { ability = abilities.normalCriticalSuccess, weight = 1 },
       { ability = abilities.normalFail, weight = 1 },
     },
-    team = 'good',
-    mayMove = false,
-    speed = 0.15,
+    team = bak.team or 'good',
+    mayMove = bak.mayMove or false,
+    speed = bak.speed or 0.15,
     pos = bak.pos or { x = 0, y = 0 },
     stats = makeGuyStats(),
-    pixie = makePixie(bak.pixie or {
-      quad = bak.pixie.quad
-    }),
+    pixie = makePixie(bak.pixie),
     rename = function (self, name)
       self.name = name
     end,
