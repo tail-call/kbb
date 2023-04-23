@@ -13,11 +13,23 @@ local SKY_TABLE = {
 ---@param fun fun(): T
 ---@param cb fun(value: T): nil
 local function exhaust(fun, cb, ...)
+  local stupidMessage = 'cannot resume dead coroutine'
+
   local crt = coroutine.create(fun)
   local isRunning, result = coroutine.resume(crt, ...)
+
+
+  local function doStuff()
+    if not isRunning and result ~= stupidMessage then
+      error(result)
+    end
+  end
+
+  doStuff()
   while isRunning do
     cb(result)
     isRunning, result = coroutine.resume(crt)
+    doStuff()
   end
 end
 
@@ -154,25 +166,31 @@ local function skyColorAtTime(time)
 end
 
 local function dump(obj)
-  coroutine.yield('{')
-  for k, v in pairs(obj) do
-    if type(v) ~= 'function' then
-      if type(v) == 'table' then
-        coroutine.yield('{')
-        for i, item in ipairs(v) do
-          local dumped = dump(item)
-          coroutine.yield(dumped)
+  if type(obj) == 'number' then
+    coroutine.yield(tostring(obj))
+  else
+    coroutine.yield('{')
+    for k, v in pairs(obj) do
+      if type(v) ~= 'function' then
+        if type(v) == 'table' then
+          coroutine.yield('{')
+          for i, item in ipairs(v) do
+            local dumped = dump(item)
+            coroutine.yield(dumped)
+            coroutine.yield(',')
+          end
+          coroutine.yield('}')
+        elseif type(v) == 'userdata' then
+          -- Do nothing
+        else
+          coroutine.yield(k..'=')
+          dump(v)
           coroutine.yield(',')
         end
-        coroutine.yield('}')
-      elseif type(v) == 'userdata' then
-        -- Do nothing
-      else
-        coroutine.yield(('%s=%s,'):format(k, v))
       end
     end
+    coroutine.yield('}')
   end
-  coroutine.yield('}')
 end
 
 return {
