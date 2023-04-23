@@ -220,7 +220,7 @@ local function new(bak)
     resources = bak.resources or require('Resources').new(),
     guys = guys,
     time = bak.time or (12 * 60),
-    entities = {},
+    entities = bak.entities or {},
     alternatingKeyIndex = 1,
     player = player,
     squad = require('Squad').new(),
@@ -375,6 +375,7 @@ local function new(bak)
           magnificationFactor = ]],tostring(self.magnificationFactor),[[,
           world = ]],self.world:serialize1(),[[,
           texts = ]],minidump(self.texts),[[,
+          entities = ]],minidump(self.entities),[[,
           resources = Resources]],minidump(self.resources),[[,
         }
       ]]}
