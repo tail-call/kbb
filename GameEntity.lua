@@ -1,6 +1,6 @@
 ---@class GameEntity
 ---@field type string
----@field object any
+---@field object { pos: Vector }
 
 ---@class GameEntity_Building: GameEntity
 ---@field type 'building'
