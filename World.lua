@@ -17,6 +17,7 @@ local X_Serializable = require('X_Serializable')
 local calcVisionDistance = require('VisionSource').calcVisionDistance
 local isVisible = require('VisionSource').isVisible
 local executeCommand = require('SaveLoad').executeCommand
+local makeCommandHandler = require('SaveLoad').makeCommandHandler
 
 ---@param world World
 ---@param v Vector
@@ -91,6 +92,19 @@ local function loadWorld(filename)
         'BLOCK tileTypes ' .. tileCompressedData:len() .. '\n',
         tileCompressedData, '\n',
       }
+    end,
+    hack_parseBlock = function (self, blockName, bytes)
+      ---@cast bytes string
+      print('here')
+      if blockName == 'fogOfWar' then
+        ---@cast bytes string
+        self.fogOfWar = makeFogOfWarFromBlock(bytes)
+      elseif blockName == 'tileTypes' then
+        self.tileTypes = {}
+        for tileType in string.gmatch(bytes, '(%w+)') do
+          table.insert(self.tileTypes, tileType)
+        end
+      end
     end,
   }
 
@@ -180,30 +194,10 @@ end
 ---@param file file*
 ---@param repeats integer
 ---@return World
-local deserialize = function (file, repeats)
+local function deserialize(file, repeats)
   local world = loadWorld('map.png')
   for i = 1, repeats do
-    executeCommand(file, '???', {
-      BLOCK_PARAMS = { 'file', 'string', 'block' },
-      BLOCK = function (self, file, blockName, bytes)
-        ---@cast bytes string
-        --say(game, ('%s: %s uncompressed bytes'):format(blockName, bytes:len()))
-        if blockName == 'fogOfWar' then
-          ---@cast bytes string
-          world.fogOfWar = makeFogOfWarFromBlock(bytes)
-        elseif blockName == 'tileTypes' then
-          world.tileTypes = {}
-          for tileType in string.gmatch(bytes, '(%w+)') do
-            table.insert(world.tileTypes, tileType)
-          end
-        end
-
-        ---@cast bytes string
-
-        -- Skip newline
-        file:read(1)
-      end,
-    }, i)
+    executeCommand(file, '???', makeCommandHandler(world), i)
   end
   return world
 end

@@ -38,8 +38,8 @@ function SaveLoad.saveGame(game, filename, echo)
   end
 end
 
----@param obj Game
-function SaveLoad.makeCommandHandler(obj, echo)
+---@param obj any
+function SaveLoad.makeCommandHandler(obj)
   local commandHandler = {
     COM_PARAMS = {},
     COM = function (self)
@@ -48,21 +48,17 @@ function SaveLoad.makeCommandHandler(obj, echo)
 
     KPSSVERSION_PARAMS = { 'number', 'number' },
     KPSSVERSION = function (self, major, minor)
-      echo(('savefile format version %s %s'):format(major, minor))
       assert(major == SaveLoad.SAVE_FORMAT_MAJOR, 'savefile major version mismatch')
       assert(minor == SaveLoad.SAVE_FORMAT_MINOR, 'savefile major version mismatch')
     end,
 
     NUMBER_PARAMS = { 'string', 'number' },
     NUMBER = function (self, name, num)
-      echo(('%s is %s'):format(name, num))
       obj[name] = num
     end,
 
     VECTOR_PARAMS = { 'string', 'number', 'number' },
     VECTOR = function (self, name, x, y)
-      echo(('%s is %sx %sy'):format(name, x, y))
-
       if name == 'playerPos' then
         obj.player:move({ x = x, y = y })
       else
@@ -73,8 +69,6 @@ function SaveLoad.makeCommandHandler(obj, echo)
     OBJECT_PARAMS = { 'file', 'string', 'string', 'number' },
     OBJECT = function (self, file, moduleName, name, propsCount)
       local module = require(moduleName)
-
-      echo(('Module %s'):format(moduleName))
 
       if module == nil then
         error('no such module')
@@ -87,6 +81,14 @@ function SaveLoad.makeCommandHandler(obj, echo)
       end
 
       obj[name] = deserialize(file, propsCount)
+    end,
+
+    BLOCK_PARAMS = { 'file', 'string', 'block' },
+    BLOCK = function (self, file, blockName, bytes)
+      obj:hack_parseBlock(blockName, bytes)
+
+      -- Skip newline
+      file:read(1)
     end,
   }
   return commandHandler
@@ -148,7 +150,7 @@ function SaveLoad.loadGame(game, filename, echo)
   if file == nil then
     echo('failed to open for reading: kobo.sav')
   else
-    local commandHandler = SaveLoad.makeCommandHandler(game, echo)
+    local commandHandler = SaveLoad.makeCommandHandler(game)
     local lineCounter = 1
     while SaveLoad.executeCommand(file, filename, commandHandler, lineCounter) do
       lineCounter = lineCounter + 1

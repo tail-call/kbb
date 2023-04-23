@@ -347,9 +347,8 @@ local function makeGame(tileset)
     serialize = function (self)
       ---@cast self Game
       return table.concat {
-        'COM Game: hello i am is:\n',
+        'OBJECT Game game 5\n',
         ('NUMBER time %s\n'):format(self.time),
-        ('NUMBER revealedTilesCount %s\n'):format(self.world.revealedTilesCount),
         ('NUMBER magnificationFactor %s\n'):format(self.magnificationFactor),
         ('VECTOR playerPos %s %s\n'):format(self.player.pos.x, self.player.pos.y),
         game.world:serialize(),

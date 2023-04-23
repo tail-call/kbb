@@ -10,6 +10,7 @@
 ---@field addStone fun(self: Resources, count: integer) Get more stone
 
 local executeCommand = require('SaveLoad').executeCommand
+local makeCommandHandler = require('SaveLoad').makeCommandHandler
 
 ---@return Resources
 local function makeResources()
@@ -47,12 +48,7 @@ end
 local deserialize = function (file, repeats)
   local resources = makeResources()
   for i = 1, repeats do
-    executeCommand(file, '???', {
-      NUMBER_PARAMS = { 'string', 'number' },
-      NUMBER = function (self, name, num)
-        resources[name] = num
-      end,
-    }, i)
+    executeCommand(file, '???', makeCommandHandler(resources), i)
   end
   return resources
 end
