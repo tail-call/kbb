@@ -16,8 +16,7 @@ local X_Serializable = require('X_Serializable')
 
 local calcVisionDistance = require('VisionSource').calcVisionDistance
 local isVisible = require('VisionSource').isVisible
-local executeCommand = require('SaveLoad').executeCommand
-local makeCommandHandler = require('SaveLoad').makeCommandHandler
+local KPSS = require('KPSS')
 
 ---@param world World
 ---@param v Vector
@@ -197,7 +196,7 @@ end
 local function deserialize(file, repeats)
   local world = loadWorld('map.png')
   for i = 1, repeats do
-    executeCommand(file, '???', makeCommandHandler(world), i)
+    KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(world), i)
   end
   return world
 end

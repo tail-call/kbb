@@ -94,12 +94,8 @@ local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
 local revealFogOfWar = require('World').revealFogOfWar
 local skyColorAtTime = require('util').skyColorAtTime
 local exhaust = require('util').exhaust
-local saveGame = require('SaveLoad').saveGame
-local loadGame = require('SaveLoad').loadGame
 local behave = require('Guy').behave
-local SAVE_FORMAT_MAJOR = require('SaveLoad').SAVE_FORMAT_MAJOR
-local SAVE_FORMAT_MINOR = require('SaveLoad').SAVE_FORMAT_MINOR
-local makeFogOfWarFromBlock = require('World').makeFogOfWarFromBlock
+local KPSS = require('KPSS')
 
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
 local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
@@ -692,17 +688,30 @@ end
 
 ---@param game Game
 local function orderSave(game)
-  saveGame(game, SAVE_FILENAME, function (str)
+  local file = io.open(SAVE_FILENAME, 'wb')
+  if file == nil then
+    return
+  end
+
+  KPSS.save(game, file, function (str)
     say(game, 'save: ' .. str)
   end)
+  file:close()
 end
 
 
 ---@param game Game
 local function orderLoad(game)
-  loadGame(game, SAVE_FILENAME, function (str)
+  local file = io.open(SAVE_FILENAME, 'rb')
+  if file == nil then
+    return
+  end
+
+  KPSS.load(game, file, function (str)
     say(game, 'load: ' .. str)
   end)
+
+  file:close()
 end
 
 -- End load/save

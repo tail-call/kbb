@@ -9,8 +9,7 @@
 ---@field stone integer Amount of stone owned
 ---@field addStone fun(self: Resources, count: integer) Get more stone
 
-local executeCommand = require('SaveLoad').executeCommand
-local makeCommandHandler = require('SaveLoad').makeCommandHandler
+local KPSS = require('KPSS')
 
 ---@return Resources
 local function makeResources()
@@ -48,7 +47,7 @@ end
 local deserialize = function (file, repeats)
   local resources = makeResources()
   for i = 1, repeats do
-    executeCommand(file, '???', makeCommandHandler(resources), i)
+    KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(resources), i)
   end
   return resources
 end

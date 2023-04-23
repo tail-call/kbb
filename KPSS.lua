@@ -1,29 +1,29 @@
----@class SaveLoad
----@field SAVE_FORMAT_MAJOR 0
----@field SAVE_FORMAT_MINOR 0
----@field saveGame fun(game: Game, filename: string, echo: fun(text: string))
----@field loadGame fun(game: Game, filename: string, echo: fun(text: string), commandHandler: any)
+---@class KPSS
+---@field MAJOR_VERSION 0
+---@field MINOR_VERSION 0
+---@field save fun(object: X_Serializable, file: file*, echo: fun(text: string))
+---@field load fun(object: X_Serializable, file: file*, echo: fun(text: string), commandHandler: any)
+---@field executeCommand fun(file: file*, name: string, commandHandler: table, rep: number)
 
----@type SaveLoad
-local SaveLoad = {}
+---@type KPSS
+local KPSS = {}
 
-SaveLoad.SAVE_FORMAT_MAJOR = 0
-SaveLoad.SAVE_FORMAT_MINOR = 0
+KPSS.MAJOR_VERSION = 0
+KPSS.MINOR_VERSION = 0
 
-function SaveLoad.saveGame(game, filename, echo)
-  echo(('now saving to %s'):format(filename))
+function KPSS.save(object, file, echo)
+  echo(('now saving to %s'):format(file))
 
   -- Save fog of war
 
   local fileContents = {
-    ('KPSSVERSION %s %s\n'):format(SaveLoad.SAVE_FORMAT_MAJOR, SaveLoad.SAVE_FORMAT_MINOR),
+    ('KPSSVERSION %s %s\n'):format(KPSS.MAJOR_VERSION, KPSS.MINOR_VERSION),
     'COM kobold princess simulator save file\n',
     'COM every line is a command, COM is a comment command\n',
     'COM\n',
-    game:serialize(),
+    object:serialize(),
   }
 
-  local file = io.open(filename, 'wb')
   local bytesWritten = 0
 
   if file == nil then
@@ -34,12 +34,11 @@ function SaveLoad.saveGame(game, filename, echo)
       bytesWritten = bytesWritten + line:len()
     end
     echo(('wrote %d bytes'):format(bytesWritten))
-    file:close()
   end
 end
 
 ---@param obj any
-function SaveLoad.makeCommandHandler(obj)
+function KPSS.makeCommandHandler(obj)
   local commandHandler = {
     COM_PARAMS = {},
     COM = function (self)
@@ -48,8 +47,8 @@ function SaveLoad.makeCommandHandler(obj)
 
     KPSSVERSION_PARAMS = { 'number', 'number' },
     KPSSVERSION = function (self, major, minor)
-      assert(major == SaveLoad.SAVE_FORMAT_MAJOR, 'savefile major version mismatch')
-      assert(minor == SaveLoad.SAVE_FORMAT_MINOR, 'savefile major version mismatch')
+      assert(major == KPSS.MAJOR_VERSION, 'savefile major version mismatch')
+      assert(minor == KPSS.MINOR_VERSION, 'savefile major version mismatch')
     end,
 
     NUMBER_PARAMS = { 'string', 'number' },
@@ -94,7 +93,7 @@ function SaveLoad.makeCommandHandler(obj)
   return commandHandler
 end
 
-function SaveLoad.executeCommand(file, filename, commandHandler, lineCounter)
+function KPSS.executeNextLine(file, filename, commandHandler, lineCounter)
   local line = file:read('*l')
   if line == nil then return false end
 
@@ -144,19 +143,17 @@ function SaveLoad.executeCommand(file, filename, commandHandler, lineCounter)
   return true
 end
 
-function SaveLoad.loadGame(game, filename, echo)
-  echo(('now loading from %s'):format(filename))
-  local file = io.open(filename, 'rb')
+function KPSS.load(object, file, echo)
+  echo(('now loading from %s'):format(file))
   if file == nil then
     echo('failed to open for reading: kobo.sav')
   else
-    local commandHandler = SaveLoad.makeCommandHandler(game)
+    local commandHandler = KPSS.makeCommandHandler(object)
     local lineCounter = 1
-    while SaveLoad.executeCommand(file, filename, commandHandler, lineCounter) do
+    while KPSS.executeNextLine(file, '???', commandHandler, lineCounter) do
       lineCounter = lineCounter + 1
     end
-    file:close()
   end
 end
 
-return SaveLoad
+return KPSS
