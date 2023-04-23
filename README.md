@@ -82,6 +82,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Save level immediately on game exit
  - [ ] Game is an editable image
  - [ ] Event system
+ - [ ] Random terrain generation in a selected area
  - [ ] Lua console in focus mode
  - [ ] Timer type
  - [ ] Game is a GuyDelegate

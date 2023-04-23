@@ -22,13 +22,15 @@ local CAMERA_LERP_SPEED = 10
 
 ---@param tileset Tileset
 ---@return DrawState
-local function makeDrawState(tileset)
+local function new(tileset)
   ---@type DrawState
   local drawState = {
-    windowScale = 1,
+    windowScale = 3,
     tileset = tileset,
     setWindowScale = function (self, windowScale)
       self.windowScale = windowScale
+
+      self.tileset:regenerate()
     end,
     camera = { x = 266 * 16, y = 229 * 16, z = 0.01 },
     cursorTimer = 0,
@@ -59,5 +61,5 @@ local function makeDrawState(tileset)
 end
 
 return {
-  makeDrawState = makeDrawState,
+  new = new,
 }

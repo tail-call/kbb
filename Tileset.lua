@@ -15,21 +15,16 @@
 ---@field waterFrames love.Quad[]
 
 ---@class Tileset
----@field tiles love.Canvas
----@field image love.Image
----@field timer number
----@field waterFrame integer
----@field quads TilesetQuads
+---@field tiles love.Canvas Tileset dynamic canvas
+---@field image love.Image Tileset source image
+---@field animationTimer number Timer that controls animation
+---@field waterFrame integer Current water animation frame
+---@field quads TilesetQuads Quads this tileset provides
+---@field regenerate fun(self: Tileset) Regenerates tileset. Need to call when video mode changes
 
 local withCanvas = require('util').withCanvas
 
 local timerCeil = 0.3
-
-local function regenerate(tileset)
-  withCanvas(tileset.tiles, function ()
-    love.graphics.draw(tileset.image)
-  end)
-end
 
 ---@type Tileset
 local tileset
@@ -118,10 +113,15 @@ local function load()
 
   ---@type Tileset
   local aTileset = {
-    timer = 1,
+    animationTimer = 1,
     tiles = canvas,
     waterFrame = 4,
     image = image,
+    regenerate = function (self)
+      withCanvas(self.tiles, function ()
+        love.graphics.draw(self.image)
+      end)
+    end,
     quads = {
       guy = tile(0, 0),
       grass = tile(1, 0),
@@ -145,15 +145,15 @@ local function load()
     }
   }
 
-  regenerate(aTileset)
+  aTileset:regenerate()
   tileset = aTileset
 end
 ---@param tileset Tileset
 ---@param dt number
 local function update(tileset, dt)
-  tileset.timer = tileset.timer + dt
-  if tileset.timer > timerCeil then
-    tileset.timer = tileset.timer % timerCeil
+  tileset.animationTimer = tileset.animationTimer + dt
+  if tileset.animationTimer > timerCeil then
+    tileset.animationTimer = tileset.animationTimer % timerCeil
     tileset.waterFrame = tileset.waterFrame + 1
     if tileset.waterFrame > #tileset.quads.waterFrames then
       tileset.waterFrame = 1

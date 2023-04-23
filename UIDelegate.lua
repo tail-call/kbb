@@ -6,6 +6,7 @@
 ---@field shouldDrawFocusModeUI fun(): boolean True if should draw focus mode UI
 
 local getTile = require('World').getTile
+local formatVector = require('Vector').formatVector
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
@@ -19,16 +20,14 @@ local function makeUIDelegate(game, player)
       return {
         WHITE_COLOR,
         string.format(
-          'Score: %d | Revealed: %d/%d %0.ffps\n%02d:%02d\n',
+          'Score: %d | Revealed: %d/%d %0.ffps\n',
           game.score,
           game.world.revealedTilesCount,
           game.world.height * game.world.width,
-          love.timer.getFPS(),
-          math.floor(game.time / 60),
-          math.floor(game.time % 60)
+          love.timer.getFPS()
         ),
         WHITE_COLOR,
-        'N] noon\nF] follow\nQ] gather\nT] warp\nC] collect\n',
+        'WASD] move\nSpc] focus\nLMB] recruit\nZ] zoom\nN] noon\nF] follow\nQ] gather\nT] warp\nC] collect\n',
         player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
         'G] dismiss 1t\n',
         player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
@@ -41,23 +40,20 @@ local function makeUIDelegate(game, player)
       local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
       return string.format(
         ''
-          .. 'Time: %02d:%02d\n (paused)\n'
           .. 'Terrain:\n %s'
-          .. '\nCoords:\n %sX %sY'
+          .. '\nCoords:\n %s'
+          .. '\n1234] scale'
           .. '\nM] message'
           .. '\nS] save'
           .. '\nL] load',
-        math.floor(game.time / 60),
-        math.floor(game.time % 60),
         tileUnderCursor,
-        game.cursorPos.x,
-        game.cursorPos.y
+        formatVector(game.cursorPos)
       )
     end,
     rightPanelText = function ()
       local header = '<- Tab ->\n\n'
 
-      local idx = 1 + (game.activeTab % 2)
+      local idx = 1 + (game.activeTab % 3)
 
       if idx == 1 then
         return string.format(
@@ -80,19 +76,22 @@ local function makeUIDelegate(game, player)
         )
       elseif idx == 2 then
         return ''
-            .. header
+          .. header
           .. ' CONTROLS  \n'
-          .. 'WASD:  move\n'
-          .. 'LMB:recruit\n'
-          .. 'Spc:  focus\n'
-          .. '1234: scale\n'
-          .. 'Z:     zoom\n'
+      elseif idx == 3 then
+        return ''
+          .. header
+          .. ' INVENTORY  \n'
+          .. game.resources:serialize()
+
       end
       return ''
     end,
     bottomPanelText = function ()
       return string.format(
-        'Wd=%s St=%s Pr=%s Gr=%s Wt=%s',
+        '%02d:%02d Wd=%s St=%s Pr=%s Gr=%s Wt=%s',
+        math.floor(game.time / 60),
+        math.floor(game.time % 60),
         game.resources.wood,
         game.resources.stone,
         game.resources.pretzels,

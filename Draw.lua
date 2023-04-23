@@ -1,6 +1,5 @@
 local updateTileset = require('Tileset').update
 local parallaxTile = require('Tileset').parallaxTile
-local regenerateTileset = require('Tileset').regenerate
 local tbl = require('tbl')
 local Vector = require('Vector')
 local withColor = require('util').withColor
@@ -29,17 +28,10 @@ local YELLOW_COLOR = { 1, 1, 0, 0.8 }
 ---@param z number
 local function setZoom(drawState, z)
   drawState:setWindowScale(z)
-  local w, h = love.window.getMode()
-  if w ~= SCREEN_WIDTH * z and h ~= SCREEN_WIDTH * z then
-    love.window.setMode(SCREEN_WIDTH * z, SCREEN_HEIGHT * z)
-  end
-
-  regenerateTileset(drawState.tileset)
 end
 
 ---@param drawState DrawState
 local function init(drawState)
-  setZoom(drawState, 3)
   return drawState
 end
 
@@ -354,10 +346,11 @@ local function drawGame(game, drawState)
       x = 8 + drawState.camera.x,
       y = 8 + drawState.camera.y
     }
+    local w, h = love.window.getMode()
     love.graphics.scale(drawState.camera.z)
     love.graphics.translate(
-      math.floor(SCREEN_WIDTH / 2 / drawState.camera.z - pos.x),
-      math.floor(SCREEN_HEIGHT / 2 / drawState.camera.z - pos.y)
+      math.floor(w / drawState.windowScale / 2 / drawState.camera.z - pos.x),
+      math.floor(h / drawState.windowScale / 2 / drawState.camera.z - pos.y)
     )
   end
 

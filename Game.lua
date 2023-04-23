@@ -71,7 +71,6 @@ local updateGuy = require('Guy').updateGuy
 local setTile = require('World').setTile
 local getTile = require('World').getTile
 local isPassable = require('World').isPassable
-local UI = require('UI')
 local tbl = require('tbl')
 local Vector = require('Vector')
 local weightedRandom = require('util').weightedRandom
@@ -153,34 +152,37 @@ end
 
 ---@param delegate UIDelegate
 local function makeUIScript(delegate)
-  return UI.makeRoot({}, {
+  local UIModule = require('UI')
+  local makePanel = UIModule.makePanel
+  local origin = UIModule.origin
+
+  return UIModule.new({}, {
     ---@type PanelUI
-    UI.makePanel(UI.origin(), 320, 8, GRAY_PANEL_COLOR, {
+    makePanel(origin(), 320, 8, GRAY_PANEL_COLOR, {
       coloredText = delegate.topPanelText,
     }),
     ---@type PanelUI
-    UI.makePanel(UI.origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
+    makePanel(origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
       text = delegate.leftPanelText,
     }),
     -- Empty underlay for console
-    ---@type PanelUI
-    UI.makePanel(UI.origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
+    makePanel(origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
-    UI.makePanel(UI.origin():translate(320-88, 8), 88, 200-16-52+4, TRANSPARENT_PANEL_COLOR, {
+    makePanel(origin():translate(320-88, 8), 88, 200-16-52+4, TRANSPARENT_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
       text = delegate.rightPanelText,
     }),
     ---@type PanelUI
-    UI.makePanel(UI.origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
+    makePanel(origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
       text = delegate.bottomPanelText,
     }),
     -- Pause icon
-    UI.makePanel(UI.origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
+    makePanel(origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
-    UI.makePanel(UI.origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
+    makePanel(origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
   })
@@ -825,4 +827,5 @@ return {
   mayRecruit = mayRecruit,
   makeGame = makeGame,
   deserialize = deserialize,
+  orderLoad = orderLoad
 }

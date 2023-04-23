@@ -1,5 +1,4 @@
----@class Vector3: Vector
----@field z number
+---@alias Vector3 { x: number, y: number, z: number }
 
 ---@param v1 Vector3
 ---@param v2 Vector3

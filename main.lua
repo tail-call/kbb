@@ -11,9 +11,10 @@ local endRecruiting = require('Game').endRecruiting
 local tbl = require('tbl')
 local vector = require('Vector')
 local gameover = require('GameOver')
-local makeDrawState = require('DrawState').makeDrawState
 local loadTileset = require('Tileset').load
 local loadFont = require('util').loadFont
+local setZoom = require('Draw').setZoom
+local orderLoad = require('Game').orderLoad
 
 ---@type 'game' | 'dead'
 local state = 'game'
@@ -29,12 +30,12 @@ function love.load()
   love.graphics.setLineStyle('rough')
   loadTileset()
   local tileset = require('Tileset').getTileset()
-  drawState = makeDrawState(tileset)
-  draw.init(drawState)
+  drawState = require('DrawState').new(tileset)
   game = makeGame()
   game.onLost = function ()
     state = 'dead'
   end
+  orderLoad(game)
 end
 
 ---@param dt number
