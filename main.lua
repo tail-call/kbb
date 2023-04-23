@@ -18,6 +18,8 @@ local loadTileset = require('Tileset').load
 local loadFont = require('Util').loadFont
 local orderLoad = require('Game').orderLoad
 
+local FILENAME = './kobo2.kpss'
+
 ---@type 'game' | 'dead'
 local state = 'game'
 ---@type Game
@@ -25,6 +27,37 @@ local game
 
 ---@type DrawState
 local drawState
+
+local function loadGame()
+  local saveGameFunction, compileError = loadfile(FILENAME)
+  if compileError then
+    error(compileError)
+  end
+
+  local moduleLoader = {}
+  setmetatable(moduleLoader, { __index = function(t, k)
+    return function(props)
+      if k == 'Quad' then
+        return love.graphics.newQuad
+      elseif k == 'buf' then
+        return function(props)
+          local compressedData = love.data.decode('data', 'base64', props.base64)
+          local data = love.data.decompress('string', 'zlib', compressedData)
+          local array = loadstring(data)()
+          return array
+        end
+      else
+        -- Loading from module k
+        return require(k).new(props)
+      end
+    end
+  end })
+  setfenv(saveGameFunction, moduleLoader)
+  game = saveGameFunction()
+  if game == nil then
+    error('no game')
+  end
+end
 
 function love.load()
   love.graphics.setDefaultFilter('linear', 'nearest')
@@ -37,7 +70,7 @@ function love.load()
   game.onLost = function ()
     state = 'dead'
   end
-  orderLoad(game)
+  loadGame()
 end
 
 ---@param dt number
@@ -79,10 +112,9 @@ function love.keypressed(key, scancode, isrepeat)
   if scancode == 'return' then
     local lines = {}
 
-    local filename = './kobo2.kpss'
     -- Write to file
     do
-      local file = io.open(filename, 'w+')
+      local file = io.open(FILENAME, 'w+')
       if file == nil then error('no file') end
 
       for _, line in ipairs(game:serialize1()) do
@@ -91,34 +123,6 @@ function love.keypressed(key, scancode, isrepeat)
       file:close()
     end
 
-    local saveGameFunction, compileError = loadfile(filename)
-    if compileError then
-      error(compileError)
-    end
-
-    local moduleLoader = {}
-    setmetatable(moduleLoader, { __index = function(t, k)
-      return function(props)
-        if k == 'Quad' then
-          return love.graphics.newQuad
-        elseif k == 'buf' then
-          return function(props)
-            local compressedData = love.data.decode('data', 'base64', props.base64)
-            local data = love.data.decompress('string', 'zlib', compressedData)
-            local array = loadstring(data)()
-            return array
-          end
-        else
-          -- Loading from module k
-          return require(k).new(props)
-        end
-      end
-    end })
-    setfenv(saveGameFunction, moduleLoader)
-    game = saveGameFunction()
-    if game == nil then
-      error('no game')
-    end
   end
 
   if state ~= 'game' then return end

@@ -83,7 +83,7 @@ local updateConsole = require('Console').updateConsole
 local randomLetterCode = require('Util').randomLetterCode
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
-local makeBattle = require('Battle').makeBattle
+local makeBattle = require('Battle').new
 local makeUIDelegate = require('UIDelegate').makeUIDelegate
 local makeText = require('Text').makeText
 local makeBuilding = require('Building').makeBuilding
@@ -218,7 +218,7 @@ local function new(bak)
     resources = bak.resources or require('Resources').new(),
     guys = guys,
     time = bak.time or (12 * 60),
-    entities = bak.entities or {},
+    entities = {} or bak.entities or {},
     alternatingKeyIndex = 1,
     player = guys[1],
     squad = require('Squad').new(),
@@ -334,7 +334,9 @@ local function new(bak)
       self:freezeGuy(attacker)
       self:freezeGuy(defender)
 
-      self:addEntity(makeBattleEntity(makeBattle(attacker, defender)))
+      self:addEntity(makeBattleEntity(makeBattle({
+        attacker = attacker, defender = defender
+      })))
     end,
     setAlternatingKeyIndex = function (self, x)
       self.alternatingKeyIndex = x

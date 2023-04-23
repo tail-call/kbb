@@ -13,15 +13,15 @@ local BATTLE_ROUND_DURATION = 0.5
 
 local Battle = {}
 
----@param attacker Guy
----@param defender Guy
+---@param bak Battle
 ---@return Battle
-function Battle.makeBattle(attacker, defender)
+function Battle.new(bak)
   ---@type Battle
   local battle = {
-    attacker = attacker,
-    defender = defender,
-    pos = defender.pos,
+    __module = 'Battle',
+    attacker = bak.attacker,
+    defender = bak.defender,
+    pos = bak.defender.pos,
     round = 1,
     timer = BATTLE_ROUND_DURATION,
     swapSides = function (self)
