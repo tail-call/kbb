@@ -78,20 +78,20 @@ function love.keypressed(key, scancode, isrepeat)
 
   if scancode == 'return' then
     local lines = {}
-    local function addLines(t)
-      for _, v in ipairs(t) do
-        if type(v) == 'string' then
-          table.insert(lines, v)
-        elseif type(v) == 'table' then
-          addLines(v)
-        end
+
+    local filename = './kobo2.kpss'
+    -- Write to file
+    do
+      local file = io.open(filename, 'w+')
+      if file == nil then error('no file') end
+
+      for _, line in ipairs(game:serialize1()) do
+        file:write(line)
       end
+      file:close()
     end
 
-    addLines(game:serialize1())
-    local script = table.concat(lines)
-
-    local saveGameFunction, compileError = loadstring(script)
+    local saveGameFunction, compileError = loadfile(filename)
     if compileError then
       error(compileError)
     end

@@ -173,10 +173,10 @@ local function dump(obj)
     if obj.__module then
       coroutine.yield(obj.__module)
     end
-    coroutine.yield('{')
+    coroutine.yield('{\n')
     for k, v in pairs(obj) do
       if type(k) == 'number' then
-        coroutine.yield('['..k..']')
+        coroutine.yield('['..k..'\n]')
       else
         coroutine.yield(k)
       end
