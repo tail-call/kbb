@@ -13,7 +13,6 @@ local getFog = require('World').getFog
 
 -- Constants
 
-local SCREEN_WIDTH = 320
 local SCREEN_HEIGHT = 200
 local TILE_HEIGHT = 16
 local TILE_WIDTH = 16
