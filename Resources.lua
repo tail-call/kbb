@@ -1,4 +1,4 @@
----@class Resources: X_Serializable
+---@class Resources
 ---
 ---@field pretzels integer Amount of pretzels owned
 ---@field addPretzels fun(self: Resources, count: integer) Get more pretzels
@@ -15,27 +15,7 @@
 ---@field water integer Amount of water owned
 ---@field addWater fun(self: Resources, count: integer) Get more water
 
-local KPSS = require('KPSS')
-
 local ResourcesModule = {}
-
----@param resources Resources
-local function serializeResources(resources)
-  return table.concat {
-    'OBJECT Resources resources 5\n',
-    'NUMBER wood %s\n',
-    'NUMBER stone %s\n',
-    'NUMBER pretzels %s\n',
-    'NUMBER grass %s\n',
-    'NUMBER water %s\n',
-  }:format(
-    resources.wood,
-    resources.stone,
-    resources.pretzels,
-    resources.grass,
-    resources.water
-  )
-end
 
 ---@param bak Resources | nil
 ---@return Resources
@@ -68,21 +48,7 @@ function ResourcesModule.new(bak)
     addWater = function (self, count)
       self.water = self.water + count
     end,
-
-    X_Serializable = require('X_Serializable'),
-    serialize = serializeResources,
   }
-  return resources
-end
-
----@param file file*
----@param repeats integer
----@return Resources
-function ResourcesModule.deserialize (file, repeats)
-  local resources = ResourcesModule.new()
-  for i = 1, repeats do
-    KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(resources), i)
-  end
   return resources
 end
 

@@ -18,7 +18,6 @@ local X_Serializable = require('X_Serializable')
 
 local calcVisionDistance = require('VisionSource').calcVisionDistance
 local isVisible = require('VisionSource').isVisible
-local KPSS = require('KPSS')
 
 ---@param world World
 ---@param v Vector

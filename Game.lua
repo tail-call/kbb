@@ -94,7 +94,6 @@ local revealFogOfWar = require('World').revealFogOfWar
 local skyColorAtTime = require('Util').skyColorAtTime
 local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
-local KPSS = require('KPSS')
 
 local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
 local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
@@ -378,30 +377,9 @@ local function new(bak)
     setAlternatingKeyIndex = function (self, x)
       self.alternatingKeyIndex = x
     end,
-    X_Serializable = X_Serializable,
-    serialize = function (self)
-      ---@cast self Game
-      return table.concat {
-        'OBJECT Game game 5\n',
-        ('NUMBER time %s\n'):format(self.time),
-        ('NUMBER magnificationFactor %s\n'):format(self.magnificationFactor),
-        ('VECTOR playerPos %s %s\n'):format(self.player.pos.x, self.player.pos.y),
-        game.world:serialize(),
-        game.resources:serialize(),
-      }
-    end,
     serialize1 = function (self)
       ---@cast self Game
       local dump = require('Util').dump
-      local exhaust = require('Util').exhaust
-
-      local function minidump(obj)
-        local result = {}
-        exhaust(dump, function(part)
-          table.insert(result, part or '')
-        end, obj)
-        return table.concat(result)
-      end
 
       game.world.fogOfWar.__dump = function(dump)
         -- dump('buf(){base64=[[')
@@ -430,7 +408,6 @@ local function new(bak)
         dump(']]}')
       end
 
-
       game.world.tileTypes.__dump = function(dump)
         dump('buf(){base64=[[')
         local words = {'return{'}
@@ -452,12 +429,12 @@ local function new(bak)
         return Game{
           time = ]],tostring(self.time),[[,
           score = ]],tostring(self.score),[[,
-          guys = ]],minidump(self.guys),[[,
+          guys = ]],dump(self.guys),[[,
           magnificationFactor = ]],tostring(self.magnificationFactor),[[,
-          world = ]],minidump(self.world),[[,
-          texts = ]],minidump(self.texts),[[,
-          entities = ]],minidump(self.entities),[[,
-          resources = Resources]],minidump(self.resources),[[,
+          world = ]],dump(self.world),[[,
+          texts = ]],dump(self.texts),[[,
+          entities = ]],dump(self.entities),[[,
+          resources = Resources]],dump(self.resources),[[,
         }
       ]]}
     end,
@@ -782,30 +759,6 @@ local function orderScribe(game)
   game:disableFocus()
 end
 
--- Load/save
-
----@param game Game
-local function orderLoad(game)
-  local file = io.open(SAVE_FILENAME, 'rb')
-  if file == nil then
-    return
-  end
-
-  local output = {}
-  KPSS.load(output, file, function (str)
-    say(game, 'load: ' .. str)
-  end)
-  game.time = output.game.time
-  game.world = output.game.world
-  game.resources = output.game.resources
-  game.magnificationFactor = output.game.magnificationFactor
-  game.player:move(output.game.playerPos)
-
-  file:close()
-end
-
--- End load/save
-
 ---@param game Game
 ---@param tileset Tileset
 local function orderSummon(game, tileset)
@@ -829,9 +782,6 @@ end
 local function handleFocusModeInput(game, scancode, tileset)
   if scancode == 'm' then
     orderScribe(game)
-  elseif scancode == 'l' then
-    orderLoad(game)
-    game:toggleFocus()
   elseif scancode == 'space' then
     orderFocus(game)
   end
@@ -890,17 +840,6 @@ local function handleInput(game, scancode, tileset)
   end
 end
 
----@param file file*
----@param repeats integer
----@return Game
-local function deserialize(file, repeats)
-  local game = new()
-  for i = 1, repeats do
-    KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(game), i)
-  end
-  return game
-end
-
 ---@type GameModule
 return {
   handleInput = handleInput,
@@ -910,7 +849,6 @@ return {
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
   new = new,
-  deserialize = deserialize,
   orderLoad = orderLoad,
   makeUIScript = makeUIScript,
 }

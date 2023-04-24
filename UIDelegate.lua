@@ -7,6 +7,7 @@
 
 local getTile = require('World').getTile
 local formatVector = require('Vector').formatVector
+local dump = require('Util').dump
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
@@ -28,7 +29,7 @@ local function makeUIDelegate(game, player)
           love.timer.getFPS()
         ),
         WHITE_COLOR,
-        'WASD] move\nSpc] focus\nLMB] recruit\nZ] zoom\nN] reload\nF] follow\nQ] gather\nT] warp\nC] collect\n',
+        'WASD] move\nSpc] focus\nLMB] recruit\nRet] save\nZ] zoom\nN] reload\nF] follow\nQ] gather\nT] warp\nC] collect\n',
         player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
         'G] dismiss 1t\n',
         player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
@@ -44,9 +45,7 @@ local function makeUIDelegate(game, player)
           .. 'Terrain:\n %s'
           .. '\nCoords:\n %s'
           .. '\n1234] scale'
-          .. '\nM] message'
-          .. '\nRet] save'
-          .. '\nL] load',
+          .. '\nM] message',
         tileUnderCursor,
         formatVector(game.cursorPos)
       )
@@ -85,7 +84,7 @@ local function makeUIDelegate(game, player)
         return ''
           .. header
           .. ' INVENTORY  \n'
-          .. game.resources:serialize()
+          .. '${game.resources}'
 
       end
       return ''

@@ -164,52 +164,64 @@ local function skyColorAtTime(time)
   }
 end
 
+---Dumps an object to Lua code
+---@param obj any
+---@return string
 local function dump(obj)
-  if type(obj) == 'number' then
-    coroutine.yield(tostring(obj))
-  elseif type(obj) == 'string' then
-    coroutine.yield(string.format('%q', obj))
-  elseif type(obj) == 'table' then
-    if obj.__dump then
-      obj.__dump(coroutine.yield)
-    else
-      if obj.__module then
-        coroutine.yield(obj.__module)
-      end
-
-      coroutine.yield('{\n')
-      for k, v in pairs(obj) do
-        if type(k) == 'number' then
-          coroutine.yield('['..k..'\n]')
-        else
-          coroutine.yield(k)
+  ---@param obj any
+  local function driver(obj)
+    if type(obj) == 'number' then
+      coroutine.yield(tostring(obj))
+    elseif type(obj) == 'string' then
+      coroutine.yield(string.format('%q', obj))
+    elseif type(obj) == 'table' then
+      if obj.__dump then
+        obj.__dump(coroutine.yield)
+      else
+        if obj.__module then
+          coroutine.yield(obj.__module)
         end
 
-        coroutine.yield('=')
-        dump(v)
-        coroutine.yield(',')
+        coroutine.yield('{\n')
+        for k, v in pairs(obj) do
+          if type(k) == 'number' then
+            coroutine.yield('['..k..'\n]')
+          else
+            coroutine.yield(k)
+          end
+
+          coroutine.yield('=')
+          driver(v)
+          coroutine.yield(',')
+        end
+        coroutine.yield('}\n')
       end
-      coroutine.yield('}\n')
-    end
-  elseif type(obj) == 'userdata' then
-    if obj:type() == 'Quad' then
-      ---@cast obj love.Quad
-      coroutine.yield('Quad()(')
-      local x, y, w, h = obj:getViewport()
-      local sw, sh = obj:getTextureDimensions()
-      coroutine.yield(('%s,%s,%s,%s,%s,%s'):format(x, y, w, h, sw, sh))
-      coroutine.yield(')')
+    elseif type(obj) == 'userdata' then
+      if obj:type() == 'Quad' then
+        ---@cast obj love.Quad
+        coroutine.yield('Quad()(')
+        local x, y, w, h = obj:getViewport()
+        local sw, sh = obj:getTextureDimensions()
+        coroutine.yield(('%s,%s,%s,%s,%s,%s'):format(x, y, w, h, sw, sh))
+        coroutine.yield(')')
+      else
+        coroutine.yield(obj:type())
+      end
+    elseif type(obj) == 'function' then
+      coroutine.yield('3')
+    elseif type(obj) == 'boolean' then
+      coroutine.yield(tostring(obj))
     else
-      coroutine.yield(obj:type())
+      error(type(obj))
+      coroutine.yield('nil')
     end
-  elseif type(obj) == 'function' then
-    coroutine.yield('3')
-  elseif type(obj) == 'boolean' then
-    coroutine.yield(tostring(obj))
-  else
-    error(type(obj))
-    coroutine.yield('nil')
   end
+
+  local result = {}
+  exhaust(driver, function(part)
+    table.insert(result, part or '')
+  end, obj)
+  return table.concat(result)
 end
 
 return {
