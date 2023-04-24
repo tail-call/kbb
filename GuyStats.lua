@@ -12,13 +12,17 @@ local clamped = require('Util').clamped
 
 local GuyStats = {}
 
-function GuyStats.makeGuyStats()
+---@param bak GuyStats
+function GuyStats.new(bak)
+  bak = bak or {}
+
   ---@type GuyStats
   local guyStats = {
-    hp = 10,
-    maxHp = 10,
-    moves = 0,
-    maxMoves = 99,
+    __module = 'GuyStats',
+    hp = bak.hp or 10,
+    maxHp = bak.maxHp or 10,
+    moves = bak.moves or 0,
+    maxMoves = bak.maxMoves or 99,
     hurt = function (self, damage)
       self.hp = self.hp - damage
     end,

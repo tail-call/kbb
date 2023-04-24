@@ -29,7 +29,6 @@
 local makePixie = require('Pixie').new
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
-local makeGuyStats = require('GuyStats').makeGuyStats
 
 ---@type Guy
 local Guy = {}
@@ -129,7 +128,7 @@ local function new(bak)
     mayMove = bak.mayMove or false,
     speed = bak.speed or 0.15,
     pos = bak.pos or { x = 0, y = 0 },
-    stats = makeGuyStats(),
+    stats = require('GuyStats').new(bak.stats),
     pixie = makePixie(bak.pixie),
     rename = function (self, name)
       self.name = name
