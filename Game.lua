@@ -748,13 +748,17 @@ end
 
 ---@param game Game
 local function orderScribe(game)
-  game:addText(makeText(string.format(
-    '%c%c\n%c%c',
-    randomLetterCode(),
-    randomLetterCode(),
-    randomLetterCode(),
-    randomLetterCode()
-  ), game.cursorPos, 4))
+  game:addText(makeText{
+    text = string.format(
+      '%c%c\n%c%c',
+      randomLetterCode(),
+      randomLetterCode(),
+      randomLetterCode(),
+      randomLetterCode()
+    ),
+    pos = game.cursorPos,
+    lifetime = 4,
+  })
 
   game:disableFocus()
 end
