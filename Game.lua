@@ -85,8 +85,8 @@ local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
 local makeBattle = require('Battle').new
 local makeUIDelegate = require('UIDelegate').new
-local makeText = require('Text').makeText
-local makeBuilding = require('Building').makeBuilding
+local makeText = require('Text').new
+local makeBuilding = require('Building').new
 local makeBuildingEntity = require('GameEntity').makeBuildingEntity
 local makeBattleEntity = require('GameEntity').makeBattleEntity
 local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
@@ -254,7 +254,7 @@ local function new(bak)
     resources = bak.resources or require('Resources').new(),
     guys = guys,
     time = bak.time or (12 * 60),
-    entities = {} or bak.entities or {},
+    entities = bak.entities or {},
     alternatingKeyIndex = 1,
     player = guys[1],
     squad = require('Squad').new(),
@@ -741,7 +741,7 @@ local function orderBuild(tileset, game)
   -- Build
   game.resources:addWood(-BUILDING_COST)
   game.player.stats:addMoves(-MOVE_COSTS_TABLE.build)
-  game:addEntity(makeBuildingEntity(makeBuilding(pos)))
+  game:addEntity(makeBuildingEntity(makeBuilding({ pos = pos })))
   game:addScore(SCORES_TABLE.builtAHouse)
   game:disableFocus()
 end

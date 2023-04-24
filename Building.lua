@@ -1,11 +1,14 @@
 ---@class Building
 ---@field pos Vector Building's position
 
----@param pos Vector
-local function makeBuilding(pos)
-  return { pos = pos }
+---@param bak Building
+local function new(bak)
+  return {
+    __module = 'Building',
+    pos = bak.pos,
+  }
 end
 
 return {
-  makeBuilding = makeBuilding
+  new = new
 }

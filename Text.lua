@@ -3,19 +3,20 @@
 ---@field pos Vector Position in the world
 ---@field maxWidth number Maximum width of displayed text
 
----@param content string
----@param pos Vector
----@param maxWidth number
-local function makeText(content, pos, maxWidth)
+---@param bak Text
+local function new(bak)
+  bak = bak or {}
+
   ---@type Text
   local text = {
-    text = content,
-    pos = pos,
-    maxWidth = maxWidth,
+    __module = 'Text',
+    text = bak.text or 'Insert text',
+    pos = bak.pos or error('Text: pos is mandatory'),
+    maxWidth = bak.maxWidth or 32,
   }
   return text
 end
 
 return {
-  makeText = makeText,
+  new = new,
 }

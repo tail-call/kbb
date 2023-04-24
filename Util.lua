@@ -211,9 +211,10 @@ local function dump(obj)
       coroutine.yield('3')
     elseif type(obj) == 'boolean' then
       coroutine.yield(tostring(obj))
+    elseif type(obj) == 'nil' then
+      coroutine.yield('nil')
     else
       error(type(obj))
-      coroutine.yield('nil')
     end
   end
 
