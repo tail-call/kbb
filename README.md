@@ -88,10 +88,10 @@ You have psy abilities, so your cursor has FOV just like you do.
  
  - [x] Game is an editable image
  - [x] Object hot reloading
+ - [x] Health bars
  - [ ] Save level immediately on game exit
  - [ ] Event system
  - [ ] Proximity based combat
- - [ ] Health bars
  - [ ] Random terrain generation in a selected area
  - [ ] Lua console in focus mode
  - [ ] Timer type

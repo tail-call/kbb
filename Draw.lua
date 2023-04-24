@@ -213,6 +213,15 @@ end
 ---@param guy Guy
 local function drawGuy(guy)
   drawPixie(guy.pixie)
+  local x, y = guy.pixie.transform:transformPoint(0, 0)
+  local xOffset = guy.pixie.flip and -16 or 0
+  withColor(1, 0, 0, 1, function ()
+    love.graphics.rectangle('fill', x + xOffset, y + 20, 16, 2)
+  end)
+  local width = 16 * guy.stats.hp / guy.stats.maxHp
+  withColor(0, 1, 0, 1, function ()
+    love.graphics.rectangle('fill', x + xOffset, y + 20, width, 2)
+  end)
 end
 
 ---@param text string
