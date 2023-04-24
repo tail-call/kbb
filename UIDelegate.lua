@@ -78,7 +78,9 @@ local function makeUIDelegate(game, player)
       elseif idx == 2 then
         return ''
           .. header
-          .. ' CONTROLS  \n'
+          .. ' DEBUG\n'
+          .. string.format('mayMove %s\n', game.player.mayMove)
+          .. string.format('pos %s\n', formatVector(game.player.pos))
       elseif idx == 3 then
         return ''
           .. header

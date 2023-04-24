@@ -1,12 +1,8 @@
 -- Need to do this before anything else is executed
 math.randomseed(os.time())
 
--- Mock he table module
-table.new = function () return {} end
-
 local draw = require('Draw')
 local makeGame = require('Game').new
-local drawGame = require('Draw').drawGame
 local handleInput = require('Game').handleInput
 local updateGame = require('Game').updateGame
 local beginRecruiting = require('Game').beginRecruiting
@@ -16,7 +12,6 @@ local vector = require('Vector')
 local gameover = require('GameOver')
 local loadTileset = require('Tileset').load
 local loadFont = require('Util').loadFont
-local orderLoad = require('Game').orderLoad
 
 local FILENAME = './kobo2.kpss'
 
@@ -30,7 +25,7 @@ local drawState
 
 local function loadGame()
   local saveGameFunction, compileError = loadfile(FILENAME)
-  if compileError then
+  if saveGameFunction == nil then
     error(compileError)
   end
 
@@ -43,6 +38,7 @@ local function loadGame()
         return function(props)
           local compressedData = love.data.decode('data', 'base64', props.base64)
           local data = love.data.decompress('string', 'zlib', compressedData)
+          ---@cast data string
           local array = loadstring(data)()
           return array
         end

@@ -34,11 +34,13 @@ local function init(drawState)
   return drawState
 end
 
+---@param drawState DrawState
 ---@param ui UI
-local function drawUI(ui)
+local function drawUI(drawState, ui)
   if ui.shouldDraw and not ui.shouldDraw() then return end
 
-  love.graphics.applyTransform(ui.transform)
+  local transform = ui.transform(drawState)
+  love.graphics.applyTransform(transform)
 
   if ui.type == 'none' then
     ---@cast ui UI
@@ -46,8 +48,9 @@ local function drawUI(ui)
     ---@cast ui PanelUI
     local bg = ui.background
 
+    local width, height = ui.w(drawState), ui.h(drawState)
     withColor(bg.r, bg.g, bg.b, bg.a, function ()
-      love.graphics.rectangle('fill', 0, 0, ui.w, ui.h)
+      love.graphics.rectangle('fill', 0, 0, width, height)
     end)
 
     -- Draw text with shadow
@@ -60,17 +63,17 @@ local function drawUI(ui)
             1 - val, 1 - val
           )
         elseif ui.text then
-          love.graphics.printf(ui.text(), 1 - val, 1 - val, ui.w)
+          love.graphics.printf(ui.text(), 1 - val, 1 - val, width)
         end
       end)
     end
   end
 
   for _, child in ipairs(ui.children) do
-    drawUI(child)
+    drawUI(drawState, child)
   end
 
-  love.graphics.applyTransform(ui.transform:inverse())
+  love.graphics.applyTransform(transform:inverse())
 end
 
 --- Should be called at the start of love.draw
@@ -495,7 +498,7 @@ local function drawGame(game, drawState)
 
   -- Draw UI
 
-  drawUI(game.ui)
+  drawUI(drawState, game.ui)
 
   -- Draw minimap
 

@@ -200,17 +200,6 @@ local function revealFogOfWar(world, visionSource, light, dt)
   end
 end
 
----@param file file*
----@param repeats integer
----@return World
-local function deserialize(file, repeats)
-  local world = new()
-  for i = 1, repeats do
-    KPSS.executeNextLine(file, '???', KPSS.makeCommandHandler(world), i)
-  end
-  return world
-end
-
 return {
   isPassable = isPassable,
   setTile = setTile,
@@ -220,5 +209,4 @@ return {
   revealFogOfWar = revealFogOfWar,
   vectorToLinearIndex = vectorToLinearIndex,
   makeFogOfWarFromBlock = makeFogOfWarFromBlock,
-  deserialize = deserialize,
 }

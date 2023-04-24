@@ -158,34 +158,72 @@ local function makeUIScript(delegate)
   local makePanel = UIModule.makePanel
   local origin = UIModule.origin
 
+  ---@param drawState DrawState
+  local function fullWidth(drawState)
+    local sw, sh = love.window.getMode()
+    print('drawState', drawState)
+    return sw / drawState.windowScale
+  end
+
+  ---@param drawState DrawState
+  local function fullHeight(drawState)
+    local sw, sh = love.window.getMode()
+    return sh / drawState.windowScale
+  end
+
+  local function fixed(x)
+    return function () return x end
+  end
+
   return UIModule.new({}, {
     ---@type PanelUI
-    makePanel(origin(), 320, 8, GRAY_PANEL_COLOR, {
+    makePanel({
+      background = GRAY_PANEL_COLOR,
+      transform = function () return origin() end,
+      w = fullWidth,
+      h = fixed(8),
       coloredText = delegate.topPanelText,
     }),
-    ---@type PanelUI
-    makePanel(origin():translate(0, 8), 88, 184, GRAY_PANEL_COLOR, {
+    -- Left panel
+    makePanel({
+      background = GRAY_PANEL_COLOR,
+      transform = function ()
+        return origin():translate(0, 8)
+      end,
+      w = fixed(88),
+      h = fullHeight,
       shouldDraw = delegate.shouldDrawFocusModeUI,
       text = delegate.leftPanelText,
     }),
     -- Empty underlay for console
-    makePanel(origin():translate(88, 144), 320-80, 52, DARK_GRAY_PANEL_COLOR, {
+    makePanel({
+      background = DARK_GRAY_PANEL_COLOR,
+      transform = function (drawState)
+        return origin():translate(88, fullHeight(drawState) - 60)
+      end,
+      w = fixed(240),
+      h = fixed(52),
       shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
-    makePanel(origin():translate(320-88, 8), 88, 200-16-52+4, TRANSPARENT_PANEL_COLOR, {
-      shouldDraw = delegate.shouldDrawFocusModeUI,
+    -- Right panel
+    makePanel({
+      background = TRANSPARENT_PANEL_COLOR,
+      transform = function (drawState)
+        return origin():translate(fullWidth(drawState)-88, 8)
+      end,
+      w = fixed(88),
+      h = fixed(128),
       text = delegate.rightPanelText,
     }),
-    ---@type PanelUI
-    makePanel(origin():translate(0, 192), 320, 8, GRAY_PANEL_COLOR, {
+    -- Bottom panel
+    makePanel({
+      background = GRAY_PANEL_COLOR,
+      transform = function (drawState)
+        return origin():translate(0, fullHeight(drawState) - 8)
+      end,
+      w = fullWidth,
+      h = fixed(8),
       text = delegate.bottomPanelText,
-    }),
-    -- Pause icon
-    makePanel(origin():translate(92, 132), 3, 8, WHITE_PANEL_COLOR, {
-      shouldDraw = delegate.shouldDrawFocusModeUI,
-    }),
-    makePanel(origin():translate(97, 132), 3, 8, WHITE_PANEL_COLOR, {
-      shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
   })
 end
@@ -790,9 +828,7 @@ end
 ---@param scancode string
 ---@param tileset Tileset
 local function handleFocusModeInput(game, scancode, tileset)
-  if scancode == 'tab' then
-    game:nextTab()
-  elseif scancode == 'm' then
+  if scancode == 'm' then
     orderScribe(game)
   elseif scancode == 'l' then
     orderLoad(game)
@@ -806,7 +842,9 @@ end
 ---@param scancode string
 ---@param tileset Tileset
 local function handleNormalModeInput(game, scancode, tileset)
-  if scancode == 'f' then
+  if scancode == 'tab' then
+    game:nextTab()
+  elseif scancode == 'f' then
     if game.player.stats.moves >= MOVE_COSTS_TABLE.follow then
       game.player.stats:addMoves(-MOVE_COSTS_TABLE.follow)
       game.squad:toggleFollow()
@@ -825,10 +863,12 @@ local function handleNormalModeInput(game, scancode, tileset)
   elseif scancode == 'space' then
     orderFocus(game)
   elseif scancode == 'n' then
+    package.loaded['UI'] = nil
     package.loaded['UIDelegate'] = nil
     package.loaded['Draw'] = nil
     package.loaded['Guy'] = nil
-    game.ui = makeUIScript(require('UIDelegate').new(game, game.player))
+    package.loaded['Game'] = nil
+    game.ui = require('Game').makeUIScript(require('UIDelegate').new(game, game.player))
     game.player = require('Guy').new(game.player)
     game.guys[1] = game.player
   elseif scancode == 't' then
@@ -872,5 +912,6 @@ return {
   mayRecruit = mayRecruit,
   new = new,
   deserialize = deserialize,
-  orderLoad = orderLoad
+  orderLoad = orderLoad,
+  makeUIScript = makeUIScript,
 }

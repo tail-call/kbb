@@ -145,6 +145,7 @@ local function new(bak)
     end,
     move = function (self, pos)
       self.mayMove = false
+      self.timer = 0
       self.stats:addMoves(-2)
       self.pos = pos
       self.pixie:move(self.pos)
@@ -152,9 +153,7 @@ local function new(bak)
     advanceTimer = function (self, dt)
       self.pixie:update(dt)
 
-      if not self.mayMove then
-        self.timer = self.timer + dt
-      end
+      self.timer = self.timer + dt
 
       while self.timer >= self.speed do
         self.mayMove = true
