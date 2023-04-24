@@ -161,7 +161,6 @@ local function makeUIScript(delegate)
   ---@param drawState DrawState
   local function fullWidth(drawState)
     local sw, sh = love.window.getMode()
-    print('drawState', drawState)
     return sw / drawState.windowScale
   end
 
