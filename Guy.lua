@@ -26,12 +26,14 @@
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
 
+local M = require('Module').define(..., 0)
+
 local makePixie = require('Pixie').new
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
 
 ---@type Guy
-local Guy = {}
+M.Guy = {}
 
 ---@param team1 GuyTeam
 ---@param team2 GuyTeam
@@ -45,7 +47,7 @@ end
 ---@param vec Vector
 ---@param delegate GuyDelegate
 ---@return Vector newPosition
-local function moveGuy(guy, vec, delegate)
+function M.moveGuy(guy, vec, delegate)
   if not guy.mayMove or guy.stats.moves < 1 then return guy.pos end
 
   local stepForward = Vector.add(guy.pos, vec)
@@ -85,22 +87,22 @@ local function moveGuy(guy, vec, delegate)
   return guy.pos
 end
 
-local function warpGuy(guy, vec)
+function M.warpGuy(guy, vec)
   guy.pos = vec
   guy.pixie:spawn(guy.pos)
 end
 
 ---@param guy Guy
 ---@param dt number
-local function updateGuy(guy, dt)
+function M.updateGuy(guy, dt)
   guy:advanceTimer(dt)
 end
 
 ---@param guy Guy
 ---@param delegate GuyDelegate
-local function behave(guy, delegate)
+function M.behave(guy, delegate)
   if guy.behavior == 'wander' then
-    moveGuy(guy, ({
+    M.moveGuy(guy, ({
       Vector.dir.up,
       Vector.dir.down,
       Vector.dir.left,
@@ -111,7 +113,7 @@ end
 
 ---@param bak Guy
 ---@return Guy
-local function new(bak)
+function M.new(bak)
   bak = bak or {}
   ---@type Guy
   local guy = {
@@ -170,8 +172,8 @@ end
 
 ---@param tileset Tileset
 ---@param pos Vector
-function Guy.makeLeader(tileset, pos)
-  local guy = new{
+function M.makeLeader(tileset, pos)
+  local guy = M.new{
     pixie = {
       quad = tileset.quads.guy,
       color = { 1, 1, 0, 1 },
@@ -184,8 +186,8 @@ end
 
 ---@param tileset Tileset
 ---@param pos Vector
-function Guy.makeHuman(tileset, pos)
-  local guy = new{
+function M.makeHuman(tileset, pos)
+  local guy = M.new{
     pixie = {
       quad = tileset.quads.human,
       color = { 1, 1, 1, 1 },
@@ -200,8 +202,8 @@ end
 
 ---@param tileset Tileset
 ---@param pos Vector
-function Guy.makeGoodGuy(tileset, pos)
-  local guy = new{
+function M.makeGoodGuy(tileset, pos)
+  local guy = M.new{
     pixie = {
       quad = tileset.quads.guy
     },
@@ -215,8 +217,8 @@ end
 
 ---@param tileset Tileset
 ---@param pos Vector
-function Guy.makeEvilGuy(tileset, pos)
-  local guy = new{
+function M.makeEvilGuy(tileset, pos)
+  local guy = M.new{
     pixie = {
       quad = tileset.quads.guy,
       color = { 1, 0, 0, 1 },
@@ -233,8 +235,8 @@ end
 
 ---@param tileset Tileset
 ---@param pos Vector
-function Guy.makeStrongEvilGuy(tileset, pos)
-  local guy = new{
+function M.makeStrongEvilGuy(tileset, pos)
+  local guy = M.new{
     pixie = {
       quad = tileset.quads.guy,
       color = { 1, 0, 1, 1 },
@@ -250,16 +252,10 @@ function Guy.makeStrongEvilGuy(tileset, pos)
   return guy
 end
 
-local function canRecruitGuy(guy)
+---@param guy Guy
+---@return boolean
+function M.canRecruitGuy(guy)
   return guy.team == 'good'
 end
 
-return {
-  Guy = Guy,
-  canRecruitGuy = canRecruitGuy,
-  moveGuy = moveGuy,
-  updateGuy = updateGuy,
-  warpGuy = warpGuy,
-  behave = behave,
-  new = new,
-}
+return M

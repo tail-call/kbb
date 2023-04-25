@@ -3,7 +3,7 @@
 ---@field pos Vector Position in the world
 ---@field maxWidth number Maximum width of displayed text
 
-local M = require('Module').define('Text', 0)
+local M = require('Module').define(..., 0)
 
 ---@param bak Text
 function M.init(bak)

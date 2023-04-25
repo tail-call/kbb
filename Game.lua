@@ -57,7 +57,6 @@
 ---
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
-local Guy = require('Guy').Guy
 local canRecruitGuy = require('Guy').canRecruitGuy
 local moveGuy = require('Guy').moveGuy
 local warpGuy = require('Guy').warpGuy
@@ -232,6 +231,7 @@ end
 ---@param bak GameBlueprint | nil
 ---@return Game
 local function new(bak)
+  local Guy = require('Guy')
   bak = bak or {}
 
   local tileset = require('Tileset').getTileset()
@@ -678,6 +678,7 @@ end
 ---@param game Game
 ---@param guy Guy
 local function maybeCollect(tileset, game, guy)
+  local Guy = require('Guy')
   if isFrozen(game, guy) then return end
 
   local pos = guy.pos
@@ -763,7 +764,7 @@ local function orderSummon(game, tileset)
 
   game.resources:addPretzels(-1)
   game.player.stats:addMoves(-MOVE_COSTS_TABLE.summon)
-  local guy = Guy.makeGoodGuy(tileset, {
+  local guy = require('Guy').makeGoodGuy(tileset, {
     x = game.cursorPos.x,
     y = game.cursorPos.y
   })
