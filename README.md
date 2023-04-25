@@ -91,6 +91,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Health bars
  - [x] Command for bringing your troops closer to you
  - [x] Lua console in focus mode
+ - [x] Travelling through void is veeeeery slow but possible
  - [ ] Console command history
  - [ ] Use mutators instead of methods to mutate objects
  - [ ] Use meshes and vertex shading for smooth fog of war
@@ -115,6 +116,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Wander areas of guys are resizable
  - [ ] Minimap fog of war
  - [ ] Flight ability
+ - [ ] Swim ability
  - [ ] Flying mountable dragon
  - [ ] Coroutines for animations
  - [ ] Items on the ground are 2D sprites rotating around Z axis
@@ -122,7 +124,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Chest for resources
  - [ ] Chest for treasures
  - [ ] Different types of tiles yield different movement speeds
- - [ ] Travelling through void is veeeeery slow but possible, even outside of the map
+ - [ ] Travelling through void outside of map is possible
  - [ ] Teleport a group of guys
  - [ ] Multi-layer parallax pseudo 3D of world
  - [ ] Constantly lower HP in the area of enemy's spawn
@@ -148,7 +150,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Workshop where foundations of buildings are made
  - [ ] A group of units must carry foundation to its place
  - [ ] Then unit carries wood to the site and builds the thing
- - [ ] Wolves
+ - [ ] Wolves that only walk on forest tiles
  - [ ] Dragons
  - [ ] Unicorns
  - [ ] Circle shaped cursor when pointing to unit/building

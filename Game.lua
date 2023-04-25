@@ -669,7 +669,13 @@ local function updateGame(game, dt, movementDirections)
   end
 
   for _, guy in ipairs(game.guys) do
-    updateGuy(guy, dt)
+    if getTile(game.world, guy.pos) == 'forest' then
+      updateGuy(guy, dt / 2)
+    elseif getTile(game.world, guy.pos) == 'void' then
+      updateGuy(guy, dt / 8)
+    else
+      updateGuy(guy, dt)
+    end
     if not isFrozen(game, guy) then
       behave(guy, game.guyDelegate)
     end
