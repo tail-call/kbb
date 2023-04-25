@@ -29,12 +29,10 @@ function M.define(name, version)
       return bak
     end,
     new = function (bak)
-      local migratedBak = module.migrate(bak)
-      local obj = migratedBak or {}
+      local obj = module.migrate(bak or {})
       obj.__module = name
       obj.__version = version
       module.init(obj, function (moduleName, dep)
-        if dep == nil then return nil end
         return require(moduleName).new(dep)
       end)
       return obj
@@ -42,7 +40,6 @@ function M.define(name, version)
     reload = function (obj)
       module.deinit(obj)
       return module.init(obj, function (moduleName, dep)
-        if dep == nil then return end
         require(moduleName).reload(dep)
       end)
     end,

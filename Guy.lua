@@ -123,7 +123,7 @@ end
 
 function M.warpGuy(guy, vec)
   guy.pos = vec
-  guy.pixie:spawn(guy.pos)
+  require('Pixie').mut.playSpawnAnimation(guy.pixie, guy.pos)
 end
 
 ---@param guy Guy

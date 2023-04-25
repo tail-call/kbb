@@ -741,23 +741,6 @@ local function orderBuild(game)
 end
 
 ---@param game Game
-local function orderScribe(game)
-  game:addText(require('Text').new{
-    text = string.format(
-      '%c%c\n%c%c',
-      randomLetterCode(),
-      randomLetterCode(),
-      randomLetterCode(),
-      randomLetterCode()
-    ),
-    pos = game.cursorPos,
-    lifetime = 4,
-  })
-
-  game:disableFocus()
-end
-
----@param game Game
 ---@param tileset Tileset
 local function orderSummon(game, tileset)
   if game.resources.pretzels <= 0 then return end
@@ -789,6 +772,12 @@ local function handleFocusModeInput(game, scancode, key)
       commands = {
         reload = function(moduleName)
           require('Module').reload(moduleName)
+        end,
+        scribe = function(text)
+          game:addText(require('Text').new{
+            text = text,
+            pos = game.player.pos,
+          })
         end,
         print = function (something)
           say(game, something)
@@ -826,8 +815,6 @@ local function handleNormalModeInput(game, scancode)
     end
   elseif scancode == 'c' then
     orderChop(tileset, game)
-  elseif scancode == 'm' then
-    orderScribe(game)
   elseif scancode == 'b' then
     orderBuild(game)
   elseif scancode == 'r' then
