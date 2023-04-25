@@ -30,7 +30,6 @@
 
 local M = require('Module').define(..., 0)
 
-local makePixie = require('Pixie').new
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
 
@@ -147,33 +146,25 @@ function M.behave(guy, delegate)
   end
 end
 
----@param bak Guy
----@return Guy
-function M.new(bak)
-  bak = bak or {}
-  ---@type Guy
-  local guy = {
-    __module = 'Guy',
-    name = 'Unnamed',
-    timer = 0,
-    behavior = bak.behavior or 'none',
-    abilities = {
-      { ability = abilities.normalSuccess, weight = 4 },
-      { ability = abilities.normalCriticalSuccess, weight = 1 },
-      { ability = abilities.normalFail, weight = 1 },
-    },
-    team = bak.team or 'good',
-    mayMove = bak.mayMove or false,
-    speed = bak.speed or 0.15,
-    pos = bak.pos or { x = 0, y = 0 },
-    stats = require('GuyStats').new(bak.stats),
-    pixie = makePixie(bak.pixie),
+---@param guy Guy
+function M.init(guy, make)
+  guy.stats = make('GuyStats', guy.stats)
+  guy.name = guy.name or 'Unnamed'
+  guy.timer = guy.timer or 0
+  guy.behavior = guy.behavior or 'none'
+  guy.abilities = {
+    { ability = abilities.normalSuccess, weight = 4 },
+    { ability = abilities.normalCriticalSuccess, weight = 1 },
+    { ability = abilities.normalFail, weight = 1 },
   }
+  guy.team = guy.team or 'good'
+  guy.mayMove = guy.mayMove or false
+  guy.speed = guy.speed or 0.15
+  guy.pos = guy.pos or { x = 0, y = 0 }
+  guy.pixie = make('Pixie', guy.pixie)
 
   guy.pixie:move(guy.pos)
   guy.pixie:spawn(guy.pos)
-
-  return guy
 end
 
 ---@param tileset Tileset

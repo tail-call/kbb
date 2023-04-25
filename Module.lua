@@ -15,22 +15,26 @@ function M.define(name, version)
   module = {
     mut = {},
     __modulename = name,
-    new = function (bak)
-      local obj = bak or {}
-      obj.__module = name
-      obj.__version = version
-      module.init(obj)
-      return obj
-    end,
-    init = function (bak)
+    init = function (bak, strategy)
       -- Do nothing
     end,
     deinit = function (bak)
       -- Do nothing
     end,
+    new = function (bak)
+      local obj = bak or {}
+      obj.__module = name
+      obj.__version = version
+      module.init(obj, function (moduleName, bak)
+        return require(moduleName).new(bak)
+      end)
+      return obj
+    end,
     reload = function (obj)
       module.deinit(obj)
-      return module.init(obj)
+      return module.init(obj, function (moduleName, bak)
+        require(moduleName).reload(bak)
+      end)
     end,
   }
   return module
