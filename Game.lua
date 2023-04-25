@@ -23,8 +23,7 @@
 ---@field guyDelegate GuyDelegate Object that talks to guys
 ---@field frozenGuys { [Guy]: true } Guys that should be not rendered and should not behave
 ---@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
----@field freezeGuy fun(self: Game, guy: Guy) Freezes a guy
----@field unfreezeGuy fun(self: Game, guy: Guy) Unfreezes a guy
+---@field setGuyFrozen fun(self: Game, guy: Guy, state: boolean) Unfreezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
 ---
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
@@ -46,13 +45,10 @@
 ---
 ---@field ui UI User interface root
 ---@field uiModel UIModel GUI state
----@field console Console Bottom console
----@field activeTab integer Current active tab in the focus screen
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
 ---@field setAlternatingKeyIndex fun(self: Game, x: number) Moves diagonam movement reader head to a new location
 ---
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
----@field nextTab fun(self: Game) Switches tab in the UI
 ---
 ---# GFX
 ---
@@ -142,11 +138,13 @@ local function findEntityAtPos(game, pos)
   end)
 end
 
----@param delegate UIModel
-local function makeUIScript(delegate)
+---@param game Game
+local function makeUIScript(game)
   local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
   local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
   local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
+
+  local model = game.uiModel
 
   local UIModule = require('UI')
   local makePanel = UIModule.makePanel
@@ -175,22 +173,22 @@ local function makeUIScript(delegate)
       transform = function () return origin() end,
       w = fullWidth,
       h = fixed(8),
-      coloredText = delegate.topPanelText,
+      coloredText = require('UIModel').topPanelText(game)
     }),
     -- Left panel
     makePanel({
-      shouldDraw = delegate.shouldDrawFocusModeUI,
+      shouldDraw = model.shouldDrawFocusModeUI,
       background = GRAY_PANEL_COLOR,
       transform = function ()
         return origin():translate(0, 8)
       end,
       w = fixed(88),
       h = fullHeight,
-      text = delegate.leftPanelText,
+      text = model.leftPanelText,
     }),
     -- Empty underlay for console
     makePanel({
-      shouldDraw = delegate.shouldDrawFocusModeUI,
+      shouldDraw = model.shouldDrawFocusModeUI,
       background = DARK_GRAY_PANEL_COLOR,
       transform = function (drawState)
         return origin():translate(88, fullHeight(drawState) - 60)
@@ -206,7 +204,7 @@ local function makeUIScript(delegate)
       end,
       w = fixed(88),
       h = fixed(128),
-      text = delegate.rightPanelText,
+      text = model.rightPanelText,
     }),
     -- Bottom panel
     makePanel({
@@ -216,18 +214,18 @@ local function makeUIScript(delegate)
       end,
       w = fullWidth,
       h = fixed(8),
-      text = delegate.bottomPanelText,
+      text = model.bottomPanelText,
     }),
     -- Command line
     makePanel({
-      shouldDraw = delegate.shouldDrawFocusModeUI,
+      shouldDraw = model.shouldDrawFocusModeUI,
       background = TRANSPARENT_PANEL_COLOR,
       transform = function (drawState)
         return origin():translate(96, fullHeight(drawState) - 76)
       end,
       w = fixed(200),
       h = fullHeight,
-      text = delegate.promptText,
+      text = model.promptText,
     }),
   })
 end
@@ -253,9 +251,7 @@ local function new(bak)
   ---@type Game
   game = {
     world = require('World').new(bak.world or {}),
-    activeTab = 0,
     score = bak.score or 0,
-    console = require('Console').new(),
     frozenGuys = tbl.weaken({}, 'k'),
     resources = bak.resources or require('Resources').new(),
     guys = guys,
@@ -344,8 +340,8 @@ local function new(bak)
       local idx = tbl.indexOf(self.entities, entity)
       table.remove(self.entities, idx)
     end,
-    freezeGuy = function (self, guy)
-      self.frozenGuys[guy] = true
+    setGuyFrozen = function (self, guy, state)
+      self.frozenGuys[guy] = state or nil
     end,
     advanceClock = function (self, dt)
       self.time = (self.time + dt) % (24 * 60)
@@ -366,15 +362,9 @@ local function new(bak)
     addGuy = function (self, guy)
       table.insert(self.guys, guy)
     end,
-    nextTab = function (self)
-      self.activeTab = self.activeTab + 1
-    end,
-    unfreezeGuy = function (self, guy)
-      self.frozenGuys[guy] = nil
-    end,
     beginBattle = function (self, attacker, defender)
-      self:freezeGuy(attacker)
-      self:freezeGuy(defender)
+      self:setGuyFrozen(attacker, true)
+      self:setGuyFrozen(defender, true)
 
       self:addEntity(makeBattleEntity(makeBattle({
         attacker = attacker, defender = defender
@@ -446,15 +436,15 @@ local function new(bak)
     end,
   }
 
-  game.uiModel = require('UIModel').new(game, game.player)
-  game.ui = makeUIScript(game.uiModel)
+  game.uiModel = require('UIModel').new(game)
+  game.ui = makeUIScript(game)
   game.guyDelegate = makeGuyDelegate(game)
 
-  game.console:say(
+  game.uiModel.console:say(
     makeConsoleMessage('Welcome to Kobold Princess Simulator.', 10)
   )
 
-  game.console:say(
+  game.uiModel.console:say(
     makeConsoleMessage('This is day 1 of your reign.', 10)
   )
 
@@ -509,7 +499,7 @@ end
 ---@param game Game
 ---@param text string
 local function say(game, text)
-  game.console:say(makeConsoleMessage(text, 60))
+  game.uiModel.console:say(makeConsoleMessage(text, 60))
 end
 
 ---@param game Game
@@ -593,8 +583,8 @@ local function updateBattle(game, entity, dt)
         die(battle.defender)
       end
 
-      game:unfreezeGuy(battle.attacker)
-      game:unfreezeGuy(battle.defender)
+      game:setGuyFrozen(battle.attacker, false)
+      game:setGuyFrozen(battle.defender, false)
     end
   end
 end
@@ -629,7 +619,7 @@ local function updateGame(game, dt, movementDirections)
   exhaust(game:makeVisionSourcesCo(), function (visionSource)
     revealFogOfWar(game.world, visionSource, skyColorAtTime(game.time).g, dt)
   end)
-  updateConsole(game.console, dt)
+  updateConsole(game.uiModel.console, dt)
   if isRecruitCircleActive(game.recruitCircle) then
     game.recruitCircle:grow(dt)
   end
@@ -823,7 +813,7 @@ local function handleNormalModeInput(game, scancode)
   local tileset = require('Tileset').getTileset()
 
   if scancode == 'tab' then
-    game:nextTab()
+    game.uiModel:nextTab()
   elseif scancode == 'f' then
     if game.player.stats.moves >= MOVE_COSTS_TABLE.follow then
       game.player.stats:addMoves(-MOVE_COSTS_TABLE.follow)
@@ -845,9 +835,11 @@ local function handleNormalModeInput(game, scancode)
   elseif scancode == 'return' then
     game:toggleFocus()
   elseif scancode == 'n' then
-    game.ui = require('Game').makeUIScript(require('UIModel').new(game, game.player))
+    game.uiModel = require('UIModel').new(game)
+    game.ui = require('Game').makeUIScript(game)
     game.player = require('Guy').new(game.player)
     game.guys[1] = game.player
+    say(game, 'recreated uiModel, ui, and player')
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
   end
@@ -886,4 +878,5 @@ return {
   new = new,
   say = say,
   handleText = handleText,
+  makeUIScript = makeUIScript,
 }

@@ -1,11 +1,18 @@
 ---@class UIModel
----@field prompt string
----@field topPanelText fun(): table Love2D colored text for top panel
+---
+---@field prompt string Command line prompt text
+---@field console Console Bottom console
+---
 ---@field leftPanelText fun(): string Left panel text
 ---@field rightPanelText fun(): string Right panel text
 ---@field bottomPanelText fun(): string Bottom panel text
 ---@field promptText fun(): string Prompt text
+---
+---@field activeTab integer Current active tab in the right panel
+---@field nextTab fun(self: UIModel) Switches tab in the UI
+---
 ---@field shouldDrawFocusModeUI fun(): boolean True if should draw focus mode UI
+---
 ---@field didTypeCharacter fun(self: UIModel, char: string) Called when player typed a character
 ---@field didPressBackspace fun(self: UIModel) Called when player typed a character
 
@@ -16,33 +23,46 @@ local dump = require('Util').dump
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 
+local UIModelModule = {}
+
+---Love2d colored text for top panel
 ---@param game Game
----@param player Guy
-local function new(game, player)
+---@return fun(): table
+function UIModelModule.topPanelText(game)
+  return function ()
+    local player = game.player
+    return {
+      WHITE_COLOR,
+      string.format(
+        'Score: %d | Revealed: %d/%d %0.ffps\n',
+        game.score,
+        game.world.revealedTilesCount,
+        game.world.height * game.world.width,
+        love.timer.getFPS()
+      ),
+      WHITE_COLOR,
+      'WASD] move\nRet] focus\nLMB] recruit\n8] save\nZ] zoom\nN] reload\nF] follow\nQ] gather\nT] warp\nC] collect\n',
+      player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
+      'G] dismiss 1t\n',
+      player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
+      'R] ritual 25t 1p\n',
+      player.stats.moves >= 50 and game.resources.wood >= 5 and WHITE_COLOR or GRAY_COLOR,
+      'B] build 50t 5w\n',
+    }
+  end
+end
+
+---@param game Game
+function UIModelModule.new(game)
   ---@type UIModel
   local model
   model = {
     __module = 'UIModel',
+    console = require('Console').new(),
     prompt = '',
-    topPanelText = function()
-      return {
-        WHITE_COLOR,
-        string.format(
-          'Score: %d | Revealed: %d/%d %0.ffps\n',
-          game.score,
-          game.world.revealedTilesCount,
-          game.world.height * game.world.width,
-          love.timer.getFPS()
-        ),
-        WHITE_COLOR,
-        'WASD] move\nRet] focus\nLMB] recruit\n8] save\nZ] zoom\nN] reload\nF] follow\nQ] gather\nT] warp\nC] collect\n',
-        player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
-        'G] dismiss 1t\n',
-        player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
-        'R] ritual 25t 1p\n',
-        player.stats.moves >= 50 and game.resources.wood >= 5 and WHITE_COLOR or GRAY_COLOR,
-        'B] build 50t 5w\n',
-      }
+    activeTab = 0,
+    nextTab = function (self)
+      self.activeTab = self.activeTab + 1
     end,
     leftPanelText = function ()
       local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
@@ -59,7 +79,7 @@ local function new(game, player)
     rightPanelText = function ()
       local header = '<- Tab ->\n\n'
 
-      local idx = 1 + (game.activeTab % 3)
+      local idx = 1 + (model.activeTab % 3)
 
       if idx == 1 then
         return string.format(
@@ -130,6 +150,4 @@ local function new(game, player)
   return model
 end
 
-return {
-  new = new,
-}
+return UIModelModule

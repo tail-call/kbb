@@ -559,7 +559,7 @@ local function drawGame(game, drawState)
     end)
 
     withTransform(love.math.newTransform(88, 32):scale(2/3, 2/3), function ()
-      for i, message in ipairs(game.console.messages) do
+      for i, message in ipairs(game.uiModel.console.messages) do
         local fadeOut = math.min(message.lifetime, 1)
         withColor(1, 1, 1, alpha * fadeOut, function ()
           love.graphics.print(message.text, 0, 8 * i)
