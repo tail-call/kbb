@@ -16,8 +16,6 @@ local dump = require('Util').dump
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 
--- TODO: this is actually a view model, not a delegate
-
 ---@param game Game
 ---@param player Guy
 local function new(game, player)
