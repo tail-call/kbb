@@ -83,7 +83,7 @@ local revealFogOfWar = require('World').revealFogOfWar
 local skyColorAtTime = require('Util').skyColorAtTime
 local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
-local statsMut = require('GuyStats').mut
+local hurt = require('GuyStats').mut.hurt
 local addMoves = require('GuyStats').mut.addMoves
 
 ---@type Vector
@@ -517,7 +517,7 @@ local function fight(game, attacker, defender, damageModifier)
   ---@param guy Guy
   ---@param damage number
   local function dealDamage(guy, damage)
-    statsMut.hurt(guy.stats, damage * damageModifier)
+    hurt(guy.stats, damage * damageModifier)
     say(game, string.format('%s got %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
   end
 
@@ -764,7 +764,7 @@ local function orderSummon(game, tileset)
   if game.player.stats.moves <= MOVE_COSTS_TABLE.summon then return end
 
   game.resources:addPretzels(-1)
-  statsMut.addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
+  addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
   local guy = require('Guy').makeGoodGuy(tileset, {
     x = game.cursorPos.x,
     y = game.cursorPos.y
@@ -816,7 +816,7 @@ local function handleNormalModeInput(game, scancode)
     game.uiModel:nextTab()
   elseif scancode == 'f' then
     if game.player.stats.moves >= MOVE_COSTS_TABLE.follow then
-      statsMut.addMoves(game.player.stats, -MOVE_COSTS_TABLE.follow)
+      addMoves(game.player.stats, -MOVE_COSTS_TABLE.follow)
       game.squad:toggleFollow()
     end
   elseif scancode == 'g' then

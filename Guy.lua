@@ -1,5 +1,3 @@
-local M = require('Module').define(..., 0)
-
 ---@alias GuyTeam 'good' | 'evil' | 'neutral'
 
 ---@class GuyOptions
@@ -29,6 +27,8 @@ local M = require('Module').define(..., 0)
 ---@field reteam fun(self: Guy, team: GuyTeam) Switches team of the guy
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
+
+local M = require('Module').define(..., 0)
 
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
