@@ -1,4 +1,4 @@
----@class GuyStatsModule 
+---@class GuyStatsModule: Module
 ---@field mut GuyStatsMutator
 
 ---@class GuyStats

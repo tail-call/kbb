@@ -44,6 +44,7 @@ local function loadGame()
         end
       else
         -- Loading from module k
+        props.__module = k
         return require(k).new(props)
       end
     end

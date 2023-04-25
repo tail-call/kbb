@@ -1,7 +1,7 @@
 ---@class Module
 ---@field mut table Mutator object
 ---@field new fun(bak: any): any Makes a new object
----@field init fun(bak: any): any Initializes an object
+---@field init fun(bak: any, strategy: fun(moduleName: string, dep: any): any): any Initializes an object
 ---@field deinit fun(bak: any): any Deinitializes an object
 ---@field reload fun(bak: any): any Reloads an object from its originating module
 
@@ -25,19 +25,25 @@ function M.define(name, version)
     deinit = function (bak)
       -- Do nothing
     end,
+    migrate = function (bak)
+      return bak
+    end,
     new = function (bak)
-      local obj = bak or {}
+      local migratedBak = module.migrate(bak)
+      local obj = migratedBak or {}
       obj.__module = name
       obj.__version = version
-      module.init(obj, function (moduleName, bak)
-        return require(moduleName).new(bak)
+      module.init(obj, function (moduleName, dep)
+        if dep == nil then return nil end
+        return require(moduleName).new(dep)
       end)
       return obj
     end,
     reload = function (obj)
       module.deinit(obj)
-      return module.init(obj, function (moduleName, bak)
-        require(moduleName).reload(bak)
+      return module.init(obj, function (moduleName, dep)
+        if dep == nil then return end
+        require(moduleName).reload(dep)
       end)
     end,
   }

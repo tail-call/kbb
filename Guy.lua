@@ -1,11 +1,5 @@
 ---@alias GuyTeam 'good' | 'evil' | 'neutral'
 
----@class GuyOptions
----@field pos Vector | nil
----@field color number[] | nil
----@field tileset Tileset
----@field quad love.Quad
-
 ---@class Guy
 ---@field pos Vector Guy's position in the world
 ---@field mayMove boolean True if may move
@@ -154,6 +148,7 @@ end
 ---@param guy Guy
 function M.init(guy, load)
   guy.stats = load('GuyStats', guy.stats)
+  guy.pixie = load('Pixie', guy.pixie)
   guy.name = guy.name or 'Unnamed'
   guy.timer = guy.timer or 0
   guy.behavior = guy.behavior or 'none'
@@ -166,7 +161,6 @@ function M.init(guy, load)
   guy.mayMove = guy.mayMove or false
   guy.speed = guy.speed or 0.15
   guy.pos = guy.pos or { x = 0, y = 0 }
-  guy.pixie = load('Pixie', guy.pixie)
 
   movePixie(guy.pixie, guy.pos)
   playSpawnAnimation(guy.pixie, guy.pos)
