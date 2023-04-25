@@ -92,6 +92,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Command for bringing your troops closer to you
  - [x] Lua console in focus mode
  - [ ] Console command history
+ - [ ] Use mutators instead of methods to mutate objects
  - [ ] Use meshes and vertex shading for smooth fog of war
  - [ ] `bind()` command to assign keys
  - [ ] Use string buffers for text manipulation [1]

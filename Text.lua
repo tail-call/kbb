@@ -3,20 +3,13 @@
 ---@field pos Vector Position in the world
 ---@field maxWidth number Maximum width of displayed text
 
----@param bak Text
-local function new(bak)
-  bak = bak or {}
+local M = require('Module').define('Text', 0)
 
-  ---@type Text
-  local text = {
-    __module = 'Text',
-    text = bak.text or 'Insert text',
-    pos = bak.pos or error('Text: pos is mandatory'),
-    maxWidth = bak.maxWidth or 32,
-  }
-  return text
+---@param bak Text
+function M.init(bak)
+  bak.text = bak.text or 'Insert text'
+  bak.pos = bak.pos or error('Text: pos is mandatory')
+  bak.maxWidth = bak.maxWidth or 32
 end
 
-return {
-  new = new,
-}
+return M

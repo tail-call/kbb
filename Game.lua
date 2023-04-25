@@ -76,7 +76,6 @@ local randomLetterCode = require('Util').randomLetterCode
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
 local makeBattle = require('Battle').new
-local makeText = require('Text').new
 local makeBuilding = require('Building').new
 local makeBuildingEntity = require('GameEntity').makeBuildingEntity
 local makeBattleEntity = require('GameEntity').makeBattleEntity
@@ -741,7 +740,7 @@ end
 
 ---@param game Game
 local function orderScribe(game)
-  game:addText(makeText{
+  game:addText(require('Text').new{
     text = string.format(
       '%c%c\n%c%c',
       randomLetterCode(),
@@ -787,8 +786,7 @@ local function handleFocusModeInput(game, scancode, key)
       local commands
       commands = {
         reload = function(moduleName)
-          package.loaded[moduleName] = nil
-          require(moduleName)
+          require('Module').reload(moduleName)
         end,
         print = function (something)
           say(game, something)
