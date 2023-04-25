@@ -9,20 +9,22 @@
 ---@class Guy
 ---@field pos Vector Guy's position in the world
 ---@field mayMove boolean True if may move
----@field move fun(self: Guy, pos: Vector) Changes guy's position
 ---@field name string Guy's name
----@field rename fun(self: Guy, name: string) Gives the guy a different name
----@field setSpeed fun(self: Guy, speed: number) Sets how quickly may move again after moving
 ---@field team GuyTeam
----@field reteam fun(self: Guy, team: GuyTeam) Switches team of the guy
 ---@field pixie Pixie Graphical representation of the guy
 ---@field stats GuyStats RPG stats
 ---@field timer number Movement timer
----@field advanceTimer fun(self: Guy, dt: number)
 ---@field speed number Delay in seconds between moves
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
+
+---@class GuyMutator
+---@field move fun(self: Guy, pos: Vector) Changes guy's position
+---@field setSpeed fun(self: Guy, speed: number) Sets how quickly may move again after moving
 ---@field beginWandering fun(self: Guy)
+---@field advanceTimer fun(self: Guy, dt: number)
+---@field rename fun(self: Guy, name: string) Gives the guy a different name
+---@field reteam fun(self: Guy, team: GuyTeam) Switches team of the guy
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
 
@@ -34,6 +36,40 @@ local abilities = require('Ability').abilities
 
 ---@type Guy
 M.Guy = {}
+
+---@type GuyMutator
+M.mut = {
+  rename = function (self, name)
+    self.name = name
+  end,
+  reteam = function (self, team)
+    self.team = team
+  end,
+  beginWandering = function (self)
+    self.behavior = 'wander'
+  end,
+  setSpeed = function (self, speed)
+    self.speed = speed
+  end,
+  move = function (self, pos)
+    self.mayMove = false
+    self.timer = 0
+    self.stats:addMoves(-2)
+    self.pos = pos
+    self.pixie:move(self.pos)
+  end,
+  advanceTimer = function (self, dt)
+    self.pixie:update(dt)
+
+    self.timer = self.timer + dt
+
+    while self.timer >= self.speed do
+      self.mayMove = true
+      self.timer = self.timer % self.speed
+      self.stats:addMoves(1)
+    end
+  end,
+}
 
 ---@param team1 GuyTeam
 ---@param team2 GuyTeam
@@ -61,11 +97,11 @@ function M.moveGuy(guy, vec, delegate)
   for _, pos in ipairs{stepForward, diagonalStepLeft, diagonalStepRight} do
     local collision = delegate.collider(pos)
     if collision.type == 'none' then
-      guy:move(pos)
+      M.mut.move(guy, pos)
       return pos
     elseif collision.type == 'guy' then
       if checkIfRivals(guy.team, collision.guy.team) then
-        guy:move(pos)
+        M.mut.move(guy, pos)
         delegate.beginBattle(guy, collision.guy)
         return pos
       end
@@ -77,7 +113,7 @@ function M.moveGuy(guy, vec, delegate)
         ---@cast sameEntity GameEntity_Building
         local shouldMove = delegate.enterHouse(guy, sameEntity)
         if shouldMove == 'shouldMove' then
-          guy:move(pos)
+          M.mut.move(guy, pos)
           return pos
         end
       end
@@ -95,7 +131,7 @@ end
 ---@param guy Guy
 ---@param dt number
 function M.updateGuy(guy, dt)
-  guy:advanceTimer(dt)
+  M.mut.advanceTimer(guy, dt)
 end
 
 ---@param guy Guy
@@ -132,36 +168,6 @@ function M.new(bak)
     pos = bak.pos or { x = 0, y = 0 },
     stats = require('GuyStats').new(bak.stats),
     pixie = makePixie(bak.pixie),
-    rename = function (self, name)
-      self.name = name
-    end,
-    reteam = function (self, team)
-      self.team = team
-    end,
-    beginWandering = function (self)
-      self.behavior = 'wander'
-    end,
-    setSpeed = function (self, speed)
-      self.speed = speed
-    end,
-    move = function (self, pos)
-      self.mayMove = false
-      self.timer = 0
-      self.stats:addMoves(-2)
-      self.pos = pos
-      self.pixie:move(self.pos)
-    end,
-    advanceTimer = function (self, dt)
-      self.pixie:update(dt)
-
-      self.timer = self.timer + dt
-
-      while self.timer >= self.speed do
-        self.mayMove = true
-        self.timer = self.timer % self.speed
-        self.stats:addMoves(1)
-      end
-    end
   }
 
   guy.pixie:move(guy.pos)
@@ -195,8 +201,8 @@ function M.makeHuman(tileset, pos)
     pos = pos,
     tileset = tileset,
   }
-  guy:reteam('neutral')
-  guy:rename('Maria')
+  M.mut.reteam(guy, 'neutral')
+  M.mut.rename(guy, 'Maria')
   return guy
 end
 
@@ -210,8 +216,8 @@ function M.makeGoodGuy(tileset, pos)
     pos = pos,
     tileset = tileset
   }
-  guy:reteam('good')
-  guy:rename('Good Guy')
+  M.mut.reteam(guy, 'good')
+  M.mut.rename(guy, 'Good Guy')
   return guy
 end
 
@@ -226,10 +232,10 @@ function M.makeEvilGuy(tileset, pos)
     pos = pos,
     tileset = tileset,
   }
-  guy:setSpeed(0.5)
-  guy:beginWandering()
-  guy:reteam('evil')
-  guy:rename('Evil Guy')
+  M.mut.setSpeed(guy, 0.5)
+  M.mut.beginWandering(guy)
+  M.mut.reteam(guy, 'evil')
+  M.mut.rename(guy, 'Evil Guy')
   return guy
 end
 

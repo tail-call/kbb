@@ -1,4 +1,5 @@
 ---@class Module
+---@field mut table Mutator object
 ---@field new fun(bak: any): any Makes a new object
 ---@field init fun(bak: any): any Initializes an object
 ---@field deinit fun(bak: any): any Deinitializes an object
@@ -12,6 +13,7 @@ local M = {}
 function M.define(name, version)
   local module
   module = {
+    mut = {},
     __modulename = name,
     new = function (bak)
       local obj = bak or {}
