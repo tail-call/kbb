@@ -4,6 +4,7 @@
 ---@field enterHouse fun(guest: Guy, entity: GameEntity_Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
 
 local isAtFullHealth = require('GuyStats').isAtFullHealth
+local heal = require('GuyStats').mut.heal
 
 local GuyDelegate = {}
 ---@param game Game
@@ -18,7 +19,7 @@ function GuyDelegate.makeGuyDelegate(game)
       if isAtFullHealth(guy.stats) then
         return 'shouldNotMove'
       end
-      guy.stats:heal()
+      heal(guy.stats)
       game:removeEntity(entity)
       return 'shouldMove'
     end,

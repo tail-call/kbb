@@ -1,3 +1,5 @@
+local M = require('Module').define(..., 0)
+
 ---@alias GuyTeam 'good' | 'evil' | 'neutral'
 
 ---@class GuyOptions
@@ -28,10 +30,9 @@
 
 ---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
 
-local M = require('Module').define(..., 0)
-
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
+local addMoves = require('GuyStats').mut.addMoves
 
 ---@type Guy
 M.Guy = {}
@@ -53,7 +54,7 @@ M.mut = {
   move = function (self, pos)
     self.mayMove = false
     self.timer = 0
-    self.stats:addMoves(-2)
+    addMoves(self.stats, -2)
     self.pos = pos
     self.pixie:move(self.pos)
   end,
@@ -65,7 +66,7 @@ M.mut = {
     while self.timer >= self.speed do
       self.mayMove = true
       self.timer = self.timer % self.speed
-      self.stats:addMoves(1)
+      addMoves(self.stats, 1)
     end
   end,
 }

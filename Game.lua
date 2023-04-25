@@ -83,6 +83,8 @@ local revealFogOfWar = require('World').revealFogOfWar
 local skyColorAtTime = require('Util').skyColorAtTime
 local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
+local statsMut = require('GuyStats').mut
+local addMoves = require('GuyStats').mut.addMoves
 
 ---@type Vector
 local EVIL_SPAWN_LOCATION = { x = 301, y = 184 }
@@ -515,7 +517,7 @@ local function fight(game, attacker, defender, damageModifier)
   ---@param guy Guy
   ---@param damage number
   local function dealDamage(guy, damage)
-    guy.stats:hurt(damage * damageModifier)
+    statsMut.hurt(guy.stats, damage * damageModifier)
     say(game, string.format('%s got %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
   end
 
@@ -709,9 +711,8 @@ local function orderChop(tileset, game)
   end
 end
 
----@param tileset Tileset
 ---@param game Game
-local function orderBuild(tileset, game)
+local function orderBuild(game)
   -- Check if has enough resources
   if game.resources.wood < BUILDING_COST then return end
   if game.player.stats.moves < MOVE_COSTS_TABLE.build then return end
@@ -733,7 +734,7 @@ local function orderBuild(tileset, game)
 
   -- Build
   game.resources:addWood(-BUILDING_COST)
-  game.player.stats:addMoves(-MOVE_COSTS_TABLE.build)
+  addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
   game:addEntity(makeBuildingEntity(makeBuilding({ pos = pos })))
   game:addScore(SCORES_TABLE.builtAHouse)
   game:disableFocus()
@@ -763,7 +764,7 @@ local function orderSummon(game, tileset)
   if game.player.stats.moves <= MOVE_COSTS_TABLE.summon then return end
 
   game.resources:addPretzels(-1)
-  game.player.stats:addMoves(-MOVE_COSTS_TABLE.summon)
+  statsMut.addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
   local guy = require('Guy').makeGoodGuy(tileset, {
     x = game.cursorPos.x,
     y = game.cursorPos.y
@@ -815,12 +816,12 @@ local function handleNormalModeInput(game, scancode)
     game.uiModel:nextTab()
   elseif scancode == 'f' then
     if game.player.stats.moves >= MOVE_COSTS_TABLE.follow then
-      game.player.stats:addMoves(-MOVE_COSTS_TABLE.follow)
+      statsMut.addMoves(game.player.stats, -MOVE_COSTS_TABLE.follow)
       game.squad:toggleFollow()
     end
   elseif scancode == 'g' then
     if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
-      game.player.stats:addMoves(-MOVE_COSTS_TABLE.dismissSquad)
+      addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
       dismissSquad(game)
     end
   elseif scancode == 'c' then
@@ -828,7 +829,7 @@ local function handleNormalModeInput(game, scancode)
   elseif scancode == 'm' then
     orderScribe(game)
   elseif scancode == 'b' then
-    orderBuild(tileset, game)
+    orderBuild(game)
   elseif scancode == 'r' then
     orderSummon(game, tileset)
   elseif scancode == 'return' then

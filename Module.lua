@@ -7,14 +7,18 @@
 
 local M = {}
 
+---@generic T
 ---@param name string
 ---@param version number
----@return table
+---@return T
 function M.define(name, version)
   local module
   module = {
     mut = {},
     __modulename = name,
+    ---@generic T
+    ---@param bak T
+    ---@param strategy fun(moduleName: string, bak: T)
     init = function (bak, strategy)
       -- Do nothing
     end,
