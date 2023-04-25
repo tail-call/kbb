@@ -98,7 +98,7 @@ function M.moveGuy(guy, vec, delegate)
     Vector.add(vec, Vector.dotProd(vec, { x = 0, y = -1 }))
   )
 
-  for _, pos in ipairs{stepForward, diagonalStepLeft, diagonalStepRight} do
+  for _, pos in ipairs{ stepForward, diagonalStepLeft, diagonalStepRight } do
     local collision = delegate.collider(pos)
     if collision.type == 'none' then
       M.mut.move(guy, pos)
