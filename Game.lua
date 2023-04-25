@@ -45,6 +45,7 @@
 ---# UI
 ---
 ---@field ui UI User interface root
+---@field uiModel UIModel GUI state
 ---@field console Console Bottom console
 ---@field activeTab integer Current active tab in the focus screen
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
@@ -59,11 +60,6 @@
 ---@field fogOfWarTimer number
 ---
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
-
----@class GameModule
----@field deserialize fun()
-
-local X_Serializable = require('X_Serializable')
 
 local Guy = require('Guy').Guy
 local canRecruitGuy = require('Guy').canRecruitGuy
@@ -84,7 +80,6 @@ local randomLetterCode = require('Util').randomLetterCode
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
 local makeBattle = require('Battle').new
-local makeUIDelegate = require('UIDelegate').new
 local makeText = require('Text').new
 local makeBuilding = require('Building').new
 local makeBuildingEntity = require('GameEntity').makeBuildingEntity
@@ -95,10 +90,6 @@ local skyColorAtTime = require('Util').skyColorAtTime
 local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
 
-local WHITE_PANEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
-local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
-local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
-local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
 ---@type Vector
 local EVIL_SPAWN_LOCATION = { x = 301, y = 184 }
 
@@ -151,21 +142,25 @@ local function findEntityAtPos(game, pos)
   end)
 end
 
----@param delegate UIDelegate
+---@param delegate UIModel
 local function makeUIScript(delegate)
+  local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
+  local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
+  local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
+
   local UIModule = require('UI')
   local makePanel = UIModule.makePanel
   local origin = UIModule.origin
 
   ---@param drawState DrawState
   local function fullWidth(drawState)
-    local sw, sh = love.window.getMode()
+    local sw, _ = love.window.getMode()
     return sw / drawState.windowScale
   end
 
   ---@param drawState DrawState
   local function fullHeight(drawState)
-    local sw, sh = love.window.getMode()
+    local _, sh = love.window.getMode()
     return sh / drawState.windowScale
   end
 
@@ -184,24 +179,24 @@ local function makeUIScript(delegate)
     }),
     -- Left panel
     makePanel({
+      shouldDraw = delegate.shouldDrawFocusModeUI,
       background = GRAY_PANEL_COLOR,
       transform = function ()
         return origin():translate(0, 8)
       end,
       w = fixed(88),
       h = fullHeight,
-      shouldDraw = delegate.shouldDrawFocusModeUI,
       text = delegate.leftPanelText,
     }),
     -- Empty underlay for console
     makePanel({
+      shouldDraw = delegate.shouldDrawFocusModeUI,
       background = DARK_GRAY_PANEL_COLOR,
       transform = function (drawState)
         return origin():translate(88, fullHeight(drawState) - 60)
       end,
       w = fixed(240),
       h = fixed(52),
-      shouldDraw = delegate.shouldDrawFocusModeUI,
     }),
     -- Right panel
     makePanel({
@@ -222,6 +217,17 @@ local function makeUIScript(delegate)
       w = fullWidth,
       h = fixed(8),
       text = delegate.bottomPanelText,
+    }),
+    -- Command line
+    makePanel({
+      shouldDraw = delegate.shouldDrawFocusModeUI,
+      background = TRANSPARENT_PANEL_COLOR,
+      transform = function (drawState)
+        return origin():translate(96, fullHeight(drawState) - 76)
+      end,
+      w = fixed(200),
+      h = fullHeight,
+      text = delegate.promptText,
     }),
   })
 end
@@ -440,7 +446,8 @@ local function new(bak)
     end,
   }
 
-  game.ui = makeUIScript(makeUIDelegate(game, game.player))
+  game.uiModel = require('UIModel').new(game, game.player)
+  game.ui = makeUIScript(game.uiModel)
   game.guyDelegate = makeGuyDelegate(game)
 
   game.console:say(
@@ -678,10 +685,6 @@ local function updateGame(game, dt, movementDirections)
   end
 end
 
-local function orderFocus(game)
-  game:toggleFocus()
-end
-
 ---@param tileset Tileset
 ---@param game Game
 ---@param guy Guy
@@ -782,19 +785,43 @@ end
 
 ---@param game Game
 ---@param scancode string
----@param tileset Tileset
-local function handleFocusModeInput(game, scancode, tileset)
-  if scancode == 'm' then
-    orderScribe(game)
-  elseif scancode == 'space' then
-    orderFocus(game)
+---@param key string
+local function handleFocusModeInput(game, scancode, key)
+  if scancode == 'escape' then
+    game:toggleFocus()
+  elseif scancode == 'return' then
+    local prompt = game.uiModel.prompt
+    game.uiModel.prompt = ''
+    local chunk = loadstring(prompt, 'commandline')
+    if chunk ~= nil then
+      local commands
+      commands = {
+        reload = function(moduleName)
+          package.loaded[moduleName] = nil
+          require(moduleName)
+        end,
+        print = function (something)
+          say(game, something)
+        end,
+        help = function ()
+          for k in pairs(commands) do
+            commands.print(k)
+          end
+        end,
+      }
+      setfenv(chunk, commands)
+      chunk()
+    end
+  elseif scancode == 'backspace' then
+    game.uiModel:didPressBackspace()
   end
 end
 
 ---@param game Game
 ---@param scancode string
----@param tileset Tileset
-local function handleNormalModeInput(game, scancode, tileset)
+local function handleNormalModeInput(game, scancode)
+  local tileset = require('Tileset').getTileset()
+
   if scancode == 'tab' then
     game:nextTab()
   elseif scancode == 'f' then
@@ -809,19 +836,16 @@ local function handleNormalModeInput(game, scancode, tileset)
     end
   elseif scancode == 'c' then
     orderChop(tileset, game)
+  elseif scancode == 'm' then
+    orderScribe(game)
   elseif scancode == 'b' then
     orderBuild(tileset, game)
   elseif scancode == 'r' then
     orderSummon(game, tileset)
-  elseif scancode == 'space' then
-    orderFocus(game)
+  elseif scancode == 'return' then
+    game:toggleFocus()
   elseif scancode == 'n' then
-    package.loaded['UI'] = nil
-    package.loaded['UIDelegate'] = nil
-    package.loaded['Draw'] = nil
-    package.loaded['Guy'] = nil
-    package.loaded['Game'] = nil
-    game.ui = require('Game').makeUIScript(require('UIDelegate').new(game, game.player))
+    game.ui = require('Game').makeUIScript(require('UIModel').new(game, game.player))
     game.player = require('Guy').new(game.player)
     game.guys[1] = game.player
   elseif scancode == 't' then
@@ -831,20 +855,27 @@ end
 
 ---@param game Game
 ---@param scancode string
----@param tileset Tileset
-local function handleInput(game, scancode, tileset)
+---@param key string
+local function handleInput(game, scancode, key)
   if scancode == 'z' then
     game:nextMagnificationFactor()
   end
 
   if game.isFocused then
-    handleFocusModeInput(game, scancode, tileset)
+    handleFocusModeInput(game, scancode, key)
   else
-    handleNormalModeInput(game, scancode, tileset)
+    handleNormalModeInput(game, scancode)
   end
 end
 
----@type GameModule
+---@param game Game
+---@param text string
+local function handleText(game, text)
+  if game.isFocused then
+    game.uiModel:didTypeCharacter(text)
+  end
+end
+
 return {
   handleInput = handleInput,
   updateGame = updateGame,
@@ -853,6 +884,6 @@ return {
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
   new = new,
-  orderLoad = orderLoad,
-  makeUIScript = makeUIScript,
+  say = say,
+  handleText = handleText,
 }

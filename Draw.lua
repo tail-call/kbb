@@ -212,16 +212,20 @@ end
 
 ---@param guy Guy
 local function drawGuy(guy)
+  -- Appearance
   drawPixie(guy.pixie)
-  local x, y = guy.pixie.transform:transformPoint(0, 0)
-  local xOffset = guy.pixie.flip and -16 or 0
-  withColor(1, 0, 0, 1, function ()
-    love.graphics.rectangle('fill', x + xOffset, y + 20, 16, 2)
-  end)
-  local width = 16 * guy.stats.hp / guy.stats.maxHp
-  withColor(0, 1, 0, 1, function ()
-    love.graphics.rectangle('fill', x + xOffset, y + 20, width, 2)
-  end)
+  -- Health bar
+  do
+    local x, y = guy.pixie.transform:transformPoint(0, 0)
+    local xOffset = guy.pixie.flip and -16 or 0
+    withColor(1, 0, 0, 1, function ()
+      love.graphics.rectangle('fill', x + xOffset, y + 20, 16, 2)
+    end)
+    local width = 16 * guy.stats.hp / guy.stats.maxHp
+    withColor(0, 1, 0, 1, function ()
+      love.graphics.rectangle('fill', x + xOffset, y + 20, width, 2)
+    end)
+  end
 end
 
 ---@param text string
@@ -292,7 +296,7 @@ local function drawCursor(drawState, pos, isFocused, moves)
       ('%02d'):format(moves), 0, 0
     )
     if isFocused then
-      love.graphics.print('FOCUS', -11, -16)
+      love.graphics.print('PAUSE', -11, -16)
     end
   end)
 end

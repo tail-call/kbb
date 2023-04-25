@@ -89,12 +89,20 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Game is an editable image
  - [x] Object hot reloading
  - [x] Health bars
+ - [x] Command for bringing your troops closer to you
+ - [x] Lua console in focus mode
+ - [ ] Console command history
+ - [ ] Use meshes and vertex shading for smooth fog of war
+ - [ ] `bind()` command to assign keys
+ - [ ] Use string buffers for text manipulation [1]
+ - [ ] `init()` and `deinit()` module methods to reload individual objects
  - [ ] Save level immediately on game exit
  - [ ] Event system
  - [ ] Proximity based combat
  - [ ] Random terrain generation in a selected area
- - [ ] Lua console in focus mode
+ - [ ] Don't crash on console errors
  - [ ] Timer type
+ - [ ] Path finding
  - [ ] Game is a GuyDelegate
  - [ ] Lerp cursor
  - [ ] Arbitrary resolution tilemaps
@@ -124,7 +132,6 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Add units to highlight continuously as button is held
  - [ ] Focus mode: unit and terrain are stacked like cards
  - [ ] Cards have actions
- - [ ] Command for bringing your troops closer to you
  - [ ] Underworld
  - [ ] Chopping wood is performed like combat
  - [ ] Mining stone is performed like combat
@@ -161,3 +168,5 @@ You have psy abilities, so your cursor has FOV just like you do.
 # Sources
 
 `cga8.png` font taken from here: https://www.seasip.info/VintagePC/cga.html
+
+[1]: https://luapower.com/files/luapower/csrc/luajit/src/doc/ext_buffer.html

@@ -1,9 +1,13 @@
----@class UIDelegate
+---@class UIModel
+---@field prompt string
 ---@field topPanelText fun(): table Love2D colored text for top panel
 ---@field leftPanelText fun(): string Left panel text
 ---@field rightPanelText fun(): string Right panel text
 ---@field bottomPanelText fun(): string Bottom panel text
+---@field promptText fun(): string Prompt text
 ---@field shouldDrawFocusModeUI fun(): boolean True if should draw focus mode UI
+---@field didTypeCharacter fun(self: UIModel, char: string) Called when player typed a character
+---@field didPressBackspace fun(self: UIModel) Called when player typed a character
 
 local getTile = require('World').getTile
 local formatVector = require('Vector').formatVector
@@ -12,12 +16,16 @@ local dump = require('Util').dump
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 
+-- TODO: this is actually a view model, not a delegate
+
 ---@param game Game
 ---@param player Guy
-local function makeUIDelegate(game, player)
-  ---@type UIDelegate
-  local uiDelegate = {
-    __module = 'UIDelegate',
+local function new(game, player)
+  ---@type UIModel
+  local model
+  model = {
+    __module = 'UIModel',
+    prompt = '',
     topPanelText = function()
       return {
         WHITE_COLOR,
@@ -29,7 +37,7 @@ local function makeUIDelegate(game, player)
           love.timer.getFPS()
         ),
         WHITE_COLOR,
-        'WASD] move\nSpc] focus\nLMB] recruit\nRet] save\nZ] zoom\nN] reload\nF] follow\nQ] gather\nT] warp\nC] collect\n',
+        'WASD] move\nRet] focus\nLMB] recruit\n8] save\nZ] zoom\nN] reload\nF] follow\nQ] gather\nT] warp\nC] collect\n',
         player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
         'G] dismiss 1t\n',
         player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
@@ -84,7 +92,7 @@ local function makeUIDelegate(game, player)
         return ''
           .. header
           .. ' INVENTORY  \n'
-          .. '${game.resources}'
+          .. dump(game.resources)
 
       end
       return ''
@@ -101,13 +109,29 @@ local function makeUIDelegate(game, player)
         game.resources.water
       )
     end,
-    shouldDrawFocusModeUI = function()
+    shouldDrawFocusModeUI = function ()
       return game.isFocused
     end,
+    didPressBackspace = function (self)
+      self.prompt = self.prompt:sub(1,-2)
+    end,
+    didTypeCharacter = function (self, char)
+      self.prompt = self.prompt .. char
+    end,
+    promptText = function ()
+      local isBlink = 0 == (
+        math.floor(love.timer.getTime() * 4) % 2
+      )
+      if isBlink then
+        return ('lua>%s_'):format(model.prompt)
+      else
+        return ('lua>%s'):format(model.prompt)
+      end
+    end,
   }
-  return uiDelegate
+  return model
 end
 
 return {
-  new = makeUIDelegate,
+  new = new,
 }

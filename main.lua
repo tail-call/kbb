@@ -95,6 +95,9 @@ function love.update(dt)
   end
 end
 
+function love.textinput(text)
+  require('Game').handleText(game, text)
+end
 
 ---@param key love.KeyConstant
 ---@param scancode love.Scancode
@@ -104,8 +107,7 @@ function love.keypressed(key, scancode, isrepeat)
     draw.setZoom(drawState, tonumber(scancode) or 1)
   end
 
-
-  if scancode == 'return' then
+  if scancode == '8' then
     -- Write to file
     do
       local file = io.open(FILENAME, 'w+')
@@ -121,7 +123,7 @@ function love.keypressed(key, scancode, isrepeat)
 
   if state ~= 'game' then return end
 
-  handleInput(game, scancode, drawState.tileset)
+  handleInput(game, scancode, key)
 end
 
 function love.mousepressed(x, y, button, presses)
