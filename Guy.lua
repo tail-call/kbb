@@ -32,7 +32,11 @@ local M = require('Module').define(..., 0)
 
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
+
 local addMoves = require('GuyStats').mut.addMoves
+local movePixie = require('Pixie').mut.movePixie
+local updatePixie = require('Pixie').mut.updatePixie
+local playSpawnAnimation = require('Pixie').mut.playSpawnAnimation
 
 ---@type Guy
 M.Guy = {}
@@ -56,10 +60,10 @@ M.mut = {
     self.timer = 0
     addMoves(self.stats, -2)
     self.pos = pos
-    self.pixie:move(self.pos)
+    movePixie(self.pixie, self.pos)
   end,
   advanceTimer = function (self, dt)
-    self.pixie:update(dt)
+    updatePixie(self.pixie, dt)
 
     self.timer = self.timer + dt
 
@@ -148,8 +152,8 @@ function M.behave(guy, delegate)
 end
 
 ---@param guy Guy
-function M.init(guy, make)
-  guy.stats = make('GuyStats', guy.stats)
+function M.init(guy, load)
+  guy.stats = load('GuyStats', guy.stats)
   guy.name = guy.name or 'Unnamed'
   guy.timer = guy.timer or 0
   guy.behavior = guy.behavior or 'none'
@@ -162,10 +166,10 @@ function M.init(guy, make)
   guy.mayMove = guy.mayMove or false
   guy.speed = guy.speed or 0.15
   guy.pos = guy.pos or { x = 0, y = 0 }
-  guy.pixie = make('Pixie', guy.pixie)
+  guy.pixie = load('Pixie', guy.pixie)
 
-  guy.pixie:move(guy.pos)
-  guy.pixie:spawn(guy.pos)
+  movePixie(guy.pixie, guy.pos)
+  playSpawnAnimation(guy.pixie, guy.pos)
 end
 
 ---@param tileset Tileset

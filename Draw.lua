@@ -217,7 +217,7 @@ local function drawGuy(guy)
   -- Health bar
   do
     local x, y = guy.pixie.transform:transformPoint(0, 0)
-    local xOffset = guy.pixie.flip and -16 or 0
+    local xOffset = guy.pixie.isFlipped and -16 or 0
     withColor(1, 0, 0, 1, function ()
       love.graphics.rectangle('fill', x + xOffset, y + 20, 16, 2)
     end)
