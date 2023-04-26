@@ -94,13 +94,15 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Travelling through void is veeeeery slow but possible
  - [x] Use mutators instead of methods to mutate objects
  - [x] Sythesize mutators to watch properties
+ - [x] Pixelized pointer
+ - [ ] Tile/object info window near pointer
  - [ ] Console command history
  - [ ] Give pretzels to feral kobolds to adopt them
  - [ ] UI: draggable panels
  - [ ] Built in text editor
  - [ ] Game plays in a window inside the GUI
  - [ ] Notable characters system: building an inn creates a barkeeper, building a smithy creates a blacksmith
- - [ ] Multiple game windwos may be opened
+ - [ ] Multiple game windows may be opened
  - [ ] Use meshes and vertex shading for smooth fog of war
  - [ ] `bind()` command to assign keys
  - [ ] Use string buffers for text manipulation [1]

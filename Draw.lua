@@ -558,6 +558,7 @@ local function drawGame(game, drawState)
       love.graphics.rectangle('fill', curX - offsetX, curY - offsetY, 1, 1)
     end)
 
+    -- Console messages
     withTransform(love.math.newTransform(88, 32):scale(2/3, 2/3), function ()
       for i, message in ipairs(game.uiModel.console.messages) do
         local fadeOut = math.min(message.lifetime, 1)
@@ -567,6 +568,17 @@ local function drawGame(game, drawState)
       end
     end)
   end)
+
+  -- Pointer
+  do
+    local x, y = love.mouse.getPosition()
+   
+    love.graphics.draw(
+      drawState.tileset.image,
+      drawState.tileset.quads.pointer,
+      x / drawState.windowScale, y / drawState.windowScale
+    )
+  end
 end
 
 
