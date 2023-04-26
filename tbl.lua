@@ -77,6 +77,7 @@ local function weaken(table, mode)
   return table
 end
 
+---Removes and item from the array if it's in there
 ---@generic T
 ---@param items T[]
 ---@param item T

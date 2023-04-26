@@ -71,7 +71,6 @@ local Ability = require('Ability')
 local maybeDrop = require('tbl').maybeDrop
 local makeConsoleMessage = require('ConsoleMessage').makeConsoleMessage
 local updateConsole = require('Console').updateConsole
-local randomLetterCode = require('Util').randomLetterCode
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
 local makeBattle = require('Battle').new
