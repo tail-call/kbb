@@ -533,6 +533,22 @@ local function orderGather(game)
   end
 end
 
+---@param guy Guy
+---@param game Game
+---@param entity GameEntity_Battle
+local function die(guy, game, entity)
+  say(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
+
+  if guy.team == 'evil' then
+    game.resources:addPretzels(1)
+    game:addScore(SCORES_TABLE.killedAnEnemy)
+  end
+
+  game:removeGuy(guy)
+  game:removeEntity(entity)
+end
+
+
 ---@param game Game -- Game object
 ---@param dt number -- Time since last update
 ---@param movementDirections Vector[] -- Momentarily pressed movement directions
@@ -583,9 +599,22 @@ local function updateGame(game, dt, movementDirections)
   game:advanceClock(dt)
   for _, entity in ipairs(game.entities) do
     if entity.type == 'battle' then
-      ---@cast entity any
-      updateBattle(game, entity, dt, function (text)
+      ---@cast entity GameEntity_Battle
+      local battle = entity.object
+      updateBattle(game, battle, dt, function (text)
         say(game, text)
+      end, function ()
+        -- TODO: use events to die
+        if battle.attacker.stats.hp <= 0 then
+          die(battle.attacker, game, entity)
+        end
+
+        if battle.defender.stats.hp <= 0 then
+          die(battle.defender, game, entity)
+        end
+
+        game:setGuyFrozen(battle.attacker, false)
+        game:setGuyFrozen(battle.defender, false)
       end)
     end
   end

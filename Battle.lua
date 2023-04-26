@@ -87,45 +87,18 @@ local function fight(game, attacker, defender, damageModifier, say)
 end
 
 ---@param game Game
----@param entity GameEntity_Battle
+---@param battle Battle
 ---@param dt number
 ---@param say fun(text: string)
-function M.updateBattle(game, entity, dt, say)
-  local battle = entity.object
+---@param fightIsOver fun()
+function M.updateBattle(game, battle, dt, say, fightIsOver)
   M.mut.advanceTimer(battle, dt)
   if battle.timer < 0 then
     fight(game, battle.attacker, battle.defender, 1, say)
-
-    ---@param guy Guy
-    local function die(guy)
-      say(('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
-
-      if guy.team == 'evil' then
-        game.resources:addPretzels(1)
-        game:addScore(100--[[SCORES_TABLE.killedAnEnemy]])
-      end
-
-      game:removeGuy(guy)
-    end
-
     if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
-      -- Keep fighting
       M.mut.beginNewRound(battle)
     else
-      -- Fight is over
-      game:removeEntity(entity)
-
-      -- TODO: use events to die
-      if battle.attacker.stats.hp <= 0 then
-        die(battle.attacker)
-      end
-
-      if battle.defender.stats.hp <= 0 then
-        die(battle.defender)
-      end
-
-      game:setGuyFrozen(battle.attacker, false)
-      game:setGuyFrozen(battle.defender, false)
+      fightIsOver()
     end
   end
 end
