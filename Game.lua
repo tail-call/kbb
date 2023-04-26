@@ -9,7 +9,7 @@
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
 ---@field magnificationFactor number How much the camera is zoomed in
 
----@class Game: X_Serializable, GameBlueprint
+---@class Game: GameBlueprint
 ---
 ---# Simulation
 ---
@@ -107,9 +107,6 @@ local FOG_OF_WAR_TIMER_LIMIT = 1/3
 local NONE_COLLISION = { type = 'none' }
 ---@type CollisionInfo
 local TERRAIN_COLLISION = { type = 'terrain' }
-
----Game save file name
-local SAVE_FILENAME = './kobo.kpss'
 
 ---Returns true if guy is marked as frozen
 ---@param game Game
@@ -229,7 +226,7 @@ local function makeUIScript(game)
   })
 end
 
----@param bak GameBlueprint | nil
+---@param bak GameBlueprint?
 ---@return Game
 local function new(bak)
   local Guy = require('Guy')

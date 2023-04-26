@@ -5,16 +5,23 @@
 ---@field tileTypes WorldTile[] Tile types of each square in the world
 ---@field fogOfWar number[] How visible is each square in the world. Numbers from 0 to 1
 
----@alias WorldTile 'grass' | 'rock' | 'water' | 'forest' | 'sand' | 'void' | 'snow' | 'cave' | 'wall'
+---@alias WorldTile
+---| 'grass'
+---| 'rock'
+---| 'water'
+---| 'forest'
+---| 'sand'
+---| 'void'
+---| 'snow'
+---| 'cave'
+---| 'wall'
 
----@class World: WorldBlueprint, X_Serializable
+---@class World: WorldBlueprint
 ---@field image love.Image Minimap image
 ---@field revealFogOfWar fun(self: World, pos: Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
 
 local FOG_REVEAL_SPEED = 1
 local SQUARE_REVEAL_THRESHOLD = 0.5
-
-local X_Serializable = require('X_Serializable')
 
 local calcVisionDistance = require('VisionSource').calcVisionDistance
 local isVisible = require('VisionSource').isVisible
@@ -65,53 +72,6 @@ local function new(bak)
       self.fogOfWar[idx] = newValue
       if oldValue < SQUARE_REVEAL_THRESHOLD and newValue > SQUARE_REVEAL_THRESHOLD then
         self.revealedTilesCount = self.revealedTilesCount + 1
-      end
-    end,
-    X_Serializable = X_Serializable,
-    serialize = function (self)
-      ---@cast self World
-
-      local fogContents = {}
-      for _, fog in ipairs(self.fogOfWar) do
-        local char = math.floor(fog * 255)
-        table.insert(fogContents, string.char(char))
-      end
-
-      local fogCompressedData = love.data.compress(
-        'string', 'zlib', table.concat(fogContents), 9
-      )
-
-      local tileCompressedData = love.data.compress(
-        'string', 'zlib', table.concat(self.tileTypes, ' '), 9
-      )
-
-      return table.concat {
-        'OBJECT World world 3\n',
-        ('NUMBER revealedTilesCount %s\n'):format(self.revealedTilesCount),
-        ---@cast fogCompressedData string
-        'BLOCK fogOfWar ' .. fogCompressedData:len() .. '\n',
-        fogCompressedData, '\n',
-        ---@cast tileCompressedData string
-        'BLOCK tileTypes ' .. tileCompressedData:len() .. '\n',
-        tileCompressedData, '\n',
-      }
-    end,
-    serialize1 = function (self)
-      ---@cast self World
-      return {[[World{
-        revealedTilesCount = ]],tostring(self.revealedTilesCount),[[,
-      }]]}
-    end,
-    hack_parseBlock = function (self, blockName, bytes)
-      ---@cast bytes string
-      if blockName == 'fogOfWar' then
-        ---@cast bytes string
-        self.fogOfWar = makeFogOfWarFromBlock(bytes)
-      elseif blockName == 'tileTypes' then
-        self.tileTypes = {}
-        for tileType in string.gmatch(bytes, '(%w+)') do
-          table.insert(self.tileTypes, tileType)
-        end
       end
     end,
   }
