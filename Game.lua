@@ -66,8 +66,6 @@ local getTile = require('World').getTile
 local isPassable = require('World').isPassable
 local tbl = require('tbl')
 local Vector = require('Vector')
-local weightedRandom = require('Util').weightedRandom
-local Ability = require('Ability')
 local maybeDrop = require('tbl').maybeDrop
 local makeConsoleMessage = require('ConsoleMessage').makeConsoleMessage
 local updateConsole = require('Console').updateConsole
@@ -82,12 +80,16 @@ local revealFogOfWar = require('World').revealFogOfWar
 local skyColorAtTime = require('Util').skyColorAtTime
 local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
-local hurt = require('GuyStats').mut.hurt
+
 local addMoves = require('GuyStats').mut.addMoves
+local updateBattle = require('Battle').updateBattle
+
 local addListener = require('Mutator').mut.addListener
 
 ---@type Vector
 local EVIL_SPAWN_LOCATION = { x = 301, y = 184 }
+---@type Vector
+local LEADER_SPAWN_LOCATION = { x = 269, y = 231 }
 
 local SCORES_TABLE = {
   killedAnEnemy = 100,
@@ -239,7 +241,7 @@ local function new(bak)
 
   ---@type Guy[]
   local guys = bak.guys or {
-    Guy.makeLeader(tileset, { x = 269, y = 231 }),
+    Guy.makeLeader(tileset, LEADER_SPAWN_LOCATION),
     Guy.makeGoodGuy(tileset, { x = 274, y = 231 }),
     Guy.makeGoodGuy(tileset, { x = 272, y = 231 }),
     Guy.makeGoodGuy(tileset, { x = 274, y = 229 }),
@@ -441,7 +443,7 @@ local function new(bak)
         game.player.stats,
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then
-            local newPlayer = Guy.makeLeader(tileset, { x = 269, y = 231 })
+            local newPlayer = Guy.makeLeader(tileset, LEADER_SPAWN_LOCATION)
             game:addGuy(newPlayer)
             game.player = newPlayer
             game.deathsCount = game.deathsCount + 1
@@ -507,92 +509,6 @@ local function say(game, text)
   game.uiModel.console:say(makeConsoleMessage(text, 60))
 end
 
----@param game Game
----@param attacker Guy
----@param defender Guy
----@param damageModifier number
-local function fight(game, attacker, defender, damageModifier)
-  local attackerAction = weightedRandom(attacker.abilities)
-  local defenderAction = weightedRandom(attacker.abilities)
-
-  local attackerEffect = attackerAction.ability.combat
-  local defenderEffect = defenderAction.ability.defence
-
-  ---@param guy Guy
-  ---@param damage number
-  local function dealDamage(guy, damage)
-    hurt(guy.stats, damage * damageModifier)
-    say(game, string.format('%s got %s damage, has %s hp now.', guy.name, damage, guy.stats.hp))
-  end
-
-  if defenderEffect == Ability.effects.defence.parry then
-    if attackerEffect == Ability.effects.combat.normalAttack then
-      say(game, '%s attacked, but %s parried!')
-      dealDamage(defender, 0)
-    elseif attackerEffect == Ability.effects.combat.miss then
-      say(game, '%s attacked and missed, %s gets an extra turn!')
-      fight(game, defender, attacker, damageModifier)
-    elseif attackerEffect == Ability.effects.combat.criticalAttack then
-      say(game, '%s did a critical attack, but %s parried! They strike back with %sx damage.')
-      fight(game, defender, attacker, damageModifier * 2)
-    end
-  elseif defenderEffect == Ability.effects.defence.takeDamage then
-    if attackerEffect == Ability.effects.combat.normalAttack then
-      say(game, '%s attacked! %s takes damage.')
-      dealDamage(defender, attackerAction.weight)
-    elseif attackerEffect == Ability.effects.combat.miss then
-      say(game, '%s attacked but missed!')
-      dealDamage(defender, 0)
-    elseif attackerEffect == Ability.effects.combat.criticalAttack then
-      say(game, '%s did a critical attack! %s takes %sx damage.')
-      dealDamage(defender, attackerAction.weight * 2)
-    end
-  end
-end
-
----@param game Game
----@param entity GameEntity_Battle
----@param dt number
-local function updateBattle(game, entity, dt)
-  local battle = entity.object
-  battle:advanceTimer(dt)
-  if battle.timer < 0 then
-    fight(game, battle.attacker, battle.defender, 1)
-    battle:swapSides()
-
-    ---@param guy Guy
-    local function die(guy)
-      say(game, (guy.name .. ' dies with %s hp.'):format(guy.stats.hp))
-
-      if guy.team == 'evil' then
-        game.resources:addPretzels(1)
-        game:addScore(SCORES_TABLE.killedAnEnemy)
-      end
-
-      game:removeGuy(guy)
-    end
-
-    if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
-      -- Keep fighting
-      battle:beginNewRound()
-    else
-      -- Fight is over
-      game:removeEntity(entity)
-
-      -- TODO: use events to die
-      if battle.attacker.stats.hp <= 0 then
-        die(battle.attacker)
-      end
-
-      if battle.defender.stats.hp <= 0 then
-        die(battle.defender)
-      end
-
-      game:setGuyFrozen(battle.attacker, false)
-      game:setGuyFrozen(battle.defender, false)
-    end
-  end
-end
 
 ---@param game Game
 local function orderGather(game)
@@ -668,7 +584,9 @@ local function updateGame(game, dt, movementDirections)
   for _, entity in ipairs(game.entities) do
     if entity.type == 'battle' then
       ---@cast entity any
-      updateBattle(game, entity, dt)
+      updateBattle(game, entity, dt, function (text)
+        say(game, text)
+      end)
     end
   end
 
