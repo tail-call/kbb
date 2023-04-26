@@ -95,10 +95,12 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Use mutators instead of methods to mutate objects
  - [x] Sythesize mutators to watch properties
  - [x] Pixelized pointer
+ - [x] `init()` and `deinit()` module methods to reload individual objects
  - [ ] Tile/object info window near pointer
  - [ ] Console command history
  - [ ] Give pretzels to feral kobolds to adopt them
  - [ ] UI: draggable panels
+ - [ ] Tile elevation
  - [ ] Built in text editor
  - [ ] Game plays in a window inside the GUI
  - [ ] Notable characters system: building an inn creates a barkeeper, building a smithy creates a blacksmith
@@ -108,9 +110,9 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Use string buffers for text manipulation [1]
  - [ ] Permadeath: when a player character dies, it dies forever. Next unit becomes the leader
  - [ ] When last character dies, a new is born from the dragon egg in the dragon shrine, then a new egg spawns immediately
- - [ ] `init()` and `deinit()` module methods to reload individual objects
  - [ ] Save level immediately on game exit
  - [ ] Event system
+ - [ ] Half-square movement
  - [ ] Proximity based combat
  - [ ] Random terrain generation in a selected area
  - [ ] Don't crash on console errors

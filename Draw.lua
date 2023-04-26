@@ -10,6 +10,7 @@ local mayRecruit = require('Game').mayRecruit
 local vectorToLinearIndex = require('World').vectorToLinearIndex
 local skyColorAtTime = require('Util').skyColorAtTime
 local getFog = require('World').getFog
+local getTile = require('World').getTile
 
 -- Constants
 
@@ -572,12 +573,23 @@ local function drawGame(game, drawState)
   -- Pointer
   do
     local x, y = love.mouse.getPosition()
+    x = x / drawState.windowScale
+    y = y / drawState.windowScale
    
     love.graphics.draw(
       drawState.tileset.image,
       drawState.tileset.quads.pointer,
-      x / drawState.windowScale, y / drawState.windowScale
+      x, y
     )
+
+    local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
+    withTransform(love.math.newTransform():translate(x + 10,y):scale(2/3, 2/3), function ()
+      withColor(0, 0, 0, 0.5, function ()
+        love.graphics.rectangle('fill', 0, 0, 72, 16)
+      end)
+      love.graphics.print(tileUnderCursor)
+      love.graphics.print(Vector.formatVector(game.cursorPos), 0, 8)
+    end)
   end
 end
 

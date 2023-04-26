@@ -729,6 +729,11 @@ local function handleFocusModeInput(game, scancode, key)
       commands = {
         reload = function(moduleName)
           require('Module').reload(moduleName)
+          game.uiModel = require('UIModel').new(game)
+          game.ui = require('Game').makeUIScript(game)
+          game.player = require('Guy').new(game.player)
+          game.guys[1] = game.player
+          say(game, 'recreated uiModel, ui, and player')
         end,
         scribe = function(text)
           game:addText(require('Text').new{
@@ -778,12 +783,6 @@ local function handleNormalModeInput(game, scancode)
     orderSummon(game, tileset)
   elseif scancode == 'return' then
     game:toggleFocus()
-  elseif scancode == 'n' then
-    game.uiModel = require('UIModel').new(game)
-    game.ui = require('Game').makeUIScript(game)
-    game.player = require('Guy').new(game.player)
-    game.guys[1] = game.player
-    say(game, 'recreated uiModel, ui, and player')
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
   end

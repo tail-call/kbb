@@ -73,12 +73,14 @@ end
 
 ---@param dt number
 function love.update(dt)
+  local pv = game.player.pos
+  local cv = game.cursorPos
   draw.update(
     drawState,
     dt,
     game.isFocused
-      and vector.add(game.cursorPos, { x = 0, y = 0 })
-      or vector.midpoint(game.player.pos, game.cursorPos),
+      and vector.add(cv, { x = 0, y = 0 })
+      or vector.midpoint(pv, cv),
     game.isFocused
       and game.magnificationFactor * 2
       or game.magnificationFactor,

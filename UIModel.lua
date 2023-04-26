@@ -16,7 +16,6 @@
 ---@field didTypeCharacter fun(self: UIModel, char: string) Called when player typed a character
 ---@field didPressBackspace fun(self: UIModel) Called when player typed a character
 
-local getTile = require('World').getTile
 local formatVector = require('Vector').formatVector
 local dump = require('Util').dump
 
@@ -65,16 +64,7 @@ function UIModelModule.new(game)
       self.activeTab = self.activeTab + 1
     end,
     leftPanelText = function ()
-      local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
-      return string.format(
-        ''
-          .. 'Terrain:\n %s'
-          .. '\nCoords:\n %s'
-          .. '\n1234] scale'
-          .. '\nM] message',
-        tileUnderCursor,
-        formatVector(game.cursorPos)
-      )
+      return '1234] scale'
     end,
     rightPanelText = function ()
       local header = '<- Tab ->\n\n'
