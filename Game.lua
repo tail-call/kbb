@@ -3,6 +3,7 @@
 ---@field resources Resources Resources player may spend on upgrades
 ---@field texts Text[] Text objects in the game world
 ---@field entities GameEntity[] Things in the game world
+---@field deathsCount number Number of times player has died
 ---@field guys Guy[] Guys aka units
 ---@field score integer Score the player has accumulated
 ---@field time number Time of day in seconds, max is 24*60
@@ -36,7 +37,6 @@
 ---# Game flow
 ---
 ---@field isFocused boolean True if focus mode is on
----@field onLost (fun(): nil) | nil Called when game is lost
 ---
 ---@field toggleFocus fun(self: Game) Toggles focus mode
 ---@field disableFocus fun(self: Game) Turns focus mode off
@@ -84,6 +84,7 @@ local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
 local hurt = require('GuyStats').mut.hurt
 local addMoves = require('GuyStats').mut.addMoves
+local addListener = require('Mutator').mut.addListener
 
 ---@type Vector
 local EVIL_SPAWN_LOCATION = { x = 301, y = 184 }
@@ -254,11 +255,11 @@ local function new(bak)
     guys = guys,
     time = bak.time or (12 * 60),
     entities = bak.entities or {},
+    deathsCount = bak.deathsCount or 0,
     alternatingKeyIndex = 1,
     player = guys[1],
     squad = require('Squad').new(),
     recruitCircle = require('RecruitCircle').new(),
-    onLost = nil,
     fogOfWarTimer = 0,
     cursorPos = bak.cursorPos or { x = 0, y = 0 },
     magnificationFactor = bak.magnificationFactor or 1,
@@ -316,10 +317,6 @@ local function new(bak)
           setTile(game.world, guy.pos, 'sand')
         end
       end
-
-      if guy == game.player and game.onLost then
-        game.onLost()
-      end
     end,
     addText = function (self, text)
       table.insert(self.texts, text)
@@ -370,23 +367,13 @@ local function new(bak)
     setAlternatingKeyIndex = function (self, x)
       self.alternatingKeyIndex = x
     end,
+    -- TODO: move this outta here
     serialize1 = function (self)
       ---@cast self Game
       local dump = require('Util').dump
 
       game.world.fogOfWar.__dump = function(dump)
-        -- dump('buf(){base64=[[')
-        -- local bytes = {}
-        -- local fog = game.world.fogOfWar
-        -- for _, v in ipairs(fog) do
-          -- table.insert(bytes, string.char(math.floor(v * 255)))
-        -- end
-        -- local data = table.concat(bytes)
-        -- local compressedData = love.data.compress('data', 'zlib', data)
-        -- local encodedData = love.data.encode('string', 'base64', compressedData)
-        -- dump(encodedData)
-        -- dump(']]}')
-
+        -- TODO: move to Util
         dump('buf(){base64=[[')
         local words = {'return{'}
         local fogOfWar = game.world.fogOfWar
@@ -422,6 +409,7 @@ local function new(bak)
         return Game{
           time = ]],tostring(self.time),[[,
           score = ]],tostring(self.score),[[,
+          deathsCount = ]],tostring(self.deathsCount),[[,
           guys = ]],dump(self.guys),[[,
           magnificationFactor = ]],tostring(self.magnificationFactor),[[,
           world = ]],dump(self.world),[[,
@@ -444,6 +432,26 @@ local function new(bak)
   game.uiModel.console:say(
     makeConsoleMessage('This is day 1 of your reign.', 10)
   )
+
+  -- Subscribe to player stats
+  do
+    local listenPlayerDeath
+    function listenPlayerDeath()
+      addListener(require('GuyStats').mut,
+        game.player.stats,
+        function (playerStats, key, value, oldValue)
+          if key == 'hp' and value <= 0 then
+            local newPlayer = Guy.makeLeader(tileset, { x = 269, y = 231 })
+            game:addGuy(newPlayer)
+            game.player = newPlayer
+            game.deathsCount = game.deathsCount + 1
+            listenPlayerDeath()
+          end
+        end
+      )
+    end
+    listenPlayerDeath()
+  end
 
   return game
 end

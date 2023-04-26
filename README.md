@@ -93,11 +93,19 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Lua console in focus mode
  - [x] Travelling through void is veeeeery slow but possible
  - [x] Use mutators instead of methods to mutate objects
+ - [x] Sythesize mutators to watch properties
  - [ ] Console command history
- - [ ] Sythesize mutators to watch properties
+ - [ ] Give pretzels to feral kobolds to adopt them
+ - [ ] UI: draggable panels
+ - [ ] Built in text editor
+ - [ ] Game plays in a window inside the GUI
+ - [ ] Notable characters system: building an inn creates a barkeeper, building a smithy creates a blacksmith
+ - [ ] Multiple game windwos may be opened
  - [ ] Use meshes and vertex shading for smooth fog of war
  - [ ] `bind()` command to assign keys
  - [ ] Use string buffers for text manipulation [1]
+ - [ ] Permadeath: when a player character dies, it dies forever. Next unit becomes the leader
+ - [ ] When last character dies, a new is born from the dragon egg in the dragon shrine, then a new egg spawns immediately
  - [ ] `init()` and `deinit()` module methods to reload individual objects
  - [ ] Save level immediately on game exit
  - [ ] Event system

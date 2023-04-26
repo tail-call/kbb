@@ -90,7 +90,8 @@ function UIModelModule.new(game)
             .. 'Coords:\n %sX %sY\n'
             .. 'HP:\n %s/%s\n'
             .. 'Action:\n %.2f/%.2f\n'
-            .. 'Moves:\n  %s\n',
+            .. 'Moves:\n  %s\n'
+            .. 'Deaths:\n  %s\n',
           game.player.name,
           game.player.pos.x,
           game.player.pos.y,
@@ -98,7 +99,8 @@ function UIModelModule.new(game)
           game.player.stats.maxHp,
           game.player.timer,
           game.player.speed,
-          game.player.stats.moves
+          game.player.stats.moves,
+          game.deathsCount
         )
       elseif idx == 2 then
         return ''

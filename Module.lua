@@ -1,9 +1,9 @@
 ---@class Module
----@field mut table Mutator object
----@field new fun(bak: any): any Makes a new object
----@field init fun(bak: any, strategy: fun(moduleName: string, dep: any): any): any Initializes an object
----@field deinit fun(bak: any): any Deinitializes an object
----@field reload fun(bak: any): any Reloads an object from its originating module
+---@field mut Mutator Mutator object
+---@field new fun(bak: table): table Makes a new object
+---@field init fun(bak: table, strategy: fun(moduleName: string, dep: table): table): any Initializes an object
+---@field deinit fun(bak: table)  Deinitializes an object
+---@field reload fun(bak: table) Reloads an object from its originating module
 
 local M = {}
 
