@@ -99,8 +99,10 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Tile/object info window near pointer
  - [ ] Console command history
  - [ ] Give pretzels to feral kobolds to adopt them
+ - [ ] World is generated from randomly assembled 8x8 patches of lands where landmarks are assembled from templates. Certain patches may be marked as special to generate a predefined location like a dungeon or a town (underworld would be very helplful if i had this)
+ - [ ] Max world size is 2048x2048 tiles (256x256 patches)
  - [ ] UI: draggable panels
- - [ ] Tile elevation
+ - [ ] Tile elevation: let sand be slightly below grass, rocks be much higher than all else, forest is elevated to conceal whoever is walking over them
  - [ ] Built in text editor
  - [ ] Game plays in a window inside the GUI
  - [ ] Notable characters system: building an inn creates a barkeeper, building a smithy creates a blacksmith

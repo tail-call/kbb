@@ -346,6 +346,19 @@ local function drawWorld(game, drawState, sky, globalLight)
           )
         end
       end)
+      if fog > 0.5 then
+        withColor(0, 0, 0, 1, function ()
+          if x % 8 == 0 then
+            love.graphics.line(x * TILE_WIDTH, y * TILE_HEIGHT, x * TILE_WIDTH, (y + 1) * TILE_HEIGHT)
+          end
+          if y % 8 == 0 then
+            love.graphics.line(x * TILE_WIDTH, y * TILE_HEIGHT, (x + 1) * TILE_WIDTH, y * TILE_HEIGHT)
+          end
+          if x % 8 == 1 and y % 8 == 1 then
+            love.graphics.print(('PATCH %x %x'):format((x-1)/8,(y-1)/8), (x-1) * TILE_WIDTH, (y-1) * TILE_HEIGHT)
+          end
+        end)
+      end
     end
   end
 end
