@@ -1,14 +1,12 @@
 ---@class Building
+---@field __module "Building"
 ---@field pos Vector Building's position
 
----@param bak Building
-local function new(bak)
-  return {
-    __module = 'Building',
-    pos = bak.pos,
-  }
+local M = require('Module').define(..., 0)
+
+---@param building Building
+function M.init(building)
+  building.pos = building.pos or error("Building: pos is required")
 end
 
-return {
-  new = new
-}
+return M

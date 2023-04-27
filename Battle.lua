@@ -1,4 +1,5 @@
 ---@class Battle
+---@field __module "Battle"
 ---@field attacker Guy Who initiated the battle
 ---@field defender Guy Who was attacked
 ---@field pos Vector Battle's location
