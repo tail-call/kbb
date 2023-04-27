@@ -96,6 +96,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Sythesize mutators to watch properties
  - [x] Pixelized pointer
  - [x] `init()` and `deinit()` module methods to reload individual objects
+ - [ ] BUGFIX: combat doesn't switch sides between rounds
  - [ ] Try using native code with ffi
  - [ ] Tile/object info window near pointer
  - [ ] Console command history
