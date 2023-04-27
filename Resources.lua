@@ -1,58 +1,35 @@
 ---A stash of resources to spend on stuff
 ---@class Resources
----
+---@field __module 'Resources'
 ---@field pretzels integer Amount of pretzels owned
----@field addPretzels fun(self: Resources, count: integer) Get more pretzels
----
 ---@field wood integer Amount of wood owned
----@field addWood fun(self: Resources, count: integer) Get more wood
----
 ---@field stone integer Amount of stone owned
----@field addStone fun(self: Resources, count: integer) Get more stone
----
 ---@field grass integer Amount of grass owned
----@field addGrass fun(self: Resources, count: integer) Get more grass
----
 ---@field water integer Amount of water owned
----@field addWater fun(self: Resources, count: integer) Get more water
 
 ---@class ResourcesMutator
+---@field addResources fun(self: Resources, delta: Resources) Get more resources
 
-local ResourcesModule = {}
+local M = require('Module').define(..., 0)
 
----@param bak Resources | nil
----@return Resources
-function ResourcesModule.new(bak)
-  bak = bak or {}
+---@type ResourcesMutator
+M.mut = require('Mutator').new {
+  addResources = function (self, delta)
+    self.pretzels = self.pretzels + (delta.pretzels or 0)
+    self.wood = self.wood + (delta.wood or 0)
+    self.grass = self.grass + (delta.grass or 0)
+    self.stone = self.stone + (delta.stone or 0)
+    self.water = self.water + (delta.water or 0)
+  end
+}
 
-  ---@type Resources
-  local resources = {
-    pretzels = bak.pretzels or 1,
-    addPretzels = function (self, count)
-      self.pretzels = self.pretzels + count
-    end,
-
-    wood = bak.wood or 0,
-    addWood = function (self, count)
-      self.wood = self.wood + count
-    end,
-
-    stone = bak.stone or 0,
-    addStone = function (self, count)
-      self.stone = self.stone + count
-    end,
-
-    grass = bak.grass or 0,
-    addGrass = function (self, count)
-      self.grass = self.grass + count
-    end,
-
-    water = bak.water or 0,
-    addWater = function (self, count)
-      self.water = self.water + count
-    end,
-  }
-  return resources
+---@param res Resources
+function M.init(res)
+  res.pretzels = res.pretzels or 0
+  res.wood = res.wood or 0
+  res.stone = res.stone or 0
+  res.grass = res.grass or 0
+  res.water = res.water or 0
 end
 
-return ResourcesModule
+return M

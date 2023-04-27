@@ -87,6 +87,7 @@ local say = require('Console').mut.say
 local resetRecruitCircle = require('RecruitCircle').mut.resetRecruitCircle
 local clearRecruitCircle = require('RecruitCircle').mut.clearRecruitCircle
 local growRecruitCircle = require('RecruitCircle').mut.growRecruitCircle
+local addResources = require('Resources').mut.addResources
 
 local addListener = require('Mutator').mut.addListener
 
@@ -555,7 +556,7 @@ local function die(guy, game, entity)
   echo(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
 
   if guy.team == 'evil' then
-    game.resources:addPretzels(1)
+    addResources(game.resources, { pretzels = 1})
     game:addScore(SCORES_TABLE.killedAnEnemy)
   end
 
@@ -658,18 +659,18 @@ local function maybeCollect(tileset, game, guy)
   local pos = guy.pos
   local tile = getTile(game.world, pos)
   if tile == 'forest' then
-    game.resources:addWood(1)
+    addResources(game.resources, { wood = 1 })
     setTile(game.world, pos, 'grass')
     game:addGuy(Guy.makeEvilGuy(tileset, EVIL_SPAWN_LOCATION))
   elseif tile == 'rock' then
-    game.resources:addStone(1)
+    addResources(game.resources, { stone = 1 })
     setTile(game.world, pos, 'sand')
     game:addGuy(Guy.makeStrongEvilGuy(tileset, EVIL_SPAWN_LOCATION))
   elseif tile == 'grass' then
-    game.resources:addGrass(1)
+    addResources(game.resources, { grass = 1 })
     setTile(game.world, pos, 'sand')
   elseif tile == 'water' then
-    game.resources:addWater(1)
+    addResources(game.resources, { water = 1 })
     setTile(game.world, pos, 'sand')
   end
 end
@@ -700,12 +701,12 @@ local function orderBuild(game)
 
   -- Is building on rock?
   if getTile(game.world, pos) == 'rock' then
-    game.resources:addStone(1)
+    addResources(game.resources, { stone = 1 })
     setTile(game.world, pos, 'sand')
   end
 
   -- Build
-  game.resources:addWood(-BUILDING_COST)
+  addResources(game.resources, { wood = -BUILDING_COST })
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
   game:addEntity(makeBuildingEntity(makeBuilding({ pos = pos })))
   game:addScore(SCORES_TABLE.builtAHouse)
@@ -718,12 +719,9 @@ local function orderSummon(game, tileset)
   if game.resources.pretzels <= 0 then return end
   if game.player.stats.moves <= MOVE_COSTS_TABLE.summon then return end
 
-  game.resources:addPretzels(-1)
+  addResources(game.resources, { pretzels = -1 })
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
-  local guy = require('Guy').makeGoodGuy(tileset, {
-    x = game.cursorPos.x,
-    y = game.cursorPos.y
-  })
+  local guy = require('Guy').makeGoodGuy(tileset, game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
   game:addGuy(guy)
   game.squad:add(guy)

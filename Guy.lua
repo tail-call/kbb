@@ -31,6 +31,7 @@ local addMoves = require('GuyStats').mut.addMoves
 local movePixie = require('Pixie').mut.movePixie
 local updatePixie = require('Pixie').mut.updatePixie
 local playSpawnAnimation = require('Pixie').mut.playSpawnAnimation
+local setMaxHp = require('GuyStats').mut.setMaxHp
 
 ---@type Guy
 M.Guy = {}
@@ -240,7 +241,7 @@ function M.makeStrongEvilGuy(tileset, pos)
     pos = pos,
     tileset = tileset,
   }
-  guy.stats:setMaxHp(50)
+  setMaxHp(guy.stats, 50)
   guy.speed = 0.25
   guy.behavior = 'wander'
   guy.team = 'evil'
