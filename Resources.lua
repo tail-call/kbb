@@ -1,3 +1,4 @@
+---A stash of resources to spend on stuff
 ---@class Resources
 ---
 ---@field pretzels integer Amount of pretzels owned
@@ -14,6 +15,8 @@
 ---
 ---@field water integer Amount of water owned
 ---@field addWater fun(self: Resources, count: integer) Get more water
+
+---@class ResourcesMutator
 
 local ResourcesModule = {}
 

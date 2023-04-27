@@ -1,6 +1,6 @@
 ---Description of a class
 ---@class ${name}
----@field __module "${name}"
+---@field __module '${name}'
 ---@field demoProp any Any property
 
 ---@class ${name}Mutator

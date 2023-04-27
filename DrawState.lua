@@ -1,5 +1,6 @@
 ---State of the renderer
 ---@class DrawState
+---@field __module 'DrawState'
 ---@field windowScale number Window scale
 ---@field tileset Tileset Tileset used for drawing
 ---@field camera Vector3 Camera position in the world
@@ -13,6 +14,7 @@
 ---@field advanceTime fun(self: DrawState, dt: number)
 
 local M = require('Module').define(..., 0)
+
 local lerp3 = require('Vector3').lerp3
 local VectorModule = require('Vector')
 local updateTileset = require('Tileset').update

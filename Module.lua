@@ -10,7 +10,7 @@ local M = {}
 ---@generic T
 ---@param name string
 ---@param version number
----@return T
+---@return Module
 function M.define(name, version)
   local module
   module = {
@@ -28,6 +28,9 @@ function M.define(name, version)
     migrate = function (bak)
       return bak
     end,
+    ---@generic T
+    ---@param bak T
+    ---@return T
     new = function (bak)
       local obj = module.migrate(bak or {})
       obj.__module = name

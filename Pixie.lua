@@ -1,6 +1,6 @@
 ---A pixie is a texture + quad + transform with animation support
-
 ---@class Pixie
+---@field __module 'Pixie'
 ---@field texture love.Texture
 ---@field quad love.Quad
 ---@field pos Vector
@@ -79,7 +79,7 @@ M.mut = {
 
 ---@param pixie Pixie
 ---@return Pixie
-function M.init(pixie, load)
+function M.init(pixie)
   pixie.texture = require('Tileset').getTileset().image
   pixie.quad = pixie.quad
   pixie.isRightStep = pixie.isRightStep or false

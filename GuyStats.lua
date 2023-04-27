@@ -1,7 +1,5 @@
----@class GuyStatsModule: Module
----@field mut GuyStatsMutator
-
 ---@class GuyStats
+---@field __module 'GuyStats'
 ---@field hp number Current health points
 ---@field maxHp number Maximum health points
 ---@field moves number Current moves
@@ -13,10 +11,9 @@
 ---@field setMaxHp fun(self: GuyStats, maxHp: number) Sets maximum health points and fully heals
 ---@field addMoves fun(self: GuyStats, amount: number) Adds moves
 
-local clamped = require('Util').clamped
-
----@type GuyStatsModule
 local M = require('Module').define(..., 0)
+
+local clamped = require('Util').clamped
 
 ---@type GuyStatsMutator
 M.mut = require('Mutator').new {

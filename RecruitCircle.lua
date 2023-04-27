@@ -1,4 +1,5 @@
 ---@class RecruitCircle
+---@field __module 'RecruitCircle'
 ---@field radius number | nil
 ---@field growthSpeed number
 ---@field maxRadius number
