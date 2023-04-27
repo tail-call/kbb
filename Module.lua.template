@@ -1,0 +1,24 @@
+---Description of a class
+---@class ${name}
+---@field __module "${name}"
+---@field demoProp any Any property
+
+---@class ${name}Mutator
+---@field setDemoProp fun(self: ${name}, newValue: any)
+
+local M = require('Module').define(..., 0)
+
+---@type ${name}Mutator
+M.mut = require('Mutator').new {
+  setDemoProp = function (self, newValue)
+    self.demoProp = newValue
+  end,
+}
+
+---@param obj ${name}
+function M.init(obj)
+  obj.demoProp = obj.demoProp or error('${name}: demoProp is required')
+end
+
+return M
+

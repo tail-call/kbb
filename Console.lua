@@ -8,6 +8,8 @@
 
 local M = require('Module').define(..., 0)
 
+local fadeOut = require('ConsoleMessage').mut.fadeOut
+
 ---@type ConsoleMutator
 M.mut = require('Mutator').new {
   say = function (self, message)
@@ -28,7 +30,7 @@ end
 ---@param dt number
 function M.updateConsole(console, dt)
   for _, message in ipairs(console.messages) do
-    message:fadeOut(dt)
+    fadeOut(message, dt)
   end
 end
 

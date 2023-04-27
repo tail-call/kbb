@@ -1,4 +1,3 @@
-local updateTileset = require('Tileset').update
 local parallaxTile = require('Tileset').parallaxTile
 local tbl = require('tbl')
 local Vector = require('Vector')
@@ -11,24 +10,16 @@ local vectorToLinearIndex = require('World').vectorToLinearIndex
 local skyColorAtTime = require('Util').skyColorAtTime
 local getFog = require('World').getFog
 local getTile = require('World').getTile
+local TILE_HEIGHT = require('const').TILE_HEIGHT
+local TILE_WIDTH = require('const').TILE_WIDTH
 
 -- Constants
-
-local SCREEN_HEIGHT = 200
-local TILE_HEIGHT = 16
-local TILE_WIDTH = 16
 local MINIMAP_SIZE = 72
 local HIGHLIGHT_CIRCLE_RADIUS = 10
 
 local WHITE_CURSOR_COLOR = { 1, 1, 1, 0.8 }
 local RED_COLOR = { 1, 0, 0, 0.8 }
 local YELLOW_COLOR = { 1, 1, 0, 0.8 }
-
----@param drawState DrawState
----@param z number
-local function setZoom(drawState, z)
-  drawState:setWindowScale(z)
-end
 
 ---@param drawState DrawState
 local function init(drawState)
@@ -81,23 +72,6 @@ end
 ---@param drawState DrawState
 local function prepareFrame(drawState)
   love.graphics.scale(drawState.windowScale)
-end
-
----@param drawState DrawState
----@param dt number
----@param lookingAt Vector
----@param magn number
----@param isAltCentering boolean
-local function update(drawState, dt, lookingAt, magn, isAltCentering)
-  drawState:advanceTime(dt)
-
-  local yOffset = isAltCentering and SCREEN_HEIGHT/magn/8 or 0
-  local offset = Vector.add(
-    Vector.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }
-  )
-
-  drawState:setCamera(offset, dt, magn)
-  updateTileset(drawState.tileset, dt)
 end
 
 ---@param pos Vector
@@ -612,8 +586,6 @@ return {
   init = init,
   prepareFrame = prepareFrame,
   recruitableHighlight = recruitableHighlight,
-  setZoom = setZoom,
-  update = update,
   textAtTile = textAtTile,
   house = drawHouse,
   getCursorCoords = getCursorCoords,

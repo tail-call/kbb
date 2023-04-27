@@ -1,7 +1,6 @@
 -- Need to do this before anything else is executed
 math.randomseed(os.time())
 
-local draw = require('Draw')
 local makeGame = require('Game').new
 local handleInput = require('Game').handleInput
 local updateGame = require('Game').updateGame
@@ -12,6 +11,9 @@ local vector = require('Vector')
 local gameover = require('GameOver')
 local loadTileset = require('Tileset').load
 local loadFont = require('Util').loadFont
+local updateDrawState = require('DrawState').updateDrawState
+
+local setWindowScale = require('DrawState').mut.setWindowScale
 
 local FILENAME = './kobo2.kpss'
 
@@ -63,7 +65,7 @@ function love.load()
   love.mouse.setVisible(false)
   loadTileset()
   local tileset = require('Tileset').getTileset()
-  drawState = require('DrawState').new(tileset)
+  drawState = require('DrawState').new({ tileset = tileset })
   game = makeGame()
   game.onLost = function ()
     state = 'dead'
@@ -75,7 +77,7 @@ end
 function love.update(dt)
   local pv = game.player.pos
   local cv = game.cursorPos
-  draw.update(
+  updateDrawState(
     drawState,
     dt,
     game.isFocused
@@ -108,7 +110,7 @@ end
 ---@param isrepeat boolean
 function love.keypressed(key, scancode, isrepeat)
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
-    draw.setZoom(drawState, tonumber(scancode) or 1)
+    setWindowScale(drawState, tonumber(scancode) or 1)
   end
 
   if scancode == '8' then

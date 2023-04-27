@@ -1,65 +1,84 @@
+---State of the renderer
 ---@class DrawState
----
 ---@field windowScale number Window scale
----@field setWindowScale fun(self: DrawState, windowScale: number) Changes window scale
----
 ---@field tileset Tileset Tileset used for drawing
----
 ---@field camera Vector3 Camera position in the world
----@field setCamera fun(self: DrawState, offset: Vector, z: number, magn: number)
----
 ---@field cursorTimer number Cursor animation timer
 ---@field battleTimer number Battle animation timer
 ---@field waterTimer number Water animation timer
+
+---@class DrawStateMutator
+---@field setWindowScale fun(self: DrawState, windowScale: number) Changes window scale
+---@field setCamera fun(self: DrawState, offset: Vector, z: number, magn: number)
 ---@field advanceTime fun(self: DrawState, dt: number)
 
+local M = require('Module').define(..., 0)
 local lerp3 = require('Vector3').lerp3
+local VectorModule = require('Vector')
+local updateTileset = require('Tileset').update
+
+local TILE_WIDTH = require('const').TILE_WIDTH
+local SCREEN_HEIGHT = 200
 
 local CURSOR_TIMER_SPEED = 2
 local BATTLE_TIMER_SPEED = 2
 local WATER_TIMER_SPEED = 1/4
 local CAMERA_LERP_SPEED = 10
 
----@param tileset Tileset
----@return DrawState
-local function new(tileset)
-  ---@type DrawState
-  local drawState = {
-    windowScale = 3,
-    tileset = tileset,
-    setWindowScale = function (self, windowScale)
-      self.windowScale = windowScale
+---@type DrawStateMutator
+M.mut = require('Mutator').new {
+  setWindowScale = function (self, windowScale)
+    self.windowScale = windowScale
 
-      self.tileset:regenerate()
-    end,
-    camera = { x = 266 * 16, y = 229 * 16, z = 0.01 },
-    cursorTimer = 0,
-    battleTimer = 0,
-    waterTimer = 0,
-    advanceTime = function (self, dt)
-      self.battleTimer = (
-        self.battleTimer + BATTLE_TIMER_SPEED * dt
-      ) % 1
+    self.tileset:regenerate()
+  end,
+  advanceTime = function (self, dt)
+    self.battleTimer = (
+      self.battleTimer + BATTLE_TIMER_SPEED * dt
+    ) % 1
 
-      self.waterTimer = (
-        self.waterTimer + WATER_TIMER_SPEED * dt
-      ) % (math.pi / 2)
+    self.waterTimer = (
+      self.waterTimer + WATER_TIMER_SPEED * dt
+    ) % (math.pi / 2)
 
-      self.cursorTimer = (
-        self.cursorTimer + CURSOR_TIMER_SPEED * dt
-      ) % (math.pi * 2)
-    end,
-    setCamera = function (self, offset, dt, magn)
-      self.camera = lerp3(
-        self.camera,
-        { x = offset.x, y = offset.y, z = magn },
-        dt * CAMERA_LERP_SPEED
-      )
-    end
-  }
-  return drawState
+    self.cursorTimer = (
+      self.cursorTimer + CURSOR_TIMER_SPEED * dt
+    ) % (math.pi * 2)
+  end,
+  setCamera = function (self, offset, dt, magn)
+    self.camera = lerp3(
+      self.camera,
+      { x = offset.x, y = offset.y, z = magn },
+      dt * CAMERA_LERP_SPEED
+    )
+  end
+}
+
+---@param drawState DrawState
+function M.init(drawState)
+  drawState.windowScale = drawState.windowScale or 3
+  drawState.tileset = drawState.tileset or error('DrawState: tileset is required')
+  drawState.camera = drawState.camera or { x = 266 * 16, y = 229 * 16, z = 0.01 }
+  drawState.cursorTimer = drawState.cursorTimer or 0
+  drawState.battleTimer = drawState.battleTimer or 0
+  drawState.waterTimer = drawState.waterTimer or  0
 end
 
-return {
-  new = new,
-}
+---@param drawState DrawState
+---@param dt number
+---@param lookingAt Vector
+---@param magn number
+---@param isAltCentering boolean
+function M.updateDrawState(drawState, dt, lookingAt, magn, isAltCentering)
+  M.mut.advanceTime(drawState, dt)
+
+  local yOffset = isAltCentering and SCREEN_HEIGHT/magn/8 or 0
+  local offset = VectorModule.add(
+    VectorModule.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }
+  )
+
+  M.mut.setCamera(drawState, offset, dt, magn)
+  updateTileset(drawState.tileset, dt)
+end
+
+return M

@@ -67,7 +67,7 @@ local isPassable = require('World').isPassable
 local tbl = require('tbl')
 local Vector = require('Vector')
 local maybeDrop = require('tbl').maybeDrop
-local makeConsoleMessage = require('ConsoleMessage').makeConsoleMessage
+local makeConsoleMessage = require('ConsoleMessage').new
 local updateConsole = require('Console').updateConsole
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
@@ -430,12 +430,18 @@ local function new(bak)
 
   say(
     game.uiModel.console,
-    makeConsoleMessage('Welcome to Kobold Princess Simulator.', 10)
+    makeConsoleMessage {
+      text = 'Welcome to Kobold Princess Simulator.',
+      lifetime = 10
+    }
   )
 
   say(
     game.uiModel.console,
-    makeConsoleMessage('This is day 1 of your reign.', 10)
+    makeConsoleMessage {
+      text = 'This is day 1 of your reign.',
+      lifetime = 10,
+    }
   )
 
   -- Subscribe to player stats
@@ -509,7 +515,10 @@ end
 ---@param game Game
 ---@param text string
 local function echo(game, text)
-  say(game.uiModel.console, makeConsoleMessage(text, 60))
+  say(game.uiModel.console, makeConsoleMessage {
+    text = text,
+    lifetime = 60,
+  })
 end
 
 
