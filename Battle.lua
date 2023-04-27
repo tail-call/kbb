@@ -1,3 +1,4 @@
+---A representation of a battle between units
 ---@class Battle
 ---@field __module "Battle"
 ---@field attacker Guy Who initiated the battle

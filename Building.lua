@@ -1,3 +1,4 @@
+---A representation of a building
 ---@class Building
 ---@field __module "Building"
 ---@field pos Vector Building's position

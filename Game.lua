@@ -83,6 +83,7 @@ local behave = require('Guy').behave
 
 local addMoves = require('GuyStats').mut.addMoves
 local updateBattle = require('Battle').updateBattle
+local say = require('Console').mut.say
 
 local addListener = require('Mutator').mut.addListener
 
@@ -427,11 +428,13 @@ local function new(bak)
   game.ui = makeUIScript(game)
   game.guyDelegate = makeGuyDelegate(game)
 
-  game.uiModel.console:say(
+  say(
+    game.uiModel.console,
     makeConsoleMessage('Welcome to Kobold Princess Simulator.', 10)
   )
 
-  game.uiModel.console:say(
+  say(
+    game.uiModel.console,
     makeConsoleMessage('This is day 1 of your reign.', 10)
   )
 
@@ -505,8 +508,8 @@ end
 
 ---@param game Game
 ---@param text string
-local function say(game, text)
-  game.uiModel.console:say(makeConsoleMessage(text, 60))
+local function echo(game, text)
+  say(game.uiModel.console, makeConsoleMessage(text, 60))
 end
 
 
@@ -537,7 +540,7 @@ end
 ---@param game Game
 ---@param entity GameEntity_Battle
 local function die(guy, game, entity)
-  say(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
+  echo(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
 
   if guy.team == 'evil' then
     game.resources:addPretzels(1)
@@ -602,7 +605,7 @@ local function updateGame(game, dt, movementDirections)
       ---@cast entity GameEntity_Battle
       local battle = entity.object
       updateBattle(game, battle, dt, function (text)
-        say(game, text)
+        echo(game, text)
       end, function ()
         -- TODO: use events to die
         if battle.attacker.stats.hp <= 0 then
@@ -709,7 +712,7 @@ local function orderSummon(game, tileset)
     x = game.cursorPos.x,
     y = game.cursorPos.y
   })
-  say(game, ('%s was summonned.'):format(guy.name))
+  echo(game, ('%s was summonned.'):format(guy.name))
   game:addGuy(guy)
   game.squad:add(guy)
 end
@@ -733,7 +736,7 @@ local function handleFocusModeInput(game, scancode, key)
           game.ui = require('Game').makeUIScript(game)
           game.player = require('Guy').new(game.player)
           game.guys[1] = game.player
-          say(game, 'recreated uiModel, ui, and player')
+          echo(game, 'recreated uiModel, ui, and player')
         end,
         scribe = function(text)
           game:addText(require('Text').new{
@@ -742,7 +745,7 @@ local function handleFocusModeInput(game, scancode, key)
           })
         end,
         print = function (something)
-          say(game, something)
+          echo(game, something)
         end,
         help = function ()
           for k in pairs(commands) do
@@ -819,7 +822,7 @@ return {
   isFrozen = isFrozen,
   mayRecruit = mayRecruit,
   new = new,
-  say = say,
+  say = echo,
   handleText = handleText,
   makeUIScript = makeUIScript,
 }

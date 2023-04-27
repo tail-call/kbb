@@ -1,31 +1,35 @@
----@class Console Bottom console
+---Console for in-game messages
+---@class Console
+---@field __module "Console"
 ---@field messages ConsoleMessage[] List of displayed messages
+
+---@class ConsoleMutator
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
 
-local ConsoleModule = {}
+local M = require('Module').define(..., 0)
 
----@return Console
-function ConsoleModule.new()
-  ---@type Console
-  local console = {
-    messages = {},
-    say = function (self, message)
-      io.stdout:write(('\tEcho: %s\n'):format(message.text))
-      table.insert(self.messages, message)
-      while #self.messages >= 8 do
-        table.remove(self.messages, 1)
-      end
-    end,
-  }
-  return console
+---@type ConsoleMutator
+M.mut = require('Mutator').new {
+  say = function (self, message)
+    io.stdout:write(('\tEcho: %s\n'):format(message.text))
+    table.insert(self.messages, message)
+    while #self.messages >= 8 do
+      table.remove(self.messages, 1)
+    end
+  end
+}
+
+---@param console Console
+function M.init(console)
+  console.messages = console.messages or {}
 end
 
 ---@param console Console
 ---@param dt number
-function ConsoleModule.updateConsole(console, dt)
+function M.updateConsole(console, dt)
   for _, message in ipairs(console.messages) do
     message:fadeOut(dt)
   end
 end
 
-return ConsoleModule
+return M
