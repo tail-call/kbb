@@ -225,6 +225,26 @@ local function dump(obj)
   return table.concat(result)
 end
 
+local function makeBufDumper (array, format)
+  ---@param write fun(data: string)
+  return function(write)
+    local words = {'return{'}
+    for _, word in ipairs(array) do
+      table.insert(words, string.format(format, word))
+    end
+
+    table.insert(words, '}')
+    local data = table.concat(words, '\n')
+
+    write('buf(){base64=[[')
+    local compressedData = love.data.compress('data', 'zlib', data)
+    local encodedData = love.data.encode('string', 'base64', compressedData)
+    ---@cast encodedData string
+    write(encodedData)
+    write(']]}')
+  end
+end
+
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,
@@ -237,4 +257,5 @@ return {
   clamped = clamped,
   skyColorAtTime = skyColorAtTime,
   dump = dump,
+  makeBufDumper = makeBufDumper,
 }

@@ -67,19 +67,15 @@ local isPassable = require('World').isPassable
 local tbl = require('tbl')
 local Vector = require('Vector')
 local maybeDrop = require('tbl').maybeDrop
-local makeConsoleMessage = require('ConsoleMessage').new
 local updateConsole = require('Console').updateConsole
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
-local makeBattle = require('Battle').new
-local makeBuilding = require('Building').new
-local makeBuildingEntity = require('GameEntity').makeBuildingEntity
-local makeBattleEntity = require('GameEntity').makeBattleEntity
 local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
 local revealFogOfWar = require('World').revealFogOfWar
 local skyColorAtTime = require('Util').skyColorAtTime
 local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
+local makeBufDumper = require('Util').makeBufDumper
 
 local addMoves = require('GuyStats').mut.addMoves
 local updateBattle = require('Battle').updateBattle
@@ -372,9 +368,12 @@ local function new(bak)
       self:setGuyFrozen(attacker, true)
       self:setGuyFrozen(defender, true)
 
-      self:addEntity(makeBattleEntity(makeBattle({
-        attacker = attacker, defender = defender
-      })))
+      self:addEntity(
+        require('GameEntity').makeBattleEntity(
+          require('Battle').new {
+          attacker = attacker, defender = defender
+        })
+      )
     end,
     setAlternatingKeyIndex = function (self, x)
       self.alternatingKeyIndex = x
@@ -383,24 +382,6 @@ local function new(bak)
     serialize1 = function (self)
       ---@cast self Game
       local dump = require('Util').dump
-
-      local function makeBufDumper (array, format)
-        return function(write)
-          local words = {'return{'}
-          for _, word in ipairs(array) do
-            table.insert(words, string.format(format, word))
-          end
-
-          table.insert(words, '}')
-          local data = table.concat(words, '\n')
-
-          write('buf(){base64=[[')
-          local compressedData = love.data.compress('data', 'zlib', data)
-          local encodedData = love.data.encode('string', 'base64', compressedData)
-          write(encodedData)
-          write(']]}')
-        end
-      end
 
       game.world.fogOfWar.__dump = makeBufDumper(game.world.fogOfWar, '%.3f,')
       game.world.tileTypes.__dump = makeBufDumper(game.world.tileTypes, '%q,')
@@ -430,7 +411,7 @@ local function new(bak)
 
   say(
     game.uiModel.console,
-    makeConsoleMessage {
+    require('ConsoleMessage').new {
       text = 'Welcome to Kobold Princess Simulator.',
       lifetime = 10
     }
@@ -438,7 +419,7 @@ local function new(bak)
 
   say(
     game.uiModel.console,
-    makeConsoleMessage {
+    require('ConsoleMessage').new {
       text = 'This is day 1 of your reign.',
       lifetime = 10,
     }
@@ -515,7 +496,7 @@ end
 ---@param game Game
 ---@param text string
 local function echo(game, text)
-  say(game.uiModel.console, makeConsoleMessage {
+  say(game.uiModel.console, require('ConsoleMessage').new {
     text = text,
     lifetime = 60,
   })
@@ -704,7 +685,11 @@ local function orderBuild(game)
   -- Build
   addResources(game.resources, { wood = -BUILDING_COST })
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
-  game:addEntity(makeBuildingEntity(makeBuilding({ pos = pos })))
+  game:addEntity(
+    require('GameEntity').makeBuildingEntity(
+      require('Building').new { pos = pos }
+    )
+  )
   game:addScore(SCORES_TABLE.builtAHouse)
   game:disableFocus()
 end
