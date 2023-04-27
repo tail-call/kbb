@@ -171,6 +171,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Then unit carries wood to the site and builds the thing
  - [ ] Wolves that only walk on forest tiles
  - [ ] Dragons
+ - [ ] Measure revealed terrytory by patches rather than by tiles
  - [ ] Unicorns
  - [ ] Circle shaped cursor when pointing to unit/building
  - [ ] All guys have ability rings: they're being spinned during the battle to determine next action. Player is invited to optimize the ability rings towards most preferable outcome.

@@ -88,6 +88,10 @@ local resetRecruitCircle = require('RecruitCircle').mut.resetRecruitCircle
 local clearRecruitCircle = require('RecruitCircle').mut.clearRecruitCircle
 local growRecruitCircle = require('RecruitCircle').mut.growRecruitCircle
 local addResources = require('Resources').mut.addResources
+local addToSquad = require('Squad').mut.addToSquad
+local removeFromSquad = require('Squad').mut.removeFromSquad
+local startFollowing = require('Squad').mut.startFollowing
+local toggleFollow = require('Squad').mut.toggleFollow
 
 local addListener = require('Mutator').mut.addListener
 
@@ -102,7 +106,6 @@ local SCORES_TABLE = {
 }
 
 local MOVE_COSTS_TABLE = {
-  follow = 0,
   dismissSquad = 1,
   summon = 25,
   build = 50,
@@ -255,18 +258,20 @@ local function new(bak)
 
   ---@type Game
   game = {
+    -- TODO: use load param
     world = require('World').new(bak.world or {}),
     score = bak.score or 0,
     frozenGuys = tbl.weaken({}, 'k'),
-    resources = bak.resources or require('Resources').new(),
+    -- TODO: use load param
+    resources = require('Resources').new(bak.resources or {}),
     guys = guys,
     time = bak.time or (12 * 60),
     entities = bak.entities or {},
     deathsCount = bak.deathsCount or 0,
     alternatingKeyIndex = 1,
     player = guys[1],
-    squad = require('Squad').new(),
-    recruitCircle = require('RecruitCircle').new(),
+    squad = require('Squad').new {},
+    recruitCircle = require('RecruitCircle').new {},
     fogOfWarTimer = 0,
     cursorPos = bak.cursorPos or { x = 0, y = 0 },
     magnificationFactor = bak.magnificationFactor or 1,
@@ -304,7 +309,7 @@ local function new(bak)
     end,
     removeGuy = function (self, guy)
       maybeDrop(self.guys, guy)
-      self.squad:remove(guy)
+      removeFromSquad(self.squad, guy)
       self.frozenGuys[guy] = nil
 
       local tile = getTile(game.world, guy.pos)
@@ -422,7 +427,7 @@ local function new(bak)
           world = ]],dump(self.world),[[,
           texts = ]],dump(self.texts),[[,
           entities = ]],dump(self.entities),[[,
-          resources = Resources]],dump(self.resources),[[,
+          resources = ]],dump(self.resources),[[,
         }
       ]]}
     end,
@@ -495,7 +500,7 @@ end
 ---@param game Game
 local function dismissSquad(game)
   for guy in pairs(game.squad.followers) do
-    game.squad:remove(guy)
+    removeFromSquad(game.squad, guy)
   end
 end
 
@@ -509,10 +514,10 @@ end
 local function endRecruiting(game)
   for _, guy in ipairs(game.guys) do
     if mayRecruit(game, guy) then
-      game.squad:add(guy)
+      addToSquad(game.squad, guy)
     end
   end
-  game.squad:startFollowing()
+  startFollowing(game.squad)
   clearRecruitCircle(game.recruitCircle)
 end
 
@@ -724,7 +729,7 @@ local function orderSummon(game, tileset)
   local guy = require('Guy').makeGoodGuy(tileset, game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
   game:addGuy(guy)
-  game.squad:add(guy)
+  addToSquad(game.squad, guy)
 end
 
 ---@param game Game
@@ -779,10 +784,7 @@ local function handleNormalModeInput(game, scancode)
   if scancode == 'tab' then
     game.uiModel:nextTab()
   elseif scancode == 'f' then
-    if game.player.stats.moves >= MOVE_COSTS_TABLE.follow then
-      addMoves(game.player.stats, -MOVE_COSTS_TABLE.follow)
-      game.squad:toggleFollow()
-    end
+    toggleFollow(game.squad)
   elseif scancode == 'g' then
     if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
       addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)

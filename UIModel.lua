@@ -57,7 +57,7 @@ function UIModelModule.new(game)
   local model
   model = {
     __module = 'UIModel',
-    console = require('Console').new(),
+    console = require('Console').new {},
     prompt = '',
     activeTab = 0,
     nextTab = function (self)
