@@ -2,42 +2,44 @@
 ---@field radius number | nil
 ---@field growthSpeed number
 ---@field maxRadius number
----@field grow fun(self: RecruitCircle, dt: number) -- Increase recruit circle radius if active
----@field reset fun(self: RecruitCircle) -- Activates recruit circle
----@field clear fun(self: RecruitCircle) -- Deactivates recruit circle
+
+---@class RecruitCircleMutator
+---@field growRecruitCircle fun(self: RecruitCircle, dt: number) -- Increase recruit circle radius if active
+---@field resetRecruitCircle fun(self: RecruitCircle) -- Activates recruit circle
+---@field clearRecruitCircle fun(self: RecruitCircle) -- Deactivates recruit circle
+
+local M = require('Module').define(..., 0)
 
 local RECRUIT_CIRCLE_MAX_RADIUS = 6
 local RECRUIT_CIRCLE_GROWTH_SPEED = 6
 
-local RecruitCircleModule = {}
+---@type RecruitCircleMutator
+M.mut = require('Mutator').new {
+  resetRecruitCircle = function(self)
+    self.radius = 0
+  end,
+  clearRecruitCircle = function(self)
+    self.radius = nil
+  end,
+  growRecruitCircle = function (self, dt)
+    self.radius = math.min(
+      self.radius + dt * self.growthSpeed,
+      self.maxRadius
+    )
+  end,
+}
 
----@return RecruitCircle
-function RecruitCircleModule.new()
-  ---@type RecruitCircle
-  local recruitCircle = {
-    radius = nil,
-    maxRadius = RECRUIT_CIRCLE_MAX_RADIUS,
-    growthSpeed = RECRUIT_CIRCLE_GROWTH_SPEED,
-    reset = function(self)
-      self.radius = 0
-    end,
-    clear = function(self)
-      self.radius = nil
-    end,
-    grow = function (self, dt)
-      self.radius = math.min(
-        self.radius + dt * self.growthSpeed,
-        self.maxRadius
-      )
-    end
-  }
-  return recruitCircle
+---@param recruitCircle RecruitCircle
+function M.init(recruitCircle)
+  recruitCircle.radius = recruitCircle.radius or nil
+  recruitCircle.maxRadius = RECRUIT_CIRCLE_MAX_RADIUS
+  recruitCircle.growthSpeed = RECRUIT_CIRCLE_GROWTH_SPEED
 end
 
 ---@param recruitCircle RecruitCircle
 ---@return boolean
-function RecruitCircleModule.isRecruitCircleActive(recruitCircle)
+function M.isRecruitCircleActive(recruitCircle)
   return recruitCircle.radius ~= nil
 end
 
-return RecruitCircleModule
+return M

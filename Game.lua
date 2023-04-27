@@ -84,6 +84,9 @@ local behave = require('Guy').behave
 local addMoves = require('GuyStats').mut.addMoves
 local updateBattle = require('Battle').updateBattle
 local say = require('Console').mut.say
+local resetRecruitCircle = require('RecruitCircle').mut.resetRecruitCircle
+local clearRecruitCircle = require('RecruitCircle').mut.clearRecruitCircle
+local growRecruitCircle = require('RecruitCircle').mut.growRecruitCircle
 
 local addListener = require('Mutator').mut.addListener
 
@@ -498,7 +501,7 @@ end
 ---@param game Game
 local function beginRecruiting(game)
   if game.isFocused then return end
-  game.recruitCircle:reset()
+  resetRecruitCircle(game.recruitCircle)
 end
 
 ---@param game Game
@@ -509,7 +512,7 @@ local function endRecruiting(game)
     end
   end
   game.squad:startFollowing()
-  game.recruitCircle:clear()
+  clearRecruitCircle(game.recruitCircle)
 end
 
 ---@param game Game
@@ -570,7 +573,7 @@ local function updateGame(game, dt, movementDirections)
   end)
   updateConsole(game.uiModel.console, dt)
   if isRecruitCircleActive(game.recruitCircle) then
-    game.recruitCircle:grow(dt)
+    growRecruitCircle(game.recruitCircle, dt)
   end
 
   if game.isFocused then return end

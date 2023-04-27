@@ -102,8 +102,11 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] World is generated from randomly assembled 8x8 patches of lands where landmarks are assembled from templates. Certain patches may be marked as special to generate a predefined location like a dungeon or a town (underworld would be very helplful if i had this)
  - [ ] Max world size is 2048x2048 tiles (256x256 patches)
  - [ ] UI: draggable panels
+ - [ ] Each patch of land is a separate mesh
+ - [ ] Each patch of fog of war is also a mesh
  - [ ] Tile elevation: let sand be slightly below grass, rocks be much higher than all else, forest is elevated to conceal whoever is walking over them
  - [ ] Built in text editor
+ - [ ] Randomly generated dungeons: a door will appear when a new dungeon occurs
  - [ ] Game plays in a window inside the GUI
  - [ ] Notable characters system: building an inn creates a barkeeper, building a smithy creates a blacksmith
  - [ ] Multiple game windows may be opened
