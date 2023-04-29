@@ -8,7 +8,6 @@
 ---@field round number Current round number
 
 ---@class BattleMutator
----@field swapSides fun(self: Battle) Swap attacker and defender
 ---@field advanceTimer fun(self: Battle, dt: number) Makes battle timer go down
 ---@field beginNewRound fun(self: Battle) Reset round timer
 
@@ -23,13 +22,11 @@ local BATTLE_ROUND_DURATION = 0.5
 
 ---@type BattleMutator
 M.mut = require('Mutator').new {
-  swapSides = function (self)
-    self.attacker, self.defender = self.defender, self.attacker
-  end,
   advanceTimer = function (self, dt)
     self.timer = self.timer - dt
   end,
   beginNewRound = function (self)
+    self.attacker, self.defender = self.defender, self.attacker
     self.timer = BATTLE_ROUND_DURATION
     self.round = self.round + 1
   end,

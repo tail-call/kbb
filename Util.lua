@@ -225,6 +225,10 @@ local function dump(obj)
   return table.concat(result)
 end
 
+---Returns a function that will dump an array into a base64 encoded buffer
+---@param array any
+---@param format any
+---@return function
 local function makeBufDumper (array, format)
   ---@param write fun(data: string)
   return function(write)

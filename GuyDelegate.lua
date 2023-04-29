@@ -6,21 +6,22 @@
 local isAtFullHealth = require('GuyStats').isAtFullHealth
 local heal = require('GuyStats').mut.heal
 
-local GuyDelegate = {}
+local M = require('Module').define(..., 0)
+
 ---@param game Game
 ---@return GuyDelegate
-function GuyDelegate.makeGuyDelegate(game)
+function M.new(game)
   ---@type GuyDelegate
   local guyDelegate = {
     beginBattle = function (attacker, defender)
-      game:beginBattle(attacker, defender)
+      require('Game').mut.beginBattle(game, attacker, defender)
     end,
     enterHouse = function (guy, entity)
       if isAtFullHealth(guy.stats) then
         return 'shouldNotMove'
       end
       heal(guy.stats)
-      game:removeEntity(entity)
+      require('Game').mut.removeEntity(game, entity)
       return 'shouldMove'
     end,
     collider = function (pos)
@@ -30,4 +31,4 @@ function GuyDelegate.makeGuyDelegate(game)
   return guyDelegate
 end
 
-return GuyDelegate
+return M

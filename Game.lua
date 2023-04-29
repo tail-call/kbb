@@ -1,61 +1,48 @@
----@class GameBlueprint
+---@class GameModule: Module
+---@field __modulename 'GameModule'
+---@field mut GameMutator
+
+---@class Game
 ---@field world World Game world
 ---@field resources Resources Resources player may spend on upgrades
 ---@field texts Text[] Text objects in the game world
 ---@field entities GameEntity[] Things in the game world
 ---@field deathsCount number Number of times player has died
 ---@field guys Guy[] Guys aka units
+---@field guyDelegate GuyDelegate Object that talks to guys
+---@field squad Squad A bunch of guys that follows player's movement
+---@field player Guy A guy controlled by the player
 ---@field score integer Score the player has accumulated
 ---@field time number Time of day in seconds, max is 24*60
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
 ---@field magnificationFactor number How much the camera is zoomed in
-
----@class Game: GameBlueprint
----
----# Simulation
----
----@field advanceClock fun(self: Game, dt: number) Advances in-game clock
----
----@field addScore fun(self: Game, count: integer) Increases score count
----
----@field squad Squad A bunch of guys that follows player's movement
----
----@field player Guy A guy controlled by the player
----@field guyDelegate GuyDelegate Object that talks to guys
----@field frozenGuys { [Guy]: true } Guys that should be not rendered and should not behave
----@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
----@field setGuyFrozen fun(self: Game, guy: Guy, state: boolean) Unfreezes a guy
----@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
----
----@field addText fun(self: Game, text: Text) Adds the text in the game world
----@field addEntity fun(self: Game, entity: GameEntity) Adds a building to the world
----@field removeEntity fun(self: Game, entity: GameEntity) Adds a building to the world
----@field beginBattle fun(self: Game, attacker: Guy, defender: Guy): nil
----
 ---@field collider fun(self: Game, v: Vector): CollisionInfo Function that performs collision checks between game world objects
----
----# Game flow
----
 ---@field isFocused boolean True if focus mode is on
----
----@field toggleFocus fun(self: Game) Toggles focus mode
----@field disableFocus fun(self: Game) Turns focus mode off
----
----# UI
----
 ---@field ui UI User interface root
 ---@field uiModel UIModel GUI state
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
----@field setAlternatingKeyIndex fun(self: Game, x: number) Moves diagonam movement reader head to a new location
----
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
----
----# GFX
----
 ---@field makeVisionSourcesCo fun(self: Game): fun(): VisionSource Returns a coroutine function that will yield all vision sources in the game world
 ---@field fogOfWarTimer number
----
+---@field frozenGuys { [Guy]: true } Guys that should be not rendered and should not behave
+
+---@class GameMutator
+---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
+---@field addScore fun(self: Game, count: integer) Increases score count
+---@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
+---@field setGuyFrozen fun(self: Game, guy: Guy, state: boolean) Unfreezes a guy
+---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
+---@field addText fun(self: Game, text: Text) Adds the text in the game world
+---@field addEntity fun(self: Game, entity: GameEntity) Adds a building to the world
+---@field removeEntity fun(self: Game, entity: GameEntity) Adds a building to the world
+---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
+---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
+---@field toggleFocus fun(self: Game) Toggles focus mode
+---@field disableFocus fun(self: Game) Turns focus mode off
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
+
+---@type GameModule
+local M = require('Module').define(..., 0)
 
 local canRecruitGuy = require('Guy').canRecruitGuy
 local moveGuy = require('Guy').moveGuy
@@ -70,12 +57,11 @@ local maybeDrop = require('tbl').maybeDrop
 local updateConsole = require('Console').updateConsole
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isGuyAFollower = require('Squad').isGuyAFollower
-local makeGuyDelegate = require('GuyDelegate').makeGuyDelegate
+local makeGuyDelegate = require('GuyDelegate').new
 local revealFogOfWar = require('World').revealFogOfWar
 local skyColorAtTime = require('Util').skyColorAtTime
 local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
-local makeBufDumper = require('Util').makeBufDumper
 
 local addMoves = require('GuyStats').mut.addMoves
 local updateBattle = require('Battle').updateBattle
@@ -115,11 +101,95 @@ local NONE_COLLISION = { type = 'none' }
 ---@type CollisionInfo
 local TERRAIN_COLLISION = { type = 'terrain' }
 
+---@type GameMutator
+M.mut = require('Mutator').new {
+  -- Methods
+  addScore = function(self, count)
+    self.score = self.score + count
+  end,
+  removeGuy = function (self, guy)
+    maybeDrop(self.guys, guy)
+    removeFromSquad(self.squad, guy)
+    self.frozenGuys[guy] = nil
+
+    local tile = getTile(self.world, guy.pos)
+
+    if guy.team == 'evil' then
+      if tile == 'sand' then
+        setTile(self.world, guy.pos, 'grass')
+      elseif tile == 'grass' then
+        setTile(self.world, guy.pos, 'forest')
+      elseif tile == 'forest' then
+        setTile(self.world, guy.pos, 'water')
+      end
+    elseif guy.team == 'good' then
+      if tile == 'sand' then
+        setTile(self.world, guy.pos, 'rock')
+      else
+        setTile(self.world, guy.pos, 'sand')
+      end
+    end
+  end,
+  addText = function (self, text)
+    table.insert(self.texts, text)
+  end,
+  addEntity = function (self, entity)
+    table.insert(self.entities, entity)
+  end,
+  toggleFocus = function (self)
+    self.isFocused = not self.isFocused
+  end,
+  disableFocus = function (self)
+    self.isFocused = false
+  end,
+  removeEntity = function (self, entity)
+    local idx = tbl.indexOf(self.entities, entity)
+    table.remove(self.entities, idx)
+  end,
+  setGuyFrozen = function (self, guy, state)
+    self.frozenGuys[guy] = state or nil
+  end,
+  advanceClock = function (self, dt)
+    self.time = (self.time + dt) % (24 * 60)
+    self.fogOfWarTimer = self.fogOfWarTimer + dt
+    if self.fogOfWarTimer > FOG_OF_WAR_TIMER_LIMIT then
+      self.fogOfWarTimer = self.fogOfWarTimer % FOG_OF_WAR_TIMER_LIMIT
+    end
+  end,
+  nextMagnificationFactor = function (self)
+    if self.magnificationFactor == 1 then
+      self.magnificationFactor = 2/3
+    elseif self.magnificationFactor == 2/3 then
+      self.magnificationFactor = 2
+    else
+      self.magnificationFactor = 1
+    end
+  end,
+  addGuy = function (self, guy)
+    table.insert(self.guys, guy)
+  end,
+  beginBattle = function (self, attacker, defender)
+    M.mut.setGuyFrozen(self, attacker, true)
+    M.mut.setGuyFrozen(self, defender, true)
+
+    M.mut.addEntity(
+      self,
+      require('GameEntity').makeBattleEntity(
+        require('Battle').new {
+        attacker = attacker, defender = defender
+      })
+    )
+  end,
+  setAlternatingKeyIndex = function (self, x)
+    self.alternatingKeyIndex = x
+  end,
+}
+
 ---Returns true if guy is marked as frozen
 ---@param game Game
 ---@param guy Guy
 ---@return boolean
-local function isFrozen(game, guy)
+function M.isFrozen(game, guy)
   return game.frozenGuys[guy] or false
 end
 
@@ -150,7 +220,7 @@ local function makeUIScript(game)
   local model = game.uiModel
 
   local UIModule = require('UI')
-  local makePanel = UIModule.makePanel
+  local panel = UIModule.makePanel
   local origin = UIModule.origin
 
   ---@param drawState DrawState
@@ -169,17 +239,17 @@ local function makeUIScript(game)
     return function () return x end
   end
 
+  -- TODO: make UI from serialized markup
   return UIModule.new({}, {
-    ---@type PanelUI
-    makePanel({
+    panel {
       background = GRAY_PANEL_COLOR,
       transform = function () return origin() end,
       w = fullWidth,
       h = fixed(8),
       coloredText = require('UIModel').topPanelText(game)
-    }),
+    },
     -- Left panel
-    makePanel({
+    panel {
       shouldDraw = model.shouldDrawFocusModeUI,
       background = GRAY_PANEL_COLOR,
       transform = function ()
@@ -188,9 +258,9 @@ local function makeUIScript(game)
       w = fixed(88),
       h = fullHeight,
       text = model.leftPanelText,
-    }),
+    },
     -- Empty underlay for console
-    makePanel({
+    panel {
       shouldDraw = model.shouldDrawFocusModeUI,
       background = DARK_GRAY_PANEL_COLOR,
       transform = function (drawState)
@@ -198,9 +268,9 @@ local function makeUIScript(game)
       end,
       w = fixed(240),
       h = fixed(52),
-    }),
+    },
     -- Right panel
-    makePanel({
+    panel {
       background = TRANSPARENT_PANEL_COLOR,
       transform = function (drawState)
         return origin():translate(fullWidth(drawState)-88, 8)
@@ -208,9 +278,9 @@ local function makeUIScript(game)
       w = fixed(88),
       h = fixed(128),
       text = model.rightPanelText,
-    }),
+    },
     -- Bottom panel
-    makePanel({
+    panel {
       background = GRAY_PANEL_COLOR,
       transform = function (drawState)
         return origin():translate(0, fullHeight(drawState) - 8)
@@ -218,9 +288,9 @@ local function makeUIScript(game)
       w = fullWidth,
       h = fixed(8),
       text = model.bottomPanelText,
-    }),
+    },
     -- Command line
-    makePanel({
+    panel {
       shouldDraw = model.shouldDrawFocusModeUI,
       background = TRANSPARENT_PANEL_COLOR,
       transform = function (drawState)
@@ -229,13 +299,13 @@ local function makeUIScript(game)
       w = fixed(200),
       h = fullHeight,
       text = model.promptText,
-    }),
+    },
   })
 end
 
----@param bak GameBlueprint?
+---@param bak Game?
 ---@return Game
-local function new(bak)
+function M.new(bak)
   local Guy = require('Guy')
   bak = bak or {}
 
@@ -297,112 +367,6 @@ local function new(bak)
       end
       return TERRAIN_COLLISION
     end,
-
-    -- Methods
-
-    addScore = function(self, count)
-      self.score = self.score + count
-    end,
-    removeGuy = function (self, guy)
-      maybeDrop(self.guys, guy)
-      removeFromSquad(self.squad, guy)
-      self.frozenGuys[guy] = nil
-
-      local tile = getTile(game.world, guy.pos)
-
-      if guy.team == 'evil' then
-        if tile == 'sand' then
-          setTile(game.world, guy.pos, 'grass')
-        elseif tile == 'grass' then
-          setTile(game.world, guy.pos, 'forest')
-        elseif tile == 'forest' then
-          setTile(game.world, guy.pos, 'water')
-        end
-      elseif guy.team == 'good' then
-        if tile == 'sand' then
-          setTile(game.world, guy.pos, 'rock')
-        else
-          setTile(game.world, guy.pos, 'sand')
-        end
-      end
-    end,
-    addText = function (self, text)
-      table.insert(self.texts, text)
-    end,
-    addEntity = function (self, entity)
-      table.insert(self.entities, entity)
-    end,
-    toggleFocus = function (self)
-      self.isFocused = not self.isFocused
-    end,
-    disableFocus = function (self)
-      self.isFocused = false
-    end,
-    removeEntity = function (self, entity)
-      local idx = tbl.indexOf(self.entities, entity)
-      table.remove(self.entities, idx)
-    end,
-    setGuyFrozen = function (self, guy, state)
-      self.frozenGuys[guy] = state or nil
-    end,
-    advanceClock = function (self, dt)
-      self.time = (self.time + dt) % (24 * 60)
-      self.fogOfWarTimer = self.fogOfWarTimer + dt
-      if self.fogOfWarTimer > FOG_OF_WAR_TIMER_LIMIT then
-        self.fogOfWarTimer = self.fogOfWarTimer % FOG_OF_WAR_TIMER_LIMIT
-      end
-    end,
-    nextMagnificationFactor = function (self)
-      if self.magnificationFactor == 1 then
-        self.magnificationFactor = 2/3
-      elseif self.magnificationFactor == 2/3 then
-        self.magnificationFactor = 2
-      else
-        self.magnificationFactor = 1
-      end
-    end,
-    addGuy = function (self, guy)
-      table.insert(self.guys, guy)
-    end,
-    beginBattle = function (self, attacker, defender)
-      self:setGuyFrozen(attacker, true)
-      self:setGuyFrozen(defender, true)
-
-      self:addEntity(
-        require('GameEntity').makeBattleEntity(
-          require('Battle').new {
-          attacker = attacker, defender = defender
-        })
-      )
-    end,
-    setAlternatingKeyIndex = function (self, x)
-      self.alternatingKeyIndex = x
-    end,
-    -- TODO: move this outta here
-    serialize1 = function (self)
-      ---@cast self Game
-      local dump = require('Util').dump
-
-      game.world.fogOfWar.__dump = makeBufDumper(game.world.fogOfWar, '%.3f,')
-      game.world.tileTypes.__dump = makeBufDumper(game.world.tileTypes, '%q,')
-
-      return {[[
-        -- This is a Kobold Princess Simulator v0.2 savefile. You shouldn't run it.
-        -- It was created at ]],os.date(),[[
-        
-        return Game{
-          time = ]],tostring(self.time),[[,
-          score = ]],tostring(self.score),[[,
-          deathsCount = ]],tostring(self.deathsCount),[[,
-          guys = ]],dump(self.guys),[[,
-          magnificationFactor = ]],tostring(self.magnificationFactor),[[,
-          world = ]],dump(self.world),[[,
-          texts = ]],dump(self.texts),[[,
-          entities = ]],dump(self.entities),[[,
-          resources = ]],dump(self.resources),[[,
-        }
-      ]]}
-    end,
   }
 
   game.uiModel = require('UIModel').new(game)
@@ -426,15 +390,16 @@ local function new(bak)
   )
 
   -- Subscribe to player stats
+  -- TODO: move this into an "addPlayer" function
   do
-    local listenPlayerDeath
-    function listenPlayerDeath()
-      addListener(require('GuyStats').mut,
+    local function listenPlayerDeath()
+      addListener(
+       require('GuyStats').mut,
         game.player.stats,
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then
             local newPlayer = Guy.makeLeader(tileset, LEADER_SPAWN_LOCATION)
-            game:addGuy(newPlayer)
+            M.mut.addGuy(game, newPlayer)
             game.player = newPlayer
             game.deathsCount = game.deathsCount + 1
             listenPlayerDeath()
@@ -459,7 +424,7 @@ end
 ---@param game Game
 ---@param guy Guy
 ---@return boolean
-local function mayRecruit(game, guy)
+function M.mayRecruit(game, guy)
   if not isRecruitCircleActive(game.recruitCircle) then return false end
   if isGuyAPlayer(game, guy) then return false end
   if isGuyAFollower(game.squad, guy) then return false end
@@ -477,15 +442,15 @@ local function dismissSquad(game)
 end
 
 ---@param game Game
-local function beginRecruiting(game)
+function M.beginRecruiting(game)
   if game.isFocused then return end
   resetRecruitCircle(game.recruitCircle)
 end
 
 ---@param game Game
-local function endRecruiting(game)
+function M.endRecruiting(game)
   for _, guy in ipairs(game.guys) do
-    if mayRecruit(game, guy) then
+    if M.mayRecruit(game, guy) then
       addToSquad(game.squad, guy)
     end
   end
@@ -506,7 +471,7 @@ end
 ---@param game Game
 local function orderGather(game)
   for guy in pairs(game.squad.followers) do
-    if not isFrozen(game, guy) then
+    if not M.isFrozen(game, guy) then
       local destination = { x = 0, y = 0 }
       local guyDist = Vector.dist(guy.pos, game.player.pos)
       for _, direction in ipairs{
@@ -528,24 +493,25 @@ end
 
 ---@param guy Guy
 ---@param game Game
+---@param mut GameMutator
 ---@param entity GameEntity_Battle
-local function die(guy, game, entity)
+local function die(guy, game, mut, entity)
   echo(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
 
   if guy.team == 'evil' then
     addResources(game.resources, { pretzels = 1})
-    game:addScore(SCORES_TABLE.killedAnEnemy)
+    mut.addScore(game, SCORES_TABLE.killedAnEnemy)
   end
 
-  game:removeGuy(guy)
-  game:removeEntity(entity)
+  mut.removeGuy(game, guy)
+  mut.removeEntity(game, entity)
 end
 
 
 ---@param game Game -- Game object
 ---@param dt number -- Time since last update
 ---@param movementDirections Vector[] -- Momentarily pressed movement directions
-local function updateGame(game, dt, movementDirections)
+function M.updateGame(game, dt, movementDirections)
   exhaust(game:makeVisionSourcesCo(), function (visionSource)
     revealFogOfWar(game.world, visionSource, skyColorAtTime(game.time).g, dt)
   end)
@@ -561,19 +527,19 @@ local function updateGame(game, dt, movementDirections)
   if game.player.stats.moves > 0 and #movementDirections > 0 then
     for _ = 1, #movementDirections do
       local index = (game.alternatingKeyIndex + 1) % (#movementDirections)
-      game:setAlternatingKeyIndex(index)
+      M.mut.setAlternatingKeyIndex(game, index)
 
       local vec = movementDirections[index + 1]
 
       if game.squad.shouldFollow then
         for guy in pairs(game.squad.followers) do
-          if not isFrozen(game, guy) then
+          if not M.isFrozen(game, guy) then
             moveGuy(guy, vec, game.guyDelegate)
           end
         end
       end
 
-      if not isFrozen(game, game.player) then
+      if not M.isFrozen(game, game.player) then
         local oldPos = game.player.pos
         local newPos = moveGuy(game.player, vec, game.guyDelegate)
         if not Vector.equal(newPos, oldPos) then
@@ -589,7 +555,7 @@ local function updateGame(game, dt, movementDirections)
 
   -- Handle game logic
 
-  game:advanceClock(dt)
+  M.mut.advanceClock(game, dt)
   for _, entity in ipairs(game.entities) do
     if entity.type == 'battle' then
       ---@cast entity GameEntity_Battle
@@ -599,15 +565,15 @@ local function updateGame(game, dt, movementDirections)
       end, function ()
         -- TODO: use events to die
         if battle.attacker.stats.hp <= 0 then
-          die(battle.attacker, game, entity)
+          die(battle.attacker, game, M.mut, entity)
         end
 
         if battle.defender.stats.hp <= 0 then
-          die(battle.defender, game, entity)
+          die(battle.defender, game, M.mut, entity)
         end
 
-        game:setGuyFrozen(battle.attacker, false)
-        game:setGuyFrozen(battle.defender, false)
+        M.mut.setGuyFrozen(game, battle.attacker, false)
+        M.mut.setGuyFrozen(game, battle.defender, false)
       end)
     end
   end
@@ -620,7 +586,7 @@ local function updateGame(game, dt, movementDirections)
     else
       updateGuy(guy, dt)
     end
-    if not isFrozen(game, guy) then
+    if not M.isFrozen(game, guy) then
       behave(guy, game.guyDelegate)
     end
   end
@@ -631,18 +597,18 @@ end
 ---@param guy Guy
 local function maybeCollect(tileset, game, guy)
   local Guy = require('Guy')
-  if isFrozen(game, guy) then return end
+  if M.isFrozen(game, guy) then return end
 
   local pos = guy.pos
   local tile = getTile(game.world, pos)
   if tile == 'forest' then
     addResources(game.resources, { wood = 1 })
     setTile(game.world, pos, 'grass')
-    game:addGuy(Guy.makeEvilGuy(tileset, EVIL_SPAWN_LOCATION))
+    M.mut.addGuy(game, Guy.makeEvilGuy(tileset, EVIL_SPAWN_LOCATION))
   elseif tile == 'rock' then
     addResources(game.resources, { stone = 1 })
     setTile(game.world, pos, 'sand')
-    game:addGuy(Guy.makeStrongEvilGuy(tileset, EVIL_SPAWN_LOCATION))
+    M.mut.addGuy(game, Guy.makeStrongEvilGuy(tileset, EVIL_SPAWN_LOCATION))
   elseif tile == 'grass' then
     addResources(game.resources, { grass = 1 })
     setTile(game.world, pos, 'sand')
@@ -685,13 +651,14 @@ local function orderBuild(game)
   -- Build
   addResources(game.resources, { wood = -BUILDING_COST })
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
-  game:addEntity(
+  M.mut.addEntity(
+    game,
     require('GameEntity').makeBuildingEntity(
       require('Building').new { pos = pos }
     )
   )
-  game:addScore(SCORES_TABLE.builtAHouse)
-  game:disableFocus()
+  M.mut.addScore(game, SCORES_TABLE.builtAHouse)
+  M.mut.disableFocus(game)
 end
 
 ---@param game Game
@@ -704,7 +671,7 @@ local function orderSummon(game, tileset)
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
   local guy = require('Guy').makeGoodGuy(tileset, game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
-  game:addGuy(guy)
+  M.mut.addGuy(game, guy)
   addToSquad(game.squad, guy)
 end
 
@@ -713,7 +680,7 @@ end
 ---@param key string
 local function handleFocusModeInput(game, scancode, key)
   if scancode == 'escape' then
-    game:toggleFocus()
+    M.mut.toggleFocus(game)
   elseif scancode == 'return' then
     local prompt = game.uiModel.prompt
     game.uiModel.prompt = ''
@@ -723,6 +690,7 @@ local function handleFocusModeInput(game, scancode, key)
       commands = {
         reload = function(moduleName)
           require('Module').reload(moduleName)
+          -- TODO: use mutator
           game.uiModel = require('UIModel').new(game)
           game.ui = require('Game').makeUIScript(game)
           game.player = require('Guy').new(game.player)
@@ -730,10 +698,13 @@ local function handleFocusModeInput(game, scancode, key)
           echo(game, 'recreated uiModel, ui, and player')
         end,
         scribe = function(text)
-          game:addText(require('Text').new{
-            text = text,
-            pos = game.player.pos,
-          })
+          M.mut.addText(
+            game,
+            require('Text').new {
+              text = text,
+              pos = game.player.pos,
+            }
+          )
         end,
         print = function (something)
           echo(game, something)
@@ -773,7 +744,7 @@ local function handleNormalModeInput(game, scancode)
   elseif scancode == 'r' then
     orderSummon(game, tileset)
   elseif scancode == 'return' then
-    game:toggleFocus()
+    M.mut.toggleFocus(game)
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
   end
@@ -782,9 +753,9 @@ end
 ---@param game Game
 ---@param scancode string
 ---@param key string
-local function handleInput(game, scancode, key)
+function M.handleInput(game, scancode, key)
   if scancode == 'z' then
-    game:nextMagnificationFactor()
+    M.mut.nextMagnificationFactor(game)
   end
 
   if game.isFocused then
@@ -796,21 +767,10 @@ end
 
 ---@param game Game
 ---@param text string
-local function handleText(game, text)
+function M.handleText(game, text)
   if game.isFocused then
     game.uiModel:didTypeCharacter(text)
   end
 end
 
-return {
-  handleInput = handleInput,
-  updateGame = updateGame,
-  beginRecruiting = beginRecruiting,
-  endRecruiting = endRecruiting,
-  isFrozen = isFrozen,
-  mayRecruit = mayRecruit,
-  new = new,
-  say = echo,
-  handleText = handleText,
-  makeUIScript = makeUIScript,
-}
+return M

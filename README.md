@@ -96,8 +96,10 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Sythesize mutators to watch properties
  - [x] Pixelized pointer
  - [x] `init()` and `deinit()` module methods to reload individual objects
- - [ ] BUGFIX: combat doesn't switch sides between rounds
+ - [x] BUGFIX: combat doesn't switch sides between rounds
+ - [ ] Use FFI for huge arrays like fog of war
  - [ ] Try using native code with ffi
+ - [ ] Use package.preload to load resources
  - [ ] Tile/object info window near pointer
  - [ ] Console command history
  - [ ] Give pretzels to feral kobolds to adopt them
@@ -145,6 +147,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Chest for treasures
  - [ ] Different types of tiles yield different movement speeds
  - [ ] Travelling through void outside of map is possible
+ - [ ] Enemies have vision cones and you can sneak past them
  - [ ] Teleport a group of guys
  - [ ] Multi-layer parallax pseudo 3D of world
  - [ ] Constantly lower HP in the area of enemy's spawn

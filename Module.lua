@@ -10,7 +10,7 @@ local M = {}
 ---@generic T
 ---@param name string
 ---@param version number
----@return Module
+---@return T
 function M.define(name, version)
   local module
   module = {

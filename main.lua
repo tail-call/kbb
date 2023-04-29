@@ -1,7 +1,6 @@
 -- Need to do this before anything else is executed
 math.randomseed(os.time())
 
-local makeGame = require('Game').new
 local handleInput = require('Game').handleInput
 local updateGame = require('Game').updateGame
 local beginRecruiting = require('Game').beginRecruiting
@@ -66,7 +65,7 @@ function love.load()
   loadTileset()
   local tileset = require('Tileset').getTileset()
   drawState = require('DrawState').new({ tileset = tileset })
-  game = makeGame()
+  game = require('Game').new({})
   game.onLost = function ()
     state = 'dead'
   end
@@ -105,6 +104,33 @@ function love.textinput(text)
   require('Game').handleText(game, text)
 end
 
+---@param game Game
+local function serializeGame(game)
+  local dump = require('Util').dump
+  local makeBufDumper = require('Util').makeBufDumper
+
+  -- TODO: move these to corresponding modules
+  game.world.fogOfWar.__dump = makeBufDumper(game.world.fogOfWar, '%.3f,')
+  game.world.tileTypes.__dump = makeBufDumper(game.world.tileTypes, '%q,')
+
+  return {[[
+    -- This is a Kobold Princess Simulator v0.2 savefile. You shouldn't run it.
+    -- It was created at ]],os.date(),[[
+    
+    return Game{
+      time = ]],tostring(game.time),[[,
+      score = ]],tostring(game.score),[[,
+      deathsCount = ]],tostring(game.deathsCount),[[,
+      guys = ]],dump(game.guys),[[,
+      magnificationFactor = ]],tostring(game.magnificationFactor),[[,
+      world = ]],dump(game.world),[[,
+      texts = ]],dump(game.texts),[[,
+      entities = ]],dump(game.entities),[[,
+      resources = ]],dump(game.resources),[[,
+    }
+  ]]}
+end
+
 ---@param key love.KeyConstant
 ---@param scancode love.Scancode
 ---@param isrepeat boolean
@@ -119,7 +145,7 @@ function love.keypressed(key, scancode, isrepeat)
       local file = io.open(FILENAME, 'w+')
       if file == nil then error('no file') end
 
-      for _, line in ipairs(game:serialize1()) do
+      for _, line in ipairs(serializeGame(game)) do
         file:write(line)
       end
       file:close()
