@@ -10,6 +10,118 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 # Plan
 
+## Quality of life
+
+ - [ ] Event system
+ - [ ] Path finding
+ - [ ] Timer type
+ - [ ] Tile/object info window near pointer
+ - [ ] Don't serialize same object twice
+ - [ ] Savefile: index strings and object keys
+ - [ ] Console command history
+ - [ ] Use meshes and vertex shading for smooth fog of war
+ - [ ] Game is a GuyDelegate
+ - [ ] Don't crash on console command errors
+ - [ ] Minimap fog of war
+ - [ ] Coroutines for animations
+ - [ ] Teleport a group of guys
+ - [ ] Dynamic lighting
+ - [ ] World is generated from randomly assembled 8x8 patches of lands where landmarks are assembled from templates. Certain patches may be marked as special to generate a predefined location like a dungeon or a town (underworld would be very helplful if i had this)
+ - [ ] Max world size is 2048x2048 tiles (256x256 patches)
+ - [ ] Each patch of land is a separate mesh
+ - [ ] Each patch of fog of war is also a mesh
+ - [ ] Measure revealed terrytory by patches rather than by tiles
+ - [ ] Circle shaped cursor when pointing to unit/building
+
+## Experimentation
+
+ - [ ] Use FFI for huge arrays like fog of war
+ - [ ] Try using native code with ffi
+ - [ ] Use package.preload to load resources
+ - [ ] Use string buffers for text manipulation [1]
+ - [ ] Random terrain generation in a selected area
+
+## Game ideas
+
+ - [ ] Telefrags
+ - [ ] Die when teleporting into a solid object
+ - [ ] Wolves that only walk on forest tiles
+ - [ ] Randomly generated dungeons: a door will appear when a new dungeon occurs
+ - [ ] Underworld: do I have one huge underworld or many underworlds for many dungeons?
+ - [ ] Give pretzels to feral kobolds to adopt them
+ - [ ] Damage numbers will display as damage is dealt
+ - [ ] Items on the ground are 2D sprites rotating around Z axis
+ - [ ] Remove guy from squad when is too far
+ - [ ] Unit highlight line will begin blinking when this happens
+ - [ ] Humans don't have fast diagonal movement
+ - [ ] Notable characters system: building an inn creates a barkeeper, building a smithy creates a blacksmith
+ - [ ] Hunger: kobolds need to eat twice per day, or they will grow weak and die
+ - [ ] Permadeath: when a player character dies, it dies forever. Next unit becomes the leader
+ - [ ] Workshop where foundations of buildings are made
+ - [ ] Then unit carries wood to the site and builds the thing
+ - [ ] A group of units must carry foundation to its place
+ - [ ] Daily routines
+ - [ ] Dragon egg in the sanctuary
+ - [ ] When last character dies, a new is born from the dragon egg in the dragon shrine, then a new egg spawns immediately
+ - [ ] Proximity based combat
+ - [ ] You must build roads for guys to navigate freely
+ - [ ] Each guy has wander area they may never leave when not in squad
+ - [ ] Friendly guys wander when not in squad
+ - [ ] Wander area moves as guy moves with the player
+ - [ ] Wander areas of guys are resizable
+ - [ ] Skills: combat, defence, chopping, etc. All of these grant XP. +1 level means +1 weight in table and +1 to the effect.
+ - [ ] Chest for resources
+ - [ ] Chest for treasures
+ - [ ] Constantly lower HP in the area of enemy's spawn
+ - [ ] Chopping wood is performed like combat
+ - [ ] Mining stone is performed like combat
+ - [ ] Fishing is performed like combat
+ - [ ] Digging for treasures is performed like combat
+ - [ ] Building is performed like combat
+ - [ ] Buried treasures
+ - [ ] Every guy may carry up to 10 of any item
+ - [ ] Items may be dropped
+ - [ ] Every guy may also have an item equipped: a tool or a weapon
+ - [ ] A tool or a weapon affects ability rings
+ - [ ] Jobs
+ - [ ] Dragons
+ - [ ] Tavern
+ - [ ] Town hall
+ - [ ] All guys have ability rings: they're being spinned during the battle to determine next action. Player is invited to optimize the ability rings towards most preferable outcome.
+ - [ ] Ability rings has non-combat use, too: they may affect the outcome of other tasks such as gathering wood
+
+## Nice to have
+
+ - [ ] UI: draggable panels
+ - [ ] Tile elevation: let sand be slightly below grass, rocks be much higher than all else, forest is elevated to conceal whoever is walking over them
+ - [ ] Built in text editor
+ - [ ] Game plays in a window inside the GUI
+ - [ ] Multiple game windows may be opened
+ - [ ] `bind()` command to assign keys
+ - [ ] Save level immediately on game exit
+ - [ ] Half-square movement
+ - [ ] Lerp cursor
+ - [ ] Arbitrary resolution tilemaps
+ - [ ] Flight ability
+ - [ ] Swim ability
+ - [ ] Flying mountable dragon
+ - [ ] Boats
+ - [ ] Unicorns
+ - [ ] Bonuses for exploring map
+ - [ ] Travelling through void outside of map is possible
+ - [ ] Enemies have vision cones and you can sneak past them
+ - [ ] Multi-layer parallax pseudo 3D of world
+ - [ ] Pixies visibly jump when they walk (shadow stays on the ground)
+ - [ ] Add units to highlight continuously as button is held
+ - [ ] Focus mode: unit and terrain are stacked like cards
+ - [ ] Cards have actions
+ - [ ] Squad's turn follows cursor
+ - [ ] Ridable ponies
+ - [ ] Mushrooms
+ - [ ] Noisy texture details when zooming in
+
+## Completed
+
  - [x] Load from images and stuff
  - [x] Guys don't step on one another
  - [x] Sprite batch for background
@@ -97,100 +209,8 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [x] Pixelized pointer
  - [x] `init()` and `deinit()` module methods to reload individual objects
  - [x] BUGFIX: combat doesn't switch sides between rounds
- - [ ] Use FFI for huge arrays like fog of war
- - [ ] Try using native code with ffi
- - [ ] Use package.preload to load resources
- - [ ] Tile/object info window near pointer
- - [ ] Console command history
- - [ ] Give pretzels to feral kobolds to adopt them
- - [ ] World is generated from randomly assembled 8x8 patches of lands where landmarks are assembled from templates. Certain patches may be marked as special to generate a predefined location like a dungeon or a town (underworld would be very helplful if i had this)
- - [ ] Max world size is 2048x2048 tiles (256x256 patches)
- - [ ] UI: draggable panels
- - [ ] Each patch of land is a separate mesh
- - [ ] Each patch of fog of war is also a mesh
- - [ ] Tile elevation: let sand be slightly below grass, rocks be much higher than all else, forest is elevated to conceal whoever is walking over them
- - [ ] Built in text editor
- - [ ] Randomly generated dungeons: a door will appear when a new dungeon occurs
- - [ ] Game plays in a window inside the GUI
- - [ ] Notable characters system: building an inn creates a barkeeper, building a smithy creates a blacksmith
- - [ ] Multiple game windows may be opened
- - [ ] Use meshes and vertex shading for smooth fog of war
- - [ ] `bind()` command to assign keys
- - [ ] Use string buffers for text manipulation [1]
- - [ ] Permadeath: when a player character dies, it dies forever. Next unit becomes the leader
- - [ ] When last character dies, a new is born from the dragon egg in the dragon shrine, then a new egg spawns immediately
- - [ ] Save level immediately on game exit
- - [ ] Event system
- - [ ] Half-square movement
- - [ ] Proximity based combat
- - [ ] Random terrain generation in a selected area
- - [ ] Don't crash on console errors
- - [ ] Timer type
- - [ ] Path finding
- - [ ] Game is a GuyDelegate
- - [ ] Lerp cursor
- - [ ] Arbitrary resolution tilemaps
- - [ ] You must build roads for guys to navigate freely
- - [ ] Friendly guys wander when not in squad
- - [ ] Each guy has wander area they may never leave when not in squad
- - [ ] Humans don't have fast diagonal movement
- - [ ] Wander area moves as guy moves with the player
- - [ ] Wander areas of guys are resizable
- - [ ] Minimap fog of war
- - [ ] Flight ability
- - [ ] Swim ability
- - [ ] Flying mountable dragon
- - [ ] Coroutines for animations
- - [ ] Items on the ground are 2D sprites rotating around Z axis
- - [ ] Skills: combat, defence, chopping, etc. All of these grant XP. +1 level means +1 weight in table and +1 to the effect.
- - [ ] Chest for resources
- - [ ] Chest for treasures
- - [ ] Different types of tiles yield different movement speeds
- - [ ] Travelling through void outside of map is possible
- - [ ] Enemies have vision cones and you can sneak past them
- - [ ] Teleport a group of guys
- - [ ] Multi-layer parallax pseudo 3D of world
- - [ ] Constantly lower HP in the area of enemy's spawn
- - [ ] Pixies visibly jump when they walk (shadow stays on the ground)
- - [ ] Damage numbers will display as damage is dealt
- - [ ] Remove from squad when too far
- - [ ] Unit highlight line will begin blinking when this happens
- - [ ] Add units to highlight continuously as button is held
- - [ ] Focus mode: unit and terrain are stacked like cards
- - [ ] Cards have actions
- - [ ] Underworld
- - [ ] Chopping wood is performed like combat
- - [ ] Mining stone is performed like combat
- - [ ] Fishing is performed like combat
- - [ ] Digging for treasures is performed like combat
- - [ ] Building is performed like combat
- - [ ] Buried treasures
- - [ ] Every guy may carry up to 10 of any item
- - [ ] Items may be dropped
- - [ ] Every guy may also have an item equipped: a tool or a weapon
- - [ ] A tool or a weapon affects ability rings
- - [ ] Squad's turn follows cursor
- - [ ] Workshop where foundations of buildings are made
- - [ ] A group of units must carry foundation to its place
- - [ ] Then unit carries wood to the site and builds the thing
- - [ ] Wolves that only walk on forest tiles
- - [ ] Dragons
- - [ ] Measure revealed terrytory by patches rather than by tiles
- - [ ] Unicorns
- - [ ] Circle shaped cursor when pointing to unit/building
- - [ ] All guys have ability rings: they're being spinned during the battle to determine next action. Player is invited to optimize the ability rings towards most preferable outcome.
- - [ ] Ability rings has non-combat use, too: they may affect the outcome of other tasks such as gathering wood
- - [ ] Tavern
- - [ ] Boats
- - [ ] Ponies
- - [ ] Town hall
- - [ ] Mushrooms
- - [ ] Dynamic lighting
- - [ ] Noisy texture details when zooming in
- - [ ] Daily routines
- - [ ] Jobs
- - [ ] Hunger
- - [ ] Bonuses for exploring map
+ - [x] Different types of tiles yield different movement speeds
+
 
 # Sources
 
