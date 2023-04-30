@@ -55,17 +55,17 @@ end
 ---@param world World
 function M.init(world)
   local data = love.image.newImageData('map.png')
-  local image = love.graphics.newImage(data)
 
-  local width = data:getWidth()
-  local height = data:getHeight()
-
-  world.width = width
-  world.height = height
-  world.image = image
+  world.width = data:getWidth()
+  world.height = data:getHeight()
+  world.image = love.graphics.newImage(data)
   world.revealedTilesCount = world.revealedTilesCount or 0
   world.tileTypes = world.tileTypes or {}
   world.fogOfWar = world.fogOfWar or {}
+
+  local makeBufDumper = require('Util').makeBufDumper
+  world.fogOfWar.__dump = makeBufDumper(world.fogOfWar, '%.3f,')
+  world.tileTypes.__dump = makeBufDumper(world.tileTypes, '%q,')
 
   ---@type World
 

@@ -111,11 +111,6 @@ end
 
 local function serializeGame()
   local dump = require('Util').dump
-  local makeBufDumper = require('Util').makeBufDumper
-
-  -- TODO: move these to corresponding modules
-  game.world.fogOfWar.__dump = makeBufDumper(game.world.fogOfWar, '%.3f,')
-  game.world.tileTypes.__dump = makeBufDumper(game.world.tileTypes, '%q,')
 
   return {[[
     -- This is a Kobold Princess Simulator v0.2 savefile. You shouldn't run it.
