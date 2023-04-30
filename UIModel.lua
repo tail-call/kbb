@@ -40,7 +40,7 @@ function UIModelModule.topPanelText(game)
         love.timer.getFPS()
       ),
       WHITE_COLOR,
-      'WASD] move\nRet] focus\nLMB] recruit\n8] save\nZ] zoom\nN] reload\nF] follow\nQ] gather\nT] warp\nC] collect\n',
+      'LMB] recruit\n8] save\nZ] zoom\nF] follow\nQ] gather\nT] warp\nC] collect\n',
       player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
       'G] dismiss 1t\n',
       player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
@@ -64,7 +64,7 @@ function UIModelModule.new(game)
       self.activeTab = self.activeTab + 1
     end,
     leftPanelText = function ()
-      return '1234] scale'
+      return 'something'
     end,
     rightPanelText = function ()
       local header = '<- Tab ->\n\n'
