@@ -1,3 +1,6 @@
+---@class GameScene: Module
+
+---@type GameScene
 local M = require('Module').define(..., 0)
 
 local setWindowScale = require('DrawState').mut.setWindowScale
@@ -7,6 +10,7 @@ local Vector = require('Vector')
 local updateGame = require('Game').updateGame
 local handleText = require('Game').handleText
 local tbl = require('tbl')
+local DrawModule = require('Draw')
 local handleInput = require('Game').handleInput
 local beginRecruiting = require('Game').beginRecruiting
 local endRecruiting = require('Game').endRecruiting
@@ -43,7 +47,7 @@ end
 ---@param savefileName string
 function M.load(savefileName)
   local tileset = require('Tileset').getTileset()
-  drawState = require('DrawState').new({ tileset = tileset })
+  drawState = require('DrawState').new { tileset = tileset }
   local gameFunction = loadGame(savefileName, {
     quad = function (...)
       return love.graphics.newQuad(...)
@@ -113,6 +117,8 @@ function M.keypressed(key, scancode, isrepeat)
       file:write(require('Util').dump(game))
       file:close()
     end
+  elseif scancode == 'return' then
+    require('main').loadScene('FocusScene', M)
   end
 
   handleInput(game, scancode, key)
@@ -139,8 +145,8 @@ function M.mousereleased(x, y, button, presses)
 end
 
 function M.draw()
-  require('Draw').prepareFrame(drawState)
-  require('Draw').drawGame(game, drawState)
+  DrawModule.prepareFrame(drawState)
+  DrawModule.drawGame(game, drawState)
 end
 
 return M

@@ -77,7 +77,7 @@ function M.keypressed(key, scancode, isrepeat)
   elseif scancode == 'n' then
     extraText = '\nSTARTING NEW GAME...'
     afterDraw = function ()
-      loadScene('GameScene', '???')
+      loadScene('GameScene', '#dontload')
     end
   elseif scancode == 'x' then
     afterDraw = function ()
