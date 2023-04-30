@@ -506,6 +506,7 @@ local function drawGame(game, drawState)
   withTransform(love.math.newTransform(8, screenH - 16 - MINIMAP_SIZE), function ()
     local offsetX = game.player.pos.x - MINIMAP_SIZE / 2
     local offsetY = game.player.pos.y - MINIMAP_SIZE / 2
+
     local quad = love.graphics.newQuad(
       offsetX, offsetY,
       MINIMAP_SIZE, MINIMAP_SIZE,
