@@ -698,6 +698,10 @@ local function handleFocusModeInput(game, scancode, key)
             commands.print(k)
           end
         end,
+        quit = function ()
+          package.loaded['MenuScene'] = nil
+          require('main').loadScene('MenuScene', 'fromgame')
+        end,
       }
       setfenv(chunk, commands)
       chunk()

@@ -34,7 +34,7 @@ function M.load(type)
   elseif type == 'reload' then
     extraText = 'Reload successful.\n'
   else
-    error('oh no')
+    extraText = 'You came back from game.\n'
   end
 end
 
@@ -57,7 +57,6 @@ function M.draw()
   love.graphics.print(
     INTRO
       .. (extraText)
-      .. (afterDraw and '\nLOADING...' or '')
       .. (afterDraw and '' or '\nPress a key')
       .. (cursorTimer > 0.5 and '_' or ''),
     0, 0
@@ -71,27 +70,28 @@ function M.keypressed(key, scancode, isrepeat)
   local loadScene = require('main').loadScene
   afterDrawTimer = AFTER_DRAW_DURATION
   if scancode == 'l' then
+    extraText = '\nLOADING...'
     afterDraw = function ()
-      loadScene(require('GameScene'), SAVEFILE_NAME)
+      loadScene('GameScene', SAVEFILE_NAME)
     end
   elseif scancode == 'n' then
+    extraText = '\nSTARTING NEW GAME...'
     afterDraw = function ()
-      loadScene(require('GameScene'), '???')
+      loadScene('GameScene', '???')
     end
   elseif scancode == 'x' then
     afterDraw = function ()
+      extraText = '\nQUITTING...'
       love.event.quit()
     end
   elseif scancode == 'f' then
+    extraText = '\nRELOADING...'
     afterDraw = function ()
-      package.loaded['MenuScene'] = nil
-      loadScene(require('MenuScene'), 'reload')
+      loadScene('MenuScene', 'reload')
     end
   else
     doNothingCounter = doNothingCounter + 1
     extraText = scancode:upper()
-      .. '('
-      .. scancode:upper()
       .. ') Do nothing ('
       .. doNothingCounter
       ..')\n'

@@ -3,8 +3,10 @@ local M = require('Module').define(..., 0)
 local rescuedCallbacks = {}
 
 ---Loads a scene for execution
----@param scene table
-function M.loadScene (scene, ...)
+---@param sceneName string
+function M.loadScene (sceneName, ...)
+  package.loaded[sceneName] = nil
+  local scene = require(sceneName)
   for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
     love[callbackName] = scene[callbackName]
       or rescuedCallbacks[callbackName]
@@ -51,7 +53,7 @@ function love.load()
   end
 
   loadTileset()
-  M.loadScene(require('MenuScene'), 'initial')
+  M.loadScene('MenuScene', 'initial')
 end
 
 return M
