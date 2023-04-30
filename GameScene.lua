@@ -1,4 +1,4 @@
----@class GameScene: Module
+---@class GameScene: Scene, Module
 
 ---@type GameScene
 local M = require('Module').define(..., 0)

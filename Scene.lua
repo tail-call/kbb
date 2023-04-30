@@ -1,0 +1,2 @@
+---@class Scene
+---@field draw fun() Draws the scene on the screen
