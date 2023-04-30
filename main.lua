@@ -1,6 +1,8 @@
 local loadTileset = require('Tileset').load
 local loadFont = require('Util').loadFont
 
+local rescuedCallbacks = {}
+
 local function imageLoader(filename)
   local imageData = love.image.newImageData(filename)
   return imageData
@@ -10,25 +12,39 @@ local function imageDataLoader(filename)
   return love.graphics.newImage(filename)
 end
 
+local function rescueLoveDefaultCallbacks()
+  for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
+    rescuedCallbacks[callbackName] = love[callbackName] or function () end
+  end
+end
+
 local function loadScene (scene)
   for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
     love[callbackName] = scene[callbackName]
+      or rescuedCallbacks[callbackName]
+      or error('main: no such callback: ' .. callbackName)
   end
-  scene.load()
+  if scene.load ~= nil then
+    scene.load()
+  end
 end
 
 function love.load()
-  package.preload['res/map.png'] = imageLoader
-  package.preload['res/cga8.png'] = imageLoader
-  package.preload['res/tiles.png'] = imageDataLoader
-
   -- Need to do this before anything else is executed
-  math.randomseed(os.time())
+  do
+    package.preload['res/map.png'] = imageLoader
+    package.preload['res/cga8.png'] = imageLoader
+    package.preload['res/tiles.png'] = imageDataLoader
 
-  love.graphics.setDefaultFilter('linear', 'nearest')
-  love.graphics.setFont(loadFont(require('res/cga8.png'), 8, 8, math.random() > 0.5))
-  love.graphics.setLineStyle('rough')
-  love.mouse.setVisible(false)
+    love.graphics.setDefaultFilter('linear', 'nearest')
+    love.graphics.setFont(loadFont(require('res/cga8.png'), 8, 8, math.random() > 0.5))
+    love.graphics.setLineStyle('rough')
+    love.mouse.setVisible(false)
+
+    math.randomseed(os.time())
+    rescueLoveDefaultCallbacks()
+  end
+
   loadTileset()
-  loadScene(require('GameScene'))
+  loadScene(require('MenuScene'))
 end

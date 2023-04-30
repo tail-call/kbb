@@ -350,7 +350,6 @@ function M.init(game)
     return TERRAIN_COLLISION
   end)
 
-
   say(
     game.uiModel.console,
     require('ConsoleMessage').new {

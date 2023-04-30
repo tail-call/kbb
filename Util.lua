@@ -207,7 +207,7 @@ local function dump(obj)
         coroutine.yield(obj:type())
       end
     elseif type(obj) == 'function' then
-      coroutine.yield('3')
+      coroutine.yield('\'' .. tostring(obj) .. '\'')
     elseif type(obj) == 'boolean' then
       coroutine.yield(tostring(obj))
     elseif type(obj) == 'nil' then

@@ -3,8 +3,7 @@ return {
   TILE_WIDTH = 16,
   LOVE_CALLBACKS = {
     'draw',
-    'errhand',
-    'errorhandler',
+    -- 'errorhandler', We cannot obtain default errorhandler
     'load',
     'lowmemory',
     'quit',

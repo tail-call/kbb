@@ -34,13 +34,14 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Measure revealed terrytory by patches rather than by tiles
  - [ ] Circle shaped cursor when pointing to unit/building
 
-## Experimentation
+## Research
 
  - [x] Use package.preload to load resources
  - [ ] Use FFI for huge arrays like fog of war
  - [ ] Try using native code with ffi
  - [ ] Use string buffers for text manipulation [1]
  - [ ] Random terrain generation in a selected area
+ - [ ] Try using love2d threads for something?
 
 ## Game ideas
 
