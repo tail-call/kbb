@@ -14,7 +14,7 @@ local updateDrawState = require('DrawState').updateDrawState
 
 local setWindowScale = require('DrawState').mut.setWindowScale
 
-local FILENAME = './kobo2.kpss'
+local SAVEFILE_NAME = './kobo2.kpss'
 
 ---@type 'game' | 'dead'
 local state = 'game'
@@ -24,8 +24,11 @@ local game
 ---@type DrawState
 local drawState
 
-local function loadGame()
-  local saveGameFunction, compileError = loadfile(FILENAME)
+---@param filename string
+---@param loaders { [string]: fun(props: { [string]: any }): any }
+---@return fun()
+local function loadGame(filename, loaders)
+  local saveGameFunction, compileError = loadfile(filename)
   if saveGameFunction == nil then
     error(compileError)
   end
@@ -33,16 +36,9 @@ local function loadGame()
   local moduleLoader = {}
   setmetatable(moduleLoader, { __index = function(t, k)
     return function(props)
-      if k == 'Quad' then
-        return love.graphics.newQuad
-      elseif k == 'buf' then
-        return function(props)
-          local compressedData = love.data.decode('data', 'base64', props.base64)
-          local data = love.data.decompress('string', 'zlib', compressedData)
-          ---@cast data string
-          local array = loadstring(data)()
-          return array
-        end
+      local loader = loaders[k]
+      if loader ~= nil then
+        return loader(props)
       else
         -- Loading from module k
         props.__module = k
@@ -51,10 +47,7 @@ local function loadGame()
     end
   end })
   setfenv(saveGameFunction, moduleLoader)
-  game = saveGameFunction()
-  if game == nil then
-    error('no game')
-  end
+  return saveGameFunction
 end
 
 function love.load()
@@ -69,7 +62,21 @@ function love.load()
   game.onLost = function ()
     state = 'dead'
   end
-  loadGame()
+  game = loadGame(SAVEFILE_NAME, {
+    Quad = function (props)
+      return love.graphics.newQuad
+    end,
+    buf = function (props)
+      local compressedData = love.data.decode('data', 'base64', props.base64)
+      local data = love.data.decompress('string', 'zlib', compressedData)
+      ---@cast data string
+      local array = loadstring(data)()
+      return array
+    end,
+  })()
+  if game == nil then
+    error('no game')
+  end
 end
 
 ---@param dt number
@@ -142,7 +149,7 @@ function love.keypressed(key, scancode, isrepeat)
   if scancode == '8' then
     -- Write to file
     do
-      local file = io.open(FILENAME, 'w+')
+      local file = io.open(SAVEFILE_NAME, 'w+')
       if file == nil then error('no file') end
 
       for _, line in ipairs(serializeGame(game)) do

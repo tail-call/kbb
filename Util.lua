@@ -240,7 +240,7 @@ local function makeBufDumper (array, format)
     table.insert(words, '}')
     local data = table.concat(words, '\n')
 
-    write('buf(){base64=[[')
+    write('buf{base64=[[')
     local compressedData = love.data.compress('data', 'zlib', data)
     local encodedData = love.data.encode('string', 'base64', compressedData)
     ---@cast encodedData string
