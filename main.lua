@@ -21,6 +21,8 @@ package.preload['res/map.png'] = function (filename)
   return imageData
 end
 
+package.preload['res/cga8.png'] = package.preload['res/map.png']
+
 package.preload['res/tiles.png'] = function (filename)
   return love.graphics.newImage(filename)
 end
@@ -59,7 +61,7 @@ end
 
 function love.load()
   love.graphics.setDefaultFilter('linear', 'nearest')
-  love.graphics.setFont(loadFont('res/cga8.png', 8, 8, math.random() > 0.5))
+  love.graphics.setFont(loadFont(require('res/cga8.png'), 8, 8, math.random() > 0.5))
   love.graphics.setLineStyle('rough')
   love.mouse.setVisible(false)
   loadTileset()

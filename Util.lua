@@ -82,12 +82,11 @@ end
 
 -- See <https://love2d.org/wiki/ImageFontFormat>
 
----@param name string
+---@param data love.ImageData
 ---@param charWidth integer
 ---@param charHeight integer
 ---@param isBold boolean
-local function loadFont(name, charWidth, charHeight, isBold)
-  local data = love.image.newImageData(name)
+local function loadFont(data, charWidth, charHeight, isBold)
   local characters = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'
   local fontWidth = 1 + #characters * (charWidth + 1)
   local output = love.image.newImageData(fontWidth, charHeight)

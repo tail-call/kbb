@@ -36,9 +36,9 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 ## Experimentation
 
+ - [x] Use package.preload to load resources
  - [ ] Use FFI for huge arrays like fog of war
  - [ ] Try using native code with ffi
- - [ ] Use package.preload to load resources
  - [ ] Use string buffers for text manipulation [1]
  - [ ] Random terrain generation in a selected area
 
