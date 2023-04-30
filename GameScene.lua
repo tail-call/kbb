@@ -11,8 +11,6 @@ local handleInput = require('Game').handleInput
 local beginRecruiting = require('Game').beginRecruiting
 local endRecruiting = require('Game').endRecruiting
 
-local SAVEFILE_NAME = './kobo2.kpss'
-
 ---@type Game
 local game
 ---@type DrawState
@@ -42,10 +40,11 @@ local function loadGame(filename, loaders)
   return saveGameFunction
 end
 
-function M.load()
+---@param savefileName string
+function M.load(savefileName)
   local tileset = require('Tileset').getTileset()
   drawState = require('DrawState').new({ tileset = tileset })
-  local gameFunction = loadGame(SAVEFILE_NAME, {
+  local gameFunction = loadGame(savefileName, {
     quad = function (...)
       return love.graphics.newQuad(...)
     end,

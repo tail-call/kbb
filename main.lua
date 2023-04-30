@@ -1,7 +1,23 @@
-local loadTileset = require('Tileset').load
-local loadFont = require('Util').loadFont
+local M = require('Module').define(..., 0)
 
 local rescuedCallbacks = {}
+
+---Loads a scene for execution
+---@param scene table
+function M.loadScene (scene, ...)
+  for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
+    love[callbackName] = scene[callbackName]
+      or rescuedCallbacks[callbackName]
+      or error('main: no such callback: ' .. callbackName)
+  end
+  if scene.load ~= nil then
+    scene.load(...)
+  end
+end
+
+
+local loadTileset = require('Tileset').load
+local loadFont = require('Util').loadFont
 
 local function imageLoader(filename)
   local imageData = love.image.newImageData(filename)
@@ -15,17 +31,6 @@ end
 local function rescueLoveDefaultCallbacks()
   for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
     rescuedCallbacks[callbackName] = love[callbackName] or function () end
-  end
-end
-
-local function loadScene (scene)
-  for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
-    love[callbackName] = scene[callbackName]
-      or rescuedCallbacks[callbackName]
-      or error('main: no such callback: ' .. callbackName)
-  end
-  if scene.load ~= nil then
-    scene.load()
   end
 end
 
@@ -46,5 +51,7 @@ function love.load()
   end
 
   loadTileset()
-  loadScene(require('MenuScene'))
+  M.loadScene(require('MenuScene'))
 end
+
+return M
