@@ -12,6 +12,7 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 ## Quality of life
 
+ - [ ] Focus mode is a scene
  - [ ] Drop GameEntity class: I already have type markers in my objects
  - [ ] Event system
  - [ ] Path finding
