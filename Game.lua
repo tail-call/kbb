@@ -301,18 +301,12 @@ local function makeUIScript(game)
   })
 end
 
----@param bak Game?
----@return Game
-function M.new(bak)
+---@param game Game
+function M.init(game)
   local Guy = require('Guy')
-  bak = bak or {}
-
   local tileset = require('Tileset').getTileset()
-  ---@type Game
-  local game
 
-  ---@type Guy[]
-  local guys = bak.guys or {
+  game.guys = game.guys or {
     Guy.makeLeader(tileset, LEADER_SPAWN_LOCATION),
     Guy.makeGoodGuy(tileset, { x = 274, y = 231 }),
     Guy.makeGoodGuy(tileset, { x = 272, y = 231 }),
@@ -320,28 +314,24 @@ function M.new(bak)
     Guy.makeGoodGuy(tileset, { x = 272, y = 229 }),
   }
 
-  ---@type Game
-  game = {
     -- TODO: use load param
-    world = require('World').new(bak.world or {}),
-    score = bak.score or 0,
-    frozenGuys = tbl.weaken({}, 'k'),
-    -- TODO: use load param
-    resources = require('Resources').new(bak.resources or {}),
-    guys = guys,
-    time = bak.time or (12 * 60),
-    entities = bak.entities or {},
-    deathsCount = bak.deathsCount or 0,
-    alternatingKeyIndex = 1,
-    player = guys[1],
-    squad = require('Squad').new {},
-    recruitCircle = require('RecruitCircle').new {},
-    fogOfWarTimer = 0,
-    cursorPos = bak.cursorPos or { x = 0, y = 0 },
-    magnificationFactor = bak.magnificationFactor or 1,
-    isFocused = false,
-    texts = bak.texts or {},
-  }
+  game.world = require('World').new(game.world or {})
+  game.score = game.score or 0
+  game.frozenGuys = tbl.weaken({}, 'k')
+  -- TODO: use load param
+  game.resources = require('Resources').new(game.resources or {})
+  game.time = game.time or (12 * 60)
+  game.entities = game.entities or {}
+  game.deathsCount = game.deathsCount or 0
+  game.alternatingKeyIndex = 1
+  game.player = game.guys[1]
+  game.squad = require('Squad').new {}
+  game.recruitCircle = require('RecruitCircle').new {}
+  game.fogOfWarTimer = 0
+  game.cursorPos = game.cursorPos or { x = 0, y = 0 }
+  game.magnificationFactor = game.magnificationFactor or 1
+  game.isFocused = false
+  game.texts = game.texts or {}
 
   game.uiModel = require('UIModel').new(game)
   game.ui = makeUIScript(game)

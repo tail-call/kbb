@@ -198,7 +198,7 @@ local function dump(obj)
     elseif type(obj) == 'userdata' then
       if obj:type() == 'Quad' then
         ---@cast obj love.Quad
-        coroutine.yield('Quad(')
+        coroutine.yield('quad(')
         local x, y, w, h = obj:getViewport()
         local sw, sh = obj:getTextureDimensions()
         coroutine.yield(('%s,%s,%s,%s,%s,%s'):format(x, y, w, h, sw, sh))

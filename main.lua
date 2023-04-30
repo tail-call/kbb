@@ -7,7 +7,6 @@ local beginRecruiting = require('Game').beginRecruiting
 local endRecruiting = require('Game').endRecruiting
 local tbl = require('tbl')
 local vector = require('Vector')
-local gameover = require('GameOver')
 local loadTileset = require('Tileset').load
 local loadFont = require('Util').loadFont
 local updateDrawState = require('DrawState').updateDrawState
@@ -27,8 +26,6 @@ package.preload['res/tiles.png'] = function (filename)
   return love.graphics.newImage(filename)
 end
 
----@type 'game' | 'dead'
-local state = 'game'
 ---@type Game
 local game
 
@@ -68,11 +65,8 @@ function love.load()
   local tileset = require('Tileset').getTileset()
   drawState = require('DrawState').new({ tileset = tileset })
   game = require('Game').new({})
-  game.onLost = function ()
-    state = 'dead'
-  end
   local gameFunction, loadingError = loadGame(SAVEFILE_NAME, {
-    Quad = function (...)
+    quad = function (...)
       return love.graphics.newQuad(...)
     end,
     buf = function (props)
@@ -104,42 +98,19 @@ function love.update(dt)
       or game.magnificationFactor,
     game.isFocused
   )
-  if state == 'game' then
-    -- Handle diagonal movement
-    local directions = {}
-    for key, value in pairs(vector.dir) do
-      if love.keyboard.isDown(key) then
-        table.insert(directions, value)
-      end
+  -- Handle diagonal movement
+  local directions = {}
+  for key, value in pairs(vector.dir) do
+    if love.keyboard.isDown(key) then
+      table.insert(directions, value)
     end
-
-    updateGame(game, dt, directions)
   end
+
+  updateGame(game, dt, directions)
 end
 
 function love.textinput(text)
   require('Game').handleText(game, text)
-end
-
-local function serializeGame()
-  local dump = require('Util').dump
-
-  return {[[
-    -- This is a Kobold Princess Simulator v0.2 savefile. You shouldn't run it.
-    -- It was created at ]],os.date(),[[
-    
-    return Game{
-      time = ]],tostring(game.time),[[,
-      score = ]],tostring(game.score),[[,
-      deathsCount = ]],tostring(game.deathsCount),[[,
-      guys = ]],dump(game.guys),[[,
-      magnificationFactor = ]],tostring(game.magnificationFactor),[[,
-      world = ]],dump(game.world),[[,
-      texts = ]],dump(game.texts),[[,
-      entities = ]],dump(game.entities),[[,
-      resources = ]],dump(game.resources),[[,
-    }
-  ]]}
 end
 
 ---@param key love.KeyConstant
@@ -156,15 +127,14 @@ function love.keypressed(key, scancode, isrepeat)
       local file = io.open(SAVEFILE_NAME, 'w+')
       if file == nil then error('no file') end
 
-      for _, line in ipairs(serializeGame(game)) do
-        file:write(line)
-      end
+      file:write('-- This is a Kobold Princess Simulator v0.2 savefile. You should not run it.\n')
+      file:write('-- It was created at ' .. os.date() .. '\n')
+      file:write('return ')
+      
+      file:write(require('Util').dump(game))
       file:close()
     end
-
   end
-
-  if state ~= 'game' then return end
 
   handleInput(game, scancode, key)
 end
@@ -184,13 +154,9 @@ end
 ---@param key love.KeyConstant
 ---@param scancode love.Scancode
 function love.keyreleased(key, scancode)
-  if state ~= 'game' then return end
 end
 
 function love.draw()
   require('Draw').prepareFrame(drawState)
   require('Draw').drawGame(game, drawState)
-  if state == 'dead' then
-    gameover.draw()
-  end
 end
