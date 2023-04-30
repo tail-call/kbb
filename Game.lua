@@ -21,7 +21,6 @@
 ---@field uiModel UIModel GUI state
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
----@field makeVisionSourcesCo fun(self: Game): fun(): VisionSource Returns a coroutine function that will yield all vision sources in the game world
 ---@field fogOfWarTimer number
 ---@field frozenGuys { [Guy]: true } Guys that should be not rendered and should not behave
 
@@ -342,16 +341,6 @@ function M.new(bak)
     magnificationFactor = bak.magnificationFactor or 1,
     isFocused = false,
     texts = bak.texts or {},
-    makeVisionSourcesCo = function (self)
-      return function ()
-        coroutine.yield({ pos = self.player.pos, sight = 10 })
-
-        return {
-          pos = self.cursorPos,
-          sight = math.max(2, self.recruitCircle.radius or 0),
-        }
-      end
-    end,
   }
 
   game.uiModel = require('UIModel').new(game)
@@ -506,14 +495,21 @@ local function die(guy, game, mut, entity)
   mut.removeEntity(game, entity)
 end
 
-
 ---@param game Game -- Game object
 ---@param dt number -- Time since last update
 ---@param movementDirections Vector[] -- Momentarily pressed movement directions
 function M.updateGame(game, dt, movementDirections)
-  exhaust(game:makeVisionSourcesCo(), function (visionSource)
+  exhaust(function ()
+    coroutine.yield({ pos = game.player.pos, sight = 10 })
+
+    return {
+      pos = game.cursorPos,
+      sight = math.max(2, game.recruitCircle.radius or 0),
+    }
+  end, function (visionSource)
     revealFogOfWar(game.world, visionSource, skyColorAtTime(game.time).g, dt)
   end)
+
   updateConsole(game.uiModel.console, dt)
   if isRecruitCircleActive(game.recruitCircle) then
     growRecruitCircle(game.recruitCircle, dt)
