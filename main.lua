@@ -25,7 +25,7 @@ local game
 local drawState
 
 ---@param filename string
----@param loaders { [string]: fun(props: { [string]: any }): any }
+---@param loaders { [string]: function }
 ---@return fun()
 local function loadGame(filename, loaders)
   local saveGameFunction, compileError = loadfile(filename)
@@ -35,14 +35,12 @@ local function loadGame(filename, loaders)
 
   local moduleLoader = {}
   setmetatable(moduleLoader, { __index = function(t, k)
-    return function(props)
+    return function(...)
       local loader = loaders[k]
       if loader ~= nil then
-        return loader(props)
+        return loader(...)
       else
-        -- Loading from module k
-        props.__module = k
-        return require(k).new(props)
+        return require(k).new(...)
       end
     end
   end })
@@ -63,8 +61,8 @@ function love.load()
     state = 'dead'
   end
   game = loadGame(SAVEFILE_NAME, {
-    Quad = function (props)
-      return love.graphics.newQuad
+    Quad = function (...)
+      return love.graphics.newQuad(...)
     end,
     buf = function (props)
       local compressedData = love.data.decode('data', 'base64', props.base64)
