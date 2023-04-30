@@ -16,7 +16,6 @@
 ---@field time number Time of day in seconds, max is 24*60
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
 ---@field magnificationFactor number How much the camera is zoomed in
----@field collider fun(self: Game, v: Vector): CollisionInfo Function that performs collision checks between game world objects
 ---@field isFocused boolean True if focus mode is on
 ---@field ui UI User interface root
 ---@field uiModel UIModel GUI state
@@ -353,25 +352,25 @@ function M.new(bak)
         }
       end
     end,
-    collider = function(self, v)
-      local someoneThere = findGuyAtPos(self, v)
-      if someoneThere then
-        return { type = 'guy', guy = someoneThere }
-      end
-      local someEntityThere = findEntityAtPos(self, v)
-      if someEntityThere then
-        return { type = 'entity', entity = someEntityThere }
-      end
-      if isPassable(self.world, v) then
-        return NONE_COLLISION
-      end
-      return TERRAIN_COLLISION
-    end,
   }
 
   game.uiModel = require('UIModel').new(game)
   game.ui = makeUIScript(game)
-  game.guyDelegate = makeGuyDelegate(game)
+  game.guyDelegate = makeGuyDelegate(game, function(self, v)
+    local someoneThere = findGuyAtPos(self, v)
+    if someoneThere then
+      return { type = 'guy', guy = someoneThere }
+    end
+    local someEntityThere = findEntityAtPos(self, v)
+    if someEntityThere then
+      return { type = 'entity', entity = someEntityThere }
+    end
+    if isPassable(self.world, v) then
+      return NONE_COLLISION
+    end
+    return TERRAIN_COLLISION
+  end)
+
 
   say(
     game.uiModel.console,

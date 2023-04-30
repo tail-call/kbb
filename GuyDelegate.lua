@@ -9,8 +9,9 @@ local heal = require('GuyStats').mut.heal
 local M = require('Module').define(..., 0)
 
 ---@param game Game
+---@param collider fun(self: Game, v: Vector): CollisionInfo Function that performs collision checks between game world objects
 ---@return GuyDelegate
-function M.new(game)
+function M.new(game, collider)
   ---@type GuyDelegate
   local guyDelegate = {
     beginBattle = function (attacker, defender)
@@ -25,7 +26,7 @@ function M.new(game)
       return 'shouldMove'
     end,
     collider = function (pos)
-      return game:collider(pos)
+      return collider(game, pos)
     end,
   }
   return guyDelegate

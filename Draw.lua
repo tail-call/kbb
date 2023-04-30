@@ -483,7 +483,7 @@ local function drawGame(game, drawState)
       game.cursorPos = cursorPos
     end
 
-    local collision = game:collider(game.cursorPos)
+    local collision = game.guyDelegate.collider(game.cursorPos)
 
     if collision.type == 'terrain' then
       cursorColor = RED_COLOR
