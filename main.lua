@@ -109,8 +109,7 @@ function love.textinput(text)
   require('Game').handleText(game, text)
 end
 
----@param game Game
-local function serializeGame(game)
+local function serializeGame()
   local dump = require('Util').dump
   local makeBufDumper = require('Util').makeBufDumper
 
