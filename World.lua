@@ -54,7 +54,8 @@ end
 
 ---@param world World
 function M.init(world)
-  local data = love.image.newImageData('map.png')
+  ---@type love.ImageData
+  local data = require('res/map.png')
 
   world.width = data:getWidth()
   world.height = data:getHeight()

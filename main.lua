@@ -16,6 +16,15 @@ local setWindowScale = require('DrawState').mut.setWindowScale
 
 local SAVEFILE_NAME = './kobo2.kpss'
 
+package.preload['res/map.png'] = function (filename)
+  local imageData = love.image.newImageData(filename)
+  return imageData
+end
+
+package.preload['res/tiles.png'] = function (filename)
+  return love.graphics.newImage(filename)
+end
+
 ---@type 'game' | 'dead'
 local state = 'game'
 ---@type Game
@@ -26,11 +35,11 @@ local drawState
 
 ---@param filename string
 ---@param loaders { [string]: function }
----@return fun()
+---@return fun()?, string? errorMessage
 local function loadGame(filename, loaders)
   local saveGameFunction, compileError = loadfile(filename)
   if saveGameFunction == nil then
-    error(compileError)
+    return nil, compileError
   end
 
   local moduleLoader = {}
@@ -50,7 +59,7 @@ end
 
 function love.load()
   love.graphics.setDefaultFilter('linear', 'nearest')
-  love.graphics.setFont(loadFont('cga8.png', 8, 8, math.random() > 0.5))
+  love.graphics.setFont(loadFont('res/cga8.png', 8, 8, math.random() > 0.5))
   love.graphics.setLineStyle('rough')
   love.mouse.setVisible(false)
   loadTileset()
@@ -60,7 +69,7 @@ function love.load()
   game.onLost = function ()
     state = 'dead'
   end
-  game = loadGame(SAVEFILE_NAME, {
+  local gameFunction, loadingError = loadGame(SAVEFILE_NAME, {
     Quad = function (...)
       return love.graphics.newQuad(...)
     end,
@@ -71,10 +80,11 @@ function love.load()
       local array = loadstring(data)()
       return array
     end,
-  })()
-  if game == nil then
-    error('no game')
+  })
+  if gameFunction == nil then
+    error('loading error: ' .. loadingError)
   end
+  game = gameFunction()
 end
 
 ---@param dt number

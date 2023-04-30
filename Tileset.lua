@@ -95,7 +95,8 @@ local function parallaxTile(baseX, baseY, offsetX, offsetY)
 end
 
 local function load()
-  local image = love.graphics.newImage('tiles.png')
+  ---@type love.Image
+  local image = require('res/tiles.png')
   local canvas = love.graphics.newCanvas(image:getWidth(), image:getHeight())
 
   local function tile(x, y)
