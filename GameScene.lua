@@ -103,7 +103,7 @@ function M.keypressed(key, scancode, isrepeat)
   if scancode == '8' then
     -- Write to file
     do
-      local file = io.open(SAVEFILE_NAME, 'w+')
+      local file = io.open('./kobo2.kpss', 'w+')
       if file == nil then error('no file') end
 
       file:write('-- This is a Kobold Princess Simulator v0.2 savefile. You should not run it.\n')
