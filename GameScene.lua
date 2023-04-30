@@ -45,8 +45,7 @@ end
 function M.load()
   local tileset = require('Tileset').getTileset()
   drawState = require('DrawState').new({ tileset = tileset })
-  game = require('Game').new({})
-  local gameFunction, loadingError = loadGame(SAVEFILE_NAME, {
+  local gameFunction = loadGame(SAVEFILE_NAME, {
     quad = function (...)
       return love.graphics.newQuad(...)
     end,
@@ -58,10 +57,9 @@ function M.load()
       return array
     end,
   })
-  if gameFunction == nil then
-    error('loading error: ' .. loadingError)
-  end
-  game = gameFunction()
+  game = gameFunction
+    and gameFunction()
+    or require('Game').new {}
 end
 
 ---@param dt number
