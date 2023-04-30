@@ -33,7 +33,7 @@
 ---@field setGuyFrozen fun(self: Game, guy: Guy, state: boolean) Unfreezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
----@field addEntity fun(self: Game, entity: GameEntity) Adds a building to the world
+---@field addEntity fun(self: Game, entity: GameEntity) Adds an entity to the world
 ---@field removeEntity fun(self: Game, entity: GameEntity) Adds a building to the world
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
