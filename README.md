@@ -44,6 +44,7 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 ## Game ideas
 
+ - [ ] Make fog be a noise rather than uniform color
  - [ ] Telefrags
  - [ ] Die when teleporting into a solid object
  - [ ] Wolves that only walk on forest tiles
