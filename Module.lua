@@ -52,7 +52,7 @@ end
 
 function M.reload(name)
   package.loaded[name] = nil
-  require(name)
+  return require(name)
 end
 
 return M

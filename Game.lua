@@ -210,7 +210,7 @@ local function findEntityAtPos(game, pos)
 end
 
 ---@param game Game
-local function makeUIScript(game)
+function M.makeUIScript(game)
   local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
   local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
   local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
@@ -334,7 +334,7 @@ function M.init(game)
   game.texts = game.texts or {}
 
   game.uiModel = require('UIModel').new(game)
-  game.ui = makeUIScript(game)
+  game.ui = M.makeUIScript(game)
   game.guyDelegate = makeGuyDelegate(game, function(self, v)
     local someoneThere = findGuyAtPos(self, v)
     if someoneThere then

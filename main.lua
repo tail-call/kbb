@@ -5,8 +5,8 @@ local rescuedCallbacks = {}
 ---Loads a scene for execution
 ---@param sceneName string
 function M.loadScene (sceneName, ...)
-  package.loaded[sceneName] = nil
-  local scene = require(sceneName)
+  print('Loading ' .. sceneName .. '...')
+  local scene = require('Module').reload(sceneName)
   for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
     love[callbackName] = scene[callbackName]
       or rescuedCallbacks[callbackName]
