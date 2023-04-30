@@ -48,6 +48,9 @@ end
 function M.load(savefileName)
   local tileset = require('Tileset').getTileset()
   drawState = require('DrawState').new { tileset = tileset }
+  if savefileName == '#back' then
+    return
+  end
   local gameFunction = loadGame(savefileName, {
     quad = function (...)
       return love.graphics.newQuad(...)

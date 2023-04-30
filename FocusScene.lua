@@ -12,7 +12,7 @@ end
 ---@param scancode love.Scancode
 ---@param isrepeat boolean
 function M.keypressed(key, scancode, isrepeat)
-  require('main').setScene(storedScene, '???')
+  require('main').setScene(storedScene, '#back')
 end
 
 function M.draw()
