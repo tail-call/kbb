@@ -51,7 +51,7 @@ function love.load()
   end
 
   loadTileset()
-  M.loadScene(require('MenuScene'))
+  M.loadScene(require('MenuScene'), 'initial')
 end
 
 return M

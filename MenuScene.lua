@@ -1,4 +1,5 @@
 local M = require('Module').define(..., 0)
+
 local SAVEFILE_NAME = './kobo2.kpss'
 local AFTER_DRAW_DURATION = 0.05
 local INTRO = [[
@@ -23,9 +24,19 @@ X) Exit game
 
 local cursorTimer = 0
 local afterDraw = nil
-local isErrorChar = nil
 local afterDrawTimer = nil
 local doNothingCounter = 0
+local extraText = ''
+
+function M.load(type)
+  if type == 'initial' then
+    extraText = ''
+  elseif type == 'reload' then
+    extraText = 'Reload successful.\n'
+  else
+    error('oh no')
+  end
+end
 
 function M.update(dt)
   cursorTimer = cursorTimer + 4 * dt
@@ -45,7 +56,7 @@ function M.draw()
   love.graphics.scale(3, 3)
   love.graphics.print(
     INTRO
-      .. (isErrorChar and ('' .. (isErrorChar):upper() .. ') Do nothing ('.. doNothingCounter ..')\n') or '')
+      .. (extraText)
       .. (afterDraw and '\nLOADING...' or '')
       .. (afterDraw and '' or '\nPress a key')
       .. (cursorTimer > 0.5 and '_' or ''),
@@ -61,7 +72,6 @@ function M.keypressed(key, scancode, isrepeat)
   afterDrawTimer = AFTER_DRAW_DURATION
   if scancode == 'l' then
     afterDraw = function ()
-      isErrorChar = nil
       loadScene(require('GameScene'), SAVEFILE_NAME)
     end
   elseif scancode == 'n' then
@@ -75,11 +85,16 @@ function M.keypressed(key, scancode, isrepeat)
   elseif scancode == 'f' then
     afterDraw = function ()
       package.loaded['MenuScene'] = nil
-      loadScene(require('MenuScene'))
+      loadScene(require('MenuScene'), 'reload')
     end
   else
     doNothingCounter = doNothingCounter + 1
-    isErrorChar = scancode
+    extraText = scancode:upper()
+      .. '('
+      .. scancode:upper()
+      .. ') Do nothing ('
+      .. doNothingCounter
+      ..')\n'
     afterDraw = function ()
       afterDraw = nil
     end
