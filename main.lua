@@ -11,8 +11,8 @@ local function imageDataLoader(filename)
 end
 
 local function loadScene (scene)
-  for k, v in pairs(scene) do
-    love[k] = v
+  for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
+    love[callbackName] = scene[callbackName]
   end
   scene.load()
 end
