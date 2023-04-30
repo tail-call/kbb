@@ -25,6 +25,7 @@ local cursorTimer = 0
 local afterDraw = nil
 local isErrorChar = nil
 local afterDrawTimer = nil
+local doNothingCounter = 0
 
 function M.update(dt)
   cursorTimer = cursorTimer + 4 * dt
@@ -44,7 +45,7 @@ function M.draw()
   love.graphics.scale(3, 3)
   love.graphics.print(
     INTRO
-      .. (isErrorChar and ('\nERROR Scenario ' .. (isErrorChar):upper() .. ' cannot be\nexecuted. Try inserting operational \ndisk B and rebooting the main frame.\nAnd remember: never let the game\ndecide your fate.') or '')
+      .. (isErrorChar and ('' .. (isErrorChar):upper() .. ') Do nothing ('.. doNothingCounter ..')\n') or '')
       .. (afterDraw and '\nLOADING...' or '')
       .. (afterDraw and '' or '\nPress a key')
       .. (cursorTimer > 0.5 and '_' or ''),
@@ -77,6 +78,7 @@ function M.keypressed(key, scancode, isrepeat)
       loadScene(require('MenuScene'))
     end
   else
+    doNothingCounter = doNothingCounter + 1
     isErrorChar = scancode
     afterDraw = function ()
       afterDraw = nil
