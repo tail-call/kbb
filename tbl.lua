@@ -88,9 +88,23 @@ local function maybeDrop(items, item)
   fastRemoveAtIndex(items, i)
 end
 
+---Maps an array
+---@generic T, U
+---@param items T[]
+---@param mapper fun(item: T): U
+---@return U[]
+local function imap(items, mapper)
+  local itemsClone = {}
+  for _, v in ipairs(items) do
+    table.insert(itemsClone, mapper(v))
+  end
+  return itemsClone
+end
+
 return {
   find = find,
   iclone = iclone,
+  imap = imap,
   ifilter = ifilter,
   has = has,
   fastRemoveAtIndex = fastRemoveAtIndex,

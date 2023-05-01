@@ -18,9 +18,12 @@ function M.textinput(text)
   prompt = prompt .. text
 end
 
----@param text string
-local function echo(text)
-  output = table.concat { output, text, '\n' }
+---@param ... string
+local function echo(...)
+  output = table.concat(
+    require('tbl').imap({ output, ... }, tostring)
+  )
+  output = output .. '\n'
 end
 
 ---@param key love.KeyConstant
@@ -32,13 +35,25 @@ function M.keypressed(key, scancode, isrepeat)
   elseif scancode == 'return' then
     local savedPrompt = prompt
     prompt = ''
-    local chunk = loadstring(savedPrompt, 'commandline')
+    local chunk, compileErrorMessage = loadstring(savedPrompt, 'commandline')
+    echo('lua>' .. savedPrompt)
     if chunk ~= nil then
-      echo('lua>' .. savedPrompt)
       local commands
       commands = {
+        reloadHelp = function ()
+          echo [[
+---Reloads a module
+---@param moduleName string
+reload(moduleName)]]
+        end,
         reload = function(moduleName)
           require('Module').reload(moduleName)
+        end,
+        scribeHelp = function ()
+          echo [[
+---Scribes a message in the world
+---@param message string
+scribe(message)]]
         end,
         scribe = function(text)
           error('no scribe for you today')
@@ -50,13 +65,50 @@ function M.keypressed(key, scancode, isrepeat)
           --   }
           -- )
         end,
-        print = function (something)
-          echo(something)
+        printHelp = function ()
+          echo [[
+---Prints objects to a console
+---@param ... any[]
+print(...)]]
         end,
-        help = function ()
-          for k in pairs(commands) do
-            commands.print(k)
+        print = function (...)
+          echo(...)
+        end,
+        clearHelp = function ()
+          echo [[
+---Clears the screen
+clear()]]
+        end,
+        clear = function (...)
+          output = ''
+        end,
+        helpHelp = function ()
+          echo [[
+---Outputs info about a command in the console
+---@param name string
+help(name)]]
+        end,
+        help = function (arg)
+          if arg == nil then
+            echo 'try these commands or hit escape if confused:\n'
+            for k in pairs(commands) do
+              echo(('help(\'%s\')'):format(k))
+            end
+          else
+            local helpFunc = commands[arg .. 'Help']
+            if helpFunc == nil then
+              echo(([[
+---Don't use this command
+%s(...) -- bad]]):format(arg))
+            else
+              helpFunc()
+            end
           end
+        end,
+        quitHelp = function ()
+          echo [[
+---Quits to the main menu
+quit()]]
         end,
         quit = function ()
           package.loaded['MenuScene'] = nil
@@ -64,7 +116,12 @@ function M.keypressed(key, scancode, isrepeat)
         end,
       }
       setfenv(chunk, commands)
-      chunk()
+      local isSuccess, errorMessage = pcall(chunk)
+      if not isSuccess then
+        echo(errorMessage)
+      end
+    else
+      echo(compileErrorMessage or 'Unknown error')
     end
   elseif scancode == 'backspace' then
     prompt = prompt:sub(1,-2)
