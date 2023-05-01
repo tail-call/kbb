@@ -46,6 +46,9 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 ## Game ideas
 
+ - [ ] Guys are *lost* when are in the unexplored area
+ - [ ] You can't recruit lost guys
+ - [ ] Lost guys despawn after a while
  - [ ] Make fog be a noise rather than uniform color
  - [ ] Telefrags
  - [ ] Die when teleporting into a solid object
