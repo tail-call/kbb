@@ -70,20 +70,13 @@ function M.init(world)
 
   ---@type World
 
-  local tileColors = {
-    default = 'grass',
-  }
-
   for y = 0, data:getHeight() - 1 do
     for x = 0, data:getWidth() - 1 do
       local r, g, b = data:getPixel(x, y)
       r = math.floor(r*2)/2
       g = math.floor(g*2)/2
       b = math.floor(b*2)/2
-      local tileType = tileColors[
-        string.format('%s,%s,%s', r, g, b)
-      ] or tileColors.default
-      table.insert(world.tileTypes, tileType)
+      table.insert(world.tileTypes, 'void')
       table.insert(world.fogOfWar, 0.0)
     end
   end

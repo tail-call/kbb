@@ -13,4 +13,9 @@ function M.init(patch)
   patch.name = patch.name or ('PATCH %x %x'):format(patch.coords.x, patch.coords.y)
 end
 
+---@param patch Patch
+function M.patchCenter(patch)
+  return patch.coords.x * 8 + 4, patch.coords.y * 8 + 4
+end
+
 return M

@@ -76,9 +76,7 @@ local toggleFollow = require('Squad').mut.toggleFollow
 local addListener = require('Mutator').mut.addListener
 
 ---@type Vector
-local EVIL_SPAWN_LOCATION = { x = 301, y = 184 }
----@type Vector
-local LEADER_SPAWN_LOCATION = { x = 269, y = 231 }
+local LEADER_SPAWN_LOCATION = { x = 250, y = 250 }
 
 local SCORES_TABLE = {
   killedAnEnemy = 100,
@@ -307,10 +305,6 @@ function M.init(game)
 
   game.guys = game.guys or {
     Guy.makeLeader(LEADER_SPAWN_LOCATION),
-    Guy.makeGoodGuy { x = 274, y = 231 },
-    Guy.makeGoodGuy { x = 272, y = 231 },
-    Guy.makeGoodGuy { x = 274, y = 229 },
-    Guy.makeGoodGuy { x = 272, y = 229 },
   }
 
     -- TODO: use load param
@@ -583,15 +577,23 @@ local function maybeCollect(game, guy)
   if M.isFrozen(game, guy) then return end
 
   local pos = guy.pos
+  local patch = require('World').patchAt(game.world, pos)
+  local patchCenterX, patchCenterY = require('Patch').patchCenter(patch)
   local tile = getTile(game.world, pos)
   if tile == 'forest' then
     addResources(game.resources, { wood = 1 })
     setTile(game.world, pos, 'grass')
-    M.mut.addGuy(game, Guy.makeEvilGuy(EVIL_SPAWN_LOCATION))
+    M.mut.addGuy(game, Guy.makeEvilGuy {
+      x = patchCenterX,
+      y = patchCenterY,
+    })
   elseif tile == 'rock' then
     addResources(game.resources, { stone = 1 })
     setTile(game.world, pos, 'sand')
-    M.mut.addGuy(game, Guy.makeStrongEvilGuy(EVIL_SPAWN_LOCATION))
+    M.mut.addGuy(game, Guy.makeStrongEvilGuy {
+      x = patchCenterX,
+      y = patchCenterY,
+    })
   elseif tile == 'grass' then
     addResources(game.resources, { grass = 1 })
     setTile(game.world, pos, 'sand')
