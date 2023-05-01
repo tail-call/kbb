@@ -6,7 +6,6 @@
 ---@field leftPanelText fun(): string Left panel text
 ---@field rightPanelText fun(): string Right panel text
 ---@field bottomPanelText fun(): string Bottom panel text
----@field promptText fun(): string Prompt text
 ---
 ---@field activeTab integer Current active tab in the right panel
 ---@field nextTab fun(self: UIModel) Switches tab in the UI
@@ -122,21 +121,8 @@ function UIModelModule.new(game)
     shouldDrawFocusModeUI = function ()
       return game.isFocused
     end,
-    didPressBackspace = function (self)
-      self.prompt = self.prompt:sub(1,-2)
-    end,
     didTypeCharacter = function (self, char)
       self.prompt = self.prompt .. char
-    end,
-    promptText = function ()
-      local isBlink = 0 == (
-        math.floor(love.timer.getTime() * 4) % 2
-      )
-      if isBlink then
-        return ('lua>%s_'):format(model.prompt)
-      else
-        return ('lua>%s'):format(model.prompt)
-      end
     end,
   }
   return model

@@ -296,7 +296,6 @@ function M.makeUIScript(game)
       end,
       w = fixed(200),
       h = fullHeight,
-      text = model.promptText,
     },
   })
 end
@@ -663,52 +662,13 @@ end
 ---@param scancode string
 ---@param key string
 local function handleFocusModeInput(game, scancode, key)
-  if scancode == 'escape' then
-    M.mut.toggleFocus(game)
-  elseif scancode == 'return' then
-    local prompt = game.uiModel.prompt
-    game.uiModel.prompt = ''
-    local chunk = loadstring(prompt, 'commandline')
-    if chunk ~= nil then
-      local commands
-      commands = {
-        reload = function(moduleName)
-          require('Module').reload(moduleName)
-          -- TODO: use mutator
-          game.uiModel = require('UIModel').new(game)
-          game.ui = require('Game').makeUIScript(game)
-          game.player = require('Guy').new(game.player)
-          game.guys[1] = game.player
-          echo(game, 'recreated uiModel, ui, and player')
-        end,
-        scribe = function(text)
-          M.mut.addText(
-            game,
-            require('Text').new {
-              text = text,
-              pos = game.player.pos,
-            }
-          )
-        end,
-        print = function (something)
-          echo(game, something)
-        end,
-        help = function ()
-          for k in pairs(commands) do
-            commands.print(k)
-          end
-        end,
-        quit = function ()
-          package.loaded['MenuScene'] = nil
-          require('main').loadScene('MenuScene', 'fromgame')
-        end,
-      }
-      setfenv(chunk, commands)
-      chunk()
-    end
-  elseif scancode == 'backspace' then
-    game.uiModel:didPressBackspace()
-  end
+  M.mut.toggleFocus(game)
+  -- TODO: use mutator
+  game.uiModel = require('UIModel').new(game)
+  game.ui = require('Game').makeUIScript(game)
+  game.player = require('Guy').new(game.player)
+  game.guys[1] = game.player
+  echo(game, 'recreated uiModel, ui, and player')
 end
 
 ---@param game Game
