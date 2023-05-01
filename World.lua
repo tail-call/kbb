@@ -154,4 +154,14 @@ function M.revealVisionSourceFog(world, visionSource, light, dt)
   end
 end
 
+---@param world World
+---@param patch Patch
+function M.randomizePatch(world, patch)
+  for y = patch.coords.y, patch.coords.y + 8 do
+    for x = patch.coords.x, patch.coords.x + 8 do
+      M.setTile(world, { x = x, y = y }, 'rock')
+    end
+  end
+end
+
 return M

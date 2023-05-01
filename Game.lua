@@ -306,11 +306,11 @@ function M.init(game)
   local tileset = require('Tileset').getTileset()
 
   game.guys = game.guys or {
-    Guy.makeLeader(tileset, LEADER_SPAWN_LOCATION),
-    Guy.makeGoodGuy(tileset, { x = 274, y = 231 }),
-    Guy.makeGoodGuy(tileset, { x = 272, y = 231 }),
-    Guy.makeGoodGuy(tileset, { x = 274, y = 229 }),
-    Guy.makeGoodGuy(tileset, { x = 272, y = 229 }),
+    Guy.makeLeader(LEADER_SPAWN_LOCATION),
+    Guy.makeGoodGuy { x = 274, y = 231 },
+    Guy.makeGoodGuy { x = 272, y = 231 },
+    Guy.makeGoodGuy { x = 274, y = 229 },
+    Guy.makeGoodGuy { x = 272, y = 229 },
   }
 
     -- TODO: use load param
@@ -374,7 +374,7 @@ function M.init(game)
         game.player.stats,
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then
-            local newPlayer = Guy.makeLeader(tileset, LEADER_SPAWN_LOCATION)
+            local newPlayer = Guy.makeLeader(LEADER_SPAWN_LOCATION)
             M.mut.addGuy(game, newPlayer)
             game.player = newPlayer
             game.deathsCount = game.deathsCount + 1
@@ -575,11 +575,11 @@ function M.updateGame(game, dt, movementDirections)
   end
 end
 
----@param tileset Tileset
 ---@param game Game
 ---@param guy Guy
-local function maybeCollect(tileset, game, guy)
+local function maybeCollect(game, guy)
   local Guy = require('Guy')
+
   if M.isFrozen(game, guy) then return end
 
   local pos = guy.pos
@@ -587,11 +587,11 @@ local function maybeCollect(tileset, game, guy)
   if tile == 'forest' then
     addResources(game.resources, { wood = 1 })
     setTile(game.world, pos, 'grass')
-    M.mut.addGuy(game, Guy.makeEvilGuy(tileset, EVIL_SPAWN_LOCATION))
+    M.mut.addGuy(game, Guy.makeEvilGuy(EVIL_SPAWN_LOCATION))
   elseif tile == 'rock' then
     addResources(game.resources, { stone = 1 })
     setTile(game.world, pos, 'sand')
-    M.mut.addGuy(game, Guy.makeStrongEvilGuy(tileset, EVIL_SPAWN_LOCATION))
+    M.mut.addGuy(game, Guy.makeStrongEvilGuy(EVIL_SPAWN_LOCATION))
   elseif tile == 'grass' then
     addResources(game.resources, { grass = 1 })
     setTile(game.world, pos, 'sand')
@@ -601,12 +601,11 @@ local function maybeCollect(tileset, game, guy)
   end
 end
 
----@param tileset Tileset
 ---@param game Game
-local function orderChop(tileset, game)
-  maybeCollect(tileset, game, game.player)
+local function orderCollect(game)
+  maybeCollect(game, game.player)
   for guy in pairs(game.squad.followers) do
-    maybeCollect(tileset, game, guy)
+    maybeCollect(game, guy)
   end
 end
 
@@ -645,14 +644,14 @@ local function orderBuild(game)
 end
 
 ---@param game Game
----@param tileset Tileset
-local function orderSummon(game, tileset)
+local function orderSummon(game)
+  local tileset = require('Tileset').getTileset()
   if game.resources.pretzels <= 0 then return end
   if game.player.stats.moves <= MOVE_COSTS_TABLE.summon then return end
 
   addResources(game.resources, { pretzels = -1 })
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
-  local guy = require('Guy').makeGoodGuy(tileset, game.cursorPos)
+  local guy = require('Guy').makeGoodGuy(game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
   M.mut.addGuy(game, guy)
   addToSquad(game.squad, guy)
@@ -674,8 +673,6 @@ end
 ---@param game Game
 ---@param scancode string
 local function handleNormalModeInput(game, scancode)
-  local tileset = require('Tileset').getTileset()
-
   if scancode == 'tab' then
     game.uiModel:nextTab()
   elseif scancode == 'f' then
@@ -686,11 +683,11 @@ local function handleNormalModeInput(game, scancode)
       dismissSquad(game)
     end
   elseif scancode == 'c' then
-    orderChop(tileset, game)
+    orderCollect(game)
   elseif scancode == 'b' then
     orderBuild(game)
   elseif scancode == 'r' then
-    orderSummon(game, tileset)
+    orderSummon(game)
   elseif scancode == 'return' then
     M.mut.toggleFocus(game)
   elseif scancode == 't' then

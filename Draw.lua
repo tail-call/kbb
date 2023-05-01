@@ -352,12 +352,26 @@ local function drawGame(game, drawState)
 
   -- Draw patch highlight
   withColor(0, 0, 0, 1, function ()
-    local x, y = game.player.pos.x, game.player.pos.y
-    x, y = x / 8, y / 8
-    x, y = math.floor(x), math.floor(y)
     local patchWidth, patchHeight = 8 * TILE_WIDTH, 8 * TILE_HEIGHT
-    love.graphics.rectangle('line', x * patchWidth, y * patchHeight, patchWidth, patchHeight)
-    love.graphics.print(('PATCH %x %x'):format(x,y), x * patchWidth, y * patchHeight)
+    local patch = require('Patch').new {
+      world = game.world,
+      coords = {
+        x = math.floor(game.player.pos.x / 8),
+        y = math.floor(game.player.pos.y / 8),
+      }
+    }
+    love.graphics.rectangle(
+      'line',
+      patch.coords.x * patchWidth,
+      patch.coords.y * patchHeight,
+      patchWidth,
+      patchHeight
+    )
+    love.graphics.print(
+      patch.name,
+      patch.coords.x * patchWidth,
+      patch.coords.y * patchHeight
+    )
   end)
 
   -- Draw in-game objects

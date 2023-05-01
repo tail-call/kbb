@@ -167,9 +167,10 @@ function M.init(guy, load)
   playSpawnAnimation(guy.pixie, guy.pos)
 end
 
----@param tileset Tileset
 ---@param pos Vector
-function M.makeLeader(tileset, pos)
+function M.makeLeader(pos)
+  local tileset = require('Tileset').getTileset()
+
   local guy = M.new{
     pixie = {
       quad = tileset.quads.guy,
@@ -181,9 +182,10 @@ function M.makeLeader(tileset, pos)
   return guy
 end
 
----@param tileset Tileset
 ---@param pos Vector
-function M.makeHuman(tileset, pos)
+function M.makeHuman(pos)
+  local tileset = require('Tileset').getTileset()
+
   local guy = M.new{
     pixie = {
       quad = tileset.quads.human,
@@ -197,9 +199,10 @@ function M.makeHuman(tileset, pos)
   return guy
 end
 
----@param tileset Tileset
 ---@param pos Vector
-function M.makeGoodGuy(tileset, pos)
+function M.makeGoodGuy(pos)
+  local tileset = require('Tileset').getTileset()
+
   local guy = M.new{
     pixie = {
       quad = tileset.quads.guy
@@ -212,9 +215,10 @@ function M.makeGoodGuy(tileset, pos)
   return guy
 end
 
----@param tileset Tileset
 ---@param pos Vector
-function M.makeEvilGuy(tileset, pos)
+function M.makeEvilGuy(pos)
+  local tileset = require('Tileset').getTileset()
+
   local guy = M.new{
     pixie = {
       quad = tileset.quads.guy,
@@ -230,9 +234,10 @@ function M.makeEvilGuy(tileset, pos)
   return guy
 end
 
----@param tileset Tileset
 ---@param pos Vector
-function M.makeStrongEvilGuy(tileset, pos)
+function M.makeStrongEvilGuy(pos)
+  local tileset = require('Tileset').getTileset()
+
   local guy = M.new{
     pixie = {
       quad = tileset.quads.guy,
