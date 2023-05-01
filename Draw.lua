@@ -276,12 +276,12 @@ local function drawCursor(drawState, pos, isFocused, moves)
   end)
 end
 
----@param game Game
+---@param observerPos Vector
+---@param world World
 ---@param drawState DrawState
 ---@param sky { r: number, b: number, g: number }
----@param globalLight number
-local function drawWorld(game, drawState, sky, globalLight)
-  local posX, posY = game.player.pos.x, game.player.pos.y
+local function drawTerrain(observerPos, world, drawState, sky)
+  local posX, posY = observerPos.x, observerPos.y
   local visionDistance = 21
   local voidTile = parallaxTile(0, 48, -drawState.camera.x/2, -drawState.camera.y/2)
   local waterPhase = 16 * math.sin(drawState.waterTimer)
@@ -293,7 +293,6 @@ local function drawWorld(game, drawState, sky, globalLight)
       vec.x = x
       vec.y = y
 
-      local world = game.world
       local idx = vectorToLinearIndex(world, vec)
       local fog = world.fogOfWar[idx] or 0
       local tileType = world.tileTypes[idx] or 'void'
@@ -320,19 +319,6 @@ local function drawWorld(game, drawState, sky, globalLight)
           )
         end
       end)
-      if fog > 0.5 then
-        withColor(0, 0, 0, 1, function ()
-          if x % 8 == 0 then
-            love.graphics.line(x * TILE_WIDTH, y * TILE_HEIGHT, x * TILE_WIDTH, (y + 1) * TILE_HEIGHT)
-          end
-          if y % 8 == 0 then
-            love.graphics.line(x * TILE_WIDTH, y * TILE_HEIGHT, (x + 1) * TILE_WIDTH, y * TILE_HEIGHT)
-          end
-          if x % 8 == 1 and y % 8 == 1 then
-            love.graphics.print(('PATCH %x %x'):format((x-1)/8,(y-1)/8), (x-1) * TILE_WIDTH, (y-1) * TILE_HEIGHT)
-          end
-        end)
-      end
     end
   end
 end
@@ -362,7 +348,17 @@ local function drawGame(game, drawState)
   -- Draw visible terrain
 
   local colorOfSky = skyColorAtTime(game.time)
-  drawWorld(game, drawState, colorOfSky, colorOfSky.g)
+  drawTerrain(game.player.pos, game.world, drawState, colorOfSky)
+
+  -- Draw patch highlight
+  withColor(0, 0, 0, 1, function ()
+    local x, y = game.player.pos.x, game.player.pos.y
+    x, y = x / 8, y / 8
+    x, y = math.floor(x), math.floor(y)
+    local patchWidth, patchHeight = 8 * TILE_WIDTH, 8 * TILE_HEIGHT
+    love.graphics.rectangle('line', x * patchWidth, y * patchHeight, patchWidth, patchHeight)
+    love.graphics.print(('PATCH %x %x'):format(x,y), x * patchWidth, y * patchHeight)
+  end)
 
   -- Draw in-game objects
 

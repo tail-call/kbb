@@ -38,10 +38,11 @@ You have psy abilities, so your cursor has FOV just like you do.
 ## Research
 
  - [x] Use package.preload to load resources
+ - [x] Draw current patch only
+ - [ ] Random terrain generation in a selected area
  - [ ] Use FFI for huge arrays like fog of war
  - [ ] Try using native code with ffi
  - [ ] Use string buffers for text manipulation [1]
- - [ ] Random terrain generation in a selected area
  - [ ] Try using love2d threads for something?
 
 ## Game ideas
