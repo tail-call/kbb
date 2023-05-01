@@ -70,6 +70,7 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] A group of units must carry foundation to its place
  - [ ] Daily routines
  - [ ] Dragon egg in the sanctuary
+ - [ ] Sometimes player's character is immobilized (like stuck in rock) and her minions need to rescue her
  - [ ] When last character dies, a new is born from the dragon egg in the dragon shrine, then a new egg spawns immediately
  - [ ] Proximity based combat
  - [ ] You must build roads for guys to navigate freely

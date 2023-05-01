@@ -13,6 +13,7 @@ Welcome to KOBOLD PRINCESS SIMULATOR
 |            (try typing 'help()')     |
 |Escape)     close lua console         |
 |N)          reload main guy           |
+|E)          terramorphing             |
 +--------------------------------------+
 Now choose:
 
