@@ -170,9 +170,21 @@ end
 ---@param world World
 ---@param patch Patch
 function M.randomizePatch(world, patch)
+  local weightTable = {{
+    weight = math.random(1, 100),
+    tile = 'grass',
+  }, {
+    weight = math.random(1, 100),
+    tile = 'rock',
+  }, {
+    weight = math.random(1, 100),
+    tile = 'forest',
+  }}
   for y = patch.coords.y * 8, patch.coords.y * 8 + 8 - 1 do
     for x = patch.coords.x * 8, patch.coords.x * 8 + 8 - 1 do
-      M.setTile(world, { x = x, y = y }, 'rock')
+      ---@type { tile: WorldTile, weight: number }
+      local tile = require('Util').weightedRandom(weightTable)
+      M.setTile(world, { x = x, y = y }, tile.tile)
     end
   end
 end

@@ -123,7 +123,7 @@ local function loadFont(data, charWidth, charHeight, isBold)
 end
 
 -- Adapted from <https://www.reddit.com/r/lua/comments/8t0mlf/methods_for_weighted_random_picks/>
----@generic T
+---@generic T: { weight: number }
 ---@param pool T[]
 ---@return T
 local function weightedRandom (pool)
