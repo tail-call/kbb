@@ -155,10 +155,23 @@ function M.revealVisionSourceFog(world, visionSource, light, dt)
 end
 
 ---@param world World
+---@param pos Vector
+---@return Patch
+function M.patchAt(world, pos)
+  return require('Patch').new {
+    world = world,
+    coords = {
+      x = math.floor(pos.x / 8),
+      y = math.floor(pos.y / 8),
+    },
+  }
+end
+
+---@param world World
 ---@param patch Patch
 function M.randomizePatch(world, patch)
-  for y = patch.coords.y, patch.coords.y + 8 do
-    for x = patch.coords.x, patch.coords.x + 8 do
+  for y = patch.coords.y * 8, patch.coords.y * 8 + 8 - 1 do
+    for x = patch.coords.x * 8, patch.coords.x * 8 + 8 - 1 do
       M.setTile(world, { x = x, y = y }, 'rock')
     end
   end

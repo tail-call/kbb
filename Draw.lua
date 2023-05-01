@@ -353,13 +353,7 @@ local function drawGame(game, drawState)
   -- Draw patch highlight
   withColor(0, 0, 0, 1, function ()
     local patchWidth, patchHeight = 8 * TILE_WIDTH, 8 * TILE_HEIGHT
-    local patch = require('Patch').new {
-      world = game.world,
-      coords = {
-        x = math.floor(game.player.pos.x / 8),
-        y = math.floor(game.player.pos.y / 8),
-      }
-    }
+    local patch = require('World').patchAt(game.world, game.player.pos)
     love.graphics.rectangle(
       'line',
       patch.coords.x * patchWidth,

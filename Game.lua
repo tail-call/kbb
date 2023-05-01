@@ -688,6 +688,9 @@ local function handleNormalModeInput(game, scancode)
     orderBuild(game)
   elseif scancode == 'r' then
     orderSummon(game)
+  elseif scancode == 'q' then
+    local patch = require('World').patchAt(game.world, game.player.pos)
+    require('World').randomizePatch(game.world, patch)
   elseif scancode == 'return' then
     M.mut.toggleFocus(game)
   elseif scancode == 't' then
