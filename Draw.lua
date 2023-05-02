@@ -425,14 +425,6 @@ local function drawGame(game, drawState)
     withColor(fog, fog, fog, 1, cb)
   end
 
-  -- Draw texts
-
-  for _, text in ipairs(game.texts) do
-    cullAndShade(text, function ()
-      textAtTile(text.text, text.pos, text.maxWidth)
-    end)
-  end
-
   -- Draw entities
 
   for _, entity in ipairs(game.entities) do
@@ -445,6 +437,11 @@ local function drawGame(game, drawState)
       ---@cast entity Battle
       cullAndShade(entity, function ()
         drawBattle(drawState, entity)
+      end)
+    elseif entity.__module == 'Text' then
+      ---@cast entity Text
+      cullAndShade(entity, function ()
+        textAtTile(entity.text, entity.pos, entity.maxWidth)
       end)
     end
   end

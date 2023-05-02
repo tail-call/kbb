@@ -1,7 +1,6 @@
----@class Text Text object displayed in the world
+---@class Text: Object2D Text object displayed in the world
 ---@field __module 'Text'
 ---@field text string Text content
----@field pos Vector Position in the world
 ---@field maxWidth number Maximum width of displayed text
 
 local M = require('Module').define(..., 0)

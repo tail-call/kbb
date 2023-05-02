@@ -5,7 +5,6 @@
 ---@class Game
 ---@field world World Game world
 ---@field resources Resources Resources player may spend on upgrades
----@field texts Text[] Text objects in the game world
 ---@field entities Object2D[] Things in the game world
 ---@field deathsCount number Number of times player has died
 ---@field guys Guy[] Guys aka units
@@ -30,7 +29,6 @@
 ---@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
 ---@field setGuyFrozen fun(self: Game, guy: Guy, state: boolean) Unfreezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
----@field addText fun(self: Game, text: Text) Adds the text in the game world
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
 ---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
@@ -126,9 +124,6 @@ M.mut = require('Mutator').new {
         setTile(self.world, guy.pos, 'sand')
       end
     end
-  end,
-  addText = function (self, text)
-    table.insert(self.texts, text)
   end,
   addEntity = function (self, entity)
     table.insert(self.entities, entity)
@@ -322,7 +317,6 @@ function M.init(game)
   game.cursorPos = game.cursorPos or { x = 0, y = 0 }
   game.magnificationFactor = game.magnificationFactor or 1
   game.isFocused = false
-  game.texts = game.texts or {}
 
   game.uiModel = require('UIModel').new(game)
   game.ui = M.makeUIScript(game)
