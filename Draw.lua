@@ -374,35 +374,38 @@ local function drawGame(game, drawState)
   local drawn = {}
 
   -- TODO: sort all visible objects before drawing
-  local guysClone = tbl.iclone(game.guys)
-  table.sort(guysClone, function (g1, g2)
+  local entitiesClone = tbl.iclone(game.entities)
+  table.sort(entitiesClone, function (g1, g2)
     return g1.pos.y < g2.pos.y
   end)
 
   -- Draw lines between player and units
-  for guy in pairs(game.squad.followers) do
-    local guyHealth = guy.stats.hp / guy.stats.maxHp
-    withColor(1, guyHealth, guyHealth, 0.5, function ()
+  for entity in pairs(game.squad.followers) do
+    if entity.__module == 'Guy' then
+      ---@cast entity Guy
+      local guyHealth = entity.stats.hp / entity.stats.maxHp
+      withColor(1, guyHealth, guyHealth, 0.5, function ()
 
-      if not game.squad.shouldFollow then
-        love.graphics.setColor(0.3, 0.3, 0.4, 0.5)
-      end
+        if not game.squad.shouldFollow then
+          love.graphics.setColor(0.3, 0.3, 0.4, 0.5)
+        end
 
-      local playerX, playerY = game.player.pixie.transform:transformPoint(8, 16)
-      local guyX, guyY = guy.pixie.transform:transformPoint(8, 16)
+        local playerX, playerY = game.player.pixie.transform:transformPoint(8, 16)
+        local guyX, guyY = entity.pixie.transform:transformPoint(8, 16)
 
-      love.graphics.line(
-        playerX, playerY,
-        guyX, guyY
-      )
-      love.graphics.ellipse(
-        'line',
-        guyX,
-        guyY,
-        TILE_WIDTH / 1.9,
-        TILE_HEIGHT / 8
-      )
-    end)
+        love.graphics.line(
+          playerX, playerY,
+          guyX, guyY
+        )
+        love.graphics.ellipse(
+          'line',
+          guyX,
+          guyY,
+          TILE_WIDTH / 1.9,
+          TILE_HEIGHT / 8
+        )
+      end)
+    end
   end
 
   -- Draw visible objects
@@ -443,25 +446,27 @@ local function drawGame(game, drawState)
       cullAndShade(entity, function ()
         textAtTile(entity.text, entity.pos, entity.maxWidth)
       end)
+    elseif entity.__module == 'Guy' then
+      ---@cast entity Guy
+      if not isFrozen(game, entity) then
+        cullAndShade(entity, function ()
+          drawGuy(entity)
+        end)
+      end
     end
   end
 
   -- Draw guys
 
-  for _, guy in ipairs(guysClone) do
-    if not isFrozen(game, guy) then
-      cullAndShade(guy, function ()
-        drawGuy(guy)
-      end)
-    end
+  for _, guy in ipairs(entitiesClone) do
   end
 
   -- Draw recruit circle
 
   if game.recruitCircle.radius then
     drawRecruitCircle(game.cursorPos, game.recruitCircle.radius)
-    for _, guy in tbl.ifilter(game.guys, function (guy)
-      return mayRecruit(game, guy)
+    for _, guy in tbl.ifilter(game.entities, function (entity)
+      return mayRecruit(game, entity)
     end) do
       recruitableHighlight(guy.pos)
     end
@@ -528,11 +533,15 @@ local function drawGame(game, drawState)
       love.graphics.print('    S    ', 0, 64)
     end)
 
-    -- Units
-    for _, guy in ipairs(game.guys) do
-      local color = guy.pixie.color
-      local pointX = guy.pos.x - 1 - offsetX
-      local pointY = guy.pos.y - 1 - offsetY
+    -- Entities
+    for _, entity in ipairs(game.entities) do
+      local color = { 0.5, 0.5, 0.5, 1 }
+      if entity.__module == 'Guy' then
+        ---@cast entity Guy
+        color = entity.pixie.color
+      end
+      local pointX = entity.pos.x - 1 - offsetX
+      local pointY = entity.pos.y - 1 - offsetY
       if pointX >= 0
         and pointX < MINIMAP_SIZE
         and pointY >= 0

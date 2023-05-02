@@ -1,10 +1,9 @@
 ---@alias GuyTeam 'good' | 'evil' | 'neutral'
 
----@class Guy
----@field pos Vector Guy's position in the world
+---@class Guy: Object2D
 ---@field mayMove boolean True if may move
 ---@field name string Guy's name
----@field team GuyTeam
+---@field team GuyTeam Guy's team
 ---@field pixie Pixie Graphical representation of the guy
 ---@field stats GuyStats RPG stats
 ---@field timer number Movement timer
@@ -20,7 +19,7 @@
 ---@field rename fun(self: Guy, name: string) Gives the guy a different name
 ---@field reteam fun(self: Guy, team: GuyTeam) Switches team of the guy
 
----@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: Object2D | nil }
+---@alias CollisionInfo { type: 'entity' | 'terrain' | 'none', entity: Object2D | nil }
 
 local M = require('Module').define(..., 0)
 
@@ -98,20 +97,23 @@ function M.moveGuy(guy, vec, delegate)
     if collision.type == 'none' then
       M.mut.move(guy, pos)
       return pos
-    elseif collision.type == 'guy' then
-      if checkIfRivals(guy.team, collision.guy.team) then
-        M.mut.move(guy, pos)
-        delegate.beginBattle(guy, collision.guy)
-        return pos
-      end
     elseif collision.type == 'entity' then
-      if collision.entity.type == 'building' then
-        local entity = collision.entity
-        ---@cast entity Building
-        local shouldMove = delegate.enterHouse(guy, entity)
-        if shouldMove == 'shouldMove' then
-          M.mut.move(guy, pos)
-          return pos
+      local entity = collision.entity
+      if entity ~= nil then
+        if entity.__module == 'Building' then
+          ---@cast entity Building
+          local shouldMove = delegate.enterHouse(guy, entity)
+          if shouldMove == 'shouldMove' then
+            M.mut.move(guy, pos)
+            return pos
+          end
+        elseif collision.entity.__module == 'Guy' then
+          ---@cast entity Guy
+          if checkIfRivals(guy.team, collision.entity.team) then
+            M.mut.move(guy, pos)
+            delegate.beginBattle(guy, entity)
+            return pos
+          end
         end
       end
     end

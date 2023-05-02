@@ -18,7 +18,7 @@ function M.new(game, collider)
       if guy.team ~= 'good' then
         return 'shouldNotMove'
       end
-      require('GuysStats').mut.setMaxHp(guy.stats, guy.stats.maxHp + 1)
+      require('GuyStats').mut.setMaxHp(guy.stats, guy.stats.maxHp + 1)
       require('Game').mut.removeEntity(game, building)
       return 'shouldMove'
     end,

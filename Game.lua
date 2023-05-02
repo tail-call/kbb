@@ -7,7 +7,6 @@
 ---@field resources Resources Resources player may spend on upgrades
 ---@field entities Object2D[] Things in the game world
 ---@field deathsCount number Number of times player has died
----@field guys Guy[] Guys aka units
 ---@field guyDelegate GuyDelegate Object that talks to guys
 ---@field squad Squad A bunch of guys that follows player's movement
 ---@field player Guy A guy controlled by the player
@@ -21,18 +20,17 @@
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field fogOfWarTimer number
----@field frozenGuys { [Guy]: true } Guys that should be not rendered and should not behave
+---@field frozenEntities { [Object2D]: true } Entities that should be not rendered and should not behave
 
 ---@class GameMutator
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field addScore fun(self: Game, count: integer) Increases score count
----@field addGuy fun(self: Game, guy: Guy) Adds a guy into the world
----@field setGuyFrozen fun(self: Game, guy: Guy, state: boolean) Unfreezes a guy
----@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
+---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
 ---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
+---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
 ---@field toggleFocus fun(self: Game) Toggles focus mode
 ---@field disableFocus fun(self: Game) Turns focus mode off
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
@@ -52,7 +50,7 @@ local Vector = require('Vector')
 local maybeDrop = require('tbl').maybeDrop
 local updateConsole = require('Console').updateConsole
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
-local isGuyAFollower = require('Squad').isGuyAFollower
+local isAFollower = require('Squad').isAFollower
 local makeGuyDelegate = require('GuyDelegate').new
 local revealFogOfWar = require('World').revealVisionSourceFog
 local skyColorAtTime = require('Util').skyColorAtTime
@@ -105,7 +103,7 @@ M.mut = require('Mutator').new {
   removeGuy = function (self, guy)
     maybeDrop(self.guys, guy)
     removeFromSquad(self.squad, guy)
-    self.frozenGuys[guy] = nil
+    self.frozenEntities[guy] = nil
 
     local tile = getTile(self.world, guy.pos)
 
@@ -125,6 +123,15 @@ M.mut = require('Mutator').new {
       end
     end
   end,
+  addPlayer = function (self, guy)
+    if self.player ~= nil then
+      M.mut.removeEntity(self, self.player)
+      self.player = nil
+    end
+
+    self.player = guy
+    M.mut.addEntity(self, guy)
+  end,
   addEntity = function (self, entity)
     table.insert(self.entities, entity)
   end,
@@ -137,8 +144,8 @@ M.mut = require('Mutator').new {
   removeEntity = function (self, entity)
     maybeDrop(self.entities, entity)
   end,
-  setGuyFrozen = function (self, guy, state)
-    self.frozenGuys[guy] = state or nil
+  setEntityFrozen = function (self, entity, state)
+    self.frozenEntities[entity] = state or nil
   end,
   advanceClock = function (self, dt)
     self.time = (self.time + dt) % (24 * 60)
@@ -160,8 +167,8 @@ M.mut = require('Mutator').new {
     table.insert(self.guys, guy)
   end,
   beginBattle = function (self, attacker, defender)
-    M.mut.setGuyFrozen(self, attacker, true)
-    M.mut.setGuyFrozen(self, defender, true)
+    M.mut.setEntityFrozen(self, attacker, true)
+    M.mut.setEntityFrozen(self, defender, true)
 
     M.mut.addEntity(
       self,
@@ -177,19 +184,10 @@ M.mut = require('Mutator').new {
 
 ---Returns true if guy is marked as frozen
 ---@param game Game
----@param guy Guy
+---@param object Object2D
 ---@return boolean
-function M.isFrozen(game, guy)
-  return game.frozenGuys[guy] or false
-end
-
----@param game Game
----@param pos Vector
----@return Guy | nil
-local function findGuyAtPos(game, pos)
-  return tbl.find(game.guys, function (guy)
-    return Vector.equal(guy.pos, pos)
-  end)
+function M.isFrozen(game, object)
+  return game.frozenEntities[object] or false
 end
 
 ---@param game Game
@@ -296,21 +294,16 @@ end
 function M.init(game)
   local Guy = require('Guy')
 
-  game.guys = game.guys or {
-    Guy.makeLeader(LEADER_SPAWN_LOCATION),
-  }
-
     -- TODO: use load param
   game.world = require('World').new(game.world or {})
   game.score = game.score or 0
-  game.frozenGuys = tbl.weaken({}, 'k')
+  game.frozenEntities = tbl.weaken({}, 'k')
   -- TODO: use load param
   game.resources = require('Resources').new(game.resources or {})
   game.time = game.time or (12 * 60)
   game.entities = game.entities or {}
   game.deathsCount = game.deathsCount or 0
   game.alternatingKeyIndex = 1
-  game.player = game.guys[1]
   game.squad = require('Squad').new {}
   game.recruitCircle = require('RecruitCircle').new {}
   game.fogOfWarTimer = 0
@@ -321,10 +314,6 @@ function M.init(game)
   game.uiModel = require('UIModel').new(game)
   game.ui = M.makeUIScript(game)
   game.guyDelegate = makeGuyDelegate(game, function(self, v)
-    local someoneThere = findGuyAtPos(self, v)
-    if someoneThere then
-      return { type = 'guy', guy = someoneThere }
-    end
     local someEntityThere = findEntityAtPos(self, v)
     if someEntityThere then
       return { type = 'entity', entity = someEntityThere }
@@ -351,6 +340,8 @@ function M.init(game)
     }
   )
 
+  M.mut.addPlayer(game, Guy.makeLeader(LEADER_SPAWN_LOCATION))
+
   -- Subscribe to player stats
   -- TODO: move this into an "addPlayer" function
   do
@@ -361,7 +352,7 @@ function M.init(game)
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then
             local newPlayer = Guy.makeLeader(LEADER_SPAWN_LOCATION)
-            M.mut.addGuy(game, newPlayer)
+            M.mut.addEntity(game, newPlayer)
             --- TODO: mutators
             game.player = newPlayer
             game.deathsCount = game.deathsCount + 1
@@ -372,6 +363,10 @@ function M.init(game)
       )
     end
     listenPlayerDeath()
+  end
+
+  if game.player == nil then
+    error('no player')
   end
 
   return game
@@ -385,14 +380,16 @@ local function isGuyAPlayer(game, guy)
 end
 
 ---@param game Game
----@param guy Guy
+---@param entity Object2D
 ---@return boolean
-function M.mayRecruit(game, guy)
+function M.mayRecruit(game, entity)
+  if not entity.__module == 'Guy' then return false end
+  ---@cast entity Guy
   if not isRecruitCircleActive(game.recruitCircle) then return false end
-  if isGuyAPlayer(game, guy) then return false end
-  if isGuyAFollower(game.squad, guy) then return false end
-  if not canRecruitGuy(guy) then return false end
-  return Vector.dist(guy.pos, game.cursorPos) < game.recruitCircle.radius + 0.5
+  if isGuyAPlayer(game, entity) then return false end
+  if isAFollower(game.squad, entity) then return false end
+  if not canRecruitGuy(entity) then return false end
+  return Vector.dist(entity.pos, game.cursorPos) < game.recruitCircle.radius + 0.5
 end
 
 -- Writers
@@ -412,9 +409,12 @@ end
 
 ---@param game Game
 function M.endRecruiting(game)
-  for _, guy in ipairs(game.guys) do
-    if M.mayRecruit(game, guy) then
-      addToSquad(game.squad, guy)
+  for _, entity in ipairs(game.entities) do
+    if M.mayRecruit(game, entity) then
+      if entity.__module == 'Guy' then
+        ---@cast entity Guy
+        addToSquad(game.squad, entity)
+      end
     end
   end
   startFollowing(game.squad)
@@ -432,23 +432,23 @@ end
 
 ---@param game Game
 local function orderGather(game)
-  for guy in pairs(game.squad.followers) do
-    if not M.isFrozen(game, guy) then
+  for entity in pairs(game.squad.followers) do
+    if not M.isFrozen(game, entity) then
       local destination = { x = 0, y = 0 }
-      local guyDist = Vector.dist(guy.pos, game.player.pos)
+      local guyDist = Vector.dist(entity.pos, game.player.pos)
       for _, direction in ipairs{
         Vector.dir.up,
         Vector.dir.down,
         Vector.dir.left,
         Vector.dir.right,
       } do
-        local pos = Vector.add(direction, guy.pos)
+        local pos = Vector.add(direction, entity.pos)
         local posDist = Vector.dist(game.player.pos, pos)
         if posDist < guyDist then
           destination = direction
         end
       end
-      moveGuy(guy, destination, game.guyDelegate)
+      moveGuy(entity, destination, game.guyDelegate)
     end
   end
 end
@@ -465,7 +465,7 @@ local function die(guy, game, mut, battle)
     mut.addScore(game, SCORES_TABLE.killedAnEnemy)
   end
 
-  mut.removeGuy(game, guy)
+  mut.removeEntity(game, guy)
   mut.removeEntity(game, battle)
 end
 
@@ -540,22 +540,25 @@ function M.updateGame(game, dt, movementDirections)
           die(entity.defender, game, M.mut, entity)
         end
 
-        M.mut.setGuyFrozen(game, entity.attacker, false)
-        M.mut.setGuyFrozen(game, entity.defender, false)
+        M.mut.setEntityFrozen(game, entity.attacker, false)
+        M.mut.setEntityFrozen(game, entity.defender, false)
       end)
     end
   end
 
-  for _, guy in ipairs(game.guys) do
-    if getTile(game.world, guy.pos) == 'forest' then
-      updateGuy(guy, dt / 2)
-    elseif getTile(game.world, guy.pos) == 'void' then
-      updateGuy(guy, dt / 8)
-    else
-      updateGuy(guy, dt)
-    end
-    if not M.isFrozen(game, guy) then
-      behave(guy, game.guyDelegate)
+  for _, entity in ipairs(game.entities) do
+    if entity.__module == 'Guy' then
+      ---@cast entity Guy
+      if getTile(game.world, entity.pos) == 'forest' then
+        updateGuy(entity, dt / 2)
+      elseif getTile(game.world, entity.pos) == 'void' then
+        updateGuy(entity, dt / 8)
+      else
+        updateGuy(entity, dt)
+      end
+      if not M.isFrozen(game, entity) then
+        behave(entity, game.guyDelegate)
+      end
     end
   end
 end
@@ -574,14 +577,14 @@ local function maybeCollect(game, guy)
   if tile == 'forest' then
     addResources(game.resources, { wood = 1 })
     setTile(game.world, pos, 'grass')
-    M.mut.addGuy(game, Guy.makeEvilGuy {
+    M.mut.addEntity(game, Guy.makeEvilGuy {
       x = patchCenterX,
       y = patchCenterY,
     })
   elseif tile == 'rock' then
     addResources(game.resources, { stone = 1 })
     setTile(game.world, pos, 'cave')
-    M.mut.addGuy(game, Guy.makeStrongEvilGuy {
+    M.mut.addEntity(game, Guy.makeStrongEvilGuy {
       x = patchCenterX,
       y = patchCenterY,
     })
@@ -644,7 +647,7 @@ local function orderSummon(game)
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
   local guy = require('Guy').makeGoodGuy(game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
-  M.mut.addGuy(game, guy)
+  M.mut.addEntity(game, guy)
   addToSquad(game.squad, guy)
 end
 
@@ -656,9 +659,7 @@ local function handleFocusModeInput(game, scancode, key)
   -- TODO: use mutator
   game.uiModel = require('UIModel').new(game)
   game.ui = require('Game').makeUIScript(game)
-  game.player = require('Guy').new(game.player)
-  game.guys[1] = game.player
-  echo(game, 'recreated uiModel, ui, and player')
+  echo(game, 'recreated uiModel and ui')
 end
 
 ---@param game Game

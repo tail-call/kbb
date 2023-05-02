@@ -36,10 +36,10 @@ function M.init(squad)
 end
 
 ---@param squad Squad
----@param guy Guy
+---@param entity Guy
 ---@return boolean
-function M.isGuyAFollower(squad, guy)
-  return squad.followers[guy] or false
+function M.isAFollower(squad, entity)
+  return squad.followers[entity] or false
 end
 
 return M
