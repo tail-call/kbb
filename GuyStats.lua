@@ -7,7 +7,7 @@
 
 ---@class GuyStatsMutator: Mutator
 ---@field hurt fun(self: GuyStats, damage: number) Decreases health points
----@field heal fun(self: GuyStats) Sets health points eqal max health points
+---@field heal fun(self: GuyStats, amount: number) Heals a specified amount of damage
 ---@field setMaxHp fun(self: GuyStats, maxHp: number) Sets maximum health points and fully heals
 ---@field addMoves fun(self: GuyStats, amount: number) Adds moves
 
@@ -20,8 +20,8 @@ M.mut = require('Mutator').new {
   hurt = function (self, damage)
     self.hp = self.hp - damage
   end,
-  heal = function (self)
-    self.hp = self.hp + self.maxHp
+  heal = function (self, amount)
+    self.hp = math.min(self.hp + amount, self.maxHp)
   end,
   setMaxHp = function (self, maxHp)
     self.hp = maxHp

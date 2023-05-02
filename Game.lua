@@ -81,6 +81,7 @@ local LEADER_SPAWN_LOCATION = { x = 250, y = 250 }
 local SCORES_TABLE = {
   killedAnEnemy = 100,
   builtAHouse = 500,
+  dead = -1000,
 }
 
 local MOVE_COSTS_TABLE = {
@@ -370,8 +371,10 @@ function M.init(game)
           if key == 'hp' and value <= 0 then
             local newPlayer = Guy.makeLeader(LEADER_SPAWN_LOCATION)
             M.mut.addGuy(game, newPlayer)
+            --- TODO: mutators
             game.player = newPlayer
             game.deathsCount = game.deathsCount + 1
+            M.mut.addScore(game, SCORES_TABLE.dead)
             listenPlayerDeath()
           end
         end
@@ -589,7 +592,7 @@ local function maybeCollect(game, guy)
     })
   elseif tile == 'rock' then
     addResources(game.resources, { stone = 1 })
-    setTile(game.world, pos, 'sand')
+    setTile(game.world, pos, 'cave')
     M.mut.addGuy(game, Guy.makeStrongEvilGuy {
       x = patchCenterX,
       y = patchCenterY,
@@ -597,6 +600,7 @@ local function maybeCollect(game, guy)
   elseif tile == 'grass' then
     addResources(game.resources, { grass = 1 })
     setTile(game.world, pos, 'sand')
+    require('GuyStats').mut.heal(guy.stats, 1)
   elseif tile == 'water' then
     addResources(game.resources, { water = 1 })
     setTile(game.world, pos, 'sand')
@@ -647,7 +651,6 @@ end
 
 ---@param game Game
 local function orderSummon(game)
-  local tileset = require('Tileset').getTileset()
   if game.resources.pretzels <= 0 then return end
   if game.player.stats.moves <= MOVE_COSTS_TABLE.summon then return end
 

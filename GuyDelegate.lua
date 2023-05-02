@@ -4,7 +4,7 @@
 ---@field enterHouse fun(guest: Guy, entity: GameEntity_Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
 
 local isAtFullHealth = require('GuyStats').isAtFullHealth
-local heal = require('GuyStats').mut.heal
+local setMaxHp = require('GuyStats').mut.setMaxHp
 
 local M = require('Module').define(..., 0)
 
@@ -18,10 +18,10 @@ function M.new(game, collider)
       require('Game').mut.beginBattle(game, attacker, defender)
     end,
     enterHouse = function (guy, entity)
-      if isAtFullHealth(guy.stats) then
+      if guy.team ~= 'good' then
         return 'shouldNotMove'
       end
-      heal(guy.stats)
+      setMaxHp(guy.stats, guy.stats.maxHp + 1)
       require('Game').mut.removeEntity(game, entity)
       return 'shouldMove'
     end,
