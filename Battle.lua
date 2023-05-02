@@ -1,9 +1,8 @@
 ---A representation of a battle between units
----@class Battle
+---@class Battle: Object2D
 ---@field __module "Battle"
 ---@field attacker Guy Who initiated the battle
 ---@field defender Guy Who was attacked
----@field pos Vector Battle's location
 ---@field timer number Time before current round finishes
 ---@field round number Current round number
 

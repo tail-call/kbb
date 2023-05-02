@@ -1,3 +1,9 @@
+---@class Object
+---@field __module string
+
+---@class Object2D: Object
+---@field pos Vector
+
 local M = require('Module').define(..., 0)
 
 local rescuedCallbacks = {}

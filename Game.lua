@@ -6,7 +6,7 @@
 ---@field world World Game world
 ---@field resources Resources Resources player may spend on upgrades
 ---@field texts Text[] Text objects in the game world
----@field entities { pos: Vector }[] Things in the game world
+---@field entities Object2D[] Things in the game world
 ---@field deathsCount number Number of times player has died
 ---@field guys Guy[] Guys aka units
 ---@field guyDelegate GuyDelegate Object that talks to guys
@@ -31,8 +31,8 @@
 ---@field setGuyFrozen fun(self: Game, guy: Guy, state: boolean) Unfreezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
----@field addEntity fun(self: Game, entity: { pos: Vector }) Adds an entity to the world
----@field removeEntity fun(self: Game, entity: { pos: Vector }) Adds a building to the world
+---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
+---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 ---@field toggleFocus fun(self: Game) Toggles focus mode
@@ -619,7 +619,7 @@ local function orderBuild(game)
 
   -- Check if no other entities
   for _, entity in ipairs(game.entities) do
-    if Vector.equal(entity.object.pos, pos) then
+    if Vector.equal(entity.pos, pos) then
       return
     end
   end

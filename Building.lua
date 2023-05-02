@@ -1,7 +1,6 @@
 ---A representation of a building
----@class Building
+---@class Building: Object2D
 ---@field __module "Building"
----@field pos Vector Building's position
 
 local M = require('Module').define(..., 0)
 

@@ -20,7 +20,7 @@
 ---@field rename fun(self: Guy, name: string) Gives the guy a different name
 ---@field reteam fun(self: Guy, team: GuyTeam) Switches team of the guy
 
----@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: GameEntity | nil }
+---@alias CollisionInfo { type: 'entity' | 'guy' | 'terrain' | 'none', guy: Guy | nil, entity: Object2D | nil }
 
 local M = require('Module').define(..., 0)
 
@@ -107,10 +107,8 @@ function M.moveGuy(guy, vec, delegate)
     elseif collision.type == 'entity' then
       if collision.entity.type == 'building' then
         local entity = collision.entity
-        ---@cast entity any
-        local sameEntity = entity
-        ---@cast sameEntity GameEntity_Building
-        local shouldMove = delegate.enterHouse(guy, sameEntity)
+        ---@cast entity Building
+        local shouldMove = delegate.enterHouse(guy, entity)
         if shouldMove == 'shouldMove' then
           M.mut.move(guy, pos)
           return pos
