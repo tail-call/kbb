@@ -436,14 +436,15 @@ local function drawGame(game, drawState)
   -- Draw entities
 
   for _, entity in ipairs(game.entities) do
-    if entity.type == 'building' then
-      cullAndShade(entity.object, function ()
-        drawHouse(drawState.tileset, entity.object.pos)
+    if entity.__module == 'Building' then
+      ---@cast entity Building
+      cullAndShade(entity, function ()
+        drawHouse(drawState.tileset, entity.pos)
       end)
-    elseif entity.type == 'battle' then
-      local battle = entity.object
-      cullAndShade(battle, function ()
-        drawBattle(drawState, battle)
+    elseif entity.__module == 'Battle' then
+      ---@cast entity Battle
+      cullAndShade(entity, function ()
+        drawBattle(drawState, entity)
       end)
     end
   end

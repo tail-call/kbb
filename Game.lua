@@ -6,7 +6,7 @@
 ---@field world World Game world
 ---@field resources Resources Resources player may spend on upgrades
 ---@field texts Text[] Text objects in the game world
----@field entities GameEntity[] Things in the game world
+---@field entities { pos: Vector }[] Things in the game world
 ---@field deathsCount number Number of times player has died
 ---@field guys Guy[] Guys aka units
 ---@field guyDelegate GuyDelegate Object that talks to guys
@@ -31,8 +31,8 @@
 ---@field setGuyFrozen fun(self: Game, guy: Guy, state: boolean) Unfreezes a guy
 ---@field removeGuy fun(self: Game, guy: Guy) Removes the guy from the game
 ---@field addText fun(self: Game, text: Text) Adds the text in the game world
----@field addEntity fun(self: Game, entity: GameEntity) Adds an entity to the world
----@field removeEntity fun(self: Game, entity: GameEntity) Adds a building to the world
+---@field addEntity fun(self: Game, entity: { pos: Vector }) Adds an entity to the world
+---@field removeEntity fun(self: Game, entity: { pos: Vector }) Adds a building to the world
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 ---@field toggleFocus fun(self: Game) Toggles focus mode
@@ -140,8 +140,7 @@ M.mut = require('Mutator').new {
     self.isFocused = false
   end,
   removeEntity = function (self, entity)
-    local idx = tbl.indexOf(self.entities, entity)
-    table.remove(self.entities, idx)
+    maybeDrop(self.entities, entity)
   end,
   setGuyFrozen = function (self, guy, state)
     self.frozenGuys[guy] = state or nil
@@ -171,10 +170,9 @@ M.mut = require('Mutator').new {
 
     M.mut.addEntity(
       self,
-      require('GameEntity').makeBattleEntity(
-        require('Battle').new {
+      require('Battle').new {
         attacker = attacker, defender = defender
-      })
+      }
     )
   end,
   setAlternatingKeyIndex = function (self, x)
@@ -201,10 +199,10 @@ end
 
 ---@param game Game
 ---@param pos Vector
----@return GameEntity | nil
+---@return { pos: Vector } | nil
 local function findEntityAtPos(game, pos)
   return tbl.find(game.entities, function (entity)
-    return Vector.equal(entity.object.pos, pos)
+    return Vector.equal(entity.pos, pos)
   end)
 end
 
@@ -302,7 +300,6 @@ end
 ---@param game Game
 function M.init(game)
   local Guy = require('Guy')
-  local tileset = require('Tileset').getTileset()
 
   game.guys = game.guys or {
     Guy.makeLeader(LEADER_SPAWN_LOCATION),
@@ -393,7 +390,6 @@ local function isGuyAPlayer(game, guy)
   return guy == game.player
 end
 
-
 ---@param game Game
 ---@param guy Guy
 ---@return boolean
@@ -440,7 +436,6 @@ local function echo(game, text)
   })
 end
 
-
 ---@param game Game
 local function orderGather(game)
   for guy in pairs(game.squad.followers) do
@@ -467,8 +462,8 @@ end
 ---@param guy Guy
 ---@param game Game
 ---@param mut GameMutator
----@param entity GameEntity_Battle
-local function die(guy, game, mut, entity)
+---@param battle Battle
+local function die(guy, game, mut, battle)
   echo(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
 
   if guy.team == 'evil' then
@@ -477,7 +472,7 @@ local function die(guy, game, mut, entity)
   end
 
   mut.removeGuy(game, guy)
-  mut.removeEntity(game, entity)
+  mut.removeEntity(game, battle)
 end
 
 ---@param game Game -- Game object
@@ -537,23 +532,22 @@ function M.updateGame(game, dt, movementDirections)
 
   M.mut.advanceClock(game, dt)
   for _, entity in ipairs(game.entities) do
-    if entity.type == 'battle' then
-      ---@cast entity GameEntity_Battle
-      local battle = entity.object
-      updateBattle(game, battle, dt, function (text)
+    if entity.__module == 'Battle' then
+      ---@cast entity Battle
+      updateBattle(game, entity, dt, function (text)
         echo(game, text)
       end, function ()
         -- TODO: use events to die
-        if battle.attacker.stats.hp <= 0 then
-          die(battle.attacker, game, M.mut, entity)
+        if entity.attacker.stats.hp <= 0 then
+          die(entity.attacker, game, M.mut, entity)
         end
 
-        if battle.defender.stats.hp <= 0 then
-          die(battle.defender, game, M.mut, entity)
+        if entity.defender.stats.hp <= 0 then
+          die(entity.defender, game, M.mut, entity)
         end
 
-        M.mut.setGuyFrozen(game, battle.attacker, false)
-        M.mut.setGuyFrozen(game, battle.defender, false)
+        M.mut.setGuyFrozen(game, entity.attacker, false)
+        M.mut.setGuyFrozen(game, entity.defender, false)
       end)
     end
   end
@@ -641,9 +635,7 @@ local function orderBuild(game)
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
   M.mut.addEntity(
     game,
-    require('GameEntity').makeBuildingEntity(
-      require('Building').new { pos = pos }
-    )
+    require('Building').new { pos = pos }
   )
   M.mut.addScore(game, SCORES_TABLE.builtAHouse)
   M.mut.disableFocus(game)

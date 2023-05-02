@@ -33,6 +33,9 @@ function M.define(name, version)
     ---@return T
     new = function (bak)
       local obj = module.migrate(bak or {})
+      if obj == nil then
+        error('migate must return a value')
+      end
       obj.__module = name
       obj.__version = version
       module.init(obj, function (moduleName, dep)
