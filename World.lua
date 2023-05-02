@@ -171,13 +171,34 @@ function M.randomizePatch(world, patch)
     tile = 'rock',
   }, {
     weight = math.random(1, 100),
+    tile = 'sand',
+  }, {
+    weight = math.random(1, 100),
     tile = 'forest',
+  }, {
+    weight = math.random(1, 60),
+    tile = 'water',
+  }, {
+    weight = math.random(1, 3),
+    tile = 'snow',
+  }, {
+    weight = math.random(1, 2),
+    tile = 'cave',
+  }, {
+    weight = math.random(1, 1),
+    tile = 'wall',
   }}
   for y = patch.coords.y * 8, patch.coords.y * 8 + 8 - 1 do
     for x = patch.coords.x * 8, patch.coords.x * 8 + 8 - 1 do
-      ---@type { tile: WorldTile, weight: number }
+      local tileAbove = M.getTile(world, { x = x, y = y - 1 })
+      local tileToTheLeft = M.getTile(world, { x = x - 1, y = y })
+
       local tile = require('Util').weightedRandom(weightTable)
       M.setTile(world, { x = x, y = y }, tile.tile)
+
+      if tileAbove == tileToTheLeft and tileAbove ~= 'void' then
+        M.setTile(world, { x = x, y = y }, tileAbove or 'grass')
+      end
     end
   end
 end
