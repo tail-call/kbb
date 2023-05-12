@@ -115,8 +115,7 @@ function M.keypressed(key, scancode, isrepeat)
 
       file:write('-- This is a Kobold Princess Simulator v0.2 savefile. You should not run it.\n')
       file:write('-- It was created at ' .. os.date() .. '\n')
-      file:write('return ')
-      
+
       file:write(require('Util').dump(game))
       file:close()
     end

@@ -217,7 +217,7 @@ local function dump(obj)
     end
   end
 
-  local result = {}
+  local result = {'return '}
   exhaust(driver, function(part)
     table.insert(result, part or '')
   end, obj)
