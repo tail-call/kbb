@@ -101,6 +101,19 @@ local function imap(items, mapper)
   return itemsClone
 end
 
+---@generic K, V
+---@param items { [K]: V }
+---@return { [V]: K }
+local function invert(items)
+  local result = {}
+
+  for k, v in pairs(items) do
+    result[v] = k
+  end
+
+  return result
+end
+
 return {
   find = find,
   iclone = iclone,
@@ -111,4 +124,5 @@ return {
   indexOf = indexOf,
   weaken = weaken,
   maybeDrop = maybeDrop,
+  invert = invert,
 }
