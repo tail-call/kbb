@@ -194,6 +194,7 @@ local function dump(object)
       coroutine.yield(string.format('%q', obj))
       endRecord(obj)
     elseif type(obj) == 'table' then
+      -- TODO: use metatables
       if obj.__dump then
         beginRecord()
         obj.__dump(coroutine.yield)
