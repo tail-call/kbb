@@ -164,38 +164,71 @@ local function skyColorAtTime(time)
 end
 
 ---Dumps an object to Lua code
----@param obj any
+---@param object any
 ---@return string
-local function dump(obj)
+local function dump(object)
+  local references = {}
+  local lastReference = 0
+
+  local function beginRecord()
+    coroutine.yield(('O[%d] = '):format(lastReference + 1))
+  end
+
+  local function endRecord(obj)
+    lastReference = lastReference + 1
+    references[obj] = lastReference
+  end
+
   ---@param obj any
-  local function driver(obj)
-    if type(obj) == 'number' then
+  local function process(obj)
+    if references[obj] then
+      beginRecord()
+      coroutine.yield(('O[%d]'):format(references[obj]))
+      endRecord(obj)
+    elseif type(obj) == 'number' then
+      beginRecord()
       coroutine.yield(tostring(obj))
+      endRecord(obj)
     elseif type(obj) == 'string' then
+      beginRecord()
       coroutine.yield(string.format('%q', obj))
+      endRecord(obj)
     elseif type(obj) == 'table' then
       if obj.__dump then
+        beginRecord()
         obj.__dump(coroutine.yield)
+        endRecord(obj)
       else
+        -- First dump all dependencies
+        for k, v in pairs(obj) do
+          process(k)
+          process(v)
+        end
+
+        beginRecord()
+
         if obj.__module then
           coroutine.yield(obj.__module)
         end
 
-        coroutine.yield('{\n')
+        coroutine.yield('{')
         for k, v in pairs(obj) do
           if type(k) == 'number' then
-            coroutine.yield('['..k..'\n]')
+            coroutine.yield('['..k..']')
           else
             coroutine.yield(k)
           end
 
           coroutine.yield('=')
-          driver(v)
+          coroutine.yield(('O[%d]'):format(references[v]))
           coroutine.yield(',')
         end
-        coroutine.yield('}\n')
+        coroutine.yield('}')
+
+        endRecord(obj)
       end
     elseif type(obj) == 'userdata' then
+      beginRecord()
       if obj:type() == 'Quad' then
         ---@cast obj love.Quad
         coroutine.yield('quad(')
@@ -206,21 +239,32 @@ local function dump(obj)
       else
         coroutine.yield(obj:type())
       end
+      endRecord(obj)
     elseif type(obj) == 'function' then
+      beginRecord()
       coroutine.yield('\'' .. tostring(obj) .. '\'')
+      endRecord(obj)
     elseif type(obj) == 'boolean' then
+      beginRecord()
       coroutine.yield(tostring(obj))
+      endRecord(obj)
     elseif type(obj) == 'nil' then
+      beginRecord()
       coroutine.yield('nil')
+      endRecord(obj)
     else
       error(type(obj))
     end
+    coroutine.yield('\n')
   end
 
-  local result = {'return '}
-  exhaust(driver, function(part)
+  local result = { 'local O = {}\n' }
+  exhaust(process, function(part)
     table.insert(result, part or '')
-  end, obj)
+  end, object)
+
+  table.insert(result, 'return O[#O]')
+
   return table.concat(result)
 end
 

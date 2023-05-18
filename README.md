@@ -10,6 +10,8 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 # Plan
 
+ - [x] Don't serialize same object twice
+
 ## Quality of life
 
  - [ ] Focus mode is a scene
@@ -18,7 +20,6 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Path finding
  - [ ] Timer type
  - [ ] Tile/object info window near pointer
- - [ ] Don't serialize same object twice
  - [ ] Savefile: index strings and object keys
  - [ ] Console command history
  - [ ] Use meshes and vertex shading for smooth fog of war
