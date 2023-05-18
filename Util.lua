@@ -179,26 +179,32 @@ local function dump(object)
     references[obj] = lastReference
   end
 
+  local function withRecord(obj, cb)
+    beginRecord()
+    cb()
+    endRecord(obj)
+  end
+
   ---@param obj any
   local function process(obj)
     if references[obj] then
-      beginRecord()
-      coroutine.yield(('O[%d]'):format(references[obj]))
-      endRecord(obj)
+      withRecord(obj, function ()
+        coroutine.yield(('O[%d]'):format(references[obj]))
+      end)
     elseif type(obj) == 'number' then
-      beginRecord()
-      coroutine.yield(tostring(obj))
-      endRecord(obj)
+      withRecord(obj, function ()
+        coroutine.yield(tostring(obj))
+      end)
     elseif type(obj) == 'string' then
-      beginRecord()
-      coroutine.yield(string.format('%q', obj))
-      endRecord(obj)
+      withRecord(obj, function ()
+        coroutine.yield(string.format('%q', obj))
+      end)
     elseif type(obj) == 'table' then
       -- TODO: use metatables
       if obj.__dump then
-        beginRecord()
-        obj.__dump(coroutine.yield)
-        endRecord(obj)
+        withRecord(obj, function ()
+          obj.__dump(coroutine.yield)
+        end)
       else
         -- First dump all dependencies
         for k, v in pairs(obj) do
@@ -206,53 +212,52 @@ local function dump(object)
           process(v)
         end
 
-        beginRecord()
-
-        if obj.__module then
-          coroutine.yield(obj.__module)
-        end
-
-        coroutine.yield('{')
-        for k, v in pairs(obj) do
-          if type(k) == 'number' then
-            coroutine.yield('['..k..']')
-          else
-            coroutine.yield(k)
+        withRecord(obj, function ()
+          if obj.__module then
+            coroutine.yield(obj.__module)
           end
 
-          coroutine.yield('=')
-          coroutine.yield(('O[%d]'):format(references[v]))
-          coroutine.yield(',')
-        end
-        coroutine.yield('}')
+          coroutine.yield('{')
+          for k, v in pairs(obj) do
+            if type(k) == 'number' then
+              coroutine.yield('['..k..']')
+            else
+              coroutine.yield(k)
+            end
 
-        endRecord(obj)
+            coroutine.yield('=')
+            coroutine.yield(('O[%d]'):format(references[v]))
+            coroutine.yield(',')
+          end
+
+          coroutine.yield('}')
+        end)
       end
     elseif type(obj) == 'userdata' then
-      beginRecord()
-      if obj:type() == 'Quad' then
-        ---@cast obj love.Quad
-        coroutine.yield('quad(')
-        local x, y, w, h = obj:getViewport()
-        local sw, sh = obj:getTextureDimensions()
-        coroutine.yield(('%s,%s,%s,%s,%s,%s'):format(x, y, w, h, sw, sh))
-        coroutine.yield(')')
-      else
-        coroutine.yield(obj:type())
-      end
-      endRecord(obj)
+      withRecord(obj, function ()
+        if obj:type() == 'Quad' then
+          ---@cast obj love.Quad
+          coroutine.yield('quad(')
+          local x, y, w, h = obj:getViewport()
+          local sw, sh = obj:getTextureDimensions()
+          coroutine.yield(('%s,%s,%s,%s,%s,%s'):format(x, y, w, h, sw, sh))
+          coroutine.yield(')')
+        else
+          coroutine.yield(obj:type())
+        end
+      end)
     elseif type(obj) == 'function' then
-      beginRecord()
-      coroutine.yield('\'' .. tostring(obj) .. '\'')
-      endRecord(obj)
+      withRecord(obj, function ()
+        coroutine.yield('\'' .. tostring(obj) .. '\'')
+      end)
     elseif type(obj) == 'boolean' then
-      beginRecord()
-      coroutine.yield(tostring(obj))
-      endRecord(obj)
+      withRecord(obj, function ()
+        coroutine.yield(tostring(obj))
+      end)
     elseif type(obj) == 'nil' then
-      beginRecord()
-      coroutine.yield('nil')
-      endRecord(obj)
+      withRecord(obj, function ()
+        coroutine.yield('nil')
+      end)
     else
       error(type(obj))
     end
