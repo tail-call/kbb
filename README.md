@@ -12,6 +12,11 @@ You have psy abilities, so your cursor has FOV just like you do.
 
  - [x] Don't serialize same object twice
 
+## Bugs
+
+ - [ ] Dead guys are not deleted from the squad
+ - [ ] Player always respawns in the same spot
+
 ## Quality of life
 
  - [ ] Focus mode is a scene

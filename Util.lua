@@ -183,6 +183,7 @@ local function dump(object)
     beginRecord()
     cb()
     endRecord(obj)
+    coroutine.yield('\n')
   end
 
   ---@param obj any
@@ -261,7 +262,6 @@ local function dump(object)
     else
       error(type(obj))
     end
-    coroutine.yield('\n')
   end
 
   local result = { 'local O = {}\n' }
