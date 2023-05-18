@@ -170,19 +170,11 @@ local function dump(object)
   local references = {}
   local lastReference = 0
 
-  local function beginRecord()
+  local function withRecord(obj, cb)
     coroutine.yield(('O[%d] = '):format(lastReference + 1))
-  end
-
-  local function endRecord(obj)
+    cb()
     lastReference = lastReference + 1
     references[obj] = lastReference
-  end
-
-  local function withRecord(obj, cb)
-    beginRecord()
-    cb()
-    endRecord(obj)
     coroutine.yield('\n')
   end
 
