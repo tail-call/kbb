@@ -17,8 +17,6 @@ local M = require('Module').define{..., version = 0, metatable = {
   }
 }}
 
-local fadeOut = require('ConsoleMessage').mut.fadeOut
-
 ---@param console Console
 function M.init(console)
   console.messages = console.messages or {}
@@ -28,7 +26,7 @@ end
 ---@param dt number
 function M.updateConsole(console, dt)
   for _, message in ipairs(console.messages) do
-    fadeOut(message, dt)
+    message:fadeOut(dt)
   end
 end
 
