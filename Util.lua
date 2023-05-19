@@ -201,8 +201,10 @@ local function dump(object)
       else
         -- First dump all dependencies
         for k, v in pairs(obj) do
-          process(k)
-          process(v)
+          if type(v) ~= 'boolean' then
+            process(k)
+            process(v)
+          end
         end
 
         withRecord(obj, function ()
@@ -219,7 +221,11 @@ local function dump(object)
             end
 
             coroutine.yield('=')
-            coroutine.yield(('O[%d]'):format(references[v]))
+            if type(v) == 'boolean' then
+              coroutine.yield(v and 'true' or 'false')
+            else
+              coroutine.yield(('O[%d]'):format(references[v]))
+            end
             coroutine.yield(',')
           end
 
@@ -244,6 +250,7 @@ local function dump(object)
         coroutine.yield('\'' .. tostring(obj) .. '\'')
       end)
     elseif type(obj) == 'boolean' then
+      error('bolen')
       withRecord(obj, function ()
         coroutine.yield(tostring(obj))
       end)
