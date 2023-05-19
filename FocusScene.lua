@@ -1,4 +1,4 @@
-local M = require 'Module'.define(..., 0)
+local M = require 'Module'.define{..., version = 0}
 
 local withColor = require('Util').withColor
 
