@@ -8,8 +8,12 @@ You're a magical kobold princess. You lead your tribe to the prosperity.
 
 You have psy abilities, so your cursor has FOV just like you do.
 
+Game is an editable image.
+
 # Plan
 
+ - [x] Use package.preload to load resources
+ - [x] Draw current patch only
  - [x] Don't serialize same object twice
  - [x] Timer type
  - [x] Drop GameEntity class: I already have type markers in my objects
@@ -22,9 +26,11 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 ## Quality of life
 
+ - [ ] Tile paint mode
  - [ ] Focus mode is a scene
  - [ ] Event system
  - [ ] Path finding
+ - [ ] Use normal methods in all modules
  - [ ] Tile/object info window near pointer
  - [ ] Savefile: index strings and object keys
  - [ ] Console command history
@@ -44,8 +50,6 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 ## Research
 
- - [x] Use package.preload to load resources
- - [x] Draw current patch only
  - [ ] Random terrain generation in a selected area
  - [ ] Use FFI for huge arrays like fog of war
  - [ ] Try using native code with ffi
@@ -54,6 +58,7 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 ## Game ideas
 
+ - [ ] Paint mode has primitive noise-based terrain generation tools
  - [ ] Guys are *lost* when are in the unexplored area
  - [ ] You can't recruit lost guys
  - [ ] Lost guys despawn after a while
