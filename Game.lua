@@ -19,11 +19,10 @@
 ---@field uiModel UIModel GUI state
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
----@field fogOfWarTimer number
 ---@field frozenEntities { [Object2D]: true } Entities that should be not rendered and should not behave
+---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 
 ---@class GameMutator
----@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field addScore fun(self: Game, count: integer) Increases score count
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
@@ -34,9 +33,6 @@
 ---@field toggleFocus fun(self: Game) Toggles focus mode
 ---@field disableFocus fun(self: Game) Turns focus mode off
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
-
----@type GameModule
-local M = require('Module').define(..., 0)
 
 local canRecruitGuy = require('Guy').canRecruitGuy
 local moveGuy = require('Guy').moveGuy
@@ -87,6 +83,16 @@ local MOVE_COSTS_TABLE = {
 
 local BUILDING_COST = 5
 local FOG_OF_WAR_TIMER_LIMIT = 1/3
+
+---@type GameModule
+local M = require('Module').define{..., version = 0, metatable = {
+  ---@type Game
+  __index = {
+    advanceClock = function (self, dt)
+      self.time = (self.time + dt) % (24 * 60)
+    end,
+  }
+}}
 
 ---@type CollisionInfo
 local NONE_COLLISION = { type = 'none' }
@@ -145,13 +151,6 @@ M.mut = require('Mutator').new {
   end,
   setEntityFrozen = function (self, entity, state)
     self.frozenEntities[entity] = state or nil
-  end,
-  advanceClock = function (self, dt)
-    self.time = (self.time + dt) % (24 * 60)
-    self.fogOfWarTimer = self.fogOfWarTimer + dt
-    if self.fogOfWarTimer > FOG_OF_WAR_TIMER_LIMIT then
-      self.fogOfWarTimer = self.fogOfWarTimer % FOG_OF_WAR_TIMER_LIMIT
-    end
   end,
   nextMagnificationFactor = function (self)
     if self.magnificationFactor == 1 then
@@ -305,7 +304,6 @@ function M.init(game)
   game.alternatingKeyIndex = 1
   game.squad = require('Squad').new {}
   game.recruitCircle = require('RecruitCircle').new {}
-  game.fogOfWarTimer = 0
   game.cursorPos = game.cursorPos or { x = 0, y = 0 }
   game.magnificationFactor = game.magnificationFactor or 1
   game.isFocused = false
@@ -521,7 +519,7 @@ function M.updateGame(game, dt, movementDirections)
 
   -- Handle game logic
 
-  M.mut.advanceClock(game, dt)
+  game:advanceClock(dt)
   for _, entity in ipairs(game.entities) do
     if entity.__module == 'Battle' then
       ---@cast entity Battle
