@@ -178,19 +178,37 @@ local function dump(object)
     coroutine.yield('\n')
   end
 
+  local function isPrimitive(obj)
+    local t = type(obj)
+    return (
+      t == 'boolean'
+      or t == 'function'
+      or t == 'number'
+      or t == 'string'
+      or t == 'nil'
+    )
+  end
+
+  local function dumpPrimitive(obj)
+    local t = type(obj)
+    if t == 'boolean' then
+      return t and 'true' or 'false'
+    elseif t == 'function' then
+      return ('nil--[[%s]]'):format(obj)
+    elseif t == 'number' then
+      return tostring(obj)
+    elseif t == 'string' then
+      return ('%q'):format(obj)
+    elseif t == 'nil' then
+      return 'nil'
+    end
+  end
+
   ---@param obj any
   local function process(obj)
     if references[obj] then
       withRecord(obj, function ()
         coroutine.yield(('O[%d]'):format(references[obj]))
-      end)
-    elseif type(obj) == 'number' then
-      withRecord(obj, function ()
-        coroutine.yield(tostring(obj))
-      end)
-    elseif type(obj) == 'string' then
-      withRecord(obj, function ()
-        coroutine.yield(string.format('%q', obj))
       end)
     elseif type(obj) == 'table' then
       -- TODO: use metatables
@@ -201,8 +219,7 @@ local function dump(object)
       else
         -- First dump all dependencies
         for k, v in pairs(obj) do
-          if type(v) ~= 'boolean' then
-            process(k)
+          if not isPrimitive(v) then
             process(v)
           end
         end
@@ -221,8 +238,8 @@ local function dump(object)
             end
 
             coroutine.yield('=')
-            if type(v) == 'boolean' then
-              coroutine.yield(v and 'true' or 'false')
+            if isPrimitive(v) then
+              coroutine.yield(dumpPrimitive(v))
             else
               coroutine.yield(('O[%d]'):format(references[v]))
             end
@@ -245,21 +262,8 @@ local function dump(object)
           coroutine.yield(obj:type())
         end
       end)
-    elseif type(obj) == 'function' then
-      withRecord(obj, function ()
-        coroutine.yield('\'' .. tostring(obj) .. '\'')
-      end)
-    elseif type(obj) == 'boolean' then
-      error('bolen')
-      withRecord(obj, function ()
-        coroutine.yield(tostring(obj))
-      end)
-    elseif type(obj) == 'nil' then
-      withRecord(obj, function ()
-        coroutine.yield('nil')
-      end)
     else
-      error(type(obj))
+      error(('dump: unsupported type %s of object %s'):format(type(obj), obj))
     end
   end
 

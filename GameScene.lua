@@ -113,7 +113,7 @@ function M.keypressed(key, scancode, isrepeat)
       local file = io.open('./kobo2.kpss', 'w+')
       if file == nil then error('no file') end
 
-      file:write('-- This is a Kobold Princess Simulator v0.3 savefile. You should not run it.\n')
+      file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
       file:write('-- It was created at ' .. os.date() .. '\n')
 
       file:write(require('Util').dump(game))

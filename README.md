@@ -16,6 +16,7 @@ You have psy abilities, so your cursor has FOV just like you do.
 
  - [ ] Dead guys are not deleted from the squad
  - [ ] Player always respawns in the same spot
+ - [ ] Game crashes when saving game if a squad is not empty
 
 ## Quality of life
 
