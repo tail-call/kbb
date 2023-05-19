@@ -8,10 +8,17 @@
 local M = {}
 
 ---@generic T
----@param name string
----@param version number
+---@param name string | table
+---@param version? number
 ---@return T
 function M.define(name, version)
+  local metatable = {}
+
+  if type(name) == 'table' then
+    version = name.version
+    metatable = name.metatable
+  end
+
   local module
   module = {
     mut = {},
@@ -20,7 +27,7 @@ function M.define(name, version)
     ---@param bak T
     ---@param strategy fun(moduleName: string, bak: T)
     init = function (bak, strategy)
-      -- Do nothing
+      return bak
     end,
     deinit = function (bak)
       -- Do nothing
@@ -41,13 +48,16 @@ function M.define(name, version)
       module.init(obj, function (moduleName, dep)
         return require(moduleName).new(dep)
       end)
+      setmetatable(obj, metatable)
       return obj
     end,
     reload = function (obj)
       module.deinit(obj)
-      return module.init(obj, function (moduleName, dep)
+      module.init(obj, function (moduleName, dep)
         require(moduleName).reload(dep)
       end)
+      setmetatable(obj, metatable)
+      return obj
     end,
   }
   return module

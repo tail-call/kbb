@@ -4,11 +4,7 @@
 ---@field messages ConsoleMessage[] List of displayed messages
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
 
-local M = require('Module').define(..., 0)
-
-local fadeOut = require('ConsoleMessage').mut.fadeOut
-
-local meta = {
+local M = require('Module').define{..., version = 0, metatable = {
   ---@type Console
   __index = {
     say = function (self, message)
@@ -19,12 +15,13 @@ local meta = {
       end
     end
   }
-}
+}}
+
+local fadeOut = require('ConsoleMessage').mut.fadeOut
 
 ---@param console Console
 function M.init(console)
   console.messages = console.messages or {}
-  setmetatable(console, meta)
 end
 
 ---@param console Console
