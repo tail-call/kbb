@@ -126,11 +126,11 @@ local function drawBattle(drawState, battle)
     )
   end)
 
-  local isBlink = drawState.battleTimer % 1/4 < 1/16
+  local isBlink = drawState.battleTimer.value % 1/4 < 1/16
 
   if not isBlink then
-    local r = 0.5 + drawState.battleTimer / 2
-    local g = 1 - drawState.battleTimer / 2
+    local r = 0.5 + drawState.battleTimer.value / 2
+    local g = 1 - drawState.battleTimer.value / 2
     local b = 0
     withColor(r, g, b, 1, function ()
       love.graphics.draw(
@@ -273,7 +273,7 @@ local function drawTerrain(observerPos, world, drawState, sky)
   local posX, posY = observerPos.x, observerPos.y
   local visionDistance = 21
   local voidTile = parallaxTile(0, 48, -drawState.camera.x/2, -drawState.camera.y/2)
-  local waterPhase = 16 * math.sin(drawState.waterTimer)
+  local waterPhase = 16 * math.sin(drawState.waterTimer.value)
   local waterTile = parallaxTile(48, 0, -waterPhase, waterPhase)
 
   local vec = { x = 0, y = 0 }

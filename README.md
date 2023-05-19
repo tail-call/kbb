@@ -11,6 +11,7 @@ You have psy abilities, so your cursor has FOV just like you do.
 # Plan
 
  - [x] Don't serialize same object twice
+ - [x] Timer type
 
 ## Bugs
 
@@ -24,7 +25,6 @@ You have psy abilities, so your cursor has FOV just like you do.
  - [ ] Drop GameEntity class: I already have type markers in my objects
  - [ ] Event system
  - [ ] Path finding
- - [ ] Timer type
  - [ ] Tile/object info window near pointer
  - [ ] Savefile: index strings and object keys
  - [ ] Console command history
