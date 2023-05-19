@@ -2,28 +2,29 @@
 ---@class Console
 ---@field __module "Console"
 ---@field messages ConsoleMessage[] List of displayed messages
-
----@class ConsoleMutator
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
 
 local M = require('Module').define(..., 0)
 
 local fadeOut = require('ConsoleMessage').mut.fadeOut
 
----@type ConsoleMutator
-M.mut = require('Mutator').new {
-  say = function (self, message)
-    io.stdout:write(('\tEcho: %s\n'):format(message.text))
-    table.insert(self.messages, message)
-    while #self.messages >= 8 do
-      table.remove(self.messages, 1)
+local meta = {
+  ---@type Console
+  __index = {
+    say = function (self, message)
+      io.stdout:write(('\tEcho: %s\n'):format(message.text))
+      table.insert(self.messages, message)
+      while #self.messages >= 8 do
+        table.remove(self.messages, 1)
+      end
     end
-  end
+  }
 }
 
 ---@param console Console
 function M.init(console)
   console.messages = console.messages or {}
+  setmetatable(console, meta)
 end
 
 ---@param console Console

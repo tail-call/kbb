@@ -59,7 +59,6 @@ local behave = require('Guy').behave
 
 local addMoves = require('GuyStats').mut.addMoves
 local updateBattle = require('Battle').updateBattle
-local say = require('Console').mut.say
 local resetRecruitCircle = require('RecruitCircle').mut.resetRecruitCircle
 local clearRecruitCircle = require('RecruitCircle').mut.clearRecruitCircle
 local growRecruitCircle = require('RecruitCircle').mut.growRecruitCircle
@@ -324,16 +323,14 @@ function M.init(game)
     return TERRAIN_COLLISION
   end)
 
-  say(
-    game.uiModel.console,
+  game.uiModel.console:say(
     require('ConsoleMessage').new {
       text = 'Welcome to Kobold Princess Simulator.',
       lifetime = 10
     }
   )
 
-  say(
-    game.uiModel.console,
+  game.uiModel.console:say(
     require('ConsoleMessage').new {
       text = 'This is day 1 of your reign.',
       lifetime = 10,
@@ -424,7 +421,7 @@ end
 ---@param game Game
 ---@param text string
 local function echo(game, text)
-  say(game.uiModel.console, require('ConsoleMessage').new {
+  game.uiModel.console:say(require('ConsoleMessage').new {
     text = text,
     lifetime = 60,
   })
