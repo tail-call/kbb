@@ -1,19 +1,19 @@
 ---Description of a class
 ---@class ${name}
 ---@field __module '${name}'
+---# Properties
 ---@field demoProp any Any property
-
----@class ${name}Mutator
+---# Methods
 ---@field setDemoProp fun(self: ${name}, newValue: any)
 
-local M = require('Module').define(..., 0)
-
----@type ${name}Mutator
-M.mut = require('Mutator').new {
-  setDemoProp = function (self, newValue)
-    self.demoProp = newValue
-  end,
-}
+local M = require('Module').define{..., version = 0, metatable = {
+  ---@type ${name}
+  __index = {
+    setDemoProp = function (self, newValue)
+      self.demoProp = newValue
+    end,
+  }
+}}
 
 ---@param obj ${name}
 function M.init(obj)
@@ -21,4 +21,3 @@ function M.init(obj)
 end
 
 return M
-

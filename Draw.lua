@@ -238,9 +238,9 @@ local function drawCursor(drawState, pos, isFocused, moves)
     pos.x * TILE_WIDTH + TILE_WIDTH / 2,
     pos.y * TILE_HEIGHT + TILE_HEIGHT / 2
   )
-    :rotate(drawState.cursorTimer)
+    :rotate(drawState.cursorTimer.value)
     :scale(mInvSqrt2 * math.cos(
-      drawState.cursorTimer * 4 + 4 * math.pi/2
+      drawState.cursorTimer.value * 4 + 4 * math.pi/2
     ) / 2 + invSqrt2)
     :translate(-TILE_WIDTH/2, -TILE_HEIGHT/2)
 
@@ -252,7 +252,7 @@ local function drawCursor(drawState, pos, isFocused, moves)
 
   transform
     :translate(TILE_WIDTH/2, TILE_HEIGHT/2)
-    :rotate(-drawState.cursorTimer)
+    :rotate(-drawState.cursorTimer.value)
     :translate(-7.5, -TILE_HEIGHT/4)
 
   withTransform(transform, function ()
