@@ -3,8 +3,6 @@
 ---@type GameScene
 local M = require('Module').define(..., 0)
 
-local setWindowScale = require('DrawState').mut.setWindowScale
-
 local updateDrawState = require('DrawState').updateDrawState
 local Vector = require('Vector')
 local updateGame = require('Game').updateGame
@@ -104,7 +102,7 @@ end
 ---@param isrepeat boolean
 function M.keypressed(key, scancode, isrepeat)
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
-    setWindowScale(drawState, tonumber(scancode) or 1)
+    drawState:setWindowScale(tonumber(scancode) or 1)
   end
 
   if scancode == '8' then
