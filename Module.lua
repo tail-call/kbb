@@ -64,6 +64,11 @@ function M.define(name, version)
   return module
 end
 
+---@param module Module
+---@return Module
+function M.extend(module)
+end
+
 function M.reload(name)
   package.loaded[name] = nil
   return require(name)
