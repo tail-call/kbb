@@ -21,9 +21,9 @@
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field frozenEntities { [Object2D]: true } Entities that should be not rendered and should not behave
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
+---@field addScore fun(self: Game, count: integer) Increases score count
 
 ---@class GameMutator
----@field addScore fun(self: Game, count: integer) Increases score count
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
 ---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
@@ -91,6 +91,9 @@ local M = require('Module').define{..., version = 0, metatable = {
     advanceClock = function (self, dt)
       self.time = (self.time + dt) % (24 * 60)
     end,
+    addScore = function(self, count)
+      self.score = self.score + count
+    end,
   }
 }}
 
@@ -101,10 +104,6 @@ local TERRAIN_COLLISION = { type = 'terrain' }
 
 ---@type GameMutator
 M.mut = require('Mutator').new {
-  -- Methods
-  addScore = function(self, count)
-    self.score = self.score + count
-  end,
   removeGuy = function (self, guy)
     maybeDrop(self.guys, guy)
     removeFromSquad(self.squad, guy)
@@ -351,7 +350,7 @@ function M.init(game)
             --- TODO: mutators
             game.player = newPlayer
             game.deathsCount = game.deathsCount + 1
-            M.mut.addScore(game, SCORES_TABLE.dead)
+            game:addScore(SCORES_TABLE.dead)
             listenPlayerDeath()
           end
         end
@@ -457,7 +456,7 @@ local function die(guy, game, mut, battle)
 
   if guy.team == 'evil' then
     addResources(game.resources, { pretzels = 1})
-    mut.addScore(game, SCORES_TABLE.killedAnEnemy)
+    game:addScore(SCORES_TABLE.killedAnEnemy)
   end
 
   mut.removeEntity(game, guy)
@@ -629,7 +628,7 @@ local function orderBuild(game)
     game,
     require('Building').new { pos = pos }
   )
-  M.mut.addScore(game, SCORES_TABLE.builtAHouse)
+  game:addScore(SCORES_TABLE.builtAHouse)
   M.mut.disableFocus(game)
 end
 
