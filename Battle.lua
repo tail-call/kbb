@@ -5,31 +5,29 @@
 ---@field defender Guy Who was attacked
 ---@field timer number Time before current round finishes
 ---@field round number Current round number
-
----@class BattleMutator
 ---@field advanceTimer fun(self: Battle, dt: number) Makes battle timer go down
 ---@field beginNewRound fun(self: Battle) Reset round timer
 
-local M = require('Module').define(..., 0)
+local BATTLE_ROUND_DURATION = 0.5
+
+local M = require('Module').define{..., version = 0, metatable = {
+  ---@type Battle
+  __index = {
+    advanceTimer = function (self, dt)
+      self.timer = self.timer - dt
+    end,
+    beginNewRound = function (self)
+      self.attacker, self.defender = self.defender, self.attacker
+      self.timer = BATTLE_ROUND_DURATION
+      self.round = self.round + 1
+    end,
+  }
+}}
 
 local weightedRandom = require('Util').weightedRandom
 local Ability = require('Ability')
 
 local hurt = require('GuyStats').mut.hurt
-
-local BATTLE_ROUND_DURATION = 0.5
-
----@type BattleMutator
-M.mut = require('Mutator').new {
-  advanceTimer = function (self, dt)
-    self.timer = self.timer - dt
-  end,
-  beginNewRound = function (self)
-    self.attacker, self.defender = self.defender, self.attacker
-    self.timer = BATTLE_ROUND_DURATION
-    self.round = self.round + 1
-  end,
-}
 
 ---@param battle Battle
 function M.init(battle)
@@ -90,11 +88,11 @@ end
 ---@param say fun(text: string)
 ---@param fightIsOver fun()
 function M.updateBattle(game, battle, dt, say, fightIsOver)
-  M.mut.advanceTimer(battle, dt)
+  battle:advanceTimer(dt)
   if battle.timer < 0 then
     fight(game, battle.attacker, battle.defender, 1, say)
     if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
-      M.mut.beginNewRound(battle)
+      battle:beginNewRound()
     else
       fightIsOver()
     end

@@ -12,11 +12,12 @@ local M = {}
 ---@param version? number
 ---@return T
 function M.define(name, version)
-  local metatable = {}
+  local metatable = nil
 
   if type(name) == 'table' then
     version = name.version
     metatable = name.metatable
+    name = name[1]
   end
 
   local module
@@ -41,7 +42,7 @@ function M.define(name, version)
     new = function (bak)
       local obj = module.migrate(bak or {})
       if obj == nil then
-        error('migate must return a value')
+        error('migrate must return a value')
       end
       obj.__module = name
       obj.__version = version
