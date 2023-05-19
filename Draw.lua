@@ -22,11 +22,6 @@ local RED_COLOR = { 1, 0, 0, 0.8 }
 local YELLOW_COLOR = { 1, 1, 0, 0.8 }
 
 ---@param drawState DrawState
-local function init(drawState)
-  return drawState
-end
-
----@param drawState DrawState
 ---@param ui UI
 local function drawUI(drawState, ui)
   if ui.shouldDraw and not ui.shouldDraw() then return end
@@ -66,12 +61,6 @@ local function drawUI(drawState, ui)
   end
 
   love.graphics.applyTransform(transform:inverse())
-end
-
---- Should be called at the start of love.draw
----@param drawState DrawState
-local function prepareFrame(drawState)
-  love.graphics.scale(drawState.windowScale)
 end
 
 ---@param pos Vector
@@ -326,6 +315,7 @@ end
 ---@param game Game
 ---@param drawState DrawState
 local function drawGame(game, drawState)
+  love.graphics.scale(drawState.windowScale)
   love.graphics.push('transform')
 
   -- Setup camera
@@ -594,13 +584,5 @@ end
 
 
 return {
-  battle = drawBattle,
-  init = init,
-  prepareFrame = prepareFrame,
-  recruitableHighlight = recruitableHighlight,
-  textAtTile = textAtTile,
-  house = drawHouse,
-  getCursorCoords = getCursorCoords,
-  cursor = drawCursor,
   drawGame = drawGame,
 }
