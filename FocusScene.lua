@@ -1,3 +1,5 @@
+local buffer = require('string.buffer')
+
 local M = require 'Module'.define{..., version = 0}
 
 local withColor = require('Util').withColor
@@ -20,10 +22,13 @@ end
 
 ---@param ... string
 local function echo(...)
-  output = table.concat(
-    require('tbl').imap({ output, ... }, tostring)
-  )
-  output = output .. '\n'
+  local buf = buffer.new()
+  buf:put(output)
+  for _, v in ipairs{ ... } do
+    buf:put(tostring(v))
+  end
+  buf:put('\n')
+  output = buf:tostring()
 end
 
 ---@param key love.KeyConstant
