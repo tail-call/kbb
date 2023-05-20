@@ -9,7 +9,7 @@
 ---@field resetRecruitCircle fun(self: RecruitCircle) -- Activates recruit circle
 ---@field clearRecruitCircle fun(self: RecruitCircle) -- Deactivates recruit circle
 
-local M = require('Module').define(..., 0)
+local M = require('Module').define{...}
 
 local RECRUIT_CIRCLE_MAX_RADIUS = 6
 local RECRUIT_CIRCLE_GROWTH_SPEED = 6

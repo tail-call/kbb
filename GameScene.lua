@@ -1,7 +1,7 @@
 ---@class GameScene: Scene, Module
 
 ---@type GameScene
-local M = require('Module').define(..., 0)
+local M = require('Module').define{...}
 
 local updateDrawState = require('DrawState').updateDrawState
 local Vector = require('Vector')

@@ -1,4 +1,4 @@
-local M = require('Module').define(..., 0)
+local M = require('Module').define{...}
 
 local SAVEFILE_NAME = './kobo2.kpss'
 local AFTER_DRAW_DURATION = 0.05

@@ -8,17 +8,12 @@
 local M = {}
 
 ---@generic T
----@param name string | table
----@param version? number
+---@param opts table
 ---@return T
-function M.define(name, version)
-  local metatable = nil
-
-  if type(name) == 'table' then
-    version = name.version
-    metatable = name.metatable
-    name = name[1]
-  end
+function M.define(opts)
+  local metatable = opts.metatable or nil
+  local version = opts.version or 0
+  local name = opts[1]
 
   local module
   module = {

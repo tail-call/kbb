@@ -8,7 +8,7 @@
 ---@field addListener fun(self: Mutator, table: table, listener: MutatorListener)
 ---@field removeListener fun(self: Mutator, table: table, listener: MutatorListener)
 
-local M = require('Module').define(..., 0)
+local M = require('Module').define{...}
 
 local maybeDrop = require('tbl').maybeDrop
 

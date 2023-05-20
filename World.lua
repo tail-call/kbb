@@ -20,7 +20,7 @@
 ---| 'cave'
 ---| 'wall'
 
-local M = require('Module').define(..., 0)
+local M = require('Module').define{...}
 
 local calcVisionDistance = require('VisionSource').calcVisionDistance
 local isVisible = require('VisionSource').isVisible

@@ -4,7 +4,7 @@
 ---@class Object2D: Object
 ---@field pos Vector Object's position in the world
 
-local M = require('Module').define(..., 0)
+local M = require('Module').define{...}
 
 local rescuedCallbacks = {}
 

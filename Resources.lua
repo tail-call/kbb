@@ -10,7 +10,7 @@
 ---@class ResourcesMutator
 ---@field addResources fun(self: Resources, delta: Resources) Get more resources
 
-local M = require('Module').define(..., 0)
+local M = require('Module').define{...}
 
 ---@type ResourcesMutator
 M.mut = require('Mutator').new {

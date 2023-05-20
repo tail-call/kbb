@@ -16,7 +16,7 @@
 ---@field updatePixie fun(self: Pixie, dt: number): nil
 ---@field playSpawnAnimation fun(self: Pixie, pos: Vector): nil
 
-local M = require('Module').define(..., 0)
+local M = require('Module').define{...}
 
 ---@type PixieMutator
 M.mut = {

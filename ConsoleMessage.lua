@@ -5,7 +5,7 @@
 ---@field lifetime number Seconds before message is faded out
 ---@field fadeOut fun(self: ConsoleMessage, dt: number) Applies fade out to the message
 
-local M = require('Module').define{..., version = 0, metatable = {
+local M = require('Module').define{..., metatable = {
   ---@type ConsoleMessage
   __index = {
     fadeOut = function (self, dt)

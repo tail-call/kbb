@@ -4,7 +4,7 @@
 ---@field messages ConsoleMessage[] List of displayed messages
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
 
-local M = require('Module').define{..., version = 0, metatable = {
+local M = require('Module').define{..., metatable = {
   ---@type Console
   __index = {
     say = function (self, message)

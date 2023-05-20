@@ -1,6 +1,6 @@
 local buffer = require('string.buffer')
 
-local M = require 'Module'.define{..., version = 0}
+local M = require 'Module'.define{...}
 
 local withColor = require('Util').withColor
 

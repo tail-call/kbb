@@ -2,7 +2,7 @@
 ---@class Building: Object2D
 ---@field __module "Building"
 
-local M = require('Module').define{..., version = 0}
+local M = require('Module').define{...}
 
 ---@param building Building
 function M.init(building)

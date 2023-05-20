@@ -84,7 +84,7 @@ local BUILDING_COST = 5
 local FOG_OF_WAR_TIMER_LIMIT = 1/3
 
 ---@type GameModule
-local M = require('Module').define{..., version = 0, metatable = {
+local M = require('Module').define{..., metatable = {
   ---@type Game
   __index = {
     advanceClock = function (self, dt)
