@@ -2,6 +2,9 @@
 ---@field __modulename 'GameModule'
 ---@field mut GameMutator
 
+---@alias GameMode 'normal' | 'focus' | 'paint'
+
+---Game state
 ---@class Game
 ---@field __module 'Game'
 ---# Properties
@@ -10,13 +13,13 @@
 ---@field entities Object2D[] Things in the game world
 ---@field deathsCount number Number of times player has died
 ---@field guyDelegate GuyDelegate Object that talks to guys
----@field squad Squad A bunch of guys that follows player's movement
+---@field squad Squad A bunch of guys that follow player's movement
 ---@field player Guy A guy controlled by the player
 ---@field score integer Score the player has accumulated
 ---@field time number Time of day in seconds, max is 24*60
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
 ---@field magnificationFactor number How much the camera is zoomed in
----@field isFocused boolean True if focus mode is on
+---@field mode GameMode Current game mode. Affects how player's input is handled.
 ---@field ui UI User interface root
 ---@field uiModel UIModel GUI state
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
@@ -25,7 +28,7 @@
 ---# Methods
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field addScore fun(self: Game, count: integer) Increases score count
----@field toggleFocus fun(self: Game) Toggles focus mode
+---@field switchMode fun(self: Game) Switches to next mode
 
 ---@class GameMutator
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
@@ -84,7 +87,6 @@ local MOVE_COSTS_TABLE = {
 }
 
 local BUILDING_COST = 5
-local FOG_OF_WAR_TIMER_LIMIT = 1/3
 
 ---@type GameModule
 local M = require('Module').define{..., metatable = {
@@ -96,8 +98,14 @@ local M = require('Module').define{..., metatable = {
     addScore = function(self, count)
       self.score = self.score + count
     end,
-    toggleFocus = function (self)
-      self.isFocused = not self.isFocused
+    switchMode = function (self)
+      if self.mode == 'normal' then
+        self.mode = 'paint'
+      elseif self.mode == 'paint' then
+        self.mode = 'focus'
+      else
+        self.mode = 'normal'
+      end
     end,
   }
 }}
@@ -332,7 +340,7 @@ function M.init(game)
   game.recruitCircle = require('RecruitCircle').new {}
   game.cursorPos = game.cursorPos or { x = 0, y = 0 }
   game.magnificationFactor = game.magnificationFactor or 1
-  game.isFocused = false
+  game.mode = game.mode or 'normal'
 
   game.uiModel = require('UIModel').new(game)
   game.ui = M.makeUIScript(game)
@@ -424,7 +432,7 @@ end
 
 ---@param game Game
 function M.beginRecruiting(game)
-  if game.isFocused then return end
+  if game.mode ~= 'normal' then return end
   resetRecruitCircle(game.recruitCircle)
 end
 
@@ -490,9 +498,9 @@ local function die(guy, game, mut, battle)
   mut.removeEntity(game, battle)
 end
 
----@param game Game -- Game object
----@param dt number -- Time since last update
----@param movementDirections Vector[] -- Momentarily pressed movement directions
+---@param game Game Game object
+---@param dt number Time since last update
+---@param movementDirections Vector[] Momentarily pressed movement directions
 function M.updateGame(game, dt, movementDirections)
   exhaust(function ()
     coroutine.yield({ pos = game.player.pos, sight = 10 })
@@ -510,9 +518,9 @@ function M.updateGame(game, dt, movementDirections)
     growRecruitCircle(game.recruitCircle, dt)
   end
 
-  if game.isFocused then return end
+  if game.mode == 'focus' then return end
 
-  -- Handle input
+  -- Handle normal mode movement input
 
   if game.player.stats.moves > 0 and #movementDirections > 0 then
     for _ = 1, #movementDirections do
@@ -543,7 +551,7 @@ function M.updateGame(game, dt, movementDirections)
     orderGather(game)
   end
 
-  -- Handle game logic
+  -- Handle normal mode logic
 
   game:advanceClock(dt)
   for _, entity in ipairs(game.entities) do
@@ -680,7 +688,7 @@ local function handleFocusModeInput(game, drawState, scancode, key)
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
     drawState:setWindowScale(tonumber(scancode) or 1)
   else
-    game:toggleFocus()
+    game:switchMode()
     -- TODO: use mutator
     game.uiModel = require('UIModel').new(game)
     game.ui = require('Game').makeUIScript(game)
@@ -710,7 +718,7 @@ local function handleNormalModeInput(game, scancode)
     local patch = require('World').patchAt(game.world, game.player.pos)
     require('World').randomizePatch(game.world, patch)
   elseif scancode == 'space' then
-    game:toggleFocus()
+    game:switchMode()
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
   end
@@ -725,7 +733,7 @@ function M.handleInput(game, drawState, scancode, key)
     M.mut.nextMagnificationFactor(game)
   end
 
-  if game.isFocused then
+  if game.mode == 'focus' then
     handleFocusModeInput(game, drawState, scancode, key)
   else
     handleNormalModeInput(game, scancode)
@@ -735,7 +743,7 @@ end
 ---@param game Game
 ---@param text string
 function M.handleText(game, text)
-  if game.isFocused then
+  if game.mode == 'focus' then
     game.uiModel:didTypeCharacter(text)
   end
 end

@@ -9,7 +9,7 @@ Welcome to KOBOLD PRINCESS SIMULATOR
 |W, A, S, D) move                 o o  |
 |H, J, K, L) also move             w   |
 |Arrow keys) also move                 |
-|Space)      focus mode                |
+|Space)      switch mode               |
 |Return)     open lua console          |
 |            (try typing 'help()')     |
 |Escape)     close lua console         |

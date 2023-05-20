@@ -72,13 +72,13 @@ function M.update(dt)
   updateDrawState(
     drawState,
     dt,
-    game.isFocused
+    game.mode == 'focus'
       and Vector.add(cv, { x = 0, y = 0 })
       or Vector.midpoint(pv, cv),
-    game.isFocused
+    game.mode == 'focus'
       and game.magnificationFactor * 2
       or game.magnificationFactor,
-    game.isFocused
+    game.mode == 'focus'
   )
   -- Handle diagonal movement
   local directions = {}

@@ -119,7 +119,7 @@ function UIModelModule.new(game)
       )
     end,
     shouldDrawFocusModeUI = function ()
-      return game.isFocused
+      return game.mode == 'focus'
     end,
     didTypeCharacter = function (self, char)
       self.prompt = self.prompt .. char

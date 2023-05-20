@@ -20,6 +20,7 @@ local HIGHLIGHT_CIRCLE_RADIUS = 10
 local WHITE_CURSOR_COLOR = { 1, 1, 1, 0.8 }
 local RED_COLOR = { 1, 0, 0, 0.8 }
 local YELLOW_COLOR = { 1, 1, 0, 0.8 }
+local GREEN_COLOR = { 0, 1, 0, 0.8 }
 
 ---@param drawState DrawState
 ---@param ui UI
@@ -226,9 +227,9 @@ end
 
 ---@param drawState DrawState
 ---@param pos Vector
----@param isFocused boolean
+---@param mode GameMode
 ---@param moves number
-local function drawCursor(drawState, pos, isFocused, moves)
+local function drawCursor(drawState, pos, mode, moves)
   local invSqrt2 = 1/math.sqrt(2)
   local mInvSqrt2 = 1 - invSqrt2
 
@@ -259,9 +260,7 @@ local function drawCursor(drawState, pos, isFocused, moves)
     love.graphics.print(
       ('%02d'):format(moves), 0, 0
     )
-    if isFocused then
-      love.graphics.print('PAUSE', -11, -16)
-    end
+    love.graphics.print(mode, -11, -16)
   end)
 end
 
@@ -474,8 +473,10 @@ local function drawGame(game, drawState)
     local cursorPos = { x = curX, y = curY }
     local cursorColor = WHITE_CURSOR_COLOR
 
-    if game.isFocused then
+    if game.mode == 'focus' then
       cursorColor = YELLOW_COLOR
+    elseif game.mode == 'paint' then
+      cursorColor = GREEN_COLOR
     else
       game.cursorPos = cursorPos
     end
@@ -488,7 +489,7 @@ local function drawGame(game, drawState)
 
     local r, g, b, a = unpack(cursorColor)
     withColor(r, g, b, a, function ()
-      drawCursor(drawState, game.cursorPos, game.isFocused, game.player.stats.moves)
+      drawCursor(drawState, game.cursorPos, game.mode, game.player.stats.moves)
     end)
   end
 
@@ -511,7 +512,7 @@ local function drawGame(game, drawState)
       game.world.image:getHeight()
     )
 
-    local alpha = game.isFocused and 1 or 0.25
+    local alpha = (game.mode == 'focus') and 1 or 0.25
 
     -- Overlay
     withColor(1, 1, 1, alpha, function ()
