@@ -43,25 +43,13 @@ function M.keypressed(key, scancode, isrepeat)
     local chunk, compileErrorMessage = loadstring(savedPrompt, 'commandline')
     echo('lua>' .. savedPrompt)
     if chunk ~= nil then
-      local commands
+      local commands, helpPages
       commands = {
-        reloadHelp = function ()
-          echo [[
----Reloads a module
----@param moduleName string
-reload(moduleName)]]
-        end,
         reload = function(moduleName)
           require('Module').reload(moduleName)
         end,
-        scribeHelp = function ()
-          echo [[
----Scribes a message in the world
----@param message string
-scribe(message)]]
-        end,
         scribe = function(text)
-          error('no scribe for you today')
+          echo('no scribe for you today')
           -- M.mut.addText(
           --   game,
           --   require('Text').new {
@@ -70,37 +58,20 @@ scribe(message)]]
           --   }
           -- )
         end,
-        printHelp = function ()
-          echo [[
----Prints objects to a console
----@param ... any[]
-print(...)]]
-        end,
         print = function (...)
           echo(...)
         end,
-        clearHelp = function ()
-          echo [[
----Clears the screen
-clear()]]
-        end,
         clear = function (...)
           output = ''
-        end,
-        helpHelp = function ()
-          echo [[
----Outputs info about a command in the console
----@param name string
-help(name)]]
         end,
         help = function (arg)
           if arg == nil then
             echo 'try these commands or hit escape if confused:\n'
             for k in pairs(commands) do
-              echo(('help(\'%s\')'):format(k))
+              echo(('help(%s)'):format(k))
             end
           else
-            local helpFunc = commands[arg .. 'Help']
+            local helpFunc = helpPages[arg]
             if helpFunc == nil then
               echo(([[
 ---Don't use this command
@@ -110,14 +81,45 @@ help(name)]]
             end
           end
         end,
-        quitHelp = function ()
-          echo [[
----Quits to the main menu
-quit()]]
-        end,
         quit = function ()
           package.loaded['MenuScene'] = nil
           require('main').loadScene('MenuScene', 'fromgame')
+        end,
+      }
+      helpPages = {
+        [commands.help] = function ()
+          echo [[
+---Outputs info about a command in the console
+---@param name string
+help(name)]]
+        end,
+        [commands.print] = function ()
+          echo [[
+---Prints objects to a console
+---@param ... any[]
+print(...)]]
+        end,
+        [commands.clear] = function ()
+          echo [[
+---Clears the screen
+clear()]]
+        end,
+        [commands.scribe] = function ()
+          echo [[
+---Scribes a message in the world
+---@param message string
+scribe(message)]]
+        end,
+        [commands.reload] = function ()
+          echo [[
+---Reloads a module
+---@param moduleName string
+reload(moduleName)]]
+        end,
+        [commands.quit] = function ()
+          echo [[
+---Quits to the main menu
+quit()]]
         end,
       }
       setfenv(chunk, commands)
