@@ -1,3 +1,5 @@
+local buffer = require('string.buffer')
+
 local SKY_TABLE = {
   -- 00:00
   { r = 0.3, g = 0.3, b = 0.6, },
@@ -267,14 +269,15 @@ local function dump(object)
     end
   end
 
-  local result = { 'local O = {}\n' }
+  local buf = buffer.new()
+  buf:put('local O = {}\n' )
   exhaust(process, function(part)
-    table.insert(result, part or '')
+    buf:put(part or '')
   end, object)
 
-  table.insert(result, 'return O[#O]')
+  buf:put('return O[#O]')
 
-  return table.concat(result)
+  return buf:tostring()
 end
 
 ---Returns a function that will dump an array into a base64 encoded buffer
