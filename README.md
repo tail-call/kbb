@@ -47,7 +47,6 @@ Game is an editable image.
  - [ ] Random terrain generation in a selected area
  - [ ] Use FFI for huge arrays like fog of war
  - [ ] Try using native code with ffi
- - [ ] Use string buffers for text manipulation [1]
  - [ ] Try using love2d threads for something?
 
 ## Game ideas
@@ -230,6 +229,7 @@ Game is an editable image.
  - [x] Don't serialize same object twice
  - [x] Timer type
  - [x] Drop GameEntity class: I already have type markers in my objects
+ - [x] Use string buffers for text manipulation [1]
 
 
 # Sources
