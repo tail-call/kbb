@@ -287,13 +287,14 @@ end
 local function makeBufDumper (array, format)
   ---@param write fun(data: string)
   return function(write)
-    local words = {'return{'}
+    local buf = buffer.new()
+    buf:put('return{')
     for _, word in ipairs(array) do
-      table.insert(words, string.format(format, word))
+      buf:put(string.format(format, word))
     end
 
-    table.insert(words, '}')
-    local data = table.concat(words, '\n')
+    buf:put('}')
+    local data = buf:tostring()
 
     write('buf{base64=[[')
     local compressedData = love.data.compress('data', 'zlib', data)
