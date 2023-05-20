@@ -47,7 +47,6 @@ local maybeDrop = require('tbl').maybeDrop
 local updateConsole = require('Console').updateConsole
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isAFollower = require('Squad').isAFollower
-local makeGuyDelegate = require('GuyDelegate').new
 local revealFogOfWar = require('World').revealVisionSourceFog
 local skyColorAtTime = require('Util').skyColorAtTime
 local exhaust = require('Util').exhaust
@@ -178,6 +177,31 @@ M.mut = require('Mutator').new {
     self.alternatingKeyIndex = x
   end,
 }
+
+
+---@param game Game
+---@param collider fun(self: Game, v: Vector): CollisionInfo Function that performs collision checks between game world objects
+---@return GuyDelegate
+local function makeGuyDelegate(game, collider)
+  ---@type GuyDelegate
+  local guyDelegate = {
+    beginBattle = function (attacker, defender)
+      require('Game').mut.beginBattle(game, attacker, defender)
+    end,
+    enterHouse = function (guy, building)
+      if guy.team ~= 'good' then
+        return 'shouldNotMove'
+      end
+      require('GuyStats').mut.setMaxHp(guy.stats, guy.stats.maxHp + 1)
+      require('Game').mut.removeEntity(game, building)
+      return 'shouldMove'
+    end,
+    collider = function (pos)
+      return collider(game, pos)
+    end,
+  }
+  return guyDelegate
+end
 
 ---Returns true if guy is marked as frozen
 ---@param game Game

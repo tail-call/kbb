@@ -1,5 +1,10 @@
 ---@alias GuyTeam 'good' | 'evil' | 'neutral'
 
+---@class GuyDelegate
+---@field collider fun(v: Vector): CollisionInfo Function that performs collision checks between game world objects
+---@field beginBattle fun(attacker: Guy, defender: Guy): nil Begins a battle between an attacker and defender
+---@field enterHouse fun(guest: Guy, building: Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
+
 ---@class Guy: Object2D
 ---@field mayMove boolean True if may move
 ---@field name string Guy's name
