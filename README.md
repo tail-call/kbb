@@ -12,12 +12,6 @@ Game is an editable image.
 
 # Plan
 
- - [x] Use package.preload to load resources
- - [x] Draw current patch only
- - [x] Don't serialize same object twice
- - [x] Timer type
- - [x] Drop GameEntity class: I already have type markers in my objects
-
 ## Bugs
 
  - [ ] Dead guys are not deleted from the squad
@@ -231,6 +225,11 @@ Game is an editable image.
  - [x] `init()` and `deinit()` module methods to reload individual objects
  - [x] BUGFIX: combat doesn't switch sides between rounds
  - [x] Different types of tiles yield different movement speeds
+ - [x] Use package.preload to load resources
+ - [x] Draw current patch only
+ - [x] Don't serialize same object twice
+ - [x] Timer type
+ - [x] Drop GameEntity class: I already have type markers in my objects
 
 
 # Sources
