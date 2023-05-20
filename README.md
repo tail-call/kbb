@@ -20,12 +20,12 @@ Game is an editable image.
 
 ## Quality of life
 
+ - [ ] Object info window near pointer
  - [ ] Tile paint mode
  - [ ] Focus mode is a scene
  - [ ] Event system
  - [ ] Path finding
  - [ ] Use normal methods in all modules
- - [ ] Tile/object info window near pointer
  - [ ] Savefile: index strings and object keys
  - [ ] Console command history
  - [ ] Use meshes and vertex shading for smooth fog of war

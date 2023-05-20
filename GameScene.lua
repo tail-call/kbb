@@ -8,7 +8,6 @@ local Vector = require('Vector')
 local updateGame = require('Game').updateGame
 local handleText = require('Game').handleText
 local tbl = require('tbl')
-local drawGame = require('Draw').drawGame
 local handleInput = require('Game').handleInput
 local beginRecruiting = require('Game').beginRecruiting
 local endRecruiting = require('Game').endRecruiting
@@ -145,7 +144,7 @@ function M.mousereleased(x, y, button, presses)
 end
 
 function M.draw()
-  drawGame(game, drawState)
+  require('Draw').drawGame(game, drawState)
 end
 
 return M

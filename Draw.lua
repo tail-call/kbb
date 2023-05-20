@@ -572,9 +572,16 @@ local function drawGame(game, drawState)
     )
 
     local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
-    withTransform(love.math.newTransform():translate(x + 10,y):scale(2/3, 2/3), function ()
+
+    -- Tooltip
+    local tooltipTransform = love.math.newTransform()
+      :translate(x + 10, y)
+      :scale(2/3, 2/3)
+
+    withTransform(tooltipTransform, function ()
       withColor(0, 0, 0, 0.5, function ()
-        love.graphics.rectangle('fill', 0, 0, 72, 16)
+        local width, height = 72, 24
+        love.graphics.rectangle('fill', 0, 0, width, height)
       end)
       love.graphics.print(tileUnderCursor)
       love.graphics.print(Vector.formatVector(game.cursorPos), 0, 8)
