@@ -4,23 +4,26 @@ local SAVEFILE_NAME = './kobo2.kpss'
 local AFTER_DRAW_DURATION = 0.05
 local INTRO = [[
 Welcome to KOBOLD PRINCESS SIMULATOR
+
 +In-game controls:---------------------+
 |1, 2, 3, 4) window scale         o o  |
 |W, A, S, D) move                  w   |
 |H, J, K, L) also move                 |
-|arrow keys) also move                 |
+|Arrow keys) also move                 |
+|Space)      focus mode                |
 |Return)     open lua console          |
 |            (try typing 'help()')     |
 |Escape)     close lua console         |
 |N)          reload main guy           |
 |E)          terramorphing             |
 +--------------------------------------+
+
 Now choose:
 
-N) Start new game
-L) Load game from disk (file kobo2.kpss)
+N) Play in empty world
+L) Load world from disk (kobo2.kpss)
 F) Reload this menu
-X) Exit game
+Q) Quit game
 ]]
 
 local cursorTimer = 0
@@ -80,7 +83,7 @@ function M.keypressed(key, scancode, isrepeat)
     afterDraw = function ()
       loadScene('GameScene', '#dontload')
     end
-  elseif scancode == 'x' then
+  elseif scancode == 'q' then
     afterDraw = function ()
       extraText = '\nQUITTING...'
       love.event.quit()

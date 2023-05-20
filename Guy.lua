@@ -269,4 +269,10 @@ function M.canRecruitGuy(guy)
   return guy.team == 'good'
 end
 
+---@param guy Guy
+---@return string
+function M.tooltipText(guy)
+  return ('%s\n%s/%s'):format(guy.name, guy.stats.hp, guy.stats.maxHp)
+end
+
 return M

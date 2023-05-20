@@ -20,7 +20,6 @@ Game is an editable image.
 
 ## Quality of life
 
- - [ ] Object info window near pointer
  - [ ] Tile paint mode
  - [ ] Focus mode is a scene
  - [ ] Event system
@@ -230,6 +229,7 @@ Game is an editable image.
  - [x] Timer type
  - [x] Drop GameEntity class: I already have type markers in my objects
  - [x] Use string buffers for text manipulation [1]
+ - [x] Object info window near pointer
 
 
 # Sources

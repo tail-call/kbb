@@ -3,6 +3,8 @@
 ---@field mut GameMutator
 
 ---@class Game
+---@field __module 'Game'
+---# Properties
 ---@field world World Game world
 ---@field resources Resources Resources player may spend on upgrades
 ---@field entities Object2D[] Things in the game world
@@ -20,8 +22,10 @@
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field frozenEntities { [Object2D]: true } Entities that should be not rendered and should not behave
+---# Methods
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field addScore fun(self: Game, count: integer) Increases score count
+---@field toggleFocus fun(self: Game) Toggles focus mode
 
 ---@class GameMutator
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
@@ -30,7 +34,6 @@
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 ---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
----@field toggleFocus fun(self: Game) Toggles focus mode
 ---@field disableFocus fun(self: Game) Turns focus mode off
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
@@ -93,6 +96,9 @@ local M = require('Module').define{..., metatable = {
     addScore = function(self, count)
       self.score = self.score + count
     end,
+    toggleFocus = function (self)
+      self.isFocused = not self.isFocused
+    end,
   }
 }}
 
@@ -137,9 +143,6 @@ M.mut = require('Mutator').new {
   end,
   addEntity = function (self, entity)
     table.insert(self.entities, entity)
-  end,
-  toggleFocus = function (self)
-    self.isFocused = not self.isFocused
   end,
   disableFocus = function (self)
     self.isFocused = false
@@ -673,7 +676,7 @@ end
 ---@param scancode string
 ---@param key string
 local function handleFocusModeInput(game, scancode, key)
-  M.mut.toggleFocus(game)
+  game:toggleFocus()
   -- TODO: use mutator
   game.uiModel = require('UIModel').new(game)
   game.ui = require('Game').makeUIScript(game)
@@ -701,8 +704,8 @@ local function handleNormalModeInput(game, scancode)
   elseif scancode == 'e' then
     local patch = require('World').patchAt(game.world, game.player.pos)
     require('World').randomizePatch(game.world, patch)
-  elseif scancode == 'return' then
-    M.mut.toggleFocus(game)
+  elseif scancode == 'space' then
+    game:toggleFocus()
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
   end

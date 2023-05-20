@@ -578,13 +578,28 @@ local function drawGame(game, drawState)
       :translate(x + 10, y)
       :scale(2/3, 2/3)
 
+    local entity = {}
+    -- Detect entities under cursor
+    for k, v in ipairs(game.entities) do
+      if Vector.equal(v.pos, game.cursorPos) then
+        entity = v
+      end
+    end
+
     withTransform(tooltipTransform, function ()
       withColor(0, 0, 0, 0.5, function ()
-        local width, height = 72, 24
+        local width, height = 72, 72
         love.graphics.rectangle('fill', 0, 0, width, height)
       end)
       love.graphics.print(tileUnderCursor)
       love.graphics.print(Vector.formatVector(game.cursorPos), 0, 8)
+      if entity.__module   then
+        local textGenerator = require(entity.__module).tooltipText or function (_)
+          return 'nothing special'
+        end
+        local text = textGenerator(entity)
+        love.graphics.print(text, 0, 16)
+      end
     end)
   end
 end

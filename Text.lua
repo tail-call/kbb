@@ -12,4 +12,10 @@ function M.init(bak)
   bak.maxWidth = bak.maxWidth or 32
 end
 
+---@param text Text
+---@return string
+function M.tooltipText(text)
+  return ('It says:\n"%s"'):format(text.text)
+end
+
 return M
