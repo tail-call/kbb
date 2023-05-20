@@ -7,9 +7,7 @@ local updateDrawState = require('DrawState').updateDrawState
 local Vector = require('Vector')
 local updateGame = require('Game').updateGame
 local handleText = require('Game').handleText
-local tbl = require('tbl')
 local handleInput = require('Game').handleInput
-local beginRecruiting = require('Game').beginRecruiting
 local endRecruiting = require('Game').endRecruiting
 
 ---@type Game
@@ -125,7 +123,11 @@ end
 ---@param presses table
 function M.mousepressed(x, y, button, presses)
   if button == 1 then
-    beginRecruiting(game)
+    if game.mode == 'normal' then
+      require('Game').beginRecruiting(game)
+    elseif game.mode == 'paint' then
+      require('Game').orderPaint(game)
+    end
   end
 end
 

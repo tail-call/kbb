@@ -477,7 +477,8 @@ local function drawGame(game, drawState)
       cursorColor = YELLOW_COLOR
     elseif game.mode == 'paint' then
       cursorColor = GREEN_COLOR
-    else
+      game.cursorPos = cursorPos
+    elseif game.mode == 'normal' then
       game.cursorPos = cursorPos
     end
 

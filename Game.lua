@@ -55,7 +55,6 @@ local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isAFollower = require('Squad').isAFollower
 local revealFogOfWar = require('World').revealVisionSourceFog
 local skyColorAtTime = require('Util').skyColorAtTime
-local exhaust = require('Util').exhaust
 local behave = require('Guy').behave
 
 local addMoves = require('GuyStats').mut.addMoves
@@ -502,16 +501,17 @@ end
 ---@param dt number Time since last update
 ---@param movementDirections Vector[] Momentarily pressed movement directions
 function M.updateGame(game, dt, movementDirections)
-  exhaust(function ()
-    coroutine.yield({ pos = game.player.pos, sight = 10 })
+  local visionSources = {{
+    pos = game.player.pos,
+    sight = 10
+  }, {
+    pos = game.cursorPos,
+    sight = math.max(2, game.recruitCircle.radius or 0),
+  }}
 
-    return {
-      pos = game.cursorPos,
-      sight = math.max(2, game.recruitCircle.radius or 0),
-    }
-  end, function (visionSource)
-    revealFogOfWar(game.world, visionSource, skyColorAtTime(game.time).g, dt)
-  end)
+  for _,v in ipairs(visionSources) do
+    revealFogOfWar(game.world, v, skyColorAtTime(game.time).g, dt)
+  end
 
   updateConsole(game.uiModel.console, dt)
   if isRecruitCircleActive(game.recruitCircle) then
@@ -688,7 +688,6 @@ local function handleFocusModeInput(game, drawState, scancode, key)
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
     drawState:setWindowScale(tonumber(scancode) or 1)
   else
-    game:switchMode()
     -- TODO: use mutator
     game.uiModel = require('UIModel').new(game)
     game.ui = require('Game').makeUIScript(game)
@@ -701,27 +700,20 @@ end
 local function handleNormalModeInput(game, scancode)
   if scancode == 'tab' then
     game.uiModel:nextTab()
-  elseif scancode == 'f' then
-    toggleFollow(game.squad)
-  elseif scancode == 'g' then
-    if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
-      addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
-      dismissSquad(game)
-    end
   elseif scancode == 'c' then
     orderCollect(game)
-  elseif scancode == 'b' then
-    orderBuild(game)
-  elseif scancode == 'r' then
-    orderSummon(game)
   elseif scancode == 'e' then
     local patch = require('World').patchAt(game.world, game.player.pos)
     require('World').randomizePatch(game.world, patch)
-  elseif scancode == 'space' then
-    game:switchMode()
   elseif scancode == 't' then
     warpGuy(game.player, game.cursorPos)
   end
+end
+
+
+---@param game Game
+function M.orderPaint(game)
+  setTile(game.world, game.cursorPos, 'grass')
 end
 
 ---@param game Game
@@ -733,9 +725,22 @@ function M.handleInput(game, drawState, scancode, key)
     M.mut.nextMagnificationFactor(game)
   end
 
-  if game.mode == 'focus' then
+  if scancode == 'space' then
+    game:switchMode()
+  elseif scancode == 'g' then
+    if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
+      addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
+      dismissSquad(game)
+    end
+  elseif scancode == 'r' then
+    orderSummon(game)
+  elseif scancode == 'f' then
+    toggleFollow(game.squad)
+  elseif scancode == 'b' then
+    orderBuild(game)
+  elseif game.mode == 'focus' then
     handleFocusModeInput(game, drawState, scancode, key)
-  else
+  elseif game.mode == 'normal' then
     handleNormalModeInput(game, scancode)
   end
 end

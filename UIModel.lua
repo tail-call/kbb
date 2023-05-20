@@ -29,6 +29,12 @@ local UIModelModule = {}
 function UIModelModule.topPanelText(game)
   return function ()
     local player = game.player
+    local controls = ''
+    if game.mode == 'normal' then
+      controls = 'Space] paint\nLMB] recruit\n8] save\nZ] zoom\nF] follow\nQ] gather\nT] warp\nC] collect\n'     
+    elseif game.mode == 'paint' then
+      controls = 'Space] focus\nLMB] paint\n'
+    end
     return {
       WHITE_COLOR,
       string.format(
@@ -39,7 +45,7 @@ function UIModelModule.topPanelText(game)
         love.timer.getFPS()
       ),
       WHITE_COLOR,
-      'LMB] recruit\n8] save\nZ] zoom\nF] follow\nQ] gather\nT] warp\nC] collect\n',
+      controls,
       player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
       'G] dismiss 1t\n',
       player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
@@ -63,7 +69,7 @@ function UIModelModule.new(game)
       self.activeTab = self.activeTab + 1
     end,
     leftPanelText = function ()
-      return '1,2,3,4] scale UI'
+      return 'Space] exit\n1,2,3,4] scale UI'
     end,
     rightPanelText = function ()
       local header = '<- Tab ->\n\n'
