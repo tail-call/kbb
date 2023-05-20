@@ -673,14 +673,19 @@ local function orderSummon(game)
 end
 
 ---@param game Game
+---@param drawState DrawState
 ---@param scancode string
 ---@param key string
-local function handleFocusModeInput(game, scancode, key)
-  game:toggleFocus()
-  -- TODO: use mutator
-  game.uiModel = require('UIModel').new(game)
-  game.ui = require('Game').makeUIScript(game)
-  echo(game, 'recreated uiModel and ui')
+local function handleFocusModeInput(game, drawState, scancode, key)
+  if tbl.has({ '1', '2', '3', '4' }, scancode) then
+    drawState:setWindowScale(tonumber(scancode) or 1)
+  else
+    game:toggleFocus()
+    -- TODO: use mutator
+    game.uiModel = require('UIModel').new(game)
+    game.ui = require('Game').makeUIScript(game)
+    echo(game, 'recreated uiModel and ui')
+  end
 end
 
 ---@param game Game
@@ -712,15 +717,16 @@ local function handleNormalModeInput(game, scancode)
 end
 
 ---@param game Game
+---@param drawState DrawState
 ---@param scancode string
 ---@param key string
-function M.handleInput(game, scancode, key)
+function M.handleInput(game, drawState, scancode, key)
   if scancode == 'z' then
     M.mut.nextMagnificationFactor(game)
   end
 
   if game.isFocused then
-    handleFocusModeInput(game, scancode, key)
+    handleFocusModeInput(game, drawState, scancode, key)
   else
     handleNormalModeInput(game, scancode)
   end

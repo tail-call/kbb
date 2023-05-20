@@ -6,9 +6,8 @@ local INTRO = [[
 Welcome to KOBOLD PRINCESS SIMULATOR
 
 +In-game controls:---------------------+
-|1, 2, 3, 4) window scale         o o  |
-|W, A, S, D) move                  w   |
-|H, J, K, L) also move                 |
+|W, A, S, D) move                 o o  |
+|H, J, K, L) also move             w   |
 |Arrow keys) also move                 |
 |Space)      focus mode                |
 |Return)     open lua console          |

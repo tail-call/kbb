@@ -63,7 +63,7 @@ function UIModelModule.new(game)
       self.activeTab = self.activeTab + 1
     end,
     leftPanelText = function ()
-      return 'something'
+      return '1,2,3,4] scale UI'
     end,
     rightPanelText = function ()
       local header = '<- Tab ->\n\n'

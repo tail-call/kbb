@@ -100,10 +100,6 @@ end
 ---@param scancode love.Scancode
 ---@param isrepeat boolean
 function M.keypressed(key, scancode, isrepeat)
-  if tbl.has({ '1', '2', '3', '4' }, scancode) then
-    drawState:setWindowScale(tonumber(scancode) or 1)
-  end
-
   if scancode == '8' then
     -- Write to file
     do
@@ -120,7 +116,7 @@ function M.keypressed(key, scancode, isrepeat)
     require('main').loadScene('FocusScene', M)
   end
 
-  handleInput(game, scancode, key)
+  handleInput(game, drawState, scancode, key)
 end
 
 ---@param x number
