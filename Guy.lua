@@ -26,8 +26,6 @@
 
 ---@alias CollisionInfo { type: 'entity' | 'terrain' | 'none', entity: Object2D | nil }
 
-local M = require('Module').define(..., 0)
-
 local Vector = require('Vector')
 local abilities = require('Ability').abilities
 
@@ -36,6 +34,12 @@ local movePixie = require('Pixie').mut.movePixie
 local updatePixie = require('Pixie').mut.updatePixie
 local playSpawnAnimation = require('Pixie').mut.playSpawnAnimation
 local setMaxHp = require('GuyStats').mut.setMaxHp
+
+local M = require('Module').define{..., version = 0, metatable = {
+  ---@type Guy
+  __index = {
+  }
+}}
 
 ---@type Guy
 M.Guy = {}
