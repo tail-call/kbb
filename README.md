@@ -49,6 +49,10 @@ Game is an editable image.
 
 ## Game ideas
 
+ - [ ] Corruption factor: as you collect resources, it goes up
+ - [ ] As corruption factor grows, enemies will spawn
+ - [ ] More powerful and plentiful enemies are spawned as corruption goes up
+ - [ ] Appease kobold deities to lower corruption factor
  - [ ] Paint mode has primitive noise-based terrain generation tools
  - [ ] Guys are *lost* when are in the unexplored area
  - [ ] You can't recruit lost guys
