@@ -354,19 +354,21 @@ function M.init(game)
     return TERRAIN_COLLISION
   end)
 
-  game.uiModel.console:say(
-    require('ConsoleMessage').new {
-      text = 'Welcome to Kobold Princess Simulator.',
-      lifetime = 10
-    }
-  )
+  local messages = {
+    'This is your first day of ruling your own Kobold tribe.',
+    'Tonight, you had a dream where you saw Zirnitra, your dragon deity, speak to you.',
+    '\'Avenge my death on filthy humans!\' she said.',
+    '\'Build a temple to honor me and we shall talk again. You have 6 months.\'',
+  }
 
-  game.uiModel.console:say(
-    require('ConsoleMessage').new {
-      text = 'This is day 1 of your reign.',
-      lifetime = 10,
-    }
-  )
+  for k, v in ipairs(messages) do
+    game.uiModel.console:say(
+      require('ConsoleMessage').new {
+        text = v,
+        lifetime = 10
+      }
+    )
+  end
 
   M.mut.addPlayer(game, Guy.makeLeader(LEADER_SPAWN_LOCATION))
 
