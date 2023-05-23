@@ -35,7 +35,7 @@ end
 
 function M.keypressed(key, scancode, isrepeat)
   if scancode == 'escape' then
-   require('main').setScene(storedScene, '#back')
+   require('Scene').setScene(storedScene, '#back')
   elseif scancode == 'home' then
     offset.x = offset.x + love.graphics.getWidth() / 2
   elseif scancode == 'end' then

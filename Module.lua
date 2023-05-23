@@ -1,4 +1,5 @@
 ---@class Module
+---@field __modulename string
 ---@field mut Mutator Mutator object
 ---@field new fun(bak: table): table Makes a new object
 ---@field init fun(bak: table, strategy: fun(moduleName: string, dep: table): table): any Initializes an object

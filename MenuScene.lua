@@ -70,7 +70,7 @@ end
 ---@param scancode love.Scancode
 ---@param isrepeat boolean
 function M.keypressed(key, scancode, isrepeat)
-  local loadScene = require('main').loadScene
+  local loadScene = require('Scene').loadScene
   afterDrawTimer = AFTER_DRAW_DURATION
   if scancode == 'l' then
     extraText = '\nLOADING...'

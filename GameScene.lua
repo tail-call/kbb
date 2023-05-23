@@ -108,7 +108,7 @@ function M.keypressed(key, scancode, isrepeat)
       file:close()
     end
   elseif scancode == 'return' then
-    require('main').loadScene('FocusScene', M)
+    require('Scene').loadScene('FocusScene', M)
   end
 
   handleInput(game, drawState, scancode, key)
