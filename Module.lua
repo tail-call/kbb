@@ -41,18 +41,18 @@ function M.define(opts)
       end
       obj.__module = name
       obj.__version = version
+      setmetatable(obj, metatable)
       module.init(obj, function (moduleName, dep)
         return require(moduleName).new(dep)
       end)
-      setmetatable(obj, metatable)
       return obj
     end,
     reload = function (obj)
+      setmetatable(obj, metatable)
       module.deinit(obj)
       module.init(obj, function (moduleName, dep)
         require(moduleName).reload(dep)
       end)
-      setmetatable(obj, metatable)
       return obj
     end,
   }

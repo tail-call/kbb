@@ -29,10 +29,10 @@
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field addScore fun(self: Game, count: integer) Increases score count
 ---@field switchMode fun(self: Game) Switches to next mode
+---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
 
 ---@class GameMutator
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
----@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
 ---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
@@ -97,6 +97,9 @@ local M = require('Module').define{..., metatable = {
     addScore = function(self, count)
       self.score = self.score + count
     end,
+    addEntity = function (self, entity)
+      table.insert(self.entities, entity)
+    end,
     switchMode = function (self)
       if self.mode == 'normal' then
         self.mode = 'paint'
@@ -146,10 +149,7 @@ M.mut = require('Mutator').new {
     end
 
     self.player = guy
-    M.mut.addEntity(self, guy)
-  end,
-  addEntity = function (self, entity)
-    table.insert(self.entities, entity)
+    self:addEntity(guy)
   end,
   disableFocus = function (self)
     self.isFocused = false
@@ -176,12 +176,10 @@ M.mut = require('Mutator').new {
     M.mut.setEntityFrozen(self, attacker, true)
     M.mut.setEntityFrozen(self, defender, true)
 
-    M.mut.addEntity(
-      self,
-      require('Battle').new {
-        attacker = attacker, defender = defender
-      }
-    )
+    self:addEntity(require('Battle').new {
+      attacker = attacker,
+      defender = defender,
+    })
   end,
   setAlternatingKeyIndex = function (self, x)
     self.alternatingKeyIndex = x
@@ -382,7 +380,7 @@ function M.init(game)
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then
             local newPlayer = Guy.makeLeader(LEADER_SPAWN_LOCATION)
-            M.mut.addEntity(game, newPlayer)
+            game:addEntity(newPlayer)
             --- TODO: mutators
             game.player = newPlayer
             game.deathsCount = game.deathsCount + 1
@@ -608,14 +606,14 @@ local function maybeCollect(game, guy)
   if tile == 'forest' then
     addResources(game.resources, { wood = 1 })
     setTile(game.world, pos, 'grass')
-    M.mut.addEntity(game, Guy.makeEvilGuy {
+    game:addEntity(Guy.makeEvilGuy {
       x = patchCenterX,
       y = patchCenterY,
     })
   elseif tile == 'rock' then
     addResources(game.resources, { stone = 1 })
     setTile(game.world, pos, 'cave')
-    M.mut.addEntity(game, Guy.makeStrongEvilGuy {
+    game:addEntity(Guy.makeStrongEvilGuy {
       x = patchCenterX,
       y = patchCenterY,
     })
@@ -661,10 +659,7 @@ local function orderBuild(game)
   -- Build
   addResources(game.resources, { wood = -BUILDING_COST })
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
-  M.mut.addEntity(
-    game,
-    require('Building').new { pos = pos }
-  )
+  game:addEntity(require('Building').new { pos = pos })
   game:addScore(SCORES_TABLE.builtAHouse)
   M.mut.disableFocus(game)
 end
@@ -678,7 +673,7 @@ local function orderSummon(game)
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
   local guy = require('Guy').makeGoodGuy(game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
-  M.mut.addEntity(game, guy)
+  game:addEntity(guy)
   addToSquad(game.squad, guy)
 end
 
