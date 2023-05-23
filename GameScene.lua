@@ -1,4 +1,5 @@
 ---@class GameScene: Scene, Module
+---@field getGame fun(): Game
 
 ---@type GameScene
 local M = require('Module').define{...}
@@ -63,7 +64,6 @@ function M.load(savefileName)
     or require('Game').new {}
 end
 
----@param dt number
 function M.update(dt)
   local pv = game.player.pos
   local cv = game.cursorPos
@@ -94,9 +94,6 @@ function M.textinput(text)
   handleText(game, text)
 end
 
----@param key love.KeyConstant
----@param scancode love.Scancode
----@param isrepeat boolean
 function M.keypressed(key, scancode, isrepeat)
   if scancode == '8' then
     -- Write to file
@@ -143,6 +140,10 @@ end
 
 function M.draw()
   require('Draw').drawGame(game, drawState)
+end
+
+function M.getGame()
+  return game
 end
 
 return M

@@ -20,6 +20,7 @@ Game is an editable image.
 
 ## Quality of life
 
+ - [ ] Draw cursor over everything
  - [ ] Focus mode is a scene
  - [ ] Event system
  - [ ] Path finding

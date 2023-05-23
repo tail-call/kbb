@@ -1,5 +1,6 @@
 local buffer = require('string.buffer')
 
+---@type Scene
 local M = require 'Module'.define{...}
 
 local withColor = require('Util').withColor
@@ -8,7 +9,8 @@ local withColor = require('Util').withColor
 local storedScene = nil
 
 local output = ''
-local prompt = ''
+local input = ''
+local offset = { x = 0, y = 0}
 
 ---@param scene GameScene
 function M.load(scene)
@@ -17,7 +19,7 @@ end
 
 ---@param text string
 function M.textinput(text)
-  prompt = prompt .. text
+  input = input .. text
 end
 
 ---@param ... string
@@ -31,24 +33,30 @@ local function echo(...)
   output = buf:tostring()
 end
 
----@param key love.KeyConstant
----@param scancode love.Scancode
----@param isrepeat boolean
 function M.keypressed(key, scancode, isrepeat)
   if scancode == 'escape' then
    require('main').setScene(storedScene, '#back')
+  elseif scancode == 'home' then
+    offset.x = offset.x + love.graphics.getWidth() / 2
+  elseif scancode == 'end' then
+    offset.x = offset.x - love.graphics.getWidth() / 2
+  elseif scancode == 'pageup' then
+    offset.y = offset.y + love.graphics.getHeight() / 2
+  elseif scancode == 'pagedown' then
+    offset.y = offset.y - love.graphics.getHeight() / 2
   elseif scancode == 'return' then
-    local savedPrompt = prompt
-    prompt = ''
+    local savedPrompt = input
+    input = ''
     local chunk, compileErrorMessage = loadstring(savedPrompt, 'commandline')
     echo('lua>' .. savedPrompt)
     if chunk ~= nil then
-      local commands, helpPages
-      commands = {
-        reload = function(moduleName)
-          require('Module').reload(moduleName)
+      setfenv(chunk, require('Commands').new {
+        root = storedScene.getGame(),
+        echo = echo,
+        clear = function ()
+          output = ''
         end,
-        scribe = function(text)
+        scribe = function (text)
           echo('no scribe for you today')
           -- M.mut.addText(
           --   game,
@@ -58,71 +66,7 @@ function M.keypressed(key, scancode, isrepeat)
           --   }
           -- )
         end,
-        print = function (...)
-          echo(...)
-        end,
-        clear = function (...)
-          output = ''
-        end,
-        help = function (arg)
-          if arg == nil then
-            echo 'try these commands or hit escape if confused:\n'
-            for k in pairs(commands) do
-              echo(('help(%s)'):format(k))
-            end
-          else
-            local helpFunc = helpPages[arg]
-            if helpFunc == nil then
-              echo(([[
----Don't use this command
-%s(...) -- bad]]):format(arg))
-            else
-              helpFunc()
-            end
-          end
-        end,
-        quit = function ()
-          package.loaded['MenuScene'] = nil
-          require('main').loadScene('MenuScene', 'fromgame')
-        end,
-      }
-      helpPages = {
-        [commands.help] = function ()
-          echo [[
----Outputs info about a command in the console
----@param name string
-help(name)]]
-        end,
-        [commands.print] = function ()
-          echo [[
----Prints objects to a console
----@param ... any[]
-print(...)]]
-        end,
-        [commands.clear] = function ()
-          echo [[
----Clears the screen
-clear()]]
-        end,
-        [commands.scribe] = function ()
-          echo [[
----Scribes a message in the world
----@param message string
-scribe(message)]]
-        end,
-        [commands.reload] = function ()
-          echo [[
----Reloads a module
----@param moduleName string
-reload(moduleName)]]
-        end,
-        [commands.quit] = function ()
-          echo [[
----Quits to the main menu
-quit()]]
-        end,
-      }
-      setfenv(chunk, commands)
+      })
       local isSuccess, errorMessage = pcall(chunk)
       if not isSuccess then
         echo(errorMessage)
@@ -131,7 +75,7 @@ quit()]]
       echo(compileErrorMessage or 'Unknown error')
     end
   elseif scancode == 'backspace' then
-    prompt = prompt:sub(1,-2)
+    input = input:sub(1,-2)
   end
 end
 
@@ -140,9 +84,9 @@ local function promptText()
     math.floor(love.timer.getTime() * 4) % 2
   )
   if isBlink then
-    return ('%slua>%s_'):format(output, prompt)
+    return ('%slua>%s_'):format(output, input)
   else
-    return ('%slua>%s'):format(output, prompt)
+    return ('%slua>%s'):format(output, input)
   end
 end
 
@@ -155,8 +99,10 @@ function M.draw()
     love.graphics.rectangle('fill', 0, 0, w, h)
   end)
   love.graphics.origin()
+  love.graphics.translate(offset.x, offset.y)
   love.graphics.print('welcome to command line, try help() or hit escape if confused', 10, 8)
-  love.graphics.print(promptText(), 10, 16)
+  love.graphics.print('use fn+arrows (or pageup, pagedown, home, end) to scroll', 10, 16)
+  love.graphics.print(promptText(), 10, 24)
 end
 
 return M

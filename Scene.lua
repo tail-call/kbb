@@ -1,2 +1,5 @@
 ---@class Scene
 ---@field draw fun() Draws the scene on the screen
+---@field update fun(dt: number) Updates the scene state
+---@field keypressed fun(key: love.KeyConstant, scancode: love.Scancode, isRepeat: boolean) Handles key press
+---@field mousemoved fun(x: number, y: number, dx: number, dy: number, isTouch: boolean) Handles mouse movement
