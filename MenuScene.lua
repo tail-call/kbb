@@ -1,3 +1,7 @@
+---@class MenuScene: Scene
+---@field load fun(kind: 'initial' | 'reload')
+
+---@type MenuScene
 local M = require('Module').define{...}
 
 local SAVEFILE_NAME = './kobo2.kpss'
@@ -31,10 +35,10 @@ local afterDrawTimer = nil
 local doNothingCounter = 0
 local extraText = ''
 
-function M.load(type)
-  if type == 'initial' then
+function M.load(kind)
+  if kind == 'initial' then
     extraText = ''
-  elseif type == 'reload' then
+  elseif kind == 'reload' then
     extraText = 'Reload successful.\n'
   else
     extraText = 'You came back from game.\n'
