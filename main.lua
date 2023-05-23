@@ -4,8 +4,6 @@
 ---@class Object2D: Object
 ---@field pos Vector Object's position in the world
 
-local M = require('Module').define{...}
-
 -- Initialization
 do
   package.preload['res/map.png'] = love.image.newImageData
@@ -30,5 +28,3 @@ function love.load()
   require('Tileset').load()
   require('Scene').loadScene('MenuScene', 'initial')
 end
-
-return M
