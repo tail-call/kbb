@@ -119,6 +119,7 @@ local TERRAIN_COLLISION = { type = 'terrain' }
 
 ---@type GameMutator
 M.mut = require('Mutator').new {
+  -- TODO: this is not used, delete it
   removeGuy = function (self, guy)
     maybeDrop(self.guys, guy)
     removeFromSquad(self.squad, guy)

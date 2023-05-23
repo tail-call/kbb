@@ -41,21 +41,12 @@ end
 local loadTileset = require('Tileset').load
 local loadFont = require('Util').loadFont
 
-local function imageLoader(filename)
-  local imageData = love.image.newImageData(filename)
-  return imageData
-end
-
-local function imageDataLoader(filename)
-  return love.graphics.newImage(filename)
-end
-
 function love.load()
   -- Need to do this before anything else is executed
   do
-    package.preload['res/map.png'] = imageLoader
-    package.preload['res/cga8.png'] = imageLoader
-    package.preload['res/tiles.png'] = imageDataLoader
+    package.preload['res/map.png'] = love.image.newImageData
+    package.preload['res/cga8.png'] = love.image.newImageData
+    package.preload['res/tiles.png'] = love.graphics.newImage
 
     love.graphics.setDefaultFilter('linear', 'nearest')
     love.graphics.setFont(loadFont(require('res/cga8.png'), 8, 8, math.random() > 0.5))
