@@ -8,6 +8,7 @@
 ---# Methods
 ---@field advance fun(self: Timer, dt: number) Advances timer's value
 
+---@type Module
 local M = require('Module').define{..., version = 0, metatable = {
   ---@type Timer
   __index = {

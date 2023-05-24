@@ -41,17 +41,18 @@ local M = require('Module').define{..., version = 0, metatable = {
 
 ---@param obj DrawState
 function M.init(obj)
+  local Timer = require('Timer').new
   obj.windowScale = obj.windowScale or 3
   obj.tileset = obj.tileset or error('DrawState: tileset is required')
   obj.camera = obj.camera or { x = 266 * 16, y = 229 * 16, z = 0.01 }
-  obj.cursorTimer = obj.cursorTimer or require('Timer').new {
+  obj.cursorTimer = obj.cursorTimer or Timer {
     speed = 2,
     threshold = math.pi * 2,
   }
-  obj.battleTimer = obj.battleTimer or require('Timer').new {
+  obj.battleTimer = obj.battleTimer or Timer {
     speed = 2,
   }
-  obj.waterTimer = obj.waterTimer or require('Timer').new {
+  obj.waterTimer = obj.waterTimer or Timer {
     speed = 1/4,
   }
 end
