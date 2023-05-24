@@ -19,13 +19,7 @@
 ---@field behavior 'none' | 'wander'
 ---# Methods
 ---@field move fun(self: Guy, pos: Vector) Changes guy's position
-
----@class GuyMutator
----@field setSpeed fun(self: Guy, speed: number) Sets how quickly may move again after moving
----@field beginWandering fun(self: Guy)
 ---@field advanceTimer fun(self: Guy, dt: number)
----@field rename fun(self: Guy, name: string) Gives the guy a different name
----@field reteam fun(self: Guy, team: GuyTeam) Switches team of the guy
 
 ---@alias CollisionInfo { type: 'entity' | 'terrain' | 'none', entity: Object2D | nil }
 
@@ -48,38 +42,19 @@ local M = require('Module').define{..., metatable = {
       self.pos = pos
       movePixie(self.pixie, self.pos)
     end,
+    advanceTimer = function (self, dt)
+      updatePixie(self.pixie, dt)
+
+      self.timer = self.timer + dt
+
+      while self.timer >= self.speed do
+        self.mayMove = true
+        self.timer = self.timer % self.speed
+        addMoves(self.stats, 1)
+      end
+    end,
   }
 }}
-
----@type Guy
-M.Guy = {}
-
----@type GuyMutator
-M.mut = {
-  rename = function (self, name)
-    self.name = name
-  end,
-  reteam = function (self, team)
-    self.team = team
-  end,
-  beginWandering = function (self)
-    self.behavior = 'wander'
-  end,
-  setSpeed = function (self, speed)
-    self.speed = speed
-  end,
-  advanceTimer = function (self, dt)
-    updatePixie(self.pixie, dt)
-
-    self.timer = self.timer + dt
-
-    while self.timer >= self.speed do
-      self.mayMove = true
-      self.timer = self.timer % self.speed
-      addMoves(self.stats, 1)
-    end
-  end,
-}
 
 ---@param team1 GuyTeam
 ---@param team2 GuyTeam
@@ -140,12 +115,6 @@ function M.warpGuy(guy, vec)
 end
 
 ---@param guy Guy
----@param dt number
-function M.updateGuy(guy, dt)
-  M.mut.advanceTimer(guy, dt)
-end
-
----@param guy Guy
 ---@param delegate GuyDelegate
 function M.behave(guy, delegate)
   if guy.behavior == 'wander' then
@@ -198,7 +167,9 @@ end
 function M.makeHuman(pos)
   local tileset = require('Tileset').getTileset()
 
-  local guy = M.new{
+  return M.new {
+    name = 'Maria',
+    team = 'neutral',
     pixie = {
       quad = tileset.quads.human,
       color = { 1, 1, 1, 1 },
@@ -206,32 +177,32 @@ function M.makeHuman(pos)
     pos = pos,
     tileset = tileset,
   }
-  M.mut.reteam(guy, 'neutral')
-  M.mut.rename(guy, 'Maria')
-  return guy
 end
 
 ---@param pos Vector
 function M.makeGoodGuy(pos)
   local tileset = require('Tileset').getTileset()
 
-  local guy = M.new{
+  return M.new {
+    name = 'Good Guy',
+    team = 'neutral',
     pixie = {
       quad = tileset.quads.guy
     },
     pos = pos,
     tileset = tileset
   }
-  M.mut.reteam(guy, 'good')
-  M.mut.rename(guy, 'Good Guy')
-  return guy
 end
 
 ---@param pos Vector
 function M.makeEvilGuy(pos)
   local tileset = require('Tileset').getTileset()
 
-  local guy = M.new{
+  local guy = M.new {
+    name = 'Evil Guy',
+    team = 'evil',
+    speed = 0.5,
+    behavior = 'wander',
     pixie = {
       quad = tileset.quads.guy,
       color = { 1, 0, 0, 1 },
@@ -239,10 +210,6 @@ function M.makeEvilGuy(pos)
     pos = pos,
     tileset = tileset,
   }
-  M.mut.setSpeed(guy, 0.5)
-  M.mut.beginWandering(guy)
-  M.mut.reteam(guy, 'evil')
-  M.mut.rename(guy, 'Evil Guy')
   return guy
 end
 

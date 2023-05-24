@@ -43,7 +43,6 @@
 local canRecruitGuy = require('Guy').canRecruitGuy
 local moveGuy = require('Guy').moveGuy
 local warpGuy = require('Guy').warpGuy
-local updateGuy = require('Guy').updateGuy
 local setTile = require('World').setTile
 local getTile = require('World').getTile
 local isPassable = require('World').isPassable
@@ -579,11 +578,11 @@ function M.updateGame(game, dt, movementDirections)
     if entity.__module == 'Guy' then
       ---@cast entity Guy
       if getTile(game.world, entity.pos) == 'forest' then
-        updateGuy(entity, dt / 2)
+        entity:advanceTimer(dt / 2)
       elseif getTile(game.world, entity.pos) == 'void' then
-        updateGuy(entity, dt / 8)
+        entity:advanceTimer(dt / 8)
       else
-        updateGuy(entity, dt)
+        entity:advanceTimer(dt)
       end
       if not M.isFrozen(game, entity) then
         behave(entity, game.guyDelegate)
