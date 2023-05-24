@@ -119,30 +119,6 @@ local TERRAIN_COLLISION = { type = 'terrain' }
 
 ---@type GameMutator
 M.mut = require('Mutator').new {
-  -- TODO: this is not used, delete it
-  removeGuy = function (self, guy)
-    maybeDrop(self.guys, guy)
-    removeFromSquad(self.squad, guy)
-    self.frozenEntities[guy] = nil
-
-    local tile = getTile(self.world, guy.pos)
-
-    if guy.team == 'evil' then
-      if tile == 'sand' then
-        setTile(self.world, guy.pos, 'grass')
-      elseif tile == 'grass' then
-        setTile(self.world, guy.pos, 'forest')
-      elseif tile == 'forest' then
-        setTile(self.world, guy.pos, 'water')
-      end
-    elseif guy.team == 'good' then
-      if tile == 'sand' then
-        setTile(self.world, guy.pos, 'rock')
-      else
-        setTile(self.world, guy.pos, 'sand')
-      end
-    end
-  end,
   addPlayer = function (self, guy)
     if self.player ~= nil then
       M.mut.removeEntity(self, self.player)
@@ -157,6 +133,29 @@ M.mut = require('Mutator').new {
   end,
   removeEntity = function (self, entity)
     maybeDrop(self.entities, entity)
+
+    if entity.__module == 'Guy' then
+      removeFromSquad(self.squad, entity)
+      self.frozenEntities[entity] = nil
+
+      local tile = getTile(self.world, entity.pos)
+
+      if entity.team == 'evil' then
+        if tile == 'sand' then
+          setTile(self.world, entity.pos, 'grass')
+        elseif tile == 'grass' then
+          setTile(self.world, entity.pos, 'forest')
+        elseif tile == 'forest' then
+          setTile(self.world, entity.pos, 'water')
+        end
+      elseif entity.team == 'good' then
+        if tile == 'sand' then
+          setTile(self.world, entity.pos, 'rock')
+        else
+          setTile(self.world, entity.pos, 'sand')
+        end
+      end
+    end
   end,
   setEntityFrozen = function (self, entity, state)
     self.frozenEntities[entity] = state or nil
