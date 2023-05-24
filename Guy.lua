@@ -6,6 +6,8 @@
 ---@field enterHouse fun(guest: Guy, building: Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
 
 ---@class Guy: Object2D
+---@field __module 'Guy'
+---# Properties
 ---@field mayMove boolean True if may move
 ---@field name string Guy's name
 ---@field team GuyTeam Guy's team
@@ -15,9 +17,10 @@
 ---@field speed number Delay in seconds between moves
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
+---# Methods
+---@field move fun(self: Guy, pos: Vector) Changes guy's position
 
 ---@class GuyMutator
----@field move fun(self: Guy, pos: Vector) Changes guy's position
 ---@field setSpeed fun(self: Guy, speed: number) Sets how quickly may move again after moving
 ---@field beginWandering fun(self: Guy)
 ---@field advanceTimer fun(self: Guy, dt: number)
@@ -38,6 +41,13 @@ local setMaxHp = require('GuyStats').mut.setMaxHp
 local M = require('Module').define{..., metatable = {
   ---@type Guy
   __index = {
+    move = function (self, pos)
+      self.mayMove = false
+      self.timer = 0
+      addMoves(self.stats, -2)
+      self.pos = pos
+      movePixie(self.pixie, self.pos)
+    end,
   }
 }}
 
@@ -57,13 +67,6 @@ M.mut = {
   end,
   setSpeed = function (self, speed)
     self.speed = speed
-  end,
-  move = function (self, pos)
-    self.mayMove = false
-    self.timer = 0
-    addMoves(self.stats, -2)
-    self.pos = pos
-    movePixie(self.pixie, self.pos)
   end,
   advanceTimer = function (self, dt)
     updatePixie(self.pixie, dt)
@@ -104,7 +107,7 @@ function M.moveGuy(guy, vec, delegate)
   for _, pos in ipairs{ stepForward, diagonalStepLeft, diagonalStepRight } do
     local collision = delegate.collider(pos)
     if collision.type == 'none' then
-      M.mut.move(guy, pos)
+      guy:move(pos)
       return pos
     elseif collision.type == 'entity' then
       local entity = collision.entity
@@ -113,13 +116,13 @@ function M.moveGuy(guy, vec, delegate)
           ---@cast entity Building
           local shouldMove = delegate.enterHouse(guy, entity)
           if shouldMove == 'shouldMove' then
-            M.mut.move(guy, pos)
+            guy:move(pos)
             return pos
           end
         elseif collision.entity.__module == 'Guy' then
           ---@cast entity Guy
           if checkIfRivals(guy.team, collision.entity.team) then
-            M.mut.move(guy, pos)
+            guy:move(pos)
             delegate.beginBattle(guy, entity)
             return pos
           end
