@@ -227,6 +227,10 @@ local function findEntityAtPos(game, pos)
   end)
 end
 
+local function ui(game)
+  return require('UI').makeUIScript(game)
+end
+
 ---@param game Game
 function M.init(game)
   local Guy = require('Guy')
@@ -246,7 +250,7 @@ function M.init(game)
   game.mode = game.mode or 'normal'
 
   game.uiModel = {}
-  game.ui = require('UI').makeUIScript(game)
+  game.ui = ui(game)
   game.guyDelegate = makeGuyDelegate(game, function(self, v)
     local someEntityThere = findEntityAtPos(self, v)
     if someEntityThere then
@@ -595,7 +599,7 @@ local function handleFocusModeInput(game, drawState, scancode, key)
   else
     -- TODO: use mutator
     game.uiModel = {}
-    game.ui = require('UI').makeUIScript(game)
+    game.ui = ui(game)
     echo(game, 'recreated uiModel and ui')
   end
 end
