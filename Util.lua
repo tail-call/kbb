@@ -305,6 +305,18 @@ local function makeBufDumper (array, format)
   end
 end
 
+---@param filename string
+---@param index table | function
+---@return fun()?, string? errorMessage
+local function doFileWithIndex(filename, index)
+  local chunk, compileError = loadfile(filename)
+  if chunk == nil then
+    return nil, compileError
+  end
+
+  return setfenv(chunk, setmetatable({}, { __index = index }))
+end
+
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,
@@ -318,4 +330,5 @@ return {
   skyColorAtTime = skyColorAtTime,
   dump = dump,
   makeBufDumper = makeBufDumper,
+  doFileWithIndex = doFileWithIndex,
 }

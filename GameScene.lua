@@ -17,23 +17,10 @@ local game
 local drawState
 
 ---@param filename string
----@param metatable table
----@return fun()?, string? errorMessage
-local function doFile(filename, metatable)
-  local saveGameFunction, compileError = loadfile(filename)
-  if saveGameFunction == nil then
-    return nil, compileError
-  end
-
-  setfenv(saveGameFunction, setmetatable({}, metatable))
-  return saveGameFunction
-end
-
----@param filename string
 ---@param loaders { [string]: function }
 ---@return fun()?, string? errorMessage
 local function loadGame(filename, loaders)
-  doFile(filename, { __index = function(t, k)
+  return require('Util').doFileWithIndex(filename, function(t, k)
     return function(...)
       local loader = loaders[k]
       if loader ~= nil then
@@ -42,31 +29,32 @@ local function loadGame(filename, loaders)
         return require(k).new(...)
       end
     end
-  end})
+  end)
 end
 
 ---@param savefileName string
 function M.load(savefileName)
-  local tileset = require('Tileset').getTileset()
-  drawState = require('DrawState').new { tileset = tileset }
+  drawState = require('DrawState').new()
+
   if savefileName == '#back' then
     return
+  elseif savefileName == '#dontload' then
+    game = require('Game').new{}
+  else
+    local gameFunction, err = loadGame(savefileName, {
+      quad = function (...)
+        return love.graphics.newQuad(...)
+      end,
+      buf = function (props)
+        local compressedData = love.data.decode('data', 'base64', props.base64)
+        local data = love.data.decompress('string', 'zlib', compressedData)
+        ---@cast data string
+        local array = loadstring(data)()
+        return array
+      end,
+    })
+    game = gameFunction and gameFunction() or error(err)
   end
-  local gameFunction = loadGame(savefileName, {
-    quad = function (...)
-      return love.graphics.newQuad(...)
-    end,
-    buf = function (props)
-      local compressedData = love.data.decode('data', 'base64', props.base64)
-      local data = love.data.decompress('string', 'zlib', compressedData)
-      ---@cast data string
-      local array = loadstring(data)()
-      return array
-    end,
-  })
-  game = gameFunction
-    and gameFunction()
-    or require('Game').new {}
 end
 
 function M.update(dt)
@@ -102,16 +90,14 @@ end
 function M.keypressed(key, scancode, isrepeat)
   if scancode == '8' then
     -- Write to file
-    do
-      local file = io.open('./kobo2.kpss', 'w+')
-      if file == nil then error('no file') end
+    local file = io.open('./kobo2.kpss', 'w+')
+    if file == nil then error('no file') end
 
-      file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
-      file:write('-- It was created at ' .. os.date() .. '\n')
+    file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
+    file:write('-- It was created at ' .. os.date() .. '\n')
 
-      file:write(require('Util').dump(game))
-      file:close()
-    end
+    file:write(require('Util').dump(game))
+    file:close()
   elseif scancode == 'return' then
     require('Scene').loadScene('FocusScene', M)
   end
