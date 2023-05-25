@@ -322,12 +322,10 @@ end
 function M.init(game)
   local Guy = require('Guy')
 
-    -- TODO: use load param
-  game.world = require('World').new(game.world or {})
+  game.world = game.world or {}
   game.score = game.score or 0
-  game.frozenEntities = tbl.weaken({}, 'k')
-  -- TODO: use load param
-  game.resources = require('Resources').new(game.resources or {})
+  game.frozenEntities = tbl.weaken(game.frozenEntities or {}, 'k')
+  game.resources = game.resources or {}
   game.time = game.time or (12 * 60)
   game.entities = game.entities or {}
   game.deathsCount = game.deathsCount or 0
@@ -367,7 +365,9 @@ function M.init(game)
     )
   end
 
-  M.mut.addPlayer(game, Guy.makeLeader(LEADER_SPAWN_LOCATION))
+  if not require('tbl').has(game.entities, game.player) then
+    M.mut.addPlayer(game, Guy.makeLeader(LEADER_SPAWN_LOCATION))
+  end
 
   -- Subscribe to player stats
   -- TODO: move this into an "addPlayer" function

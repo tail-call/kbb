@@ -362,12 +362,6 @@ local function drawGame(game, drawState)
   -- We keep this list so nothing renders twice
   local drawn = {}
 
-  -- TODO: sort all visible objects before drawing
-  local entitiesClone = tbl.iclone(game.entities)
-  table.sort(entitiesClone, function (g1, g2)
-    return g1.pos.y < g2.pos.y
-  end)
-
   -- Draw lines between player and units
   for entity in pairs(game.squad.followers) do
     if entity.__module == 'Guy' then
@@ -419,7 +413,12 @@ local function drawGame(game, drawState)
 
   -- Draw entities
 
-  for _, entity in ipairs(game.entities) do
+  local entities = tbl.iclone(game.entities)
+  table.sort(entities, function (g1, g2)
+    return g1.pos.y < g2.pos.y
+  end)
+
+  for _, entity in ipairs(entities) do
     if entity.__module == 'Building' then
       ---@cast entity Building
       cullAndShade(entity, function ()
@@ -443,11 +442,6 @@ local function drawGame(game, drawState)
         end)
       end
     end
-  end
-
-  -- Draw guys
-
-  for _, guy in ipairs(entitiesClone) do
   end
 
   -- Draw recruit circle

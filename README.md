@@ -14,7 +14,6 @@ Game is an editable image.
 
 ## Bugs
 
- - [ ] Player always respawns in the same spot
  - [ ] Game crashes when saving game if a squad is not empty
 
 ## Quality of life
@@ -236,6 +235,7 @@ Game is an editable image.
  - [x] Object info window near pointer
  - [x] Tile paint mode
  - [x] BUGFIX: Dead guys are not deleted from the squad
+ - [x] BUGFIX: Player always respawns in the same spot
 
 
 # Sources
