@@ -229,93 +229,27 @@ end
 
 ---@param game Game
 function M.makeUIScript(game)
-  local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
-  local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
-  local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
-
-  local model = game.uiModel
-
-  local UIModule = require('UI')
-  local panel = UIModule.makePanel
-  local origin = UIModule.origin
-
-  ---@param drawState DrawState
-  local function fullWidth(drawState)
-    local sw, _ = love.window.getMode()
-    return sw / drawState.windowScale
-  end
-
-  ---@param drawState DrawState
-  local function fullHeight(drawState)
-    local _, sh = love.window.getMode()
-    return sh / drawState.windowScale
-  end
-
-  local function fixed(x)
-    return function () return x end
-  end
-
-  -- TODO: make UI from serialized markup
-  return UIModule.new({}, {
-    panel {
-      background = GRAY_PANEL_COLOR,
-      transform = function () return origin() end,
-      w = fullWidth,
-      h = fixed(8),
-      coloredText = require('UIModel').topPanelText(game)
-    },
-    -- Left panel
-    panel {
-      shouldDraw = model.shouldDrawFocusModeUI,
-      background = GRAY_PANEL_COLOR,
-      transform = function ()
-        return origin():translate(0, 8)
-      end,
-      w = fixed(88),
-      h = fullHeight,
-      text = model.leftPanelText,
-    },
-    -- Empty underlay for console
-    panel {
-      shouldDraw = model.shouldDrawFocusModeUI,
-      background = DARK_GRAY_PANEL_COLOR,
-      transform = function (drawState)
-        return origin():translate(88, fullHeight(drawState) - 60)
-      end,
-      w = fixed(240),
-      h = fixed(52),
-    },
-    -- Right panel
-    panel {
-      background = TRANSPARENT_PANEL_COLOR,
-      transform = function (drawState)
-        return origin():translate(fullWidth(drawState)-88, 8)
-      end,
-      w = fixed(88),
-      h = fixed(128),
-      text = model.rightPanelText,
-    },
-    -- Bottom panel
-    panel {
-      background = GRAY_PANEL_COLOR,
-      transform = function (drawState)
-        return origin():translate(0, fullHeight(drawState) - 8)
-      end,
-      w = fullWidth,
-      h = fixed(8),
-      text = model.bottomPanelText,
-    },
-    -- Command line
-    panel {
-      shouldDraw = model.shouldDrawFocusModeUI,
-      background = TRANSPARENT_PANEL_COLOR,
-      transform = function (drawState)
-        return origin():translate(96, fullHeight(drawState) - 76)
-      end,
-      w = fixed(200),
-      h = fullHeight,
-    },
-  })
+  return require('Util').doFileWithIndex('./screen.ui.lua', {
+    UI = function (children)
+      return require('UI').new({}, children)
+    end,
+    Panel = require('UI').makePanel,
+    Origin = require('UI').origin,
+    Model = game.uiModel,
+    ---@param drawState DrawState
+    FullHeight = function (drawState)
+      local _, sh = love.window.getMode()
+      return sh / drawState.windowScale
+    end,
+    ---@param drawState DrawState
+    FullWidth = function (drawState)
+      local sw, _ = love.window.getMode()
+      return sw / drawState.windowScale
+    end,
+    Fixed = function (x)
+      return function () return x end
+    end,
+  })()
 end
 
 ---@param game Game

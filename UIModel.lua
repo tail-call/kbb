@@ -1,11 +1,13 @@
 ---@class UIModel
 ---
+---@field game Game Game
 ---@field prompt string Command line prompt text
 ---@field console Console Bottom console
 ---
 ---@field leftPanelText fun(): string Left panel text
 ---@field rightPanelText fun(): string Right panel text
 ---@field bottomPanelText fun(): string Bottom panel text
+---@field topPanelText fun(): table
 ---
 ---@field activeTab integer Current active tab in the right panel
 ---@field nextTab fun(self: UIModel) Switches tab in the UI
@@ -21,12 +23,12 @@ local dump = require('Util').dump
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 
-local UIModelModule = {}
+local M = {}
 
 ---Love2d colored text for top panel
 ---@param game Game
 ---@return fun(): table
-function UIModelModule.topPanelText(game)
+local function topPanelText(game)
   return function ()
     local player = game.player
     local controls = ''
@@ -57,7 +59,7 @@ function UIModelModule.topPanelText(game)
 end
 
 ---@param game Game
-function UIModelModule.new(game)
+function M.new(game)
   ---@type UIModel
   local model
   model = {
@@ -65,6 +67,7 @@ function UIModelModule.new(game)
     console = require('Console').new {},
     prompt = '',
     activeTab = 0,
+    topPanelText = topPanelText(game),
     nextTab = function (self)
       self.activeTab = self.activeTab + 1
     end,
@@ -134,4 +137,4 @@ function UIModelModule.new(game)
   return model
 end
 
-return UIModelModule
+return M
