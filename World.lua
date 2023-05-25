@@ -5,9 +5,8 @@
 ---@field revealedTilesCount number Number of tiles player had revealed
 ---@field tileTypes WorldTile[] Tile types of each square in the world
 ---@field fogOfWar number[] How visible is each square in the world. Numbers from 0 to 1
-
----@class WorldMutator
 ---@field revealFogOfWar fun(self: World, pos: Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
+---@field setTile fun(self: World, v: Vector, tile: WorldTile) Changes a tile at specific pos
 
 ---@alias WorldTile
 ---| 'grass'
@@ -20,36 +19,46 @@
 ---| 'cave'
 ---| 'wall'
 
-local M = require('Module').define{...}
-
-local calcVisionDistance = require('VisionSource').calcVisionDistance
-local isVisible = require('VisionSource').isVisible
-
 local FOG_REVEAL_SPEED = 1
 local SQUARE_REVEAL_THRESHOLD = 0.5
 
+---@param world World
+---@param v Vector
+---@return integer
+local function vectorToLinearIndex(world, v)
+  return (v.y - 1) * world.width + v.x
+end
 
----@type WorldMutator
-M.mut = require('Mutator').new {
-  revealFogOfWar = function (self, pos, value, dt)
-    local idx = M.vectorToLinearIndex(self, pos)
-    local oldValue = self.fogOfWar[idx] or 0
-    local newValue = oldValue + value * dt * FOG_REVEAL_SPEED
-    if newValue > 1 then
-      newValue = 1
-    end
-    self.fogOfWar[idx] = newValue
-    if oldValue < SQUARE_REVEAL_THRESHOLD and newValue > SQUARE_REVEAL_THRESHOLD then
-      self.revealedTilesCount = self.revealedTilesCount + 1
-    end
-  end,
-}
+local M = require('Module').define{..., metatable = {
+  ---@type World
+  __index = {
+    revealFogOfWar = function (self, pos, value, dt)
+      local idx = vectorToLinearIndex(self, pos)
+      local oldValue = self.fogOfWar[idx] or 0
+      local newValue = oldValue + value * dt * FOG_REVEAL_SPEED
+      if newValue > 1 then
+        newValue = 1
+      end
+      self.fogOfWar[idx] = newValue
+      if oldValue < SQUARE_REVEAL_THRESHOLD and newValue > SQUARE_REVEAL_THRESHOLD then
+        self.revealedTilesCount = self.revealedTilesCount + 1
+      end
+    end,
+    setTile = function (self, v, t)
+      local id = vectorToLinearIndex(self, v)
+      self.tileTypes[id] = t
+    end,
+  }
+}}
+
+local calcVisionDistance = require('VisionSource').calcVisionDistance
+local isVisible = require('VisionSource').isVisible
 
 ---@param world World
 ---@param v Vector
 ---@return integer
 function M.vectorToLinearIndex(world, v)
-  return (v.y - 1) * world.width + v.x
+  return vectorToLinearIndex(world, v)
 end
 
 ---@param world World
@@ -95,15 +104,6 @@ function M.isPassable(world, v)
   return t == 'grass' or t == 'forest' or t == 'sand' or t == 'void' or t == 'cave' or t == 'snow'
 end
 
--- TODO: make it a mutator
----@param world World
----@param v Vector
----@param t WorldTile
-function M.setTile(world, v, t)
-  local id = M.vectorToLinearIndex(world, v)
-  world.tileTypes[id] = t
-end
-
 ---@param world World
 ---@param v Vector
 ---@return WorldTile
@@ -146,7 +146,7 @@ function M.revealVisionSourceFog(world, visionSource, light, dt)
         alpha = 0
       end
       tmpVec.x, tmpVec.y = x, y
-      M.mut.revealFogOfWar(world, tmpVec, alpha, dt)
+      world:revealFogOfWar(tmpVec, alpha, dt)
     end
   end
 end
@@ -198,10 +198,10 @@ function M.randomizePatch(world, patch)
       local tileToTheLeft = M.getTile(world, { x = x - 1, y = y })
 
       local tile = require('Util').weightedRandom(weightTable)
-      M.setTile(world, { x = x, y = y }, tile.tile)
+      world:setTile({ x = x, y = y }, tile.tile)
 
       if tileAbove == tileToTheLeft and tileAbove ~= 'void' then
-        M.setTile(world, { x = x, y = y }, tileAbove or 'grass')
+        world:setTile({ x = x, y = y }, tileAbove or 'grass')
       end
     end
   end

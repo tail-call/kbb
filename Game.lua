@@ -44,7 +44,6 @@
 
 local canRecruitGuy = require('Guy').canRecruitGuy
 local moveGuy = require('Guy').moveGuy
-local setTile = require('World').setTile
 local getTile = require('World').getTile
 local isPassable = require('World').isPassable
 local tbl = require('tbl')
@@ -53,7 +52,7 @@ local maybeDrop = require('tbl').maybeDrop
 local updateConsole = require('Console').updateConsole
 local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
 local isAFollower = require('Squad').isAFollower
-local revealFogOfWar = require('World').revealVisionSourceFog
+local revealVisionSourceFog = require('World').revealVisionSourceFog
 local skyColorAtTime = require('Util').skyColorAtTime
 local behave = require('Guy').behave
 local addMoves = require('GuyStats').mut.addMoves
@@ -123,17 +122,17 @@ local M = require('Module').define{..., metatable = {
 
         if entity.team == 'evil' then
           if tile == 'sand' then
-            setTile(self.world, entity.pos, 'grass')
+            self.world:setTile(entity.pos, 'grass')
           elseif tile == 'grass' then
-            setTile(self.world, entity.pos, 'forest')
+            self.world:setTile(entity.pos, 'forest')
           elseif tile == 'forest' then
-            setTile(self.world, entity.pos, 'water')
+            self.world:setTile(entity.pos, 'water')
           end
         elseif entity.team == 'good' then
           if tile == 'sand' then
-            setTile(self.world, entity.pos, 'rock')
+            self.world:setTile(entity.pos, 'rock')
           else
-            setTile(self.world, entity.pos, 'sand')
+            self.world:setTile(entity.pos, 'sand')
           end
         end
       end
@@ -420,7 +419,7 @@ function M.updateGame(game, dt, movementDirections)
   }}
 
   for _,v in ipairs(visionSources) do
-    revealFogOfWar(game.world, v, skyColorAtTime(game.time).g, dt)
+    revealVisionSourceFog(game.world, v, skyColorAtTime(game.time).g, dt)
   end
 
   updateConsole(game.uiModel.console, dt)
@@ -514,25 +513,25 @@ local function maybeCollect(game, guy)
   local tile = getTile(game.world, pos)
   if tile == 'forest' then
     addResources(game.resources, { wood = 1 })
-    setTile(game.world, pos, 'grass')
+    game.world:setTile(pos, 'grass')
     game:addEntity(Guy.makeEvilGuy {
       x = patchCenterX,
       y = patchCenterY,
     })
   elseif tile == 'rock' then
     addResources(game.resources, { stone = 1 })
-    setTile(game.world, pos, 'cave')
+    game.world:setTile(pos, 'cave')
     game:addEntity(Guy.makeStrongEvilGuy {
       x = patchCenterX,
       y = patchCenterY,
     })
   elseif tile == 'grass' then
     addResources(game.resources, { grass = 1 })
-    setTile(game.world, pos, 'sand')
+    game.world:setTile(pos, 'sand')
     require('GuyStats').mut.heal(guy.stats, 1)
   elseif tile == 'water' then
     addResources(game.resources, { water = 1 })
-    setTile(game.world, pos, 'sand')
+    game.world:setTile(pos, 'sand')
   end
 end
 
@@ -562,7 +561,7 @@ local function orderBuild(game)
   -- Is building on rock?
   if getTile(game.world, pos) == 'rock' then
     addResources(game.resources, { stone = 1 })
-    setTile(game.world, pos, 'sand')
+    game.world:setTile(pos, 'sand')
   end
 
   -- Build
@@ -616,7 +615,7 @@ end
 
 ---@param game Game
 function M.orderPaint(game)
-  setTile(game.world, game.cursorPos, 'grass')
+  game.world:setTile(game.cursorPos, 'grass')
 end
 
 ---@param game Game
