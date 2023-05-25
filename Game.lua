@@ -30,14 +30,14 @@
 ---@field addScore fun(self: Game, count: integer) Increases score count
 ---@field switchMode fun(self: Game) Switches to next mode
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
+---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
 ---@field resetUI fun(self: Game) Adds an entity to the world
+---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
 
 ---@class GameMutator
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
----@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
----@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
 ---@field disableFocus fun(self: Game) Turns focus mode off
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
@@ -91,6 +91,15 @@ local BUILDING_COST = 5
 local M = require('Module').define{..., metatable = {
   ---@type Game
   __index = {
+    addPlayer = function (self, guy)
+      if self.player ~= nil then
+        self:removeEntity(self.player)
+        self.player = nil
+      end
+
+      self.player = guy
+      self:addEntity(guy)
+    end,
     advanceClock = function (self, dt)
       self.time = (self.time + dt) % (24 * 60)
     end,
@@ -99,6 +108,33 @@ local M = require('Module').define{..., metatable = {
     end,
     addEntity = function (self, entity)
       table.insert(self.entities, entity)
+    end,
+    removeEntity = function (self, entity)
+      maybeDrop(self.entities, entity)
+
+      if entity.__module == 'Guy' then
+        ---@cast entity Guy
+        removeFromSquad(self.squad, entity)
+        self.frozenEntities[entity] = nil
+
+        local tile = getTile(self.world, entity.pos)
+
+        if entity.team == 'evil' then
+          if tile == 'sand' then
+            setTile(self.world, entity.pos, 'grass')
+          elseif tile == 'grass' then
+            setTile(self.world, entity.pos, 'forest')
+          elseif tile == 'forest' then
+            setTile(self.world, entity.pos, 'water')
+          end
+        elseif entity.team == 'good' then
+          if tile == 'sand' then
+            setTile(self.world, entity.pos, 'rock')
+          else
+            setTile(self.world, entity.pos, 'sand')
+          end
+        end
+      end
     end,
     switchMode = function (self)
       if self.mode == 'normal' then
@@ -123,43 +159,8 @@ local TERRAIN_COLLISION = { type = 'terrain' }
 
 ---@type GameMutator
 M.mut = require('Mutator').new {
-  addPlayer = function (self, guy)
-    if self.player ~= nil then
-      M.mut.removeEntity(self, self.player)
-      self.player = nil
-    end
-
-    self.player = guy
-    self:addEntity(guy)
-  end,
   disableFocus = function (self)
     self.isFocused = false
-  end,
-  removeEntity = function (self, entity)
-    maybeDrop(self.entities, entity)
-
-    if entity.__module == 'Guy' then
-      removeFromSquad(self.squad, entity)
-      self.frozenEntities[entity] = nil
-
-      local tile = getTile(self.world, entity.pos)
-
-      if entity.team == 'evil' then
-        if tile == 'sand' then
-          setTile(self.world, entity.pos, 'grass')
-        elseif tile == 'grass' then
-          setTile(self.world, entity.pos, 'forest')
-        elseif tile == 'forest' then
-          setTile(self.world, entity.pos, 'water')
-        end
-      elseif entity.team == 'good' then
-        if tile == 'sand' then
-          setTile(self.world, entity.pos, 'rock')
-        else
-          setTile(self.world, entity.pos, 'sand')
-        end
-      end
-    end
   end,
   setEntityFrozen = function (self, entity, state)
     self.frozenEntities[entity] = state or nil
@@ -205,7 +206,7 @@ local function makeGuyDelegate(game, collider)
         return 'shouldNotMove'
       end
       require('GuyStats').mut.setMaxHp(guy.stats, guy.stats.maxHp + 1)
-      require('Game').mut.removeEntity(game, building)
+      game:removeEntity(building)
       return 'shouldMove'
     end,
     collider = function (pos)
@@ -279,7 +280,7 @@ function M.init(game)
   end
 
   if not require('tbl').has(game.entities, game.player) then
-    M.mut.addPlayer(game, Guy.makeLeader(LEADER_SPAWN_LOCATION))
+    game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
   end
 
   -- Subscribe to player stats
@@ -394,9 +395,8 @@ end
 
 ---@param guy Guy
 ---@param game Game
----@param mut GameMutator
 ---@param battle Battle
-local function die(guy, game, mut, battle)
+local function die(guy, game, battle)
   echo(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
 
   if guy.team == 'evil' then
@@ -404,8 +404,8 @@ local function die(guy, game, mut, battle)
     game:addScore(SCORES_TABLE.killedAnEnemy)
   end
 
-  mut.removeEntity(game, guy)
-  mut.removeEntity(game, battle)
+  game:removeEntity(guy)
+  game:removeEntity(battle)
 end
 
 ---@param game Game Game object
@@ -473,11 +473,11 @@ function M.updateGame(game, dt, movementDirections)
       end, function ()
         -- TODO: use events to die
         if entity.attacker.stats.hp <= 0 then
-          die(entity.attacker, game, M.mut, entity)
+          die(entity.attacker, game, entity)
         end
 
         if entity.defender.stats.hp <= 0 then
-          die(entity.defender, game, M.mut, entity)
+          die(entity.defender, game,  entity)
         end
 
         M.mut.setEntityFrozen(game, entity.attacker, false)
