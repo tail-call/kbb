@@ -17,16 +17,23 @@ local game
 local drawState
 
 ---@param filename string
----@param loaders { [string]: function }
+---@param metatable table
 ---@return fun()?, string? errorMessage
-local function loadGame(filename, loaders)
+local function doFile(filename, metatable)
   local saveGameFunction, compileError = loadfile(filename)
   if saveGameFunction == nil then
     return nil, compileError
   end
 
-  local moduleLoader = {}
-  setmetatable(moduleLoader, { __index = function(t, k)
+  setfenv(saveGameFunction, setmetatable({}, metatable))
+  return saveGameFunction
+end
+
+---@param filename string
+---@param loaders { [string]: function }
+---@return fun()?, string? errorMessage
+local function loadGame(filename, loaders)
+  doFile(filename, { __index = function(t, k)
     return function(...)
       local loader = loaders[k]
       if loader ~= nil then
@@ -35,9 +42,7 @@ local function loadGame(filename, loaders)
         return require(k).new(...)
       end
     end
-  end })
-  setfenv(saveGameFunction, moduleLoader)
-  return saveGameFunction
+  end})
 end
 
 ---@param savefileName string

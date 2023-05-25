@@ -322,7 +322,7 @@ end
 function M.init(game)
   local Guy = require('Guy')
 
-  game.world = game.world or {}
+  game.world = game.world or error('Game: world is required')
   game.score = game.score or 0
   game.frozenEntities = tbl.weaken(game.frozenEntities or {}, 'k')
   game.resources = game.resources or {}
