@@ -56,7 +56,7 @@ end
 
 ---@param game Game
 function M.makeUIScript(game)
-  return require('Util').doFileWithIndex('./screen.ui.lua', {
+  return require('Util').doFileWithIndex('./ui/screen.ui.lua', {
     UI = function (children)
       return M.new({}, children)
     end,

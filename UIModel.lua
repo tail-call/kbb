@@ -25,7 +25,6 @@ function M.new(game)
   local model
   model = {
     __module = 'UIModel',
-    console = require('Console').new {},
     prompt = '',
     game = game,
     nextTab = function (self)
