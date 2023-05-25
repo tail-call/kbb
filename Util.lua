@@ -213,10 +213,11 @@ local function dump(object)
         coroutine.yield(('O[%d]'):format(references[obj]))
       end)
     elseif type(obj) == 'table' then
-      -- TODO: use metatables
-      if obj.__dump then
+      local metatable = getmetatable(obj)
+      local customDump = metatable and metatable.dump or nil
+      if customDump then
         withRecord(obj, function ()
-          obj.__dump(coroutine.yield)
+          customDump(coroutine.yield)
         end)
       else
         -- First dump all dependencies

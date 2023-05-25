@@ -65,8 +65,12 @@ function M.init(world)
   world.fogOfWar = world.fogOfWar or {}
 
   local makeBufDumper = require('Util').makeBufDumper
-  world.fogOfWar.__dump = makeBufDumper(world.fogOfWar, '%.3f,')
-  world.tileTypes.__dump = makeBufDumper(world.tileTypes, '%q,')
+  setmetatable(world.fogOfWar, {
+    dump = makeBufDumper(world.fogOfWar, '%.3f,')
+  })
+  setmetatable(world.tileTypes, {
+    dump = makeBufDumper(world.tileTypes, '%q,')
+  })
 
   ---@type World
 
