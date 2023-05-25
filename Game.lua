@@ -30,6 +30,7 @@
 ---@field addScore fun(self: Game, count: integer) Increases score count
 ---@field switchMode fun(self: Game) Switches to next mode
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
+---@field resetUI fun(self: Game) Adds an entity to the world
 
 ---@class GameMutator
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
@@ -108,6 +109,10 @@ local M = require('Module').define{..., metatable = {
         self.mode = 'normal'
       end
     end,
+    resetUI = function (self)
+      self.uiModel = {}
+      self.ui = require('UI').makeUIScript(self)
+    end
   }
 }}
 
@@ -227,10 +232,6 @@ local function findEntityAtPos(game, pos)
   end)
 end
 
-local function ui(game)
-  return require('UI').makeUIScript(game)
-end
-
 ---@param game Game
 function M.init(game)
   local Guy = require('Guy')
@@ -249,8 +250,7 @@ function M.init(game)
   game.magnificationFactor = game.magnificationFactor or 1
   game.mode = game.mode or 'normal'
 
-  game.uiModel = {}
-  game.ui = ui(game)
+  game:resetUI()
   game.guyDelegate = makeGuyDelegate(game, function(self, v)
     local someEntityThere = findEntityAtPos(self, v)
     if someEntityThere then
@@ -597,9 +597,7 @@ local function handleFocusModeInput(game, drawState, scancode, key)
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
     drawState:setWindowScale(tonumber(scancode) or 1)
   else
-    -- TODO: use mutator
-    game.uiModel = {}
-    game.ui = ui(game)
+    game:resetUI()
     echo(game, 'recreated uiModel and ui')
   end
 end
