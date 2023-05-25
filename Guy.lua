@@ -19,7 +19,7 @@
 ---@field behavior 'none' | 'wander'
 ---# Methods
 ---@field move fun(self: Guy, pos: Vector) Changes guy's position
----@field advanceTimer fun(self: Guy, dt: number)
+---@field update fun(self: Guy, dt: number)
 
 ---@alias CollisionInfo { type: 'entity' | 'terrain' | 'none', entity: Object2D | nil }
 
@@ -27,9 +27,6 @@ local Vector = require('Vector')
 local abilities = require('Ability').abilities
 
 local addMoves = require('GuyStats').mut.addMoves
-local movePixie = require('Pixie').mut.movePixie
-local updatePixie = require('Pixie').mut.updatePixie
-local playSpawnAnimation = require('Pixie').mut.playSpawnAnimation
 local setMaxHp = require('GuyStats').mut.setMaxHp
 
 local M = require('Module').define{..., metatable = {
@@ -40,10 +37,10 @@ local M = require('Module').define{..., metatable = {
       self.timer = 0
       addMoves(self.stats, -2)
       self.pos = pos
-      movePixie(self.pixie, self.pos)
+      self.pixie:move(self.pos)
     end,
-    advanceTimer = function (self, dt)
-      updatePixie(self.pixie, dt)
+    update = function (self, dt)
+      self.pixie:update(dt)
 
       self.timer = self.timer + dt
 
@@ -110,8 +107,9 @@ function M.moveGuy(guy, vec, delegate)
 end
 
 function M.warpGuy(guy, vec)
+  -- TODO: use methods
   guy.pos = vec
-  require('Pixie').mut.playSpawnAnimation(guy.pixie, guy.pos)
+  guy.pixie:playSpawnAnimation(guy.pos)
 end
 
 ---@param guy Guy
@@ -144,8 +142,8 @@ function M.init(guy, load)
   guy.speed = guy.speed or 0.15
   guy.pos = guy.pos or { x = 0, y = 0 }
 
-  movePixie(guy.pixie, guy.pos)
-  playSpawnAnimation(guy.pixie, guy.pos)
+  guy.pixie:move(guy.pos)
+  guy.pixie:playSpawnAnimation(guy.pos)
 end
 
 ---@param pos Vector

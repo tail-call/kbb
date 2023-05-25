@@ -574,15 +574,15 @@ function M.updateGame(game, dt, movementDirections)
     end
   end
 
-  for _, entity in ipairs(game.entities) do
+for _, entity in ipairs(game.entities) do
     if entity.__module == 'Guy' then
       ---@cast entity Guy
       if getTile(game.world, entity.pos) == 'forest' then
-        entity:advanceTimer(dt / 2)
+        entity:update(dt / 2)
       elseif getTile(game.world, entity.pos) == 'void' then
-        entity:advanceTimer(dt / 8)
+        entity:update(dt / 8)
       else
-        entity:advanceTimer(dt)
+        entity:update(dt)
       end
       if not M.isFrozen(game, entity) then
         behave(entity, game.guyDelegate)
