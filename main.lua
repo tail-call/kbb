@@ -26,5 +26,5 @@ function love.load()
   love.mouse.setVisible(false)
 
   require('Tileset').load()
-  require('Scene').loadScene('MenuScene', 'initial')
+  require('Scene').loadScene('./scenes/menu.lua', 'initial')
 end

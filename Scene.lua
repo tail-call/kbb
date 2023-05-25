@@ -18,24 +18,52 @@ do
 end
 
 ---Loads a scene for execution
----@param sceneName string
-function M.loadScene(sceneName, ...)
-  print('Loading ' .. sceneName .. '...')
-  local scene = require('Module').reload(sceneName)
+---@param path string
+function M.loadScene(path, ...)
+  local scene = {}
+  local index = {
+    OnLoad = function (load)
+      scene.load = load
+    end,
+    OnUpdate = function (load)
+      scene.update = load
+    end,
+    OnDraw = function (load)
+      scene.draw = load
+    end,
+    OnKeyPressed = function (load)
+      scene.keypressed = load
+    end,
+    OnMousePressed = function (load)
+      scene.mousepressed = load
+    end,
+    OnMouseReleased = function (load)
+      scene.mousereleased = load
+    end,
+    DrawUI = function (ui)
+      require('Draw').drawUI(require('DrawState').new(), ui)
+    end,
+    UI = function (uiPath, model)
+      return require('UI').makeUIScript({}, uiPath, model)
+    end,
+    Transition = function (path, ...)
+      M.loadScene(path, ...)
+    end
+  }
+  setmetatable(index, { __index = _G })
+  require('Util').doFileWithIndex(path, index)()
   M.setScene(scene, ...)
 end
 
 ---Switches to a different scene
 ---@param scene Scene
 function M.setScene(scene, ...)
-  print('Redefining callbacks for '..scene.__modulename .. '...')
   for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
     love[callbackName] = scene[callbackName]
       or rescuedCallbacks[callbackName]
       or error('main: no such callback: ' .. callbackName)
   end
   if scene.load ~= nil then
-    print('Initializing '..scene.__modulename .. '...')
     scene.load(...)
   end
 end

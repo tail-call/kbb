@@ -1,8 +1,4 @@
----@class MenuScene: Scene
----@field load fun(kind: 'initial' | 'reload')
-
----@type MenuScene
-local M = require('Module').define{...}
+---@module 'lang/scene'
 
 local SAVEFILE_NAME = './kobo2.kpss'
 local AFTER_DRAW_DURATION = 0.05
@@ -16,9 +12,9 @@ local uiModel = {
   doNothingCounter = 0,
 }
 
-local ui = require('UI').makeUIScript({}, './ui/menu.ui.lua', uiModel)
+local ui = UI('./ui/menu.ui.lua', uiModel)
 
-function M.load(kind)
+OnLoad(function (kind)
   local extraText
   if kind == 'initial' then
     extraText = ''
@@ -28,9 +24,9 @@ function M.load(kind)
     extraText = 'You came back from game.\n'
   end
   uiModel.extraText = extraText
-end
+end)
 
-function M.update(dt)
+OnUpdate(function (dt)
   uiModel.cursorTimer = uiModel.cursorTimer + 4 * dt
   if uiModel.cursorTimer > 1 then
     uiModel.cursorTimer = 0
@@ -42,29 +38,28 @@ function M.update(dt)
       afterDraw()
     end
   end
-end
+end)
 
-function M.draw()
+OnDraw(function ()
   love.graphics.scale(3, 3)
-
-  require('Draw').drawUI(require('DrawState').new(), ui)
-end
+  DrawUI(ui)
+end)
 
 ---@param key love.KeyConstant
 ---@param scancode love.Scancode
 ---@param isrepeat boolean
-function M.keypressed(key, scancode, isrepeat)
-  local loadScene = require('Scene').loadScene
+OnKeyPressed(function (key, scancode, isrepeat)
   afterDrawTimer = AFTER_DRAW_DURATION
+  local gameScenePath = './scenes/game.lua'
   if scancode == 'l' then
     uiModel.extraText = '\nLOADING...'
     afterDraw = function ()
-      loadScene('GameScene', SAVEFILE_NAME)
+      Transition(gameScenePath, SAVEFILE_NAME)
     end
   elseif scancode == 'n' then
     uiModel.extraText = '\nSTARTING NEW GAME...'
     afterDraw = function ()
-      loadScene('GameScene', '#dontload')
+      Transition(gameScenePath, '#dontload')
     end
   elseif scancode == 'q' then
     uiModel.extraText = '\nQUITTING...'
@@ -74,7 +69,7 @@ function M.keypressed(key, scancode, isrepeat)
   elseif scancode == 'f' then
     uiModel.extraText = '\nRELOADING...'
     afterDraw = function ()
-      loadScene('MenuScene', 'reload')
+      Transition(gameScenePath, 'reload')
     end
   else
     uiModel.doNothingCounter = uiModel.doNothingCounter + 1
@@ -86,6 +81,4 @@ function M.keypressed(key, scancode, isrepeat)
       afterDraw = nil
     end
   end
-end
-
-return M
+end)

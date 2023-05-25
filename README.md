@@ -18,6 +18,7 @@ Game is an editable image.
 
 ## Quality of life
 
+ - [ ] 'lang/model'
  - [ ] Store object's __module in metatable
  - [ ] Draw cursor over everything
  - [ ] Focus mode is a scene
@@ -237,6 +238,7 @@ Game is an editable image.
  - [x] BUGFIX: Dead guys are not deleted from the squad
  - [x] BUGFIX: Player always respawns in the same spot
  - [x] Get rid of UIModel
+ - [x] 'lang/scene'
 
 # Sources
 

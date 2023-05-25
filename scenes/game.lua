@@ -1,13 +1,6 @@
----@class GameScene: Scene, Module
----@field getGame fun(): Game
-
----@type GameScene
-local M = require('Module').define{...}
-
 local updateDrawState = require('DrawState').updateDrawState
 local Vector = require('Vector')
 local updateGame = require('Game').updateGame
-local handleText = require('Game').handleText
 local handleInput = require('Game').handleInput
 local endRecruiting = require('Game').endRecruiting
 
@@ -32,8 +25,7 @@ local function loadGame(filename, loaders)
   end)
 end
 
----@param savefileName string
-function M.load(savefileName)
+OnLoad(function (savefileName)
   drawState = require('DrawState').new()
 
   if savefileName == '#back' then
@@ -55,9 +47,9 @@ function M.load(savefileName)
     })
     game = gameFunction and gameFunction() or error(err)
   end
-end
+end)
 
-function M.update(dt)
+OnUpdate(function (dt)
   local pv = game.player.pos
   local cv = game.cursorPos
   updateDrawState(
@@ -80,14 +72,9 @@ function M.update(dt)
   end
 
   updateGame(game, dt, directions)
-end
+end)
 
----@param text string
-function M.textinput(text)
-  handleText(game, text)
-end
-
-function M.keypressed(key, scancode, isrepeat)
+OnKeyPressed(function (key, scancode, isrepeat)
   if scancode == '8' then
     -- Write to file
     local file = io.open('./kobo2.kpss', 'w+')
@@ -103,13 +90,13 @@ function M.keypressed(key, scancode, isrepeat)
   end
 
   handleInput(game, drawState, scancode, key)
-end
+end)
 
 ---@param x number
 ---@param y number
 ---@param button 1 | 2 | 3
 ---@param presses table
-function M.mousepressed(x, y, button, presses)
+OnMousePressed(function (x, y, button, presses)
   if button == 1 then
     if game.mode == 'normal' then
       require('Game').beginRecruiting(game)
@@ -117,24 +104,18 @@ function M.mousepressed(x, y, button, presses)
       require('Game').orderPaint(game)
     end
   end
-end
+end)
 
 ---@param x number
 ---@param y number
 ---@param button 1 | 2 | 3
 ---@param presses table
-function M.mousereleased(x, y, button, presses)
+OnMouseReleased(function (x, y, button, presses)
   if button == 1 then
     endRecruiting(game)
   end
-end
+end)
 
-function M.draw()
+OnDraw(function ()
   require('Draw').drawGame(game, drawState)
-end
-
-function M.getGame()
-  return game
-end
-
-return M
+end)

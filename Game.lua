@@ -648,9 +648,4 @@ function M.handleInput(game, drawState, scancode, key)
   end
 end
 
----@param game Game
----@param text string
-function M.handleText(game, text)
-end
-
 return M
