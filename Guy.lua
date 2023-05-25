@@ -19,6 +19,7 @@
 ---@field behavior 'none' | 'wander'
 ---# Methods
 ---@field move fun(self: Guy, pos: Vector) Changes guy's position
+---@field warp fun(self: Guy, pos: Vector) Changes guy's position instantly
 ---@field update fun(self: Guy, dt: number)
 
 ---@alias CollisionInfo { type: 'entity' | 'terrain' | 'none', entity: Object2D | nil }
@@ -38,6 +39,10 @@ local M = require('Module').define{..., metatable = {
       addMoves(self.stats, -2)
       self.pos = pos
       self.pixie:move(self.pos)
+    end,
+    warp = function (self, pos)
+      self.pos = pos
+      self.pixie:playSpawnAnimation(self.pos)
     end,
     update = function (self, dt)
       self.pixie:update(dt)
@@ -104,12 +109,6 @@ function M.moveGuy(guy, vec, delegate)
   end
 
   return guy.pos
-end
-
-function M.warpGuy(guy, vec)
-  -- TODO: use methods
-  guy.pos = vec
-  guy.pixie:playSpawnAnimation(guy.pos)
 end
 
 ---@param guy Guy

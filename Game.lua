@@ -44,7 +44,6 @@
 
 local canRecruitGuy = require('Guy').canRecruitGuy
 local moveGuy = require('Guy').moveGuy
-local warpGuy = require('Guy').warpGuy
 local setTile = require('World').setTile
 local getTile = require('World').getTile
 local isPassable = require('World').isPassable
@@ -471,7 +470,6 @@ function M.updateGame(game, dt, movementDirections)
       updateBattle(game, entity, dt, function (text)
         echo(game, text)
       end, function ()
-        -- TODO: use events to die
         if entity.attacker.stats.hp <= 0 then
           die(entity.attacker, game, entity)
         end
@@ -612,10 +610,9 @@ local function handleNormalModeInput(game, scancode)
     local patch = require('World').patchAt(game.world, game.player.pos)
     require('World').randomizePatch(game.world, patch)
   elseif scancode == 't' then
-    warpGuy(game.player, game.cursorPos)
+    game.player:warp(game.cursorPos)
   end
 end
-
 
 ---@param game Game
 function M.orderPaint(game)
