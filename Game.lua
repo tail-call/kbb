@@ -283,7 +283,6 @@ function M.init(game)
   end
 
   -- Subscribe to player stats
-  -- TODO: move this into an "addPlayer" function
   do
     local function listenPlayerDeath()
       addListener(
