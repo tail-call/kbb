@@ -307,7 +307,7 @@ local function makeBufDumper (array, format)
 end
 
 ---@param filename string
----@param index table
+---@param index table | function
 ---@return fun()?, string? errorMessage
 local function doFileWithIndex(filename, index)
   local chunk, compileError = loadfile(filename)
@@ -315,7 +315,9 @@ local function doFileWithIndex(filename, index)
     return nil, compileError
   end
 
-  return setfenv(chunk, setmetatable({}, { __index = index }))
+  return setfenv(chunk, setmetatable({}, {
+    __index = index --[[@as table]]
+  }))
 end
 
 return {
