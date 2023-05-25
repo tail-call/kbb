@@ -87,6 +87,7 @@ function M.makeUIScript(game)
       return function () return x end
     end,
     math = math,
+    FPS = love.timer.getFPS,
   })()
 end
 

@@ -9,5 +9,6 @@ SetModel = function (...) end
 FormatVector = function (...) end
 Format = function (...) end
 Dump = function (...) end
+FPS = function (...) end
 ---@type UIModel
 Model = {}

@@ -1,5 +1,9 @@
 ---@module 'lang/ui'
 
+local WHITE_COLOR = { 1, 1, 1, 1 }
+local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
+
+
 SetModel {
   leftPanelText = function ()
     return 'Space] exit\n1,2,3,4] scale UI'
@@ -55,6 +59,33 @@ SetModel {
       Model.game.resources.grass,
       Model.game.resources.water
     )
+  end,
+  topPanelText = function ()
+    local player = Model.game.player
+    local controls = ''
+    if Model.game.mode == 'normal' then
+      controls = 'Space] paint\nLMB] recruit\n8] save\nZ] zoom\nF] follow\nQ] gather\nT] warp\nC] collect\n'     
+    elseif Model.game.mode == 'paint' then
+      controls = 'Space] focus\nLMB] paint\n'
+    end
+    return {
+      WHITE_COLOR,
+      Format(
+        'Score: %d | Revealed: %d/%d %0.ffps\n',
+        Model.game.score,
+        Model.game.world.revealedTilesCount,
+        Model.game.world.height * Model.game.world.width,
+        FPS()
+      ),
+      WHITE_COLOR,
+      controls,
+      player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
+      'G] dismiss 1t\n',
+      player.stats.moves >= 25 and Model.game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
+      'R] ritual 25t 1p\n',
+      player.stats.moves >= 50 and Model.game.resources.wood >= 5 and WHITE_COLOR or GRAY_COLOR,
+      'B] build 50t 5w\n',
+    }
   end,
   shouldDrawFocusModeUI = function ()
     return Model.game.mode == 'focus'
