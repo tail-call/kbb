@@ -2,7 +2,6 @@
 
 ---@class UIModel
 ---
----@field game Game Game
 ---@field prompt string Command line prompt text
 ---@field console Console Bottom console
 ---
@@ -18,10 +17,10 @@
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
+local game = Game()
 
 SetModel {
   console = Console(),
-  game = Game(),
   prompt = '',
   activeTab = 0,
   nextTab = function (self)
@@ -44,71 +43,71 @@ SetModel {
           .. 'Action:\n %.2f/%.2f\n'
           .. 'Moves:\n  %s\n'
           .. 'Deaths:\n  %s\n',
-        Model.game.player.name,
-        Model.game.player.pos.x,
-        Model.game.player.pos.y,
-        Model.game.player.stats.hp,
-        Model.game.player.stats.maxHp,
-        Model.game.player.timer,
-        Model.game.player.speed,
-        Model.game.player.stats.moves,
-        Model.game.deathsCount
+        game.player.name,
+        game.player.pos.x,
+        game.player.pos.y,
+        game.player.stats.hp,
+        game.player.stats.maxHp,
+        game.player.timer,
+        game.player.speed,
+        game.player.stats.moves,
+        game.deathsCount
       )
     elseif idx == 2 then
       return ''
         .. header
         .. ' DEBUG\n'
-        .. Format('mayMove %s\n', Model.game.player.mayMove)
-        .. Format('pos %s\n', FormatVector(Model.game.player.pos))
+        .. Format('mayMove %s\n', game.player.mayMove)
+        .. Format('pos %s\n', FormatVector(game.player.pos))
     elseif idx == 3 then
       return ''
         .. header
         .. ' INVENTORY  \n'
-        .. Dump(Model.game.resources)
+        .. Dump(game.resources)
     end
     return ''
   end,
   bottomPanelText = function ()
     return Format(
       '%02d:%02d Wd=%s St=%s Pr=%s Gr=%s Wt=%s',
-      math.floor(Model.game.time / 60),
-      math.floor(Model.game.time % 60),
-      Model.game.resources.wood,
-      Model.game.resources.stone,
-      Model.game.resources.pretzels,
-      Model.game.resources.grass,
-      Model.game.resources.water
+      math.floor(game.time / 60),
+      math.floor(game.time % 60),
+      game.resources.wood,
+      game.resources.stone,
+      game.resources.pretzels,
+      game.resources.grass,
+      game.resources.water
     )
   end,
   topPanelText = function ()
-    local player = Model.game.player
+    local player = game.player
     local controls = ''
-    if Model.game.mode == 'normal' then
+    if game.mode == 'normal' then
       controls = 'Space] paint\nLMB] recruit\n8] save\nZ] zoom\nF] follow\nQ] gather\nT] warp\nC] collect\n'     
-    elseif Model.game.mode == 'paint' then
+    elseif game.mode == 'paint' then
       controls = 'Space] focus\nLMB] paint\n'
     end
     return {
       WHITE_COLOR,
       Format(
         'Score: %d | Revealed: %d/%d %0.ffps\n',
-        Model.game.score,
-        Model.game.world.revealedTilesCount,
-        Model.game.world.height * Model.game.world.width,
+        game.score,
+        game.world.revealedTilesCount,
+        game.world.height * game.world.width,
         FPS()
       ),
       WHITE_COLOR,
       controls,
       player.stats.moves >= 1 and WHITE_COLOR or GRAY_COLOR,
       'G] dismiss 1t\n',
-      player.stats.moves >= 25 and Model.game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
+      player.stats.moves >= 25 and game.resources.pretzels >= 1 and WHITE_COLOR or GRAY_COLOR,
       'R] ritual 25t 1p\n',
-      player.stats.moves >= 50 and Model.game.resources.wood >= 5 and WHITE_COLOR or GRAY_COLOR,
+      player.stats.moves >= 50 and game.resources.wood >= 5 and WHITE_COLOR or GRAY_COLOR,
       'B] build 50t 5w\n',
     }
   end,
   shouldDrawFocusModeUI = function ()
-    return Model.game.mode == 'focus'
+    return game.mode == 'focus'
   end,
 }
 

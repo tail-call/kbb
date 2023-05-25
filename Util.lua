@@ -306,7 +306,7 @@ local function makeBufDumper (array, format)
 end
 
 ---@param filename string
----@param index table | function
+---@param index table
 ---@return fun()?, string? errorMessage
 local function doFileWithIndex(filename, index)
   local chunk, compileError = loadfile(filename)
