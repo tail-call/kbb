@@ -1,26 +1,23 @@
-local buffer = require('string.buffer')
+---@module 'lang/scene'
 
----@type Scene
-local M = require 'Module'.define{...}
+local buffer = require('string.buffer')
 
 local withColor = require('Util').withColor
 
----@type GameScene
-local storedScene = nil
+local game = nil
 
 local output = ''
 local input = ''
 local offset = { x = 0, y = 0}
 
----@param scene GameScene
-function M.load(scene)
-  storedScene = scene
-end
+OnLoad(function (aGame)
+  game = aGame
+end)
 
 ---@param text string
-function M.textinput(text)
+OnTextInput(function (text)
   input = input .. text
-end
+end)
 
 ---@param ... string
 local function echo(...)
@@ -33,9 +30,9 @@ local function echo(...)
   output = buf:tostring()
 end
 
-function M.keypressed(key, scancode, isrepeat)
+OnKeyPressed(function (key, scancode, isrepeat)
   if scancode == 'escape' then
-   require('Scene').setScene(storedScene, '#back')
+    GoBack('#back')
   elseif scancode == 'home' then
     offset.x = offset.x + love.graphics.getWidth() / 2
   elseif scancode == 'end' then
@@ -51,20 +48,18 @@ function M.keypressed(key, scancode, isrepeat)
     echo('lua>' .. savedPrompt)
     if chunk ~= nil then
       setfenv(chunk, require('Commands').new {
-        root = storedScene.getGame(),
+        root = game,
         echo = echo,
         clear = function ()
           output = ''
         end,
         scribe = function (text)
-          echo('no scribe for you today')
-          -- M.mut.addText(
-          --   game,
-          --   require('Text').new {
-          --     text = text,
-          --     pos = game.player.pos,
-          --   }
-          -- )
+          game:addEntity(
+            require('Text').new {
+              text = text,
+              pos = game.player.pos,
+            }
+          )
         end,
       })
       local isSuccess, errorMessage = pcall(chunk)
@@ -77,7 +72,7 @@ function M.keypressed(key, scancode, isrepeat)
   elseif scancode == 'backspace' then
     input = input:sub(1,-2)
   end
-end
+end)
 
 local function promptText()
   local isBlink = 0 == (
@@ -90,9 +85,9 @@ local function promptText()
   end
 end
 
-function M.draw()
-  if storedScene ~= nil then
-    storedScene.draw()
+OnDraw(function ()
+  if game ~= nil then
+    require('Draw').drawGame(game, DrawState)
   end
   withColor(0, 0, 0, 0.8, function ()
     local w, h = love.window.getMode()
@@ -103,6 +98,4 @@ function M.draw()
   love.graphics.print('welcome to command line, try help() or hit escape if confused', 10, 8)
   love.graphics.print('use fn+arrows (or pageup, pagedown, home, end) to scroll', 10, 16)
   love.graphics.print(promptText(), 10, 24)
-end
-
-return M
+end)

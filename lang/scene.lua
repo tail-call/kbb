@@ -4,5 +4,10 @@ OnDraw = function (...) end
 OnKeyPressed = function (...) end
 OnMousePressed = function (...) end
 OnMouseReleased = function (...) end
+OnTextInput = function (...) end
 DrawUI = function (...) end
+---@type DrawState
+DrawState = {}
 Transition = function (...) end
+Self = {}
+GoBack = function (...) end

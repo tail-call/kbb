@@ -6,8 +6,6 @@ local endRecruiting = require('Game').endRecruiting
 
 ---@type Game
 local game
----@type DrawState
-local drawState
 
 ---@param filename string
 ---@param loaders { [string]: function }
@@ -26,8 +24,6 @@ local function loadGame(filename, loaders)
 end
 
 OnLoad(function (savefileName)
-  drawState = require('DrawState').new()
-
   if savefileName == '#back' then
     return
   elseif savefileName == '#dontload' then
@@ -53,7 +49,7 @@ OnUpdate(function (dt)
   local pv = game.player.pos
   local cv = game.cursorPos
   updateDrawState(
-    drawState,
+    DrawState,
     dt,
     game.mode == 'focus'
       and Vector.add(cv, { x = 0, y = 0 })
@@ -86,10 +82,10 @@ OnKeyPressed(function (key, scancode, isrepeat)
     file:write(require('Util').dump(game))
     file:close()
   elseif scancode == 'return' then
-    require('Scene').loadScene('FocusScene', M)
+    Transition('./scenes/focus.lua', game)
   end
 
-  handleInput(game, drawState, scancode, key)
+  handleInput(game, DrawState, scancode, key)
 end)
 
 ---@param x number
@@ -117,5 +113,5 @@ OnMouseReleased(function (x, y, button, presses)
 end)
 
 OnDraw(function ()
-  require('Draw').drawGame(game, drawState)
+  require('Draw').drawGame(game, DrawState)
 end)

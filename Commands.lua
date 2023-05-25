@@ -19,6 +19,7 @@ local function new(opts)
       require('Module').reload(moduleName)
     end,
     scribe = function(text)
+      opts.scribe(text)
     end,
     print = function (...)
       local items = {...}
