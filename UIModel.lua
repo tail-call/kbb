@@ -66,66 +66,11 @@ function M.new(game)
     __module = 'UIModel',
     console = require('Console').new {},
     prompt = '',
+    game = game,
     activeTab = 0,
     topPanelText = topPanelText(game),
     nextTab = function (self)
       self.activeTab = self.activeTab + 1
-    end,
-    rightPanelText = function ()
-      local header = '<- Tab ->\n\n'
-
-      local idx = 1 + (model.activeTab % 3)
-
-      if idx == 1 then
-        return string.format(
-          ''
-            .. header
-            .. 'Name:\n %s\n'
-            .. 'Rank:\n Harmless\n'
-            .. 'Coords:\n %sX %sY\n'
-            .. 'HP:\n %s/%s\n'
-            .. 'Action:\n %.2f/%.2f\n'
-            .. 'Moves:\n  %s\n'
-            .. 'Deaths:\n  %s\n',
-          game.player.name,
-          game.player.pos.x,
-          game.player.pos.y,
-          game.player.stats.hp,
-          game.player.stats.maxHp,
-          game.player.timer,
-          game.player.speed,
-          game.player.stats.moves,
-          game.deathsCount
-        )
-      elseif idx == 2 then
-        return ''
-          .. header
-          .. ' DEBUG\n'
-          .. string.format('mayMove %s\n', game.player.mayMove)
-          .. string.format('pos %s\n', formatVector(game.player.pos))
-      elseif idx == 3 then
-        return ''
-          .. header
-          .. ' INVENTORY  \n'
-          .. dump(game.resources)
-
-      end
-      return ''
-    end,
-    bottomPanelText = function ()
-      return string.format(
-        '%02d:%02d Wd=%s St=%s Pr=%s Gr=%s Wt=%s',
-        math.floor(game.time / 60),
-        math.floor(game.time % 60),
-        game.resources.wood,
-        game.resources.stone,
-        game.resources.pretzels,
-        game.resources.grass,
-        game.resources.water
-      )
-    end,
-    shouldDrawFocusModeUI = function ()
-      return game.mode == 'focus'
     end,
     didTypeCharacter = function (self, char)
       self.prompt = self.prompt .. char

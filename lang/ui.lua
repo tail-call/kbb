@@ -6,5 +6,8 @@ Fixed = function (...) end
 FullHeight = function (...) end
 RGBA = function (...) end
 SetModel = function (...) end
+FormatVector = function (...) end
+Format = function (...) end
+Dump = function (...) end
 ---@type UIModel
 Model = {}

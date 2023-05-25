@@ -4,6 +4,61 @@ SetModel {
   leftPanelText = function ()
     return 'Space] exit\n1,2,3,4] scale UI'
   end,
+  rightPanelText = function ()
+    local header = '<- Tab ->\n\n'
+
+    local idx = 1 + (Model.activeTab % 3)
+
+    if idx == 1 then
+      return Format(
+        ''
+          .. header
+          .. 'Name:\n %s\n'
+          .. 'Rank:\n Harmless\n'
+          .. 'Coords:\n %sX %sY\n'
+          .. 'HP:\n %s/%s\n'
+          .. 'Action:\n %.2f/%.2f\n'
+          .. 'Moves:\n  %s\n'
+          .. 'Deaths:\n  %s\n',
+        Model.game.player.name,
+        Model.game.player.pos.x,
+        Model.game.player.pos.y,
+        Model.game.player.stats.hp,
+        Model.game.player.stats.maxHp,
+        Model.game.player.timer,
+        Model.game.player.speed,
+        Model.game.player.stats.moves,
+        Model.game.deathsCount
+      )
+    elseif idx == 2 then
+      return ''
+        .. header
+        .. ' DEBUG\n'
+        .. Format('mayMove %s\n', Model.game.player.mayMove)
+        .. Format('pos %s\n', FormatVector(Model.game.player.pos))
+    elseif idx == 3 then
+      return ''
+        .. header
+        .. ' INVENTORY  \n'
+        .. Dump(Model.game.resources)
+    end
+    return ''
+  end,
+  bottomPanelText = function ()
+    return Format(
+      '%02d:%02d Wd=%s St=%s Pr=%s Gr=%s Wt=%s',
+      math.floor(Model.game.time / 60),
+      math.floor(Model.game.time % 60),
+      Model.game.resources.wood,
+      Model.game.resources.stone,
+      Model.game.resources.pretzels,
+      Model.game.resources.grass,
+      Model.game.resources.water
+    )
+  end,
+  shouldDrawFocusModeUI = function ()
+    return Model.game.mode == 'focus'
+  end,
 }
 
 return UI {

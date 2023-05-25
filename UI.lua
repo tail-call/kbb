@@ -59,6 +59,9 @@ function M.makeUIScript(game)
     end,
     Panel = M.makePanel,
     Origin = M.origin,
+    Format = string.format,
+    Dump = require('Util').dump,
+    formatVector = require('Vector').formatVector,
     RGBA = function (r, g, b, a)
       return {
         r = r or 1, g = g or 1, b = b or 1, a = a or 1
@@ -83,6 +86,7 @@ function M.makeUIScript(game)
     Fixed = function (x)
       return function () return x end
     end,
+    math = math,
   })()
 end
 
