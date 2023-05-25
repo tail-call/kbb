@@ -245,7 +245,7 @@ function M.init(game)
   game.magnificationFactor = game.magnificationFactor or 1
   game.mode = game.mode or 'normal'
 
-  game.uiModel = require('UIModel').new(game)
+  game.uiModel = {}
   game.ui = require('UI').makeUIScript(game)
   game.guyDelegate = makeGuyDelegate(game, function(self, v)
     local someEntityThere = findEntityAtPos(self, v)
@@ -594,7 +594,7 @@ local function handleFocusModeInput(game, drawState, scancode, key)
     drawState:setWindowScale(tonumber(scancode) or 1)
   else
     -- TODO: use mutator
-    game.uiModel = require('UIModel').new(game)
+    game.uiModel = {}
     game.ui = require('UI').makeUIScript(game)
     echo(game, 'recreated uiModel and ui')
   end
@@ -653,9 +653,6 @@ end
 ---@param game Game
 ---@param text string
 function M.handleText(game, text)
-  if game.mode == 'focus' then
-    game.uiModel:didTypeCharacter(text)
-  end
 end
 
 return M

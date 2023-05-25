@@ -12,5 +12,6 @@ Dump = function (...) end
 FPS = function (...) end
 Text = function (...) end
 Console = function (...) end
+Game = function (...) end
 ---@type UIModel
 Model = {}

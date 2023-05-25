@@ -94,7 +94,10 @@ function M.makeUIScript(game)
     FPS = love.timer.getFPS,
     Text = function (text)
       return function() return text end
-    end
+    end,
+    Game = function ()
+      return game
+    end,
   })()
 end
 

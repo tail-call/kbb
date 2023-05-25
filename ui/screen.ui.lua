@@ -1,11 +1,33 @@
 ---@module 'lang/ui'
 
+---@class UIModel
+---
+---@field game Game Game
+---@field prompt string Command line prompt text
+---@field console Console Bottom console
+---
+---@field leftPanelText fun(): string Left panel text
+---@field rightPanelText fun(): string Right panel text
+---@field bottomPanelText fun(): string Bottom panel text
+---@field topPanelText fun(): table
+---
+---@field activeTab integer Current active tab in the right panel
+---@field nextTab fun(self: UIModel) Switches tab in the UI
+---
+---@field shouldDrawFocusModeUI fun(): boolean True if should draw focus mode UI
+
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 
 SetModel {
   console = Console(),
+  game = Game(),
+  prompt = '',
   activeTab = 0,
+  nextTab = function (self)
+    self.activeTab = self.activeTab + 1
+  end,
+  didTypeCharacter = function () end,
   rightPanelText = function ()
     local header = '<- Tab ->\n\n'
 
