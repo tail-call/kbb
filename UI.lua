@@ -45,7 +45,7 @@ function M.makePanel(bak)
   panel.h = bak.h or 0
   panel.background = bak.background or { 0, 0, 0, 1 }
   panel.coloredText = bak.coloredText
-  panel.text = bak.text
+  panel.text = bak[1]
 
   ---@cast panel PanelUI
   return panel
@@ -63,6 +63,11 @@ function M.makeUIScript(game)
       return {
         r = r or 1, g = g or 1, b = b or 1, a = a or 1
       }
+    end,
+    SetModel = function (props)
+      for k, v in pairs(props) do
+        game.uiModel[k] = v
+      end
     end,
     Model = game.uiModel,
     ---@param drawState DrawState

@@ -1,5 +1,11 @@
 ---@module 'lang/ui'
 
+SetModel {
+  leftPanelText = function ()
+    return 'Space] exit\n1,2,3,4] scale UI'
+  end,
+}
+
 return UI {
   Panel { -- Top panel
     background = RGBA(0.1, 0.5, 0.5, 1),
@@ -16,7 +22,7 @@ return UI {
     end,
     w = Fixed(88),
     h = FullHeight,
-    text = Model.leftPanelText,
+    Model.leftPanelText,
   },
   Panel { -- Empty underlay for console
     shouldDraw = Model.shouldDrawFocusModeUI,
@@ -34,7 +40,7 @@ return UI {
     end,
     w = Fixed(88),
     h = Fixed(128),
-    text = Model.rightPanelText,
+    Model.rightPanelText,
   },
   Panel { -- Bottom panel
     background = RGBA(0.5, 0.5, 0.5, 1),
@@ -43,7 +49,7 @@ return UI {
     end,
     w = FullWidth,
     h = Fixed(8),
-    text = Model.bottomPanelText,
+    Model.bottomPanelText,
   },
   Panel { -- Command line
     shouldDraw = Model.shouldDrawFocusModeUI,

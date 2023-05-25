@@ -5,5 +5,6 @@ FullWidth = function (...) end
 Fixed = function (...) end
 FullHeight = function (...) end
 RGBA = function (...) end
+SetModel = function (...) end
 ---@type UIModel
 Model = {}

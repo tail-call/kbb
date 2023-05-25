@@ -71,9 +71,6 @@ function M.new(game)
     nextTab = function (self)
       self.activeTab = self.activeTab + 1
     end,
-    leftPanelText = function ()
-      return 'Space] exit\n1,2,3,4] scale UI'
-    end,
     rightPanelText = function ()
       local header = '<- Tab ->\n\n'
 

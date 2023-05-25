@@ -595,7 +595,7 @@ local function handleFocusModeInput(game, drawState, scancode, key)
   else
     -- TODO: use mutator
     game.uiModel = require('UIModel').new(game)
-    game.ui = require('Game').makeUIScript(game)
+    game.ui = require('UI').makeUIScript(game)
     echo(game, 'recreated uiModel and ui')
   end
 end
