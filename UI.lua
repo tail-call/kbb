@@ -17,17 +17,17 @@
 
 local M = {}
 
-function M.origin()
+local function origin()
   return love.math.newTransform()
 end
 
 ---@param opts UIOptions
 ---@param children UI[]
 ---@return UI
-function M.new(opts, children)
+local function makeRoot(opts, children)
   return {
     type = 'none',
-    transform = function () return M.origin() end,
+    transform = function () return origin() end,
     shouldDraw = opts.shouldDraw,
     children = children
   }
@@ -35,10 +35,11 @@ end
 
 ---@param bak PanelUI
 ---@return PanelUI
-function M.makePanel(bak)
-  local panel = M.new({
+local function makePanel(bak)
+  local panel = makeRoot({
     shouldDraw = bak.shouldDraw
   }, {})
+
   panel.type = 'panel'
   panel.transform = bak.transform
   panel.w = bak.w or 0
@@ -58,10 +59,10 @@ end
 function M.makeUIScript(game)
   return require('Util').doFileWithIndex('./ui/screen.ui.lua', {
     UI = function (children)
-      return M.new({}, children)
+      return makeRoot({}, children)
     end,
-    Panel = M.makePanel,
-    Origin = M.origin,
+    Panel = makePanel,
+    Origin = origin,
     Format = string.format,
     Dump = require('Util').dump,
     formatVector = require('Vector').formatVector,
