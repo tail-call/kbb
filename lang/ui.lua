@@ -10,5 +10,6 @@ FormatVector = function (...) end
 Format = function (...) end
 Dump = function (...) end
 FPS = function (...) end
+Text = function (...) end
 ---@type UIModel
 Model = {}

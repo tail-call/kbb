@@ -44,8 +44,11 @@ function M.makePanel(bak)
   panel.w = bak.w or 0
   panel.h = bak.h or 0
   panel.background = bak.background or { 0, 0, 0, 1 }
-  panel.coloredText = bak.coloredText
-  panel.text = bak[1]
+  if type(bak[1]) == 'string' then
+    panel.text = bak[1]
+  else
+    panel.coloredText = bak[1]
+  end
 
   ---@cast panel PanelUI
   return panel
@@ -88,6 +91,9 @@ function M.makeUIScript(game)
     end,
     math = math,
     FPS = love.timer.getFPS,
+    Text = function (text)
+      return function() return text end
+    end
   })()
 end
 

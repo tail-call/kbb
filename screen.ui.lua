@@ -3,11 +3,7 @@
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 
-
 SetModel {
-  leftPanelText = function ()
-    return 'Space] exit\n1,2,3,4] scale UI'
-  end,
   rightPanelText = function ()
     local header = '<- Tab ->\n\n'
 
@@ -98,7 +94,7 @@ return UI {
     transform = function () return Origin() end,
     w = FullWidth,
     h = Fixed(8),
-    coloredText = Model.topPanelText,
+    Model.topPanelText,
   },
   Panel { -- Left panel
     shouldDraw = Model.shouldDrawFocusModeUI,
@@ -108,7 +104,7 @@ return UI {
     end,
     w = Fixed(88),
     h = FullHeight,
-    Model.leftPanelText,
+    Text('Space] exit\n1,2,3,4] scale UI'),
   },
   Panel { -- Empty underlay for console
     shouldDraw = Model.shouldDrawFocusModeUI,
