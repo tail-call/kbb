@@ -33,6 +33,7 @@
 ---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
 ---@field resetUI fun(self: Game) Adds an entity to the world
 ---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
+---@field addDeaths fun(self: Game, count: integer) Adds a death to a game
 
 ---@class GameMutator
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
@@ -56,7 +57,6 @@ local isAFollower = require('Squad').isAFollower
 local revealFogOfWar = require('World').revealVisionSourceFog
 local skyColorAtTime = require('Util').skyColorAtTime
 local behave = require('Guy').behave
-
 local addMoves = require('GuyStats').mut.addMoves
 local updateBattle = require('Battle').updateBattle
 local resetRecruitCircle = require('RecruitCircle').mut.resetRecruitCircle
@@ -91,6 +91,9 @@ local BUILDING_COST = 5
 local M = require('Module').define{..., metatable = {
   ---@type Game
   __index = {
+    addDeaths = function (self, guy)
+      self.deathsCount = self.deathsCount + 1
+    end,
     addPlayer = function (self, guy)
       if self.player ~= nil then
         self:removeEntity(self.player)
@@ -291,11 +294,8 @@ function M.init(game)
         game.player.stats,
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then
-            local newPlayer = Guy.makeLeader(LEADER_SPAWN_LOCATION)
-            game:addEntity(newPlayer)
-            --- TODO: mutators
-            game.player = newPlayer
-            game.deathsCount = game.deathsCount + 1
+            game:addDeaths(1)
+            game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
             game:addScore(SCORES_TABLE.dead)
             listenPlayerDeath()
           end
