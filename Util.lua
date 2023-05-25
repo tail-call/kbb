@@ -308,7 +308,7 @@ end
 
 ---@param filename string
 ---@param index table | function
----@return fun()?, string? errorMessage
+---@return function?, string? errorMessage
 local function doFileWithIndex(filename, index)
   local chunk, compileError = loadfile(filename)
   if chunk == nil then

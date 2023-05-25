@@ -6,36 +6,20 @@ local M = require('Module').define{...}
 
 local SAVEFILE_NAME = './kobo2.kpss'
 local AFTER_DRAW_DURATION = 0.05
-local INTRO = [[
-Welcome to KOBOLD PRINCESS SIMULATOR
 
-+In-game controls:---------------------+
-|W, A, S, D) move                 o o  |
-|H, J, K, L) also move             w   |
-|Arrow keys) also move                 |
-|Space)      switch mode               |
-|Return)     open lua console          |
-|            (try typing 'help()')     |
-|Escape)     close lua console         |
-|N)          reload main guy           |
-|E)          terramorphing             |
-+--------------------------------------+
-
-Now choose:
-
-N) Play in empty world
-L) Load world from disk (kobo2.kpss)
-F) Reload this menu
-Q) Quit game
-]]
-
-local cursorTimer = 0
 local afterDraw = nil
 local afterDrawTimer = nil
-local doNothingCounter = 0
-local extraText = ''
+
+local uiModel = {
+  extraText = '',
+  cursorTimer = 0,
+  doNothingCounter = 0,
+}
+
+local ui = require('UI').makeUIScript({}, './ui/menu.ui.lua', uiModel)
 
 function M.load(kind)
+  local extraText
   if kind == 'initial' then
     extraText = ''
   elseif kind == 'reload' then
@@ -43,12 +27,13 @@ function M.load(kind)
   else
     extraText = 'You came back from game.\n'
   end
+  uiModel.extraText = extraText
 end
 
 function M.update(dt)
-  cursorTimer = cursorTimer + 4 * dt
-  if cursorTimer > 1 then
-    cursorTimer = 0
+  uiModel.cursorTimer = uiModel.cursorTimer + 4 * dt
+  if uiModel.cursorTimer > 1 then
+    uiModel.cursorTimer = 0
   end
   if afterDrawTimer ~= nil then
     afterDrawTimer = afterDrawTimer - dt
@@ -61,13 +46,8 @@ end
 
 function M.draw()
   love.graphics.scale(3, 3)
-  love.graphics.print(
-    INTRO
-      .. (extraText)
-      .. (afterDraw and '' or '\nPress a key')
-      .. (cursorTimer > 0.5 and '_' or ''),
-    0, 0
-  )
+
+  require('Draw').drawUI(require('DrawState').new(), ui)
 end
 
 ---@param key love.KeyConstant
@@ -77,30 +57,30 @@ function M.keypressed(key, scancode, isrepeat)
   local loadScene = require('Scene').loadScene
   afterDrawTimer = AFTER_DRAW_DURATION
   if scancode == 'l' then
-    extraText = '\nLOADING...'
+    uiModel.extraText = '\nLOADING...'
     afterDraw = function ()
       loadScene('GameScene', SAVEFILE_NAME)
     end
   elseif scancode == 'n' then
-    extraText = '\nSTARTING NEW GAME...'
+    uiModel.extraText = '\nSTARTING NEW GAME...'
     afterDraw = function ()
       loadScene('GameScene', '#dontload')
     end
   elseif scancode == 'q' then
+    uiModel.extraText = '\nQUITTING...'
     afterDraw = function ()
-      extraText = '\nQUITTING...'
       love.event.quit()
     end
   elseif scancode == 'f' then
-    extraText = '\nRELOADING...'
+    uiModel.extraText = '\nRELOADING...'
     afterDraw = function ()
       loadScene('MenuScene', 'reload')
     end
   else
-    doNothingCounter = doNothingCounter + 1
-    extraText = scancode:upper()
+    uiModel.doNothingCounter = uiModel.doNothingCounter + 1
+    uiModel.extraText = scancode:upper()
       .. ') Do nothing ('
-      .. doNothingCounter
+      .. uiModel.doNothingCounter
       ..')\n'
     afterDraw = function ()
       afterDraw = nil

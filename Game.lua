@@ -22,6 +22,7 @@
 ---@field mode GameMode Current game mode. Affects how player's input is handled.
 ---@field ui UI User interface root
 ---@field uiModel UIModel GUI state
+---@field console Console Bottom console
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field frozenEntities { [Object2D]: true } Entities that should be not rendered and should not behave
@@ -147,8 +148,7 @@ local M = require('Module').define{..., metatable = {
       end
     end,
     resetUI = function (self)
-      self.uiModel = {}
-      self.ui = require('UI').makeUIScript(self)
+      self.ui = require('UI').makeUIScript(self, './ui/screen.ui.lua', {})
     end
   }
 }}
@@ -238,6 +238,7 @@ end
 function M.init(game)
   local Guy = require('Guy')
 
+  game.console = game.console or require('Console').new()
   game.world = game.world or require('World').new()
   game.score = game.score or 0
   game.frozenEntities = tbl.weaken(game.frozenEntities or {}, 'k')
@@ -272,7 +273,7 @@ function M.init(game)
   }
 
   for k, v in ipairs(messages) do
-    game.uiModel.console:say(
+    game.console:say(
       require('ConsoleMessage').new {
         text = v,
         lifetime = 10
@@ -362,7 +363,7 @@ end
 ---@param game Game
 ---@param text string
 local function echo(game, text)
-  game.uiModel.console:say(require('ConsoleMessage').new {
+  game.console:say(require('ConsoleMessage').new {
     text = text,
     lifetime = 60,
   })
@@ -422,7 +423,7 @@ function M.updateGame(game, dt, movementDirections)
     revealVisionSourceFog(game.world, v, skyColorAtTime(game.time).g, dt)
   end
 
-  updateConsole(game.uiModel.console, dt)
+  updateConsole(game.console, dt)
   if isRecruitCircleActive(game.recruitCircle) then
     growRecruitCircle(game.recruitCircle, dt)
   end

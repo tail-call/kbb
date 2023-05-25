@@ -3,7 +3,6 @@
 ---@class UIModel
 ---
 ---@field prompt string Command line prompt text
----@field console Console Bottom console
 ---
 ---@field leftPanelText fun(): string Left panel text
 ---@field rightPanelText fun(): string Right panel text
@@ -20,7 +19,6 @@ local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 local game = Game()
 
 SetModel {
-  console = Console(),
   prompt = '',
   activeTab = 0,
   nextTab = function (self)

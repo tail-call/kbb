@@ -56,8 +56,10 @@ local function makePanel(bak)
 end
 
 ---@param game Game
-function M.makeUIScript(game)
-  return require('Util').doFileWithIndex('./ui/screen.ui.lua', {
+---@param path string
+---@param uiModel UIModel
+function M.makeUIScript(game, path, uiModel)
+  return require('Util').doFileWithIndex(path, {
     UI = function (children)
       return makeRoot({}, children)
     end,
@@ -66,7 +68,6 @@ function M.makeUIScript(game)
     Format = string.format,
     Dump = require('Util').dump,
     formatVector = require('Vector').formatVector,
-    Console = require('Console').new,
     RGBA = function (r, g, b, a)
       return {
         r = r or 1, g = g or 1, b = b or 1, a = a or 1
@@ -74,10 +75,10 @@ function M.makeUIScript(game)
     end,
     SetModel = function (props)
       for k, v in pairs(props) do
-        game.uiModel[k] = v
+        uiModel[k] = v
       end
     end,
-    Model = game.uiModel,
+    Model = uiModel,
     ---@param drawState DrawState
     FullHeight = function (drawState)
       local _, sh = love.window.getMode()
