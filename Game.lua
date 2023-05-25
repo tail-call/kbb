@@ -228,31 +228,6 @@ local function findEntityAtPos(game, pos)
 end
 
 ---@param game Game
-function M.makeUIScript(game)
-  return require('Util').doFileWithIndex('./screen.ui.lua', {
-    UI = function (children)
-      return require('UI').new({}, children)
-    end,
-    Panel = require('UI').makePanel,
-    Origin = require('UI').origin,
-    Model = game.uiModel,
-    ---@param drawState DrawState
-    FullHeight = function (drawState)
-      local _, sh = love.window.getMode()
-      return sh / drawState.windowScale
-    end,
-    ---@param drawState DrawState
-    FullWidth = function (drawState)
-      local sw, _ = love.window.getMode()
-      return sw / drawState.windowScale
-    end,
-    Fixed = function (x)
-      return function () return x end
-    end,
-  })()
-end
-
----@param game Game
 function M.init(game)
   local Guy = require('Guy')
 
@@ -271,7 +246,7 @@ function M.init(game)
   game.mode = game.mode or 'normal'
 
   game.uiModel = require('UIModel').new(game)
-  game.ui = M.makeUIScript(game)
+  game.ui = require('UI').makeUIScript(game)
   game.guyDelegate = makeGuyDelegate(game, function(self, v)
     local someEntityThere = findEntityAtPos(self, v)
     if someEntityThere then

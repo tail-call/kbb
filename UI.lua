@@ -15,19 +15,19 @@
 ---@class UIOptions
 ---@field shouldDraw (fun(): boolean) | nil
 
-local UIModule = {}
+local M = {}
 
-function UIModule.origin()
+function M.origin()
   return love.math.newTransform()
 end
 
 ---@param opts UIOptions
 ---@param children UI[]
 ---@return UI
-function UIModule.new(opts, children)
+function M.new(opts, children)
   return {
     type = 'none',
-    transform = function () return UIModule.origin() end,
+    transform = function () return M.origin() end,
     shouldDraw = opts.shouldDraw,
     children = children
   }
@@ -35,8 +35,8 @@ end
 
 ---@param bak PanelUI
 ---@return PanelUI
-function UIModule.makePanel(bak)
-  local panel = UIModule.new({
+function M.makePanel(bak)
+  local panel = M.new({
     shouldDraw = bak.shouldDraw
   }, {})
   panel.type = 'panel'
@@ -51,4 +51,29 @@ function UIModule.makePanel(bak)
   return panel
 end
 
-return UIModule
+---@param game Game
+function M.makeUIScript(game)
+  return require('Util').doFileWithIndex('./screen.ui.lua', {
+    UI = function (children)
+      return M.new({}, children)
+    end,
+    Panel = M.makePanel,
+    Origin = M.origin,
+    Model = game.uiModel,
+    ---@param drawState DrawState
+    FullHeight = function (drawState)
+      local _, sh = love.window.getMode()
+      return sh / drawState.windowScale
+    end,
+    ---@param drawState DrawState
+    FullWidth = function (drawState)
+      local sw, _ = love.window.getMode()
+      return sw / drawState.windowScale
+    end,
+    Fixed = function (x)
+      return function () return x end
+    end,
+  })()
+end
+
+return M
