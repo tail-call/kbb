@@ -59,6 +59,11 @@ function M.makeUIScript(game)
     end,
     Panel = M.makePanel,
     Origin = M.origin,
+    RGBA = function (r, g, b, a)
+      return {
+        r = r or 1, g = g or 1, b = b or 1, a = a or 1
+      }
+    end,
     Model = game.uiModel,
     ---@param drawState DrawState
     FullHeight = function (drawState)

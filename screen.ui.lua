@@ -1,12 +1,8 @@
 ---@module 'lang/ui'
 
-local TRANSPARENT_PANEL_COLOR = { r = 0, g = 0, b = 0, a = 0 }
-local GRAY_PANEL_COLOR = { r = 0.5, g = 0.5, b = 0.5, a = 1 }
-local DARK_GRAY_PANEL_COLOR = { r = 0.25, g = 0.25, b = 0.25, a = 1 }
-
 return UI {
   Panel { -- Top panel
-    background = GRAY_PANEL_COLOR,
+    background = RGBA(0.1, 0.5, 0.5, 1),
     transform = function () return Origin() end,
     w = FullWidth,
     h = Fixed(8),
@@ -14,7 +10,7 @@ return UI {
   },
   Panel { -- Left panel
     shouldDraw = Model.shouldDrawFocusModeUI,
-    background = GRAY_PANEL_COLOR,
+    background = RGBA(0.5, 0.1, 0.5, 1),
     transform = function ()
       return Origin():translate(0, 8)
     end,
@@ -24,7 +20,7 @@ return UI {
   },
   Panel { -- Empty underlay for console
     shouldDraw = Model.shouldDrawFocusModeUI,
-    background = DARK_GRAY_PANEL_COLOR,
+    background = RGBA(0.25, 0.25, 0.25, 1),
     transform = function (drawState)
       return Origin():translate(88, FullHeight(drawState) - 60)
     end,
@@ -32,7 +28,7 @@ return UI {
     h = Fixed(52),
   },
   Panel { -- Right panel
-    background = TRANSPARENT_PANEL_COLOR,
+    background = RGBA(0, 0, 0, 0),
     transform = function (drawState)
       return Origin():translate(FullWidth(drawState)-88, 8)
     end,
@@ -41,7 +37,7 @@ return UI {
     text = Model.rightPanelText,
   },
   Panel { -- Bottom panel
-    background = GRAY_PANEL_COLOR,
+    background = RGBA(0.5, 0.5, 0.5, 1),
     transform = function (drawState)
       return Origin():translate(0, FullHeight(drawState) - 8)
     end,
@@ -51,7 +47,7 @@ return UI {
   },
   Panel { -- Command line
     shouldDraw = Model.shouldDrawFocusModeUI,
-    background = TRANSPARENT_PANEL_COLOR,
+    background = RGBA(0, 0, 0, 0),
     transform = function (drawState)
       return Origin():translate(96, FullHeight(drawState) - 76)
     end,

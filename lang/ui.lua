@@ -4,5 +4,6 @@ Origin = function (...) end
 FullWidth = function (...) end
 Fixed = function (...) end
 FullHeight = function (...) end
+RGBA = function (...) end
 ---@type UIModel
 Model = {}
