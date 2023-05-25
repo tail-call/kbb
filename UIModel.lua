@@ -28,7 +28,6 @@ function M.new(game)
     console = require('Console').new {},
     prompt = '',
     game = game,
-    activeTab = 0,
     nextTab = function (self)
       self.activeTab = self.activeTab + 1
     end,

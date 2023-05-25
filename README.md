@@ -18,6 +18,7 @@ Game is an editable image.
 
 ## Quality of life
 
+ - [ ] Get rid of UIModel
  - [ ] Store object's __module in metatable
  - [ ] Draw cursor over everything
  - [ ] Focus mode is a scene

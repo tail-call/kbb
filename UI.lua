@@ -65,6 +65,7 @@ function M.makeUIScript(game)
     Format = string.format,
     Dump = require('Util').dump,
     formatVector = require('Vector').formatVector,
+    Console = require('Console').new,
     RGBA = function (r, g, b, a)
       return {
         r = r or 1, g = g or 1, b = b or 1, a = a or 1

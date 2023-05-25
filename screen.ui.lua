@@ -4,6 +4,8 @@ local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 
 SetModel {
+  console = Console(),
+  activeTab = 0,
   rightPanelText = function ()
     local header = '<- Tab ->\n\n'
 
