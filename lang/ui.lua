@@ -14,5 +14,4 @@ Console = function (...) end
 ---@return Game
 Game = function (...) return {} end
 Background = function (...) return {} end
----@type UIModel
 Model = {}

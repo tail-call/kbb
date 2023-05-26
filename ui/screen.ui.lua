@@ -14,6 +14,9 @@
 ---
 ---@field shouldDrawFocusModeUI fun(): boolean True if should draw focus mode UI
 
+---@diagnostic disable-next-line: unknown-cast-variable
+---@cast Model UIModel
+
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 local game = Game()

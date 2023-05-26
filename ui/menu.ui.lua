@@ -1,5 +1,13 @@
 ---@module 'lang/ui'
 
+---@class MenuModel
+---@field extraText string
+---@field afterDraw string
+---@field cursorTimer number
+
+---@diagnostic disable-next-line: unknown-cast-variable
+---@cast Model MenuModel
+
 local INTRO = [[
 Welcome to KOBOLD PRINCESS SIMULATOR
 
@@ -29,9 +37,9 @@ return {
     Size('full', 'full'),
     function ()
       return INTRO
-        .. (Model['extraText'])
-        .. (Model['afterDraw'] and '' or '\nPress a key')
-        .. (Model['cursorTimer'] > 0.5 and '_' or '')
+        .. (Model.extraText)
+        .. (Model.afterDraw and '' or '\nPress a key')
+        .. (Model.cursorTimer > 0.5 and '_' or '')
     end,
     Background(0.2, 0.3, 0.1, 1),
   },
