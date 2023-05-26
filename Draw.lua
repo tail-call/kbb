@@ -376,22 +376,24 @@ local function drawGame(game, drawState)
   drawTerrain(game.player.pos, game.world, drawState, colorOfSky)
 
   -- Draw patch highlight
-  withColor(0, 0, 0, 1, function ()
-    local patchWidth, patchHeight = 8 * TILE_WIDTH, 8 * TILE_HEIGHT
-    local patch = require('World').patchAt(game.world, game.player.pos)
-    love.graphics.rectangle(
-      'line',
-      patch.coords.x * patchWidth,
-      patch.coords.y * patchHeight,
-      patchWidth,
-      patchHeight
-    )
-    love.graphics.print(
-      patch.name,
-      patch.coords.x * patchWidth,
-      patch.coords.y * patchHeight
-    )
-  end)
+  if game.mode == 'paint' then
+    withColor(0, 0, 0, 1, function ()
+      local patchWidth, patchHeight = 8 * TILE_WIDTH, 8 * TILE_HEIGHT
+      local patch = require('World').patchAt(game.world, game.player.pos)
+      love.graphics.rectangle(
+        'line',
+        patch.coords.x * patchWidth,
+        patch.coords.y * patchHeight,
+        patchWidth,
+        patchHeight
+      )
+      love.graphics.print(
+        patch.name,
+        patch.coords.x * patchWidth,
+        patch.coords.y * patchHeight
+      )
+    end)
+  end
 
   -- Draw in-game objects
 
