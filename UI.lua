@@ -44,7 +44,7 @@ local function makePanel(bak)
   panel.transform = bak.transform
   panel.w = bak[1][2] or function () return 0 end
   panel.h = bak[1][3] or function () return 0 end
-  panel.background = bak.background or { 0, 0, 0, 1 }
+  panel.background = bak[3] or { r = 0, g = 0, b = 0, a = 1 }
 
   if type(bak[2]) == 'string' then
     panel.text = bak[2]
@@ -67,11 +67,6 @@ function M.makeUIScript(game, path, uiModel)
     Format = string.format,
     Dump = require('Util').dump,
     formatVector = require('Vector').formatVector,
-    RGBA = function (r, g, b, a)
-      return {
-        r = r or 1, g = g or 1, b = b or 1, a = a or 1
-      }
-    end,
     SetModel = function (props)
       for k, v in pairs(props) do
         uiModel[k] = v
@@ -106,6 +101,12 @@ function M.makeUIScript(game, path, uiModel)
         (height == 'full') and index.FullHeight or index.Fixed(height),
       }
     end,
+    Background = function (r, g, b, a)
+      return {
+        'background',
+        r = r or 1, g = g or 1, b = b or 1, a = a or 1
+      }
+    end
   } 
   return makeRoot({}, require('Util').doFileWithIndex(path, index)())
 end

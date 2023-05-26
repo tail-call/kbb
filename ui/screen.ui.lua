@@ -111,42 +111,43 @@ SetModel {
 
 return {
   Panel { -- Top panel
-    background = RGBA(0.1, 0.5, 0.5, 1),
     transform = function () return Origin() end,
     Size('full', 8),
     Model.topPanelText,
+    Background(0.1, 0.5, 0.5, 1),
   },
   Panel { -- Left panel
     shouldDraw = Model.shouldDrawFocusModeUI,
-    background = RGBA(0.5, 0.1, 0.5, 1),
     transform = function ()
       return Origin():translate(0, 8)
     end,
     Size(88, 'full'),
     Text('Space] exit\n1,2,3,4] scale UI'),
+    Background(0.5, 0.1, 0.5, 1),
   },
   Panel { -- Empty underlay for console
     shouldDraw = Model.shouldDrawFocusModeUI,
-    background = RGBA(0.25, 0.25, 0.25, 1),
     transform = function (drawState)
       return Origin():translate(88, FullHeight(drawState) - 60)
     end,
     Size(240, 52),
+    Text(''),
+    Background(0.25, 0.25, 0.25, 1),
   },
   Panel { -- Right panel
-    background = RGBA(0, 0, 0, 0),
     transform = function (drawState)
-      return Origin():translate(FullWidth(drawState)-88, 8)
+      return Origin():translate(FullWidth(drawState) - 88, 8)
     end,
     Size(88, 128),
     Model.rightPanelText,
+    Background(0, 0, 0, 0),
   },
   Panel { -- Bottom panel
-    background = RGBA(0.5, 0.5, 0.5, 1),
     transform = function (drawState)
       return Origin():translate(0, FullHeight(drawState) - 8)
     end,
     Size('full', 8),
     Model.bottomPanelText,
+    Background(0.5, 0.5, 0.5, 1),
   },
 }

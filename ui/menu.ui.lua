@@ -23,18 +23,16 @@ F) Reload this menu
 Q) Quit game
 ]]
 
-local function text()
-  return INTRO
-    .. (Model['extraText'])
-    .. (Model['afterDraw'] and '' or '\nPress a key')
-    .. (Model['cursorTimer'] > 0.5 and '_' or '')
-end
-
 return {
   Panel {
-    background = RGBA(0.2, 0.3, 0.1, 1),
     transform = function () return Origin() end,
     Size('full', 'full'),
-    text
+    function ()
+      return INTRO
+        .. (Model['extraText'])
+        .. (Model['afterDraw'] and '' or '\nPress a key')
+        .. (Model['cursorTimer'] > 0.5 and '_' or '')
+    end,
+    Background(0.2, 0.3, 0.1, 1),
   },
 }
