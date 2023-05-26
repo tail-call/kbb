@@ -14,8 +14,8 @@
 ---
 ---@field shouldDrawFocusModeUI fun(): boolean True if should draw focus mode UI
 
----@diagnostic disable-next-line: unknown-cast-variable
----@cast Model UIModel
+---@type UIModel
+local Model = Model
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
@@ -27,7 +27,6 @@ SetModel {
   nextTab = function (self)
     self.activeTab = self.activeTab + 1
   end,
-  didTypeCharacter = function () end,
   rightPanelText = function ()
     local header = '<- Tab ->\n\n'
 

@@ -73,7 +73,6 @@ function M.makeUIScript(game, path, uiModel)
       end
     end,
     Model = uiModel,
-    math = math,
     FPS = love.timer.getFPS,
     Text = function (text)
       return function() return text end

@@ -5,8 +5,8 @@
 ---@field afterDraw string
 ---@field cursorTimer number
 
----@diagnostic disable-next-line: unknown-cast-variable
----@cast Model MenuModel
+---@type MenuModel
+local Model = Model
 
 local INTRO = [[
 Welcome to KOBOLD PRINCESS SIMULATOR

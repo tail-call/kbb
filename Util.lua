@@ -321,6 +321,8 @@ local function doFileWithIndex(filename, index)
 end
 
 local function makeLanguage(dictionary)
+  setmetatable(dictionary, { __index = _G })
+
   return {
     doFile = function(path)
       return doFileWithIndex(path, dictionary)()
