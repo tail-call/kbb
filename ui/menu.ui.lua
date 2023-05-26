@@ -30,11 +30,11 @@ local function text()
     .. (Model['cursorTimer'] > 0.5 and '_' or '')
 end
 
-return UI {
+return {
   Panel {
     background = RGBA(0.2, 0.3, 0.1, 1),
     transform = function () return Origin() end,
-    Size(FullWidth, FullHeight),
+    Size('full', 'full'),
     text
   },
 }

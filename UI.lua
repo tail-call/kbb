@@ -42,8 +42,8 @@ local function makePanel(bak)
 
   panel.type = 'panel'
   panel.transform = bak.transform
-  panel.w = bak[1][2] or 0
-  panel.h = bak[1][3] or 0
+  panel.w = bak[1][2] or function () return 0 end
+  panel.h = bak[1][3] or function () return 0 end
   panel.background = bak.background or { 0, 0, 0, 1 }
 
   if type(bak[2]) == 'string' then
@@ -60,10 +60,8 @@ end
 ---@param path string
 ---@param uiModel UIModel
 function M.makeUIScript(game, path, uiModel)
-  return require('Util').doFileWithIndex(path, {
-    UI = function (children)
-      return makeRoot({}, children)
-    end,
+  local index
+  index = {
     Panel = makePanel,
     Origin = origin,
     Format = string.format,
@@ -80,6 +78,17 @@ function M.makeUIScript(game, path, uiModel)
       end
     end,
     Model = uiModel,
+    math = math,
+    FPS = love.timer.getFPS,
+    Text = function (text)
+      return function() return text end
+    end,
+    Game = function ()
+      return game
+    end,
+    Fixed = function (x)
+      return function () return x end
+    end,
     ---@param drawState DrawState
     FullHeight = function (drawState)
       local _, sh = love.window.getMode()
@@ -90,21 +99,15 @@ function M.makeUIScript(game, path, uiModel)
       local sw, _ = love.window.getMode()
       return sw / drawState.windowScale
     end,
-    Fixed = function (x)
-      return function () return x end
-    end,
-    math = math,
-    FPS = love.timer.getFPS,
-    Text = function (text)
-      return function() return text end
-    end,
-    Game = function ()
-      return game
-    end,
     Size = function (width, height)
-      return { 'size', width, height }
+      return {
+        'size',
+        (width == 'full') and index.FullWidth or index.Fixed(width),
+        (height == 'full') and index.FullHeight or index.Fixed(height),
+      }
     end,
-  })()
+  } 
+  return makeRoot({}, require('Util').doFileWithIndex(path, index)())
 end
 
 return M

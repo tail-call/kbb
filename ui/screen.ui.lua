@@ -109,11 +109,11 @@ SetModel {
   end,
 }
 
-return UI {
+return {
   Panel { -- Top panel
     background = RGBA(0.1, 0.5, 0.5, 1),
     transform = function () return Origin() end,
-    Size(FullWidth, Fixed(8)),
+    Size('full', 8),
     Model.topPanelText,
   },
   Panel { -- Left panel
@@ -122,7 +122,7 @@ return UI {
     transform = function ()
       return Origin():translate(0, 8)
     end,
-    Size(Fixed(88), FullHeight),
+    Size(88, 'full'),
     Text('Space] exit\n1,2,3,4] scale UI'),
   },
   Panel { -- Empty underlay for console
@@ -131,14 +131,14 @@ return UI {
     transform = function (drawState)
       return Origin():translate(88, FullHeight(drawState) - 60)
     end,
-    Size(Fixed(240), Fixed(52)),
+    Size(240, 52),
   },
   Panel { -- Right panel
     background = RGBA(0, 0, 0, 0),
     transform = function (drawState)
       return Origin():translate(FullWidth(drawState)-88, 8)
     end,
-    Size(Fixed(88), Fixed(128)),
+    Size(88, 128),
     Model.rightPanelText,
   },
   Panel { -- Bottom panel
@@ -146,7 +146,7 @@ return UI {
     transform = function (drawState)
       return Origin():translate(0, FullHeight(drawState) - 8)
     end,
-    Size(FullWidth, Fixed(8)),
+    Size('full', 8),
     Model.bottomPanelText,
   },
 }
