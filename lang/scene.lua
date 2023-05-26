@@ -5,6 +5,7 @@ OnKeyPressed = function (...) end
 OnMousePressed = function (...) end
 OnMouseReleased = function (...) end
 OnTextInput = function (...) end
+Size = function (...) end
 DrawUI = function (...) end
 ---@type DrawState
 DrawState = {}

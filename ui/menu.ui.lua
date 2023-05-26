@@ -34,8 +34,7 @@ return UI {
   Panel {
     background = RGBA(0.2, 0.3, 0.1, 1),
     transform = function () return Origin() end,
-    w = FullWidth,
-    h = FullHeight,
+    Size(FullWidth, FullHeight),
     text
   },
 }

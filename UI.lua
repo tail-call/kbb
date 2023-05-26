@@ -42,13 +42,14 @@ local function makePanel(bak)
 
   panel.type = 'panel'
   panel.transform = bak.transform
-  panel.w = bak.w or 0
-  panel.h = bak.h or 0
+  panel.w = bak[1][2] or 0
+  panel.h = bak[1][3] or 0
   panel.background = bak.background or { 0, 0, 0, 1 }
-  if type(bak[1]) == 'string' then
-    panel.text = bak[1]
+
+  if type(bak[2]) == 'string' then
+    panel.text = bak[2]
   else
-    panel.coloredText = bak[1]
+    panel.coloredText = bak[2]
   end
 
   ---@cast panel PanelUI
@@ -99,6 +100,9 @@ function M.makeUIScript(game, path, uiModel)
     end,
     Game = function ()
       return game
+    end,
+    Size = function (width, height)
+      return { 'size', width, height }
     end,
   })()
 end

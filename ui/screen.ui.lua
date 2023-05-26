@@ -113,8 +113,7 @@ return UI {
   Panel { -- Top panel
     background = RGBA(0.1, 0.5, 0.5, 1),
     transform = function () return Origin() end,
-    w = FullWidth,
-    h = Fixed(8),
+    Size(FullWidth, Fixed(8)),
     Model.topPanelText,
   },
   Panel { -- Left panel
@@ -123,8 +122,7 @@ return UI {
     transform = function ()
       return Origin():translate(0, 8)
     end,
-    w = Fixed(88),
-    h = FullHeight,
+    Size(Fixed(88), FullHeight),
     Text('Space] exit\n1,2,3,4] scale UI'),
   },
   Panel { -- Empty underlay for console
@@ -133,16 +131,14 @@ return UI {
     transform = function (drawState)
       return Origin():translate(88, FullHeight(drawState) - 60)
     end,
-    w = Fixed(240),
-    h = Fixed(52),
+    Size(Fixed(240), Fixed(52)),
   },
   Panel { -- Right panel
     background = RGBA(0, 0, 0, 0),
     transform = function (drawState)
       return Origin():translate(FullWidth(drawState)-88, 8)
     end,
-    w = Fixed(88),
-    h = Fixed(128),
+    Size(Fixed(88), Fixed(128)),
     Model.rightPanelText,
   },
   Panel { -- Bottom panel
@@ -150,17 +146,7 @@ return UI {
     transform = function (drawState)
       return Origin():translate(0, FullHeight(drawState) - 8)
     end,
-    w = FullWidth,
-    h = Fixed(8),
+    Size(FullWidth, Fixed(8)),
     Model.bottomPanelText,
-  },
-  Panel { -- Command line
-    shouldDraw = Model.shouldDrawFocusModeUI,
-    background = RGBA(0, 0, 0, 0),
-    transform = function (drawState)
-      return Origin():translate(96, FullHeight(drawState) - 76)
-    end,
-    w = Fixed(200),
-    h = FullHeight,
   },
 }
