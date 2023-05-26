@@ -148,7 +148,7 @@ local M = require('Module').define{..., metatable = {
       end
     end,
     resetUI = function (self)
-      self.ui = require('ui/screen')(self, {})
+      self.ui = require('ui/screen.lua')(self, {})
     end
   }
 }}

@@ -15,8 +15,8 @@ do
   package.preload['res/map.png'] = love.image.newImageData
   package.preload['res/cga8.png'] = love.image.newImageData
   package.preload['res/tiles.png'] = love.graphics.newImage
-  package.preload['ui/screen'] = uiLoader
-  package.preload['ui/menu'] = uiLoader
+  package.preload['ui/screen.lua'] = uiLoader
+  package.preload['ui/menu.lua'] = uiLoader
 
   math.randomseed(os.time())
 end
