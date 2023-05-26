@@ -325,6 +325,11 @@ local function drawPointer(drawState, tooltips)
   )
 
   -- Tooltip
+
+  if not tooltips then
+    return
+  end
+
   local tooltipTransform = love.math.newTransform()
     :translate(x + 10, y)
     :scale(2/3, 2/3)

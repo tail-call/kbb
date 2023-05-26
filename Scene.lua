@@ -25,7 +25,7 @@ function M.loadScene(path, ...)
   local prev = previousScene
   local scene = {
     path = path,
-    tooltips = function () return {} end,
+    tooltips = nil,
   }
   local index = {
     DrawState = drawState,
