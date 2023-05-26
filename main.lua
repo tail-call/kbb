@@ -15,16 +15,9 @@ end
 
 function love.load()
   love.graphics.setDefaultFilter('linear', 'nearest')
-  love.graphics.setFont(
-    require('Util').loadFont(
-      require('res/cga8.png'),
-      8, 8,
-      math.random() > 0.5
-    )
-  )
   love.graphics.setLineStyle('rough')
   love.mouse.setVisible(false)
-
+  require('Draw').nextFont()
   require('Tileset').load()
   require('Scene').loadScene('./scenes/menu.lua', 'initial')
 end

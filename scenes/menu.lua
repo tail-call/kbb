@@ -68,9 +68,8 @@ OnKeyPressed(function (key, scancode, isrepeat)
     end
   elseif scancode == 'f' then
     uiModel.extraText = '\nRELOADING...'
-    afterDraw = function ()
-      Transition(gameScenePath, 'reload')
-    end
+    require('Draw').nextFont()
+    Transition(Self.path, 'reload')
   else
     uiModel.doNothingCounter = uiModel.doNothingCounter + 1
     uiModel.extraText = scancode:upper()

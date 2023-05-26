@@ -35,7 +35,7 @@ local M = require('Module').define{..., version = 0, metatable = {
         { x = offset.x, y = offset.y, z = magn },
         dt * CAMERA_LERP_SPEED
       )
-    end
+    end,
   }
 }}
 

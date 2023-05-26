@@ -23,7 +23,7 @@ end
 ---@param path string
 function M.loadScene(path, ...)
   local prev = previousScene
-  local scene = {}
+  local scene = { path = path }
   local index = {
     DrawState = drawState,
     OnLoad = function (load)

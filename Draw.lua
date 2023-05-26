@@ -22,6 +22,8 @@ local RED_COLOR = { 1, 0, 0, 0.8 }
 local YELLOW_COLOR = { 1, 1, 0, 0.8 }
 local GREEN_COLOR = { 0, 1, 0, 0.8 }
 
+local isUsingBoldFont = false
+
 ---@param drawState DrawState
 ---@param ui UI
 local function drawUI(drawState, ui)
@@ -600,8 +602,19 @@ local function drawGame(game, drawState)
   end
 end
 
+local function nextFont()
+  isUsingBoldFont = not isUsingBoldFont
+  love.graphics.setFont(
+    require('Util').loadFont(
+      require('res/cga8.png'),
+      8, 8,
+      isUsingBoldFont
+    )
+  )
+end
 
 return {
   drawGame = drawGame,
   drawUI = drawUI,
+  nextFont = nextFont,
 }
