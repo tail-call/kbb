@@ -15,7 +15,7 @@ Game is an editable image.
 ## Bugs
 
  - [ ] BUG: Game crashes when saving game if a squad is not empty
- - [ ] BUG: quit() doesn't work
+ - [ ] BUG: Vision source shape has a L-shaped notch at the left edge
 
 ## Quality of life
 
@@ -243,6 +243,7 @@ Game is an editable image.
  - [x] 'lang/scene'
  - [x] Draw cursor over everything
  - [x] makeLanguage
+ - [x] BUGFIX: quit() doesn't work
 
 # Sources
 
