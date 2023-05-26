@@ -66,7 +66,7 @@ function M.loadScene(path, ...)
     end,
   }
   setmetatable(index, { __index = _G })
-  require('Util').doFileWithIndex(path, index)()
+  require('Util').makeLanguage(index).doFile(path)
   M.setScene(scene, ...)
 end
 
