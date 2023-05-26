@@ -109,7 +109,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
     file:write(require('Util').dump(game))
     file:close()
   elseif scancode == 'return' then
-    Transition('./scene/console.lua', game)
+    require('scene/console.lua').go(game)
   end
 
   handleInput(game, DrawState, scancode, key)

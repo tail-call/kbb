@@ -55,7 +55,7 @@ local function new(opts)
     end,
     quit = function ()
       package.loaded['MenuScene'] = nil
-      require('Scene').loadScene('./scene/menu.lua', 'fromgame')
+      require('scene/menu.lua').go('fromgame')
     end,
   }
   helpPages = {

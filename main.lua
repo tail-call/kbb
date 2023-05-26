@@ -10,6 +10,14 @@ local function uiLoader(path)
   end
 end
 
+local function sceneLoader(path)
+  return {
+    go = function (...)
+      return require('Scene').loadScene(path, ...)
+    end
+  }
+end
+
 -- Initialization
 do
   package.preload['res/map.png'] = love.image.newImageData
@@ -17,6 +25,9 @@ do
   package.preload['res/tiles.png'] = love.graphics.newImage
   package.preload['ui/screen.lua'] = uiLoader
   package.preload['ui/menu.lua'] = uiLoader
+  package.preload['scene/menu.lua'] = sceneLoader
+  package.preload['scene/game.lua'] = sceneLoader
+  package.preload['scene/console.lua'] = sceneLoader
 
   math.randomseed(os.time())
 end
@@ -27,5 +38,5 @@ function love.load()
   love.mouse.setVisible(false)
   require('Draw').nextFont()
   require('Tileset').load()
-  require('Scene').loadScene('./scene/menu.lua', 'initial')
+  require('scene/menu.lua').go('initial')
 end

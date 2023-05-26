@@ -50,16 +50,15 @@ end)
 ---@param isrepeat boolean
 OnKeyPressed(function (key, scancode, isrepeat)
   afterDrawTimer = AFTER_DRAW_DURATION
-  local gameScenePath = './scene/game.lua'
   if scancode == 'l' then
     uiModel.extraText = '\nLOADING...'
     afterDraw = function ()
-      Transition(gameScenePath, SAVEFILE_NAME)
+      require('scene/game.lua').go(SAVEFILE_NAME)
     end
   elseif scancode == 'n' then
     uiModel.extraText = '\nSTARTING NEW GAME...'
     afterDraw = function ()
-      Transition(gameScenePath, '#dontload')
+      require('scene/game.lua').go('#dontload')
     end
   elseif scancode == 'q' then
     uiModel.extraText = '\nQUITTING...'
@@ -69,7 +68,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
   elseif scancode == 'f' then
     uiModel.extraText = '\nRELOADING...'
     require('Draw').nextFont()
-    Transition(Self.path, 'reload')
+    require(Self.path).go('reload')
   else
     uiModel.doNothingCounter = uiModel.doNothingCounter + 1
     uiModel.extraText = scancode:upper()

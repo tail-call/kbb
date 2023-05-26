@@ -64,9 +64,6 @@ function M.loadScene(path, ...)
     UI = function (uiPath, model)
       return require(uiPath)({}, model)
     end,
-    Transition = function (path, ...)
-      M.loadScene(path, ...)
-    end,
     Self = scene,
     GoBack = function (...)
       require('Scene').setScene(prev, ...)
