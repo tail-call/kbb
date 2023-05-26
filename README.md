@@ -19,7 +19,7 @@ Game is an editable image.
 
 ## Quality of life
 
- - [ ] Language{} syntax
+ - [ ] Clickable buttons
  - [ ] Require scenes and UI layouts
  - [ ] 'lang/model'
  - [ ] Store object's __module in metatable
@@ -242,6 +242,7 @@ Game is an editable image.
  - [x] Get rid of UIModel
  - [x] 'lang/scene'
  - [x] Draw cursor over everything
+ - [x] makeLanguage
 
 # Sources
 
