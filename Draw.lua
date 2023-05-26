@@ -34,7 +34,9 @@ local function drawUI(drawState, ui)
     ---@cast ui UI
   elseif ui.type == 'panel' then
     ---@cast ui PanelUI
-    local bg = ui.background
+    local bg = (type(ui.background) == 'function')
+      and ui.background()
+      or ui.background
 
     local width, height = ui.w(drawState), ui.h(drawState)
     withColor(bg.r, bg.g, bg.b, bg.a, function ()

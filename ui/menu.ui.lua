@@ -41,6 +41,13 @@ return {
         .. (Model.afterDraw and '' or '\nPress a key')
         .. (Model.cursorTimer > 0.5 and '_' or '')
     end,
-    Background(0.2, 0.3, 0.1, 1),
+    Background(function()
+      return {
+        r = (love.timer.getTime() % 1) / 2,
+        g = 0.3,
+        b = 0.1,
+        a = 1
+      }
+    end),
   },
 }

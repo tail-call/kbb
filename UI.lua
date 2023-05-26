@@ -4,11 +4,18 @@
 ---@field shouldDraw (fun(): boolean) | nil
 ---@field children UI[]
 
+---@class UIColor
+---@field r number
+---@field g number
+---@field b number
+---@field a number
+---@field fun fun(): UIColor
+
 ---@class PanelUI: UI
 ---@field type 'panel'
 ---@field w fun(drawState: DrawState): integer
 ---@field h fun(drawState: DrawState): integer
----@field background { r: number, g: number, b: number, a: number }
+---@field background UIColor
 ---@field text fun(): string
 ---@field coloredText fun(): table
 
@@ -44,7 +51,12 @@ local function makePanel(bak)
   panel.transform = bak.transform
   panel.w = bak[1][2] or function () return 0 end
   panel.h = bak[1][3] or function () return 0 end
-  panel.background = bak[3] or { r = 0, g = 0, b = 0, a = 1 }
+  panel.background = { r = 0, g = 0, b = 0, a = 1 }
+  if type(bak[3].fun) == 'function' then
+    panel.background = bak[3].fun
+  else
+    panel.background = bak[3]
+  end
 
   if type(bak[2]) == 'string' then
     panel.text = bak[2]
@@ -101,10 +113,14 @@ function M.makeUIScript(game, path, uiModel)
       }
     end,
     Background = function (r, g, b, a)
-      return {
-        'background',
-        r = r or 1, g = g or 1, b = b or 1, a = a or 1
-      }
+      if type(r) == 'function' then
+        return { 'background', fun = r }
+      else
+        return {
+          'background',
+          r = r or 1, g = g or 1, b = b or 1, a = a or 1
+        }
+      end
     end
   }
 
