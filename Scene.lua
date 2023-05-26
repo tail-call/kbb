@@ -62,7 +62,7 @@ function M.loadScene(path, ...)
       require('Draw').drawUI(require('DrawState').new(), ui)
     end,
     UI = function (uiPath, model)
-      return require('UI').makeUIScript({}, uiPath, model)
+      return require(uiPath)({}, model)
     end,
     Transition = function (path, ...)
       M.loadScene(path, ...)
