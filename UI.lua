@@ -107,8 +107,14 @@ function M.makeUIScript(game, path, uiModel)
         r = r or 1, g = g or 1, b = b or 1, a = a or 1
       }
     end
-  } 
-  return makeRoot({}, require('Util').doFileWithIndex(path, index)())
+  }
+
+  return makeRoot(
+    {},
+    require('Util')
+      .makeLanguage(index)
+      .doFile(path)
+  )
 end
 
 return M

@@ -18,6 +18,8 @@ Game is an editable image.
 
 ## Quality of life
 
+ - [ ] Language{} syntax
+ - [ ] Require scenes and UI layouts
  - [ ] 'lang/model'
  - [ ] Store object's __module in metatable
  - [ ] Draw cursor over everything

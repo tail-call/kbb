@@ -320,6 +320,14 @@ local function doFileWithIndex(filename, index)
   }))
 end
 
+local function makeLanguage(dictionary)
+  return {
+    doFile = function(path)
+      return doFileWithIndex(path, dictionary)()
+    end
+  }
+end
+
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,
@@ -334,4 +342,5 @@ return {
   dump = dump,
   makeBufDumper = makeBufDumper,
   doFileWithIndex = doFileWithIndex,
+  makeLanguage = makeLanguage,
 }
