@@ -17,6 +17,8 @@ Game is an editable image.
  - [ ] BUG: Game crashes when saving game if a squad is not empty
  - [ ] BUG: Vision source shape has a L-shaped notch at the left edge
  - [ ] BUG: Friendly units won't fight
+ - [ ] BUG: Text objects are not passable
+ - [ ] BUG: Text objects render over other objects
 
 ## Quality of life
 
