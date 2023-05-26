@@ -12,7 +12,7 @@ local game
 ---@param loaders { [string]: function }
 ---@return fun()?, string? errorMessage
 local function loadGame(filename, loaders)
-  return require('Util').doFileWithIndex(filename, function(t, k)
+  return require('Util').loadFileWithIndex(filename, function(t, k)
     return function(...)
       local loader = loaders[k]
       if loader ~= nil then
@@ -109,7 +109,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
     file:write(require('Util').dump(game))
     file:close()
   elseif scancode == 'return' then
-    Transition('./scenes/focus.lua', game)
+    Transition('./scene/console.lua', game)
   end
 
   handleInput(game, DrawState, scancode, key)

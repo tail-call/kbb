@@ -12,7 +12,7 @@ local uiModel = {
   doNothingCounter = 0,
 }
 
-local ui = UI('./ui/menu.ui.lua', uiModel)
+local ui = UI('./ui/menu.lua', uiModel)
 
 OnLoad(function (kind)
   local extraText
@@ -50,7 +50,7 @@ end)
 ---@param isrepeat boolean
 OnKeyPressed(function (key, scancode, isrepeat)
   afterDrawTimer = AFTER_DRAW_DURATION
-  local gameScenePath = './scenes/game.lua'
+  local gameScenePath = './scene/game.lua'
   if scancode == 'l' then
     uiModel.extraText = '\nLOADING...'
     afterDraw = function ()

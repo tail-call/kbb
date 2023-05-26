@@ -19,5 +19,5 @@ function love.load()
   love.mouse.setVisible(false)
   require('Draw').nextFont()
   require('Tileset').load()
-  require('Scene').loadScene('./scenes/menu.lua', 'initial')
+  require('Scene').loadScene('./scene/menu.lua', 'initial')
 end

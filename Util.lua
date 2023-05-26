@@ -309,7 +309,7 @@ end
 ---@param filename string
 ---@param index table | function
 ---@return function?, string? errorMessage
-local function doFileWithIndex(filename, index)
+local function loadFileWithIndex(filename, index)
   local chunk, compileError = loadfile(filename)
   if chunk == nil then
     return nil, compileError
@@ -325,7 +325,11 @@ local function makeLanguage(dictionary)
 
   return {
     doFile = function(path)
-      return doFileWithIndex(path, dictionary)()
+      local chunk, err = loadFileWithIndex(path, dictionary)
+      if not chunk then
+        error(err)
+      end
+      return chunk()
     end
   }
 end
@@ -343,6 +347,6 @@ return {
   skyColorAtTime = skyColorAtTime,
   dump = dump,
   makeBufDumper = makeBufDumper,
-  doFileWithIndex = doFileWithIndex,
+  loadFileWithIndex = loadFileWithIndex,
   makeLanguage = makeLanguage,
 }
