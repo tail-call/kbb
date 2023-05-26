@@ -14,7 +14,8 @@ Game is an editable image.
 
 ## Bugs
 
- - [ ] Game crashes when saving game if a squad is not empty
+ - [ ] BUG: Game crashes when saving game if a squad is not empty
+ - [ ] BUG: quit() doesn't work
 
 ## Quality of life
 
@@ -22,7 +23,6 @@ Game is an editable image.
  - [ ] Require scenes and UI layouts
  - [ ] 'lang/model'
  - [ ] Store object's __module in metatable
- - [ ] Draw cursor over everything
  - [ ] Focus mode is a scene
  - [ ] Event system
  - [ ] Path finding
@@ -241,6 +241,7 @@ Game is an editable image.
  - [x] BUGFIX: Player always respawns in the same spot
  - [x] Get rid of UIModel
  - [x] 'lang/scene'
+ - [x] Draw cursor over everything
 
 # Sources
 

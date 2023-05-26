@@ -3,6 +3,7 @@ local Vector = require('Vector')
 local updateGame = require('Game').updateGame
 local handleInput = require('Game').handleInput
 local endRecruiting = require('Game').endRecruiting
+local getTile = require('World').getTile
 
 ---@type Game
 local game
@@ -22,6 +23,32 @@ local function loadGame(filename, loaders)
     end
   end)
 end
+
+Tooltip(function ()
+  if not game then
+    return {}
+  end
+
+  local line1 = getTile(game.world, game.cursorPos) or '???'
+  local line2 = Vector.formatVector(game.cursorPos)
+  local entity = {}
+  -- Detect entities under cursor
+  for k, v in ipairs(game.entities) do
+    if Vector.equal(v.pos, game.cursorPos) then
+      entity = v
+    end
+  end
+
+  local line3 = ''
+  if entity.__module then
+    local textGenerator = require(entity.__module).tooltipText or function (_)
+      return 'nothing special'
+    end
+    line3 = textGenerator(entity)
+  end
+
+  return { line1, line2, line3 }
+end)
 
 OnLoad(function (savefileName)
   if savefileName == '#back' then

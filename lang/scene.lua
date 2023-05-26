@@ -10,5 +10,6 @@ DrawUI = function (...) end
 ---@type DrawState
 DrawState = {}
 Transition = function (...) end
+Tooltip = function (...) end
 Self = {}
 GoBack = function (...) end

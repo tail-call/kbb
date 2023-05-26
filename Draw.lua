@@ -1,6 +1,5 @@
 local parallaxTile = require('Tileset').parallaxTile
 local tbl = require('tbl')
-local Vector = require('Vector')
 local withColor = require('Util').withColor
 local withLineWidth = require('Util').withLineWidth
 local withTransform = require('Util').withTransform
@@ -9,7 +8,6 @@ local mayRecruit = require('Game').mayRecruit
 local vectorToLinearIndex = require('World').vectorToLinearIndex
 local skyColorAtTime = require('Util').skyColorAtTime
 local getFog = require('World').getFog
-local getTile = require('World').getTile
 local TILE_HEIGHT = require('const').TILE_HEIGHT
 local TILE_WIDTH = require('const').TILE_WIDTH
 
@@ -313,6 +311,35 @@ local function drawTerrain(observerPos, world, drawState, sky)
   end
 end
 
+---@param drawState DrawState
+---@param tooltips fun(): string[]
+local function drawPointer(drawState, tooltips)
+  local x, y = love.mouse.getPosition()
+  x = x / drawState.windowScale
+  y = y / drawState.windowScale
+
+  love.graphics.draw(
+    drawState.tileset.image,
+    drawState.tileset.quads.pointer,
+    x, y
+  )
+
+  -- Tooltip
+  local tooltipTransform = love.math.newTransform()
+    :translate(x + 10, y)
+    :scale(2/3, 2/3)
+
+  withTransform(tooltipTransform, function ()
+    withColor(0, 0, 0, 0.5, function ()
+      local width, height = 72, 72
+      love.graphics.rectangle('fill', 0, 0, width, height)
+    end)
+    love.graphics.print(tooltips()[1] or '')
+    love.graphics.print(tooltips()[2] or '', 0, 8)
+    love.graphics.print(tooltips()[3] or '', 0, 16)
+  end)
+end
+
 ---@param game Game
 ---@param drawState DrawState
 local function drawGame(game, drawState)
@@ -556,50 +583,6 @@ local function drawGame(game, drawState)
       end
     end)
   end)
-
-  -- Pointer
-  do
-    local x, y = love.mouse.getPosition()
-    x = x / drawState.windowScale
-    y = y / drawState.windowScale
-   
-    love.graphics.draw(
-      drawState.tileset.image,
-      drawState.tileset.quads.pointer,
-      x, y
-    )
-
-    local tileUnderCursor = getTile(game.world, game.cursorPos) or '???'
-
-    -- Tooltip
-    local tooltipTransform = love.math.newTransform()
-      :translate(x + 10, y)
-      :scale(2/3, 2/3)
-
-    local entity = {}
-    -- Detect entities under cursor
-    for k, v in ipairs(game.entities) do
-      if Vector.equal(v.pos, game.cursorPos) then
-        entity = v
-      end
-    end
-
-    withTransform(tooltipTransform, function ()
-      withColor(0, 0, 0, 0.5, function ()
-        local width, height = 72, 72
-        love.graphics.rectangle('fill', 0, 0, width, height)
-      end)
-      love.graphics.print(tileUnderCursor)
-      love.graphics.print(Vector.formatVector(game.cursorPos), 0, 8)
-      if entity.__module   then
-        local textGenerator = require(entity.__module).tooltipText or function (_)
-          return 'nothing special'
-        end
-        local text = textGenerator(entity)
-        love.graphics.print(text, 0, 16)
-      end
-    end)
-  end
 end
 
 local function nextFont()
@@ -617,4 +600,5 @@ return {
   drawGame = drawGame,
   drawUI = drawUI,
   nextFont = nextFont,
+  drawPointer = drawPointer,
 }

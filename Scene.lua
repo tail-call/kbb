@@ -23,7 +23,10 @@ end
 ---@param path string
 function M.loadScene(path, ...)
   local prev = previousScene
-  local scene = { path = path }
+  local scene = {
+    path = path,
+    tooltips = function () return {} end,
+  }
   local index = {
     DrawState = drawState,
     OnLoad = function (load)
@@ -34,13 +37,17 @@ function M.loadScene(path, ...)
         update(dt, drawState)
       end
     end,
+    Tooltip = function (tooltips)
+      scene.tooltips = tooltips
+    end,
     OnDraw = function (draw)
       scene.draw = function ()
         draw(drawState)
+        require('Draw').drawPointer(drawState, scene.tooltips)
       end
     end,
-    OnKeyPressed = function (load)
-      scene.keypressed = load
+    OnKeyPressed = function (keypressed)
+      scene.keypressed = keypressed
     end,
     OnMousePressed = function (load)
       scene.mousepressed = load
