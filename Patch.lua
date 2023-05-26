@@ -10,7 +10,7 @@ local M = require('Module').define{...}
 function M.init(patch)
   patch.world = patch.world or error('Patch: world is required')
   patch.coords = patch.coords or error('Patch: coords is required')
-  patch.name = patch.name or ('PATCH %x %x'):format(patch.coords.x, patch.coords.y)
+  patch.name = patch.name or ('PATCH (%d,%d)'):format(patch.coords.x, patch.coords.y)
 end
 
 ---@param patch Patch

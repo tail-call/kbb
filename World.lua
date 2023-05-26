@@ -61,6 +61,14 @@ function M.vectorToLinearIndex(world, v)
   return vectorToLinearIndex(world, v)
 end
 
+local function generateTiles(width, height)
+  local tileTypes = {}
+  for i = 1, width * height do
+    tileTypes[i] = 'grass'
+  end
+  return tileTypes
+end
+
 ---@param world World
 function M.init(world)
   ---@type love.ImageData
@@ -70,7 +78,7 @@ function M.init(world)
   world.height = data:getHeight()
   world.image = love.graphics.newImage(data)
   world.revealedTilesCount = world.revealedTilesCount or 0
-  world.tileTypes = world.tileTypes or {}
+  world.tileTypes = world.tileTypes or generateTiles(world.width, world.height)
   world.fogOfWar = world.fogOfWar or {}
 
   local makeBufDumper = require('Util').makeBufDumper
