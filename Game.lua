@@ -48,9 +48,6 @@ local skyColorAtTime = require 'Util'.skyColorAtTime
 local behave = require 'Guy'.behave
 local addMoves = require 'GuyStats'.mut.addMoves
 local updateBattle = require 'Battle'.updateBattle
-local resetRecruitCircle = require 'RecruitCircle'.mut.resetRecruitCircle
-local clearRecruitCircle = require 'RecruitCircle'.mut.clearRecruitCircle
-local growRecruitCircle = require 'RecruitCircle'.mut.growRecruitCircle
 local addResources = require 'Resources'.mut.addResources
 
 local addListener = require 'Mutator'.mut.addListener
@@ -314,7 +311,7 @@ end
 ---@param game Game
 function M.beginRecruiting(game)
   if game.mode ~= 'normal' then return end
-  resetRecruitCircle(game.recruitCircle)
+  game.recruitCircle:reset()
 end
 
 ---@param game Game
@@ -328,7 +325,7 @@ function M.endRecruiting(game)
     end
   end
   game.squad:startFollowing()
-  clearRecruitCircle(game.recruitCircle)
+  game.recruitCircle:clear()
 end
 
 ---@param game Game
@@ -396,7 +393,7 @@ function M.updateGame(game, dt, movementDirections)
 
   updateConsole(game.console, dt)
   if isRecruitCircleActive(game.recruitCircle) then
-    growRecruitCircle(game.recruitCircle, dt)
+    game.recruitCircle:grow(dt)
   end
 
   if game.mode == 'focus' then return end

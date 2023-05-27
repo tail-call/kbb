@@ -29,6 +29,7 @@ Game is an editable image.
  - [ ] Game world is a part of UI layout
  - [ ] Clickable buttons
  - [ ] Prefer requiring without parens
+       %s/require(\('.*'\))/require \1
  - [ ] Require scenes and UI layouts
  - [ ] 'lang/model'
  - [ ] Store object's __module in metatable
