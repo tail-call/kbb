@@ -98,6 +98,12 @@ OnUpdate(function (dt)
     end
   end
 
+  if game.mode == 'paint' then
+    if love.mouse.isDown(1) then
+      require('Game').orderPaint(game)
+    end
+  end
+
   updateGame(game, dt, directions)
 end)
 
@@ -129,8 +135,6 @@ OnMousePressed(function (x, y, button, presses)
   if button == 1 then
     if game.mode == 'normal' then
       require('Game').beginRecruiting(game)
-    elseif game.mode == 'paint' then
-      require('Game').orderPaint(game)
     end
   end
 end)
