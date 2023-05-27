@@ -26,6 +26,7 @@ Game is an editable image.
 
 ## Quality of life
 
+ - [ ] Syntax for required object fields
  - [ ] Game world is a part of UI layout
  - [ ] Clickable buttons
  - [ ] Prefer requiring without parens
