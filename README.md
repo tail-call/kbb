@@ -27,6 +27,7 @@ Game is an editable image.
 ## Quality of life
 
  - [ ] Game: move controls to scene/game.lua
+ - [ ] Game world is a part of UI layout
  - [ ] Clickable buttons
  - [ ] Require scenes and UI layouts
  - [ ] 'lang/model'
