@@ -1,7 +1,6 @@
 local updateDrawState = require 'DrawState'.updateDrawState
 local Vector = require 'Vector'
 local updateGame = require 'Game'.updateGame
-local handleInput = require 'Game'.handleInput
 local endRecruiting = require 'Game'.endRecruiting
 local getTile = require 'World'.getTile
 
@@ -68,7 +67,12 @@ OnLoad(function (savefileName)
   if savefileName == '#back' then
     return
   elseif savefileName == '#dontload' then
-    game = require 'Game'.new{}
+    game = require 'Game'.new {
+      world = require 'World'.new(),
+      resources = require 'Resources'.new(),
+      squad = require 'Squad'.new(),
+      recruitCircle = require 'RecruitCircle'.new(),
+    }
   else
     local gameFunction, err = loadGame(savefileName, {
       quad = function (...)
