@@ -6,7 +6,9 @@ local M = require('Module').define{...}
 
 ---@param building Building
 function M.init(building)
-  building.pos = building.pos or error("Building: pos is required")
+  require 'dep' (building, function (want)
+    return { want.pos }
+  end)
 end
 
 ---@param building Building

@@ -31,9 +31,11 @@ local hurt = require('GuyStats').mut.hurt
 
 ---@param battle Battle
 function M.init(battle)
-  battle.attacker = battle.attacker or error("Battle: attacker is required")
-  battle.defender = battle.defender or error("Battle: defender is required")
-  battle.pos = battle.defender.pos or error("Battle: defender.pos is required")
+  require 'dep' (battle, function (want)
+    battle.attacker = want.attacker
+    battle.defender = want.defender
+  end)
+  battle.pos = battle.defender.pos
   battle.round = battle.round or 1
   battle.timer = BATTLE_ROUND_DURATION
 end

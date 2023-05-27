@@ -26,7 +26,6 @@ Game is an editable image.
 
 ## Quality of life
 
- - [ ] Syntax for required object fields
  - [ ] Game world is a part of UI layout
  - [ ] Clickable buttons
  - [ ] Prefer requiring without parens
@@ -34,6 +33,7 @@ Game is an editable image.
  - [ ] Require scenes and UI layouts
  - [ ] 'lang/model'
  - [ ] Store object's __module in metatable
+ - [ ] dep.lua: read ---@class declaration to check dependency types
  - [ ] Focus mode is a scene
  - [ ] Event system
  - [ ] Path finding
@@ -259,6 +259,7 @@ Game is an editable image.
  - [x] BUGFIX: quit() doesn't work
  - [x] BUGFIX: Game crashes when pressing Tab during game [2023-05-27T12:24]
  - [x] Game: move controls to scene/game.lua [2023-05-27T13:31]
+ - [x] Syntax for required object fields [2023-05-27T16:16]
 
 # Sources
 

@@ -333,7 +333,6 @@ local function makeLanguage(dictionary)
     end
   }
 end
-
 return {
   exhaust = exhaust,
   withCanvas = withCanvas,

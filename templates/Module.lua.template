@@ -17,7 +17,9 @@ local M = require('Module').define{..., version = 0, metatable = {
 
 ---@param obj ${name}
 function M.init(obj)
-  obj.demoProp = obj.demoProp or error('${name}: demoProp is required')
+  require 'dep' (obj, function (want)
+    return { want.demoProp }
+  end)
 end
 
 return M

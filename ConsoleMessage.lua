@@ -16,8 +16,9 @@ local M = require('Module').define{..., metatable = {
 
 ---@param message ConsoleMessage
 function M.init(message)
-  message.text = message.text or error('Message: text is required')
-  message.lifetime = message.lifetime or error('Message: lifetime is requried')
+  require 'dep' (message, function (want)
+    return { want.text, want.lifetime }
+  end)
 end
 
 return M

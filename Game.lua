@@ -203,17 +203,21 @@ end
 
 ---@param game Game
 function M.init(game)
+  require 'dep' (game, function (want)
+    return {
+      want.world,
+      want.squad,
+      want.recruitCircle,
+      want.resources
+    }
+  end)
   game.console = game.console or require 'Console'.new()
-  game.world = game.world or error('Game: world is required')
   game.score = game.score or 0
   game.frozenEntities = tbl.weaken(game.frozenEntities or {}, 'k')
-  game.resources = game.resources or error('Game: resources is required')
   game.time = game.time or (12 * 60)
   game.entities = game.entities or {}
   game.deathsCount = game.deathsCount or 0
   game.alternatingKeyIndex = 1
-  game.squad = game.squad or error('Game: squad is required')
-  game.recruitCircle = game.recruitCircle or error('Game: recruitCircle is required')
   game.cursorPos = game.cursorPos or { x = 0, y = 0 }
   game.magnificationFactor = game.magnificationFactor or 1
   game.mode = game.mode or 'normal'
