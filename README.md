@@ -19,6 +19,7 @@ Game is an editable image.
  - [ ] BUG: Friendly units won't fight
  - [ ] BUG: Text objects are not passable
  - [ ] BUG: Text objects render over other objects
+ - [ ] BUG: Game crashes when pressing any key in focus mode
 
 ## Quality of life
 
