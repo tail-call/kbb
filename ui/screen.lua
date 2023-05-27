@@ -33,10 +33,10 @@ SetModel {
     local game = Model.game
     local header = '<- Tab ->\n\n'
 
-    local idx = 1 + (Model.activeTab % 3)
+    local idx = 1 + (Model.activeTab % 2)
 
     if idx == 1 then
-      return Format(
+      return string.format(
         ''
           .. header
           .. 'Name:\n %s\n'
@@ -60,19 +60,14 @@ SetModel {
       return ''
         .. header
         .. ' DEBUG\n'
-        .. Format('mayMove %s\n', game.player.mayMove)
-        .. Format('pos %s\n', formatVector(game.player.pos))
-    elseif idx == 3 then
-      return ''
-        .. header
-        .. ' INVENTORY  \n'
-        .. Dump(game.resources)
+        .. string.format('mayMove %s\n', game.player.mayMove)
+        .. string.format('pos %s\n', formatVector(game.player.pos))
     end
     return ''
   end,
   bottomPanelText = function ()
     local game = Model.game
-    return Format(
+    return string.format(
       '%02d:%02d Wd=%s St=%s Pr=%s Gr=%s Wt=%s',
       math.floor(game.time / 60),
       math.floor(game.time % 60),
@@ -94,12 +89,12 @@ SetModel {
     end
     return {
       WHITE_COLOR,
-      Format(
+      string.format(
         'Score: %d | Revealed: %d/%d %0.ffps\n',
         game.score,
         game.world.revealedTilesCount,
         game.world.height * game.world.width,
-        FPS()
+        love.timer.getFPS()
       ),
       WHITE_COLOR,
       controls,

@@ -68,16 +68,13 @@ local function makePanel(bak)
   return panel
 end
 
----@param game Game
 ---@param path string
 ---@param uiModel UIModel
-function M.makeUIScript(game, path, uiModel)
+function M.makeUIScript(path, uiModel)
   local index
   index = {
     Panel = makePanel,
     Origin = origin,
-    Format = string.format,
-    Dump = require('Util').dump,
     formatVector = require('Vector').formatVector,
     SetModel = function (props)
       for k, v in pairs(props) do
@@ -85,12 +82,8 @@ function M.makeUIScript(game, path, uiModel)
       end
     end,
     Model = uiModel,
-    FPS = love.timer.getFPS,
     Text = function (text)
       return function() return text end
-    end,
-    Game = function ()
-      return game
     end,
     Fixed = function (x)
       return function () return x end

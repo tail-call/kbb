@@ -5,8 +5,8 @@
 ---@field pos Vector Object's position in the world
 
 local function uiLoader(path)
-  return function (game, model)
-    return require('UI').makeUIScript(game, path, model)
+  return function (model)
+    return require('UI').makeUIScript(path, model)
   end
 end
 

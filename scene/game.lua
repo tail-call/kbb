@@ -8,7 +8,7 @@ local getTile = require 'World'.getTile
 local game
 ---@type UIModel
 local uiModel = {}
-local ui = require 'ui/screen.lua'(game, uiModel)
+local ui = require 'ui/screen.lua'(uiModel)
 local alternatingKeyIndex = 1
 
 local function saveGame()

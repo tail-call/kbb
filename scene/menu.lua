@@ -12,7 +12,7 @@ local uiModel = {
   doNothingCounter = 0,
 }
 
-local ui = require 'ui/menu.lua'({}, uiModel)
+local ui = require 'ui/menu.lua'(uiModel)
 
 OnLoad(function (kind)
   local extraText
