@@ -1,21 +1,21 @@
-local updateDrawState = require('DrawState').updateDrawState
-local Vector = require('Vector')
-local updateGame = require('Game').updateGame
-local handleInput = require('Game').handleInput
-local endRecruiting = require('Game').endRecruiting
-local getTile = require('World').getTile
+local updateDrawState = require 'DrawState'.updateDrawState
+local Vector = require 'Vector'
+local updateGame = require 'Game'.updateGame
+local handleInput = require 'Game'.handleInput
+local endRecruiting = require 'Game'.endRecruiting
+local getTile = require 'World'.getTile
 
 ---@type Game
 local game
 ---@type UIModel
 local uiModel = {}
-local ui = require('ui/screen.lua')(game, uiModel)
+local ui = require 'ui/screen.lua'(game, uiModel)
 
 ---@param filename string
 ---@param loaders { [string]: function }
 ---@return fun()?, string? errorMessage
 local function loadGame(filename, loaders)
-  return require('Util').loadFileWithIndex(filename, function(t, k)
+  return require 'Util'.loadFileWithIndex(filename, function(t, k)
     return function(...)
       local loader = loaders[k]
       if loader ~= nil then
@@ -57,7 +57,7 @@ OnLoad(function (savefileName)
   if savefileName == '#back' then
     return
   elseif savefileName == '#dontload' then
-    game = require('Game').new{}
+    game = require 'Game'.new{}
   else
     local gameFunction, err = loadGame(savefileName, {
       quad = function (...)
@@ -100,7 +100,7 @@ OnUpdate(function (dt)
 
   if game.mode == 'paint' then
     if love.mouse.isDown(1) then
-      require('Game').orderPaint(game)
+      require 'Game'.orderPaint(game)
     end
   end
 
@@ -116,24 +116,24 @@ OnKeyPressed(function (key, scancode, isrepeat)
     file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
     file:write('-- It was created at ' .. os.date() .. '\n')
 
-    file:write(require('Util').dump(game))
+    file:write(require 'Util'.dump(game))
     file:close()
   elseif scancode == 'z' then
     game:nextMagnificationFactor()
   elseif scancode == 'tab' then
     uiModel:nextTab()
   elseif scancode == 'return' then
-    require('scene/console.lua').go(game)
+    require 'scene/console.lua'.go(game)
   elseif scancode == 'space' then
     game:switchMode()
   elseif scancode == 'g' then
-    require('Game').orderDismiss(game)
+    require 'Game'.orderDismiss(game)
   elseif scancode == 'r' then
-    require('Game').orderSummon(game)
+    require 'Game'.orderSummon(game)
   elseif scancode == 'f' then
     game.squad:toggleFollow()
   elseif scancode == 'b' then
-    require('Game').orderBuild(game)
+    require 'Game'.orderBuild(game)
   end
 
   handleInput(game, DrawState, scancode, key)
@@ -146,7 +146,7 @@ end)
 OnMousePressed(function (x, y, button, presses)
   if button == 1 then
     if game.mode == 'normal' then
-      require('Game').beginRecruiting(game)
+      require 'Game'.beginRecruiting(game)
     end
   end
 end)
@@ -162,5 +162,5 @@ OnMouseReleased(function (x, y, button, presses)
 end)
 
 OnDraw(function ()
-  require('Draw').drawGame(game, DrawState, ui)
+  require 'Draw'.drawGame(game, DrawState, ui)
 end)
