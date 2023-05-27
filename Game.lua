@@ -1,7 +1,3 @@
----@class GameModule: Module
----@field __modulename 'GameModule'
----@field mut GameMutator
-
 ---@alias GameMode 'normal' | 'focus' | 'paint'
 
 ---Game state
@@ -37,27 +33,27 @@
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 
-local canRecruitGuy = require('Guy').canRecruitGuy
-local moveGuy = require('Guy').moveGuy
-local getTile = require('World').getTile
-local isPassable = require('World').isPassable
-local tbl = require('tbl')
-local Vector = require('Vector')
-local maybeDrop = require('tbl').maybeDrop
-local updateConsole = require('Console').updateConsole
-local isRecruitCircleActive = require('RecruitCircle').isRecruitCircleActive
-local isAFollower = require('Squad').isAFollower
-local revealVisionSourceFog = require('World').revealVisionSourceFog
-local skyColorAtTime = require('Util').skyColorAtTime
-local behave = require('Guy').behave
-local addMoves = require('GuyStats').mut.addMoves
-local updateBattle = require('Battle').updateBattle
-local resetRecruitCircle = require('RecruitCircle').mut.resetRecruitCircle
-local clearRecruitCircle = require('RecruitCircle').mut.clearRecruitCircle
-local growRecruitCircle = require('RecruitCircle').mut.growRecruitCircle
-local addResources = require('Resources').mut.addResources
+local canRecruitGuy = require 'Guy'.canRecruitGuy
+local moveGuy = require 'Guy'.moveGuy
+local getTile = require 'World'.getTile
+local isPassable = require 'World'.isPassable
+local tbl = require 'tbl'
+local Vector = require 'Vector'
+local maybeDrop = require 'tbl'.maybeDrop
+local updateConsole = require 'Console'.updateConsole
+local isRecruitCircleActive = require 'RecruitCircle'.isRecruitCircleActive
+local isAFollower = require 'Squad'.isAFollower
+local revealVisionSourceFog = require 'World'.revealVisionSourceFog
+local skyColorAtTime = require 'Util'.skyColorAtTime
+local behave = require 'Guy'.behave
+local addMoves = require 'GuyStats'.mut.addMoves
+local updateBattle = require 'Battle'.updateBattle
+local resetRecruitCircle = require 'RecruitCircle'.mut.resetRecruitCircle
+local clearRecruitCircle = require 'RecruitCircle'.mut.clearRecruitCircle
+local growRecruitCircle = require 'RecruitCircle'.mut.growRecruitCircle
+local addResources = require 'Resources'.mut.addResources
 
-local addListener = require('Mutator').mut.addListener
+local addListener = require 'Mutator'.mut.addListener
 
 ---@type Vector
 local LEADER_SPAWN_LOCATION = { x = 250, y = 250 }
@@ -76,8 +72,7 @@ local MOVE_COSTS_TABLE = {
 
 local BUILDING_COST = 5
 
----@type GameModule
-local M = require('Module').define{..., metatable = {
+local M = require 'Module'.define{..., metatable = {
   ---@type Game
   __index = {
     addDeaths = function (self, guy)
@@ -153,7 +148,7 @@ local M = require('Module').define{..., metatable = {
       self:setEntityFrozen(attacker, true)
       self:setEntityFrozen(defender, true)
 
-      self:addEntity(require('Battle').new {
+      self:addEntity(require 'Battle'.new {
         attacker = attacker,
         defender = defender,
       })
@@ -183,7 +178,7 @@ local function makeGuyDelegate(game, collider)
       if guy.team ~= 'good' then
         return 'shouldNotMove'
       end
-      require('GuyStats').mut.setMaxHp(guy.stats, guy.stats.maxHp + 1)
+      require 'GuyStats'.mut.setMaxHp(guy.stats, guy.stats.maxHp + 1)
       game:removeEntity(building)
       return 'shouldMove'
     end,
@@ -213,19 +208,17 @@ end
 
 ---@param game Game
 function M.init(game)
-  local Guy = require('Guy')
-
-  game.console = game.console or require('Console').new()
-  game.world = game.world or require('World').new()
+  game.console = game.console or require 'Console'.new()
+  game.world = game.world or require 'World'.new()
   game.score = game.score or 0
   game.frozenEntities = tbl.weaken(game.frozenEntities or {}, 'k')
-  game.resources = game.resources or require('Resources').new()
+  game.resources = game.resources or require 'Resources'.new()
   game.time = game.time or (12 * 60)
   game.entities = game.entities or {}
   game.deathsCount = game.deathsCount or 0
   game.alternatingKeyIndex = 1
-  game.squad = require('Squad').new {}
-  game.recruitCircle = require('RecruitCircle').new {}
+  game.squad = require 'Squad'.new {}
+  game.recruitCircle = require 'RecruitCircle'.new {}
   game.cursorPos = game.cursorPos or { x = 0, y = 0 }
   game.magnificationFactor = game.magnificationFactor or 1
   game.mode = game.mode or 'normal'
@@ -250,14 +243,16 @@ function M.init(game)
 
   for k, v in ipairs(messages) do
     game.console:say(
-      require('ConsoleMessage').new {
+      require 'ConsoleMessage'.new {
         text = v,
         lifetime = 10
       }
     )
   end
 
-  if not require('tbl').has(game.entities, game.player) then
+  local Guy = require 'Guy'
+
+  if not require 'tbl'.has(game.entities, game.player) then
     game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
   end
 
@@ -265,7 +260,7 @@ function M.init(game)
   do
     local function listenPlayerDeath()
       addListener(
-       require('GuyStats').mut,
+       require 'GuyStats'.mut,
         game.player.stats,
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then
@@ -281,7 +276,7 @@ function M.init(game)
   end
 
   if game.player == nil then
-    error('no player')
+    error 'no player'
   end
 
   return game
@@ -339,7 +334,7 @@ end
 ---@param game Game
 ---@param text string
 local function echo(game, text)
-  game.console:say(require('ConsoleMessage').new {
+  game.console:say(require 'ConsoleMessage'.new {
     text = text,
     lifetime = 60,
   })
@@ -480,13 +475,13 @@ end
 ---@param game Game
 ---@param guy Guy
 local function maybeCollect(game, guy)
-  local Guy = require('Guy')
+  local Guy = require 'Guy'
 
   if M.isFrozen(game, guy) then return end
 
   local pos = guy.pos
-  local patch = require('World').patchAt(game.world, pos)
-  local patchCenterX, patchCenterY = require('Patch').patchCenter(patch)
+  local patch = require 'World'.patchAt(game.world, pos)
+  local patchCenterX, patchCenterY = require 'Patch'.patchCenter(patch)
   local tile = getTile(game.world, pos)
   if tile == 'forest' then
     addResources(game.resources, { wood = 1 })
@@ -505,7 +500,7 @@ local function maybeCollect(game, guy)
   elseif tile == 'grass' then
     addResources(game.resources, { grass = 1 })
     game.world:setTile(pos, 'sand')
-    require('GuyStats').mut.heal(guy.stats, 1)
+    require 'GuyStats'.mut.heal(guy.stats, 1)
   elseif tile == 'water' then
     addResources(game.resources, { water = 1 })
     game.world:setTile(pos, 'sand')
@@ -540,7 +535,7 @@ function M.orderBuild(game)
   -- Build
   addResources(game.resources, { wood = -BUILDING_COST })
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
-  game:addEntity(require('Building').new { pos = pos })
+  game:addEntity(require 'Building'.new { pos = pos })
   game:addScore(SCORES_TABLE.builtAHouse)
 end
 
@@ -548,7 +543,7 @@ end
 function M.orderSummon(game)
   addResources(game.resources, { pretzels = -1 })
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
-  local guy = require('Guy').makeGoodGuy(game.cursorPos)
+  local guy = require 'Guy'.makeGoodGuy(game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
   game:addEntity(guy)
   game.squad:addToSquad(guy)
@@ -573,8 +568,8 @@ local function handleNormalModeInput(game, scancode)
   if scancode == 'c' then
     orderCollect(game)
   elseif scancode == 'e' then
-    local patch = require('World').patchAt(game.world, game.player.pos)
-    require('World').randomizePatch(game.world, patch)
+    local patch = require 'World'.patchAt(game.world, game.player.pos)
+    require 'World'.randomizePatch(game.world, patch)
   elseif scancode == 't' then
     game.player:warp(game.cursorPos)
   end
