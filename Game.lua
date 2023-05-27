@@ -33,12 +33,9 @@
 ---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
 ---@field addDeaths fun(self: Game, count: integer) Adds a death to a game
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
-
----@class GameMutator
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
----@field disableFocus fun(self: Game) Turns focus mode off
 
 local canRecruitGuy = require('Guy').canRecruitGuy
 local moveGuy = require('Guy').moveGuy
@@ -149,6 +146,22 @@ local M = require('Module').define{..., metatable = {
         self.magnificationFactor = 1
       end
     end,
+    setEntityFrozen = function (self, entity, state)
+      self.frozenEntities[entity] = state or nil
+    end,
+    beginBattle = function (self, attacker, defender)
+      self:setEntityFrozen(attacker, true)
+      self:setEntityFrozen(defender, true)
+
+      self:addEntity(require('Battle').new {
+        attacker = attacker,
+        defender = defender,
+      })
+    end,
+    -- TODO: move to scene file
+    setAlternatingKeyIndex = function (self, x)
+      self.alternatingKeyIndex = x
+    end,
   }
 }}
 
@@ -157,32 +170,6 @@ local NONE_COLLISION = { type = 'none' }
 ---@type CollisionInfo
 local TERRAIN_COLLISION = { type = 'terrain' }
 
----@type GameMutator
-M.mut = require('Mutator').new {
-  disableFocus = function (self)
-    self.isFocused = false
-  end,
-  setEntityFrozen = function (self, entity, state)
-    self.frozenEntities[entity] = state or nil
-  end,
-  addGuy = function (self, guy)
-    table.insert(self.guys, guy)
-  end,
-  beginBattle = function (self, attacker, defender)
-    M.mut.setEntityFrozen(self, attacker, true)
-    M.mut.setEntityFrozen(self, defender, true)
-
-    self:addEntity(require('Battle').new {
-      attacker = attacker,
-      defender = defender,
-    })
-  end,
-  setAlternatingKeyIndex = function (self, x)
-    self.alternatingKeyIndex = x
-  end,
-}
-
-
 ---@param game Game
 ---@param collider fun(self: Game, v: Vector): CollisionInfo Function that performs collision checks between game world objects
 ---@return GuyDelegate
@@ -190,7 +177,7 @@ local function makeGuyDelegate(game, collider)
   ---@type GuyDelegate
   local guyDelegate = {
     beginBattle = function (attacker, defender)
-      require('Game').mut.beginBattle(game, attacker, defender)
+      game:beginBattle(attacker, defender)
     end,
     enterHouse = function (guy, building)
       if guy.team ~= 'good' then
@@ -424,7 +411,7 @@ function M.updateGame(game, dt, movementDirections)
   if game.player.stats.moves > 0 and #movementDirections > 0 then
     for _ = 1, #movementDirections do
       local index = (game.alternatingKeyIndex + 1) % (#movementDirections)
-      M.mut.setAlternatingKeyIndex(game, index)
+      game:setAlternatingKeyIndex(index)
 
       local vec = movementDirections[index + 1]
 
@@ -467,8 +454,8 @@ function M.updateGame(game, dt, movementDirections)
           die(entity.defender, game,  entity)
         end
 
-        M.mut.setEntityFrozen(game, entity.attacker, false)
-        M.mut.setEntityFrozen(game, entity.defender, false)
+        game:setEntityFrozen(entity.attacker, false)
+        game:setEntityFrozen(entity.defender, false)
       end)
     end
   end
@@ -555,7 +542,6 @@ function M.orderBuild(game)
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
   game:addEntity(require('Building').new { pos = pos })
   game:addScore(SCORES_TABLE.builtAHouse)
-  M.mut.disableFocus(game)
 end
 
 ---@param game Game
