@@ -508,7 +508,7 @@ local function maybeCollect(game, guy)
 end
 
 ---@param game Game
-local function orderCollect(game)
+function M.orderCollect(game)
   maybeCollect(game, game.player)
   for guy in pairs(game.squad.followers) do
     maybeCollect(game, guy)
@@ -550,32 +550,6 @@ function M.orderSummon(game)
 end
 
 ---@param game Game
----@param drawState DrawState
----@param scancode string
----@param key string
-local function handleFocusModeInput(game, drawState, scancode, key)
-  if tbl.has({ '1', '2', '3', '4' }, scancode) then
-    drawState:setWindowScale(tonumber(scancode) or 1)
-  else
-    error('game:resetUI()') -- FIXME
-    echo(game, 'recreated uiModel and ui')
-  end
-end
-
----@param game Game
----@param scancode string
-local function handleNormalModeInput(game, scancode)
-  if scancode == 'c' then
-    orderCollect(game)
-  elseif scancode == 'e' then
-    local patch = require 'World'.patchAt(game.world, game.player.pos)
-    require 'World'.randomizePatch(game.world, patch)
-  elseif scancode == 't' then
-    game.player:warp(game.cursorPos)
-  end
-end
-
----@param game Game
 function M.orderPaint(game)
   game.world:setTile(game.cursorPos, 'grass')
 end
@@ -585,18 +559,6 @@ function M.orderDismiss(game)
   if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
     addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
     dismissSquad(game)
-  end
-end
-
----@param game Game
----@param drawState DrawState
----@param scancode string
----@param key string
-function M.handleInput(game, drawState, scancode, key)
-  if game.mode == 'focus' then
-    handleFocusModeInput(game, drawState, scancode, key)
-  elseif game.mode == 'normal' then
-    handleNormalModeInput(game, scancode)
   end
 end
 

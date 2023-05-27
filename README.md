@@ -26,7 +26,6 @@ Game is an editable image.
 
 ## Quality of life
 
- - [ ] Game: move controls to scene/game.lua
  - [ ] Game world is a part of UI layout
  - [ ] Clickable buttons
  - [ ] Prefer requiring without parens
@@ -257,6 +256,7 @@ Game is an editable image.
  - [x] makeLanguage
  - [x] BUGFIX: quit() doesn't work
  - [x] BUGFIX: Game crashes when pressing Tab during game [2023-05-27T12:24]
+ - [x] Game: move controls to scene/game.lua [2023-05-27T13:31]
 
 # Sources
 

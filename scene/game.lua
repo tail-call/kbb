@@ -11,6 +11,17 @@ local game
 local uiModel = {}
 local ui = require 'ui/screen.lua'(game, uiModel)
 
+local function saveGame()
+  local file = io.open('./kobo2.kpss', 'w+')
+  if file == nil then error('no file') end
+
+  file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
+  file:write('-- It was created at ' .. os.date() .. '\n')
+
+  file:write(require 'Util'.dump(game))
+  file:close()
+end
+
 ---@param filename string
 ---@param loaders { [string]: function }
 ---@return fun()?, string? errorMessage
@@ -109,15 +120,7 @@ end)
 
 OnKeyPressed(function (key, scancode, isrepeat)
   if scancode == '8' then
-    -- Write to file
-    local file = io.open('./kobo2.kpss', 'w+')
-    if file == nil then error('no file') end
-
-    file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
-    file:write('-- It was created at ' .. os.date() .. '\n')
-
-    file:write(require 'Util'.dump(game))
-    file:close()
+    saveGame()
   elseif scancode == 'z' then
     game:nextMagnificationFactor()
   elseif scancode == 'tab' then
@@ -136,7 +139,20 @@ OnKeyPressed(function (key, scancode, isrepeat)
     require 'Game'.orderBuild(game)
   end
 
-  handleInput(game, DrawState, scancode, key)
+  if game.mode == 'focus' then
+    if require 'tbl'.has({ '1', '2', '3', '4' }, scancode) then
+      DrawState:setWindowScale(tonumber(scancode) or 1)
+    end
+  elseif game.mode == 'normal' then
+    if scancode == 'c' then
+      require 'Game'.orderCollect(game)
+    elseif scancode == 'e' then
+      local patch = require 'World'.patchAt(game.world, game.player.pos)
+      require 'World'.randomizePatch(game.world, patch)
+    elseif scancode == 't' then
+      game.player:warp(game.cursorPos)
+    end
+  end
 end)
 
 ---@param x number
