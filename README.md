@@ -59,6 +59,8 @@ Game is an editable image.
  - [ ] Use FFI for huge arrays like fog of war
  - [ ] Try using native code with ffi
  - [ ] Try using love2d threads for something?
+ - [ ] Metalua
+ - [ ] tamale
 
 ## Game ideas
 
