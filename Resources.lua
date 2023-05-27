@@ -6,22 +6,19 @@
 ---@field stone integer Amount of stone owned
 ---@field grass integer Amount of grass owned
 ---@field water integer Amount of water owned
+---@field add fun(self: Resources, delta: Resources) Get more resources
 
----@class ResourcesMutator
----@field addResources fun(self: Resources, delta: Resources) Get more resources
-
-local M = require('Module').define{...}
-
----@type ResourcesMutator
-M.mut = require('Mutator').new {
-  addResources = function (self, delta)
-    self.pretzels = self.pretzels + (delta.pretzels or 0)
-    self.wood = self.wood + (delta.wood or 0)
-    self.grass = self.grass + (delta.grass or 0)
-    self.stone = self.stone + (delta.stone or 0)
-    self.water = self.water + (delta.water or 0)
-  end
-}
+local M = require 'Module'.define{..., metatable = {
+  __index = {
+    add = function (self, delta)
+      self.pretzels = self.pretzels + (delta.pretzels or 0)
+      self.wood = self.wood + (delta.wood or 0)
+      self.grass = self.grass + (delta.grass or 0)
+      self.stone = self.stone + (delta.stone or 0)
+      self.water = self.water + (delta.water or 0)
+    end
+  }
+}}
 
 ---@param res Resources
 function M.init(res)

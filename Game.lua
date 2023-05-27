@@ -47,8 +47,6 @@ local revealVisionSourceFog = require 'World'.revealVisionSourceFog
 local skyColorAtTime = require 'Util'.skyColorAtTime
 local behave = require 'Guy'.behave
 local addMoves = require 'GuyStats'.mut.addMoves
-local updateBattle = require 'Battle'.updateBattle
-local addResources = require 'Resources'.mut.addResources
 
 local addListener = require 'Mutator'.mut.addListener
 
@@ -367,7 +365,7 @@ local function die(guy, game, battle)
   echo(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
 
   if guy.team == 'evil' then
-    addResources(game.resources, { pretzels = 1})
+    game.resources:add { pretzels = 1 }
     game:addScore(SCORES_TABLE.killedAnEnemy)
   end
 
@@ -435,7 +433,7 @@ function M.updateGame(game, dt, movementDirections)
   for _, entity in ipairs(game.entities) do
     if entity.__module == 'Battle' then
       ---@cast entity Battle
-      updateBattle(game, entity, dt, function (text)
+      require 'Battle'.updateBattle(game, entity, dt, function (text)
         echo(game, text)
       end, function ()
         if entity.attacker.stats.hp <= 0 then
@@ -481,25 +479,25 @@ local function maybeCollect(game, guy)
   local patchCenterX, patchCenterY = require 'Patch'.patchCenter(patch)
   local tile = getTile(game.world, pos)
   if tile == 'forest' then
-    addResources(game.resources, { wood = 1 })
+    game.resources:add { wood = 1 }
     game.world:setTile(pos, 'grass')
     game:addEntity(Guy.makeEvilGuy {
       x = patchCenterX,
       y = patchCenterY,
     })
   elseif tile == 'rock' then
-    addResources(game.resources, { stone = 1 })
+    game.resources:add { stone = 1 }
     game.world:setTile(pos, 'cave')
     game:addEntity(Guy.makeStrongEvilGuy {
       x = patchCenterX,
       y = patchCenterY,
     })
   elseif tile == 'grass' then
-    addResources(game.resources, { grass = 1 })
+    game.resources:add { grass = 1 }
     game.world:setTile(pos, 'sand')
     require 'GuyStats'.mut.heal(guy.stats, 1)
   elseif tile == 'water' then
-    addResources(game.resources, { water = 1 })
+    game.resources:add { water = 1 }
     game.world:setTile(pos, 'sand')
   end
 end
@@ -525,12 +523,12 @@ function M.orderBuild(game)
 
   -- Is building on rock?
   if getTile(game.world, pos) == 'rock' then
-    addResources(game.resources, { stone = 1 })
+    game.resources:add { stone = 1 }
     game.world:setTile(pos, 'sand')
   end
 
   -- Build
-  addResources(game.resources, { wood = -BUILDING_COST })
+  game.resources:add { wood = -BUILDING_COST }
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
   game:addEntity(require 'Building'.new { pos = pos })
   game:addScore(SCORES_TABLE.builtAHouse)
@@ -538,7 +536,7 @@ end
 
 ---@param game Game
 function M.orderSummon(game)
-  addResources(game.resources, { pretzels = -1 })
+  game.resources:add { pretzels = -1 }
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
   local guy = require 'Guy'.makeGoodGuy(game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
