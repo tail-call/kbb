@@ -146,6 +146,5 @@ OnMouseReleased(function (x, y, button, presses)
 end)
 
 OnDraw(function ()
-  print('!!', game)
   require('Draw').drawGame(game, DrawState, ui)
 end)
