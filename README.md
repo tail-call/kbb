@@ -20,6 +20,7 @@ Game is an editable image.
  - [ ] BUG: Text objects are not passable
  - [ ] BUG: Text objects render over other objects
  - [ ] BUG: Game crashes when pressing any key in focus mode
+ - [ ] BUG: Game crashes when opening a console
 
 ## Quality of life
 

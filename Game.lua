@@ -32,13 +32,13 @@
 ---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
 ---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
 ---@field addDeaths fun(self: Game, count: integer) Adds a death to a game
+---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
 ---@class GameMutator
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 ---@field disableFocus fun(self: Game) Turns focus mode off
----@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 
 local canRecruitGuy = require('Guy').canRecruitGuy
 local moveGuy = require('Guy').moveGuy
@@ -144,6 +144,15 @@ local M = require('Module').define{..., metatable = {
         self.mode = 'normal'
       end
     end,
+    nextMagnificationFactor = function (self)
+      if self.magnificationFactor == 1 then
+        self.magnificationFactor = 2/3
+      elseif self.magnificationFactor == 2/3 then
+        self.magnificationFactor = 2
+      else
+        self.magnificationFactor = 1
+      end
+    end,
   }
 }}
 
@@ -159,15 +168,6 @@ M.mut = require('Mutator').new {
   end,
   setEntityFrozen = function (self, entity, state)
     self.frozenEntities[entity] = state or nil
-  end,
-  nextMagnificationFactor = function (self)
-    if self.magnificationFactor == 1 then
-      self.magnificationFactor = 2/3
-    elseif self.magnificationFactor == 2/3 then
-      self.magnificationFactor = 2
-    else
-      self.magnificationFactor = 1
-    end
   end,
   addGuy = function (self, guy)
     table.insert(self.guys, guy)
@@ -615,13 +615,7 @@ end
 ---@param scancode string
 ---@param key string
 function M.handleInput(game, drawState, scancode, key)
-  if scancode == 'z' then
-    M.mut.nextMagnificationFactor(game)
-  end
-
-  if scancode == 'space' then
-    game:switchMode()
-  elseif scancode == 'g' then
+  if scancode == 'g' then
     if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
       addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
       dismissSquad(game)

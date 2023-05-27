@@ -118,10 +118,14 @@ OnKeyPressed(function (key, scancode, isrepeat)
 
     file:write(require('Util').dump(game))
     file:close()
+  elseif scancode == 'z' then
+    game:nextMagnificationFactor()
   elseif scancode == 'tab' then
     uiModel:nextTab()
   elseif scancode == 'return' then
     require('scene/console.lua').go(game)
+  elseif scancode == 'space' then
+    game:switchMode()
   end
 
   handleInput(game, DrawState, scancode, key)
