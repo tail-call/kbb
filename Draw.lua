@@ -349,7 +349,8 @@ end
 
 ---@param game Game
 ---@param drawState DrawState
-local function drawGame(game, drawState)
+---@param ui UI
+local function drawGame(game, drawState, ui)
   love.graphics.scale(drawState.windowScale)
   love.graphics.push('transform')
 
@@ -530,7 +531,7 @@ local function drawGame(game, drawState)
 
   -- Draw UI
 
-  drawUI(drawState, game.ui)
+  drawUI(drawState, ui)
 
   -- Draw minimap
 

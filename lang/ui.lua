@@ -5,7 +5,6 @@ FullWidth = function (...) end
 Fixed = function (...) end
 FullHeight = function (...) end
 SetModel = function (...) end
-FormatVector = function (...) end
 Format = function (...) end
 Dump = function (...) end
 FPS = function (...) end

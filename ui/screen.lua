@@ -4,6 +4,7 @@
 ---
 ---@field prompt string Command line prompt text
 ---
+---@field game Game Game
 ---@field leftPanelText fun(): string Left panel text
 ---@field rightPanelText fun(): string Right panel text
 ---@field bottomPanelText fun(): string Bottom panel text
@@ -19,7 +20,8 @@ local Model = Model
 
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
-local game = Game()
+
+local formatVector = require('Vector').formatVector
 
 SetModel {
   prompt = '',
@@ -28,6 +30,7 @@ SetModel {
     self.activeTab = self.activeTab + 1
   end,
   rightPanelText = function ()
+    local game = Model.game
     local header = '<- Tab ->\n\n'
 
     local idx = 1 + (Model.activeTab % 3)
@@ -58,7 +61,7 @@ SetModel {
         .. header
         .. ' DEBUG\n'
         .. Format('mayMove %s\n', game.player.mayMove)
-        .. Format('pos %s\n', FormatVector(game.player.pos))
+        .. Format('pos %s\n', formatVector(game.player.pos))
     elseif idx == 3 then
       return ''
         .. header
@@ -68,6 +71,7 @@ SetModel {
     return ''
   end,
   bottomPanelText = function ()
+    local game = Model.game
     return Format(
       '%02d:%02d Wd=%s St=%s Pr=%s Gr=%s Wt=%s',
       math.floor(game.time / 60),
@@ -80,6 +84,7 @@ SetModel {
     )
   end,
   topPanelText = function ()
+    local game = Model.game
     local player = game.player
     local controls = ''
     if game.mode == 'normal' then
@@ -107,7 +112,7 @@ SetModel {
     }
   end,
   shouldDrawFocusModeUI = function ()
-    return game.mode == 'focus'
+    return Model.game.mode == 'focus'
   end,
 }
 

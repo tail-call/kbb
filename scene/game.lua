@@ -7,6 +7,9 @@ local getTile = require('World').getTile
 
 ---@type Game
 local game
+---@type UIModel
+local uiModel = {}
+local ui = require('ui/screen.lua')(game, uiModel)
 
 ---@param filename string
 ---@param loaders { [string]: function }
@@ -70,6 +73,7 @@ OnLoad(function (savefileName)
     })
     game = gameFunction and gameFunction() or error(err)
   end
+  uiModel.game = game
 end)
 
 OnUpdate(function (dt)
@@ -108,6 +112,8 @@ OnKeyPressed(function (key, scancode, isrepeat)
 
     file:write(require('Util').dump(game))
     file:close()
+  elseif scancode == 'tab' then
+    uiModel:nextTab()
   elseif scancode == 'return' then
     require('scene/console.lua').go(game)
   end
@@ -140,5 +146,6 @@ OnMouseReleased(function (x, y, button, presses)
 end)
 
 OnDraw(function ()
-  require('Draw').drawGame(game, DrawState)
+  print('!!', game)
+  require('Draw').drawGame(game, DrawState, ui)
 end)

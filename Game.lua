@@ -20,8 +20,6 @@
 ---@field cursorPos Vector Points to a square player's cursor is aimed at
 ---@field magnificationFactor number How much the camera is zoomed in
 ---@field mode GameMode Current game mode. Affects how player's input is handled.
----@field ui UI User interface root
----@field uiModel UIModel GUI state
 ---@field console Console Bottom console
 ---@field alternatingKeyIndex integer Diagonal movement reader head index
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
@@ -32,7 +30,6 @@
 ---@field switchMode fun(self: Game) Switches to next mode
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
 ---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
----@field resetUI fun(self: Game) Adds an entity to the world
 ---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
 ---@field addDeaths fun(self: Game, count: integer) Adds a death to a game
 
@@ -147,9 +144,6 @@ local M = require('Module').define{..., metatable = {
         self.mode = 'normal'
       end
     end,
-    resetUI = function (self)
-      self.ui = require('ui/screen.lua')(self, {})
-    end
   }
 }}
 
@@ -253,7 +247,6 @@ function M.init(game)
   game.magnificationFactor = game.magnificationFactor or 1
   game.mode = game.mode or 'normal'
 
-  game:resetUI()
   game.guyDelegate = makeGuyDelegate(game, function(self, v)
     local someEntityThere = findEntityAtPos(self, v)
     if someEntityThere then
@@ -602,9 +595,7 @@ end
 ---@param game Game
 ---@param scancode string
 local function handleNormalModeInput(game, scancode)
-  if scancode == 'tab' then
-    game.uiModel:nextTab()
-  elseif scancode == 'c' then
+  if scancode == 'c' then
     orderCollect(game)
   elseif scancode == 'e' then
     local patch = require('World').patchAt(game.world, game.player.pos)

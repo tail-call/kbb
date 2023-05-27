@@ -19,7 +19,6 @@ Game is an editable image.
  - [ ] BUG: Friendly units won't fight
  - [ ] BUG: Text objects are not passable
  - [ ] BUG: Text objects render over other objects
- - [ ] BUG: Game crashes when pressing Tab during game
 
 ## Quality of life
 
@@ -248,6 +247,7 @@ Game is an editable image.
  - [x] Draw cursor over everything
  - [x] makeLanguage
  - [x] BUGFIX: quit() doesn't work
+ - [x] BUGFIX: Game crashes when pressing Tab during game [2023-05-27T12:24]
 
 # Sources
 
