@@ -34,6 +34,7 @@ Game is an editable image.
  - [ ] 'lang/model'
  - [ ] Store object's __module in metatable
  - [ ] dep.lua: read ---@class declaration to check dependency types
+ - [ ] love APIs are buried deep in core modules
  - [ ] Focus mode is a scene
  - [ ] Event system
  - [ ] Path finding

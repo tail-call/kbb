@@ -9,6 +9,7 @@ local game
 ---@type UIModel
 local uiModel = {}
 local ui = require 'ui/screen.lua'(game, uiModel)
+local alternatingKeyIndex = 1
 
 local function saveGame()
   local file = io.open('./kobo2.kpss', 'w+')
@@ -116,6 +117,35 @@ OnUpdate(function (dt)
   if game.mode == 'paint' then
     if love.mouse.isDown(1) then
       require 'Game'.orderPaint(game)
+    end
+  elseif game.mode ~= 'focus' then
+    if #directions > 0 then
+      for _ = 1, #directions do
+        local index = (alternatingKeyIndex + 1) % (#directions)
+        alternatingKeyIndex = index
+
+        local vec = directions[index + 1]
+
+        if game.squad.shouldFollow then
+          for guy in pairs(game.squad.followers) do
+            if not require 'Game'.isFrozen(game, guy) then
+              require 'Guy'.moveGuy(guy, vec, game.guyDelegate)
+            end
+          end
+        end
+
+        if not require 'Game'.isFrozen(game, game.player) then
+          local oldPos = game.player.pos
+          local newPos = require 'Guy'.moveGuy(
+            game.player,
+            vec,
+            game.guyDelegate
+          )
+          if not Vector.equal(newPos, oldPos) then
+            break
+          end
+        end
+      end
     end
   end
 

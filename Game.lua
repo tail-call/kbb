@@ -17,7 +17,6 @@
 ---@field magnificationFactor number How much the camera is zoomed in
 ---@field mode GameMode Current game mode. Affects how player's input is handled.
 ---@field console Console Bottom console
----@field alternatingKeyIndex integer Diagonal movement reader head index
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field frozenEntities { [Object2D]: true } Entities that should be not rendered and should not behave
 ---# Methods
@@ -148,10 +147,6 @@ local M = require 'Module'.define{..., metatable = {
         defender = defender,
       })
     end,
-    -- TODO: move to scene file
-    setAlternatingKeyIndex = function (self, x)
-      self.alternatingKeyIndex = x
-    end,
   }
 }}
 
@@ -217,7 +212,6 @@ function M.init(game)
   game.time = game.time or (12 * 60)
   game.entities = game.entities or {}
   game.deathsCount = game.deathsCount or 0
-  game.alternatingKeyIndex = 1
   game.cursorPos = game.cursorPos or { x = 0, y = 0 }
   game.magnificationFactor = game.magnificationFactor or 1
   game.mode = game.mode or 'normal'
@@ -398,63 +392,39 @@ function M.updateGame(game, dt, movementDirections)
     game.recruitCircle:grow(dt)
   end
 
-  if game.mode == 'focus' then return end
 
   -- Handle normal mode movement input
 
-  if game.player.stats.moves > 0 and #movementDirections > 0 then
-    for _ = 1, #movementDirections do
-      local index = (game.alternatingKeyIndex + 1) % (#movementDirections)
-      game:setAlternatingKeyIndex(index)
+  if game.mode ~= 'focus' then
+    if love.keyboard.isDown('q') then
+      orderGather(game)
+    end
 
-      local vec = movementDirections[index + 1]
+    -- Handle normal mode logic
 
-      if game.squad.shouldFollow then
-        for guy in pairs(game.squad.followers) do
-          if not M.isFrozen(game, guy) then
-            moveGuy(guy, vec, game.guyDelegate)
+    game:advanceClock(dt)
+    for _, entity in ipairs(game.entities) do
+      if entity.__module == 'Battle' then
+        ---@cast entity Battle
+        require 'Battle'.updateBattle(game, entity, dt, function (text)
+          echo(game, text)
+        end, function ()
+          if entity.attacker.stats.hp <= 0 then
+            die(entity.attacker, game, entity)
           end
-        end
-      end
 
-      if not M.isFrozen(game, game.player) then
-        local oldPos = game.player.pos
-        local newPos = moveGuy(game.player, vec, game.guyDelegate)
-        if not Vector.equal(newPos, oldPos) then
-          break
-        end
+          if entity.defender.stats.hp <= 0 then
+            die(entity.defender, game,  entity)
+          end
+
+          game:setEntityFrozen(entity.attacker, false)
+          game:setEntityFrozen(entity.defender, false)
+        end)
       end
     end
   end
 
-  if love.keyboard.isDown('q') then
-    orderGather(game)
-  end
-
-  -- Handle normal mode logic
-
-  game:advanceClock(dt)
   for _, entity in ipairs(game.entities) do
-    if entity.__module == 'Battle' then
-      ---@cast entity Battle
-      require 'Battle'.updateBattle(game, entity, dt, function (text)
-        echo(game, text)
-      end, function ()
-        if entity.attacker.stats.hp <= 0 then
-          die(entity.attacker, game, entity)
-        end
-
-        if entity.defender.stats.hp <= 0 then
-          die(entity.defender, game,  entity)
-        end
-
-        game:setEntityFrozen(entity.attacker, false)
-        game:setEntityFrozen(entity.defender, false)
-      end)
-    end
-  end
-
-for _, entity in ipairs(game.entities) do
     if entity.__module == 'Guy' then
       ---@cast entity Guy
       if getTile(game.world, entity.pos) == 'forest' then
