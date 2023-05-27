@@ -59,10 +59,6 @@ local resetRecruitCircle = require('RecruitCircle').mut.resetRecruitCircle
 local clearRecruitCircle = require('RecruitCircle').mut.clearRecruitCircle
 local growRecruitCircle = require('RecruitCircle').mut.growRecruitCircle
 local addResources = require('Resources').mut.addResources
-local addToSquad = require('Squad').mut.addToSquad
-local removeFromSquad = require('Squad').mut.removeFromSquad
-local startFollowing = require('Squad').mut.startFollowing
-local toggleFollow = require('Squad').mut.toggleFollow
 
 local addListener = require('Mutator').mut.addListener
 
@@ -113,7 +109,7 @@ local M = require('Module').define{..., metatable = {
 
       if entity.__module == 'Guy' then
         ---@cast entity Guy
-        removeFromSquad(self.squad, entity)
+        self.squad:removeFromSquad(entity)
         self.frozenEntities[entity] = nil
 
         local tile = getTile(self.world, entity.pos)
@@ -329,7 +325,7 @@ end
 ---@param game Game
 local function dismissSquad(game)
   for guy in pairs(game.squad.followers) do
-    removeFromSquad(game.squad, guy)
+    game.squad:removeFromSquad(guy)
   end
 end
 
@@ -345,11 +341,11 @@ function M.endRecruiting(game)
     if M.mayRecruit(game, entity) then
       if entity.__module == 'Guy' then
         ---@cast entity Guy
-        addToSquad(game.squad, entity)
+        game.squad:addToSquad(entity)
       end
     end
   end
-  startFollowing(game.squad)
+  game.squad:startFollowing()
   clearRecruitCircle(game.recruitCircle)
 end
 
@@ -538,11 +534,7 @@ local function orderCollect(game)
 end
 
 ---@param game Game
-local function orderBuild(game)
-  -- Check if has enough resources
-  if game.resources.wood < BUILDING_COST then return end
-  if game.player.stats.moves < MOVE_COSTS_TABLE.build then return end
-
+function M.orderBuild(game)
   local pos = game.cursorPos
 
   -- Check if no other entities
@@ -567,16 +559,13 @@ local function orderBuild(game)
 end
 
 ---@param game Game
-local function orderSummon(game)
-  if game.resources.pretzels <= 0 then return end
-  if game.player.stats.moves <= MOVE_COSTS_TABLE.summon then return end
-
+function M.orderSummon(game)
   addResources(game.resources, { pretzels = -1 })
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
   local guy = require('Guy').makeGoodGuy(game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
   game:addEntity(guy)
-  addToSquad(game.squad, guy)
+  game.squad:addToSquad(guy)
 end
 
 ---@param game Game
@@ -587,7 +576,7 @@ local function handleFocusModeInput(game, drawState, scancode, key)
   if tbl.has({ '1', '2', '3', '4' }, scancode) then
     drawState:setWindowScale(tonumber(scancode) or 1)
   else
-    game:resetUI()
+    error('game:resetUI()') -- FIXME
     echo(game, 'recreated uiModel and ui')
   end
 end
@@ -611,22 +600,19 @@ function M.orderPaint(game)
 end
 
 ---@param game Game
+function M.orderDismiss(game)
+  if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
+    addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
+    dismissSquad(game)
+  end
+end
+
+---@param game Game
 ---@param drawState DrawState
 ---@param scancode string
 ---@param key string
 function M.handleInput(game, drawState, scancode, key)
-  if scancode == 'g' then
-    if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
-      addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
-      dismissSquad(game)
-    end
-  elseif scancode == 'r' then
-    orderSummon(game)
-  elseif scancode == 'f' then
-    toggleFollow(game.squad)
-  elseif scancode == 'b' then
-    orderBuild(game)
-  elseif game.mode == 'focus' then
+  if game.mode == 'focus' then
     handleFocusModeInput(game, drawState, scancode, key)
   elseif game.mode == 'normal' then
     handleNormalModeInput(game, scancode)

@@ -16,14 +16,17 @@ Game is an editable image.
 
  - [ ] BUG: Game crashes when saving game if a squad is not empty
  - [ ] BUG: Vision source shape has a L-shaped notch at the left edge
- - [ ] BUG: Friendly units won't fight
+ - [ ] BUG: Friendly units won't fight enemies
  - [ ] BUG: Text objects are not passable
  - [ ] BUG: Text objects render over other objects
  - [ ] BUG: Game crashes when pressing any key in focus mode
  - [ ] BUG: Game crashes when opening a console
+ - [ ] BUG: Recruiting doesn't work
+ - [ ] BUG: Life bars are concealed behind other entities
 
 ## Quality of life
 
+ - [ ] Game: move controls to scene/game.lua
  - [ ] Clickable buttons
  - [ ] Require scenes and UI layouts
  - [ ] 'lang/model'

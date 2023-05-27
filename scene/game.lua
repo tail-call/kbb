@@ -126,6 +126,14 @@ OnKeyPressed(function (key, scancode, isrepeat)
     require('scene/console.lua').go(game)
   elseif scancode == 'space' then
     game:switchMode()
+  elseif scancode == 'g' then
+    require('Game').orderDismiss(game)
+  elseif scancode == 'r' then
+    require('Game').orderSummon(game)
+  elseif scancode == 'f' then
+    game.squad:toggleFollow()
+  elseif scancode == 'b' then
+    require('Game').orderBuild(game)
   end
 
   handleInput(game, DrawState, scancode, key)
