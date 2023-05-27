@@ -12,7 +12,7 @@ local uiModel = {
   doNothingCounter = 0,
 }
 
-local ui = require('ui/menu.lua')({}, uiModel)
+local ui = require 'ui/menu.lua'({}, uiModel)
 
 OnLoad(function (kind)
   local extraText
@@ -53,12 +53,12 @@ OnKeyPressed(function (key, scancode, isrepeat)
   if scancode == 'l' then
     uiModel.extraText = '\nLOADING...'
     afterDraw = function ()
-      require('scene/game.lua').go(SAVEFILE_NAME)
+      require 'scene/game.lua'.go(SAVEFILE_NAME)
     end
   elseif scancode == 'n' then
     uiModel.extraText = '\nSTARTING NEW GAME...'
     afterDraw = function ()
-      require('scene/game.lua').go('#dontload')
+      require 'scene/game.lua'.go('#dontload')
     end
   elseif scancode == 'q' then
     uiModel.extraText = '\nQUITTING...'
@@ -67,7 +67,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
     end
   elseif scancode == 'f' then
     uiModel.extraText = '\nRELOADING...'
-    require('Draw').nextFont()
+    require 'Draw'.nextFont()
     require(Self.path).go('reload')
   else
     uiModel.doNothingCounter = uiModel.doNothingCounter + 1

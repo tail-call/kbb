@@ -1,8 +1,8 @@
 ---@module 'lang/scene'
 
-local buffer = require('string.buffer')
+local buffer = require 'string.buffer'
 
-local withColor = require('Util').withColor
+local withColor = require 'Util'.withColor
 
 local game = nil
 
@@ -47,7 +47,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
     local chunk, compileErrorMessage = loadstring(savedPrompt, 'commandline')
     echo('lua>' .. savedPrompt)
     if chunk ~= nil then
-      setfenv(chunk, require('Commands').new {
+      setfenv(chunk, require 'Commands'.new {
         root = game,
         echo = echo,
         clear = function ()
@@ -55,7 +55,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
         end,
         scribe = function (text)
           game:addEntity(
-            require('Text').new {
+            require 'Text'.new {
               text = text,
               pos = game.player.pos,
             }
@@ -87,7 +87,7 @@ end
 
 OnDraw(function ()
   if game ~= nil then
-    require('Draw').drawGame(game, DrawState, {})
+    require 'Draw'.drawGame(game, DrawState, {})
   end
   withColor(0, 0, 0, 0.8, function ()
     local w, h = love.window.getMode()
