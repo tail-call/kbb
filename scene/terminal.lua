@@ -33,7 +33,6 @@ local cursor = {
   end,
 }
 
----@return string[][]
 local screen = ({
   init = function (self)
     for _ = 1, SCREEN_TALL do
@@ -62,7 +61,6 @@ local screen = ({
     if char == '\n' then
       cursor:carriageReturn(onOverflow)
     else
-      print(self[cursor.pos.y + 1])
       self[cursor.pos.y + 1][cursor.pos.x + 1] = char
       cursor:advance(onOverflow)
     end
