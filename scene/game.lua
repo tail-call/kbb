@@ -38,6 +38,28 @@ local function loadGame(filename, loaders)
   end)
 end
 
+---@param time number
+---@return { r: number, g: number, b: number }
+local function skyColorAtTime(time)
+  local skyTable = {
+    { r = 0.3, g = 0.3, b = 0.6, }, -- 00:00
+    { r = 1.0, g = 0.9, b = 0.8, }, -- 06:00
+    { r = 1, g = 1, b = 1, },       -- 12:00
+    { r = 1.0, g = 0.7, b = 0.7, }  -- 18:00
+  }
+
+  local length = #skyTable
+  local offset, blendFactor = math.modf((time) / (24 * 60) * length)
+  local colorA = skyTable[1 + (offset + 0) % length]
+  local colorB = skyTable[1 + (offset + 1) % length]
+  -- Blend colors together
+  return {
+    r = colorA.r + (colorB.r - colorA.r) * blendFactor,
+    g = colorA.g + (colorB.g - colorA.g) * blendFactor,
+    b = colorA.b + (colorB.b - colorA.b) * blendFactor,
+  }
+end
+
 Tooltip(function ()
   if not game then
     return {}
@@ -149,7 +171,7 @@ OnUpdate(function (dt)
     end
   end
 
-  updateGame(game, dt, directions)
+  updateGame(game, dt, directions, skyColorAtTime(game.time).g)
 end)
 
 OnKeyPressed(function (key, scancode, isrepeat)
@@ -212,5 +234,10 @@ OnMouseReleased(function (x, y, button, presses)
 end)
 
 OnDraw(function ()
-  require 'Draw'.drawGame(game, DrawState, ui)
+  require 'Draw'.drawGame(
+    game,
+    DrawState,
+    ui,
+    skyColorAtTime(game.time)
+  )
 end)

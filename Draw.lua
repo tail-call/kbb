@@ -6,7 +6,6 @@ local withTransform = require('Util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
 local vectorToLinearIndex = require('World').vectorToLinearIndex
-local skyColorAtTime = require('Util').skyColorAtTime
 local getFog = require('World').getFog
 local TILE_HEIGHT = require('const').TILE_HEIGHT
 local TILE_WIDTH = require('const').TILE_WIDTH
@@ -350,7 +349,8 @@ end
 ---@param game Game
 ---@param drawState DrawState
 ---@param ui UI
-local function drawGame(game, drawState, ui)
+---@param ambientColor { r: number, g: number, b: number }
+local function drawGame(game, drawState, ui, ambientColor)
   love.graphics.scale(drawState.windowScale)
   love.graphics.push('transform')
 
@@ -373,8 +373,7 @@ local function drawGame(game, drawState, ui)
 
   -- Draw visible terrain
 
-  local colorOfSky = skyColorAtTime(game.time)
-  drawTerrain(game.player.pos, game.world, drawState, colorOfSky)
+  drawTerrain(game.player.pos, game.world, drawState, ambientColor)
 
   -- Draw patch highlight
   if game.mode == 'paint' then

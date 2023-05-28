@@ -373,8 +373,9 @@ end
 
 ---@param game Game Game object
 ---@param dt number Time since last update
+---@param visibility number How far we should see in tiles
 ---@param movementDirections Vector[] Momentarily pressed movement directions
-function M.updateGame(game, dt, movementDirections)
+function M.updateGame(game, dt, movementDirections, visibility)
   local visionSources = {{
     pos = game.player.pos,
     sight = 10
@@ -384,7 +385,7 @@ function M.updateGame(game, dt, movementDirections)
   }}
 
   for _,v in ipairs(visionSources) do
-    revealVisionSourceFog(game.world, v, skyColorAtTime(game.time).g, dt)
+    revealVisionSourceFog(game.world, v, visibility, dt)
   end
 
   updateConsole(game.console, dt)
