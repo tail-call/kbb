@@ -75,7 +75,6 @@ function M.makeUIScript(path, uiModel)
   index = {
     Panel = makePanel,
     Origin = origin,
-    formatVector = require('core.Vector').formatVector,
     SetModel = function (props)
       for k, v in pairs(props) do
         uiModel[k] = v
@@ -119,7 +118,7 @@ function M.makeUIScript(path, uiModel)
 
   return makeRoot(
     {},
-    require('core.Util')
+    require 'core.Dump'
       .makeLanguage(index)
       .doFile(path)
   )

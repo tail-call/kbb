@@ -18,7 +18,7 @@ local function saveGame()
   file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
   file:write('-- It was created at ' .. os.date() .. '\n')
 
-  file:write(require 'core.Util'.dump(game))
+  file:write(require 'core.Dump'.dump(game))
   file:close()
 end
 
@@ -26,7 +26,7 @@ end
 ---@param loaders { [string]: function }
 ---@return fun()?, string? errorMessage
 local function loadGame(filename, loaders)
-  return require 'core.Util'.loadFileWithIndex(filename, function(t, k)
+  return require 'core.Dump'.loadFileWithIndex(filename, function(t, k)
     return function(...)
       local loader = loaders[k]
       if loader ~= nil then

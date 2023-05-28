@@ -5,16 +5,16 @@
 ---@field keypressed fun(key: love.KeyConstant, scancode: love.Scancode, isRepeat: boolean) Handles key press
 ---@field mousemoved fun(x: number, y: number, dx: number, dy: number, isTouch: boolean) Handles mouse movement
 
-local M = require('core.Module').define{...}
+local M = require 'core.Module'.define{...}
 
-local drawState = require('DrawState').new()
+local drawState = require 'DrawState'.new()
 local rescuedCallbacks = {}
 local previousScene = nil
 
 -- Initialization
 do
   -- Rescue default love callbacks
-  for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
+  for _, callbackName in ipairs(require 'const'.LOVE_CALLBACKS) do
     rescuedCallbacks[callbackName] = love[callbackName] or function () end
   end
 end
@@ -43,7 +43,7 @@ function M.loadScene(path, ...)
     OnDraw = function (draw)
       scene.draw = function ()
         draw(drawState)
-        require('Draw').drawPointer(drawState, scene.tooltips)
+        require 'Draw'.drawPointer(drawState, scene.tooltips)
       end
     end,
     OnKeyPressed = function (keypressed)
@@ -59,17 +59,17 @@ function M.loadScene(path, ...)
       scene.textinput = load
     end,
     DrawUI = function (ui)
-      require('Draw').drawUI(require('DrawState').new(), ui)
+      require 'Draw'.drawUI(require 'DrawState'.new(), ui)
     end,
     UI = function (uiPath, model)
       return require(uiPath)({}, model)
     end,
     Self = scene,
     GoBack = function (...)
-      require('Scene').setScene(prev, ...)
+      require 'Scene'.setScene(prev, ...)
     end,
   }
-  require('core.Util').makeLanguage(index).doFile(path)
+  require 'core.Dump'.makeLanguage(index).doFile(path)
   M.setScene(scene, ...)
 end
 
@@ -77,7 +77,7 @@ end
 ---@param scene Scene
 function M.setScene(scene, ...)
   previousScene = scene
-  for _, callbackName in ipairs(require('const').LOVE_CALLBACKS) do
+  for _, callbackName in ipairs(require 'const'.LOVE_CALLBACKS) do
     love[callbackName] = scene[callbackName]
       or rescuedCallbacks[callbackName]
       or error('main: no such callback: ' .. callbackName)
