@@ -8,8 +8,10 @@
 ---# Methods
 ---@field advance fun(self: Timer, dt: number) Advances timer's value
 
+-- TODO: hook timers up to some global timer manager
+
 ---@type Module
-local M = require('core.Module').define{..., version = 0, metatable = {
+local M = require 'core.Module'.define{..., version = 0, metatable = {
   ---@type Timer
   __index = {
     advance = function (self, dt)

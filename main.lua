@@ -38,6 +38,7 @@ do
   package.preload['scene.menu'] = sceneLoader
   package.preload['scene.game'] = sceneLoader
   package.preload['scene.console'] = sceneLoader
+  package.preload['scene.terminal'] = sceneLoader
 
   math.randomseed(os.time())
 end
@@ -47,5 +48,5 @@ function love.load()
   love.graphics.setLineStyle('rough')
   love.mouse.setVisible(false)
   require 'Tileset'.load()
-  require 'scene.menu'.go('initial')
+  require 'scene.terminal'.go('initial')
 end
