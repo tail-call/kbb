@@ -63,7 +63,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
   elseif scancode == 'q' then
     uiModel.extraText = '\nQUITTING...'
     afterDraw = function ()
-      love.event.quit()
+      GoBack()
     end
   elseif scancode == 'f' then
     uiModel.extraText = '\nRELOADING...'

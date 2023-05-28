@@ -1,4 +1,4 @@
-local SCREEN_WIDE = 40
+local SCREEN_WIDE = 80
 local SCREEN_TALL = 24
 
 local cursor = {
@@ -145,6 +145,9 @@ local function doStuff(words)
       cls = function (_)
         screen:clear()
       end,
+      run = function (_)
+        require 'scene.menu'.go('initial')
+      end
     }
   )
 
@@ -163,7 +166,7 @@ local function fetchInput()
 end
 
 OnDraw(function ()
-  love.graphics.scale(3, 3)
+  love.graphics.scale(1.5, 3)
   for i, line in ipairs(screen) do
     for x = 1, #line do
       love.graphics.print(line[x], (x - 1) * 8, (i - 1) * 8)
