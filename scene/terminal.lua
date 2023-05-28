@@ -132,7 +132,7 @@ local function doStuff(words)
   runCommand(
     words,
     {
-      cat = function (_, filename)
+      type = function (_, filename)
         local file = io.open(filename)
         if not file then
           error('no file')
@@ -167,13 +167,21 @@ end
 
 OnDraw(function ()
   love.graphics.scale(1.5, 3)
-  for i, line in ipairs(screen) do
-    for x = 1, #line do
-      love.graphics.print(line[x], (x - 1) * 8, (i - 1) * 8)
+  for i = 1, 2 do
+    if i == 1 then
+      love.graphics.setColor(1, 1, 1, 1)
+    elseif i == 2 then
+      love.graphics.translate(0.5, 0)
+      love.graphics.setColor(1, 1, 1, 0.5)
     end
-  end
-  if cursor.timer.value > cursor.timer.threshold / 2 then
-    love.graphics.print('_', cursor.pos.x * 8, cursor.pos.y * 8)
+    for i, line in ipairs(screen) do
+      for x = 1, #line do
+        love.graphics.print(line[x], (x - 1) * 8, (i - 1) * 8)
+      end
+    end
+    if cursor.timer.value > cursor.timer.threshold / 2 then
+      love.graphics.print('_', cursor.pos.x * 8, cursor.pos.y * 8)
+    end
   end
 end)
 
