@@ -29,7 +29,7 @@ local function vectorToLinearIndex(world, v)
   return (v.y - 1) * world.width + v.x
 end
 
-local M = require('core.Module').define{..., metatable = {
+local M = require 'core.Module'.define{..., metatable = {
   ---@type World
   __index = {
     revealFogOfWar = function (self, pos, value, dt)
@@ -51,8 +51,8 @@ local M = require('core.Module').define{..., metatable = {
   }
 }}
 
-local calcVisionDistance = require('VisionSource').calcVisionDistance
-local isVisible = require('VisionSource').isVisible
+local calcVisionDistance = require 'VisionSource'.calcVisionDistance
+local isVisible = require 'VisionSource'.isVisible
 
 ---@param world World
 ---@param v Vector
@@ -72,7 +72,7 @@ end
 ---@param world World
 function M.init(world)
   ---@type love.ImageData
-  local data = require('res/map.png')
+  local data = require 'res/map.png'
 
   world.width = data:getWidth()
   world.height = data:getHeight()
@@ -81,7 +81,7 @@ function M.init(world)
   world.tileTypes = world.tileTypes or generateTiles(world.width, world.height)
   world.fogOfWar = world.fogOfWar or {}
 
-  local makeBufDumper = require('core.Util').makeBufDumper
+  local makeBufDumper = require 'core.Util'.makeBufDumper
   setmetatable(world.fogOfWar, {
     dump = makeBufDumper(world.fogOfWar, '%.3f,')
   })
@@ -163,7 +163,7 @@ end
 ---@param pos Vector
 ---@return Patch
 function M.patchAt(world, pos)
-  return require('Patch').new {
+  return require 'Patch'.new {
     world = world,
     coords = {
       x = math.floor(pos.x / 8),
@@ -205,7 +205,7 @@ function M.randomizePatch(world, patch)
       local tileAbove = M.getTile(world, { x = x, y = y - 1 })
       local tileToTheLeft = M.getTile(world, { x = x - 1, y = y })
 
-      local tile = require('core.Util').weightedRandom(weightTable)
+      local tile = require 'core.numeric'.weightedRandom(weightTable)
       world:setTile({ x = x, y = y }, tile.tile)
 
       if tileAbove == tileToTheLeft and tileAbove ~= 'void' then

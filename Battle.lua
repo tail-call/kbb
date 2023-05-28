@@ -24,7 +24,6 @@ local M = require 'core.Module'.define{..., metatable = {
   }
 }}
 
-local weightedRandom = require('core.Util').weightedRandom
 local Ability = require('Ability')
 
 local hurt = require('GuyStats').mut.hurt
@@ -46,8 +45,8 @@ end
 ---@param damageModifier number
 ---@param say fun(text: string)
 local function fight(game, attacker, defender, damageModifier, say)
-  local attackerAction = weightedRandom(attacker.abilities)
-  local defenderAction = weightedRandom(attacker.abilities)
+  local attackerAction = require 'core.numeric'.weightedRandom(attacker.abilities)
+  local defenderAction = require 'core.numeric'.weightedRandom(attacker.abilities)
 
   local attackerEffect = attackerAction.ability.combat
   local defenderEffect = defenderAction.ability.defence
