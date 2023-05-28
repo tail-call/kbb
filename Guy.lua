@@ -24,13 +24,13 @@
 
 ---@alias CollisionInfo { type: 'entity' | 'terrain' | 'none', entity: Object2D | nil }
 
-local Vector = require('Vector')
+local Vector = require('core.Vector')
 local abilities = require('Ability').abilities
 
 local addMoves = require('GuyStats').mut.addMoves
 local setMaxHp = require('GuyStats').mut.setMaxHp
 
-local M = require('Module').define{..., metatable = {
+local M = require('core.Module').define{..., metatable = {
   ---@type Guy
   __index = {
     move = function (self, pos)

@@ -4,11 +4,11 @@
 ---@field world World Containing world
 ---@field coords Vector Coordinates
 
-local M = require('Module').define{...}
+local M = require('core.Module').define{...}
 
 ---@param patch Patch
 function M.init(patch)
-  require 'dep' (patch, function (want)
+  require 'core.Dep' (patch, function (want)
     return { want.world, want.coords }
   end)
   patch.name = patch.name or ('PATCH (%d,%d)'):format(patch.coords.x, patch.coords.y)

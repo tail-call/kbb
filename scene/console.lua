@@ -2,7 +2,7 @@
 
 local buffer = require 'string.buffer'
 
-local withColor = require 'Util'.withColor
+local withColor = require 'core.Util'.withColor
 
 local game = nil
 

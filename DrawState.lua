@@ -12,8 +12,8 @@
 ---@field setWindowScale fun(self: DrawState, windowScale: number) Changes window scale
 ---@field setCamera fun(self: DrawState, offset: Vector, z: number, magn: number)
 
-local lerp3 = require('Vector3').lerp3
-local VectorModule = require('Vector')
+local lerp3 = require('core.Vector3').lerp3
+local VectorModule = require('core.Vector')
 local updateTileset = require('Tileset').update
 
 local TILE_WIDTH = require('const').TILE_WIDTH
@@ -21,7 +21,7 @@ local SCREEN_HEIGHT = 200
 
 local CAMERA_LERP_SPEED = 10
 
-local M = require('Module').define{..., version = 0, metatable = {
+local M = require('core.Module').define{..., version = 0, metatable = {
   ---@type DrawState
   __index = {
     setWindowScale = function (self, windowScale)

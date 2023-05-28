@@ -11,12 +11,12 @@
 ---@field setMaxHp fun(self: GuyStats, maxHp: number) Sets maximum health points and fully heals
 ---@field addMoves fun(self: GuyStats, amount: number) Adds moves
 
-local M = require('Module').define{...}
+local M = require('core.Module').define{...}
 
-local clamped = require('Util').clamped
+local clamped = require('core.Util').clamped
 
 ---@type GuyStatsMutator
-M.mut = require('Mutator').new {
+M.mut = require('core.Mutator').new {
   hurt = function (self, damage)
     self.hp = self.hp - damage
   end,

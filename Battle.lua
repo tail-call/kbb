@@ -10,7 +10,7 @@
 
 local BATTLE_ROUND_DURATION = 0.5
 
-local M = require('Module').define{..., metatable = {
+local M = require 'core.Module'.define{..., metatable = {
   ---@type Battle
   __index = {
     advanceTimer = function (self, dt)
@@ -24,14 +24,14 @@ local M = require('Module').define{..., metatable = {
   }
 }}
 
-local weightedRandom = require('Util').weightedRandom
+local weightedRandom = require('core.Util').weightedRandom
 local Ability = require('Ability')
 
 local hurt = require('GuyStats').mut.hurt
 
 ---@param battle Battle
 function M.init(battle)
-  require 'dep' (battle, function (want)
+  require 'core.Dep' (battle, function (want)
     battle.attacker = want.attacker
     battle.defender = want.defender
   end)

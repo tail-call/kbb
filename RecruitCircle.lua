@@ -7,7 +7,7 @@
 ---@field reset fun(self: RecruitCircle) -- Activates recruit circle
 ---@field clear fun(self: RecruitCircle) -- Deactivates recruit circle
 
-local M = require 'Module'.define{..., metatable = {
+local M = require 'core.Module'.define{..., metatable = {
   ---@type RecruitCircle
   __index = {
     reset = function(self)

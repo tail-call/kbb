@@ -2,11 +2,11 @@
 ---@class Building: Object2D
 ---@field __module "Building"
 
-local M = require('Module').define{...}
+local M = require('core.Module').define{...}
 
 ---@param building Building
 function M.init(building)
-  require 'dep' (building, function (want)
+  require 'core.Dep' (building, function (want)
     return { want.pos }
   end)
 end

@@ -1,3 +1,5 @@
+module(..., package.seeall)
+
 OnLoad = function (...) end
 OnUpdate = function (...) end
 OnDraw = function (...) end

@@ -1,8 +1,6 @@
-local parallaxTile = require('Tileset').parallaxTile
-local tbl = require('tbl')
-local withColor = require('Util').withColor
-local withLineWidth = require('Util').withLineWidth
-local withTransform = require('Util').withTransform
+local withColor = require('core.Util').withColor
+local withLineWidth = require('core.Util').withLineWidth
+local withTransform = require('core.Util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
 local vectorToLinearIndex = require('World').vectorToLinearIndex
@@ -270,6 +268,8 @@ end
 ---@param drawState DrawState
 ---@param sky { r: number, b: number, g: number }
 local function drawTerrain(observerPos, world, drawState, sky)
+  local parallaxTile = require 'Tileset'.parallaxTile
+
   local posX, posY = observerPos.x, observerPos.y
   local visionDistance = 21
   local voidTile = parallaxTile(0, 48, -drawState.camera.x/2, -drawState.camera.y/2)
@@ -451,7 +451,7 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   -- Draw entities
 
-  local entities = tbl.iclone(game.entities)
+  local entities = require 'core.tbl'.iclone(game.entities)
   table.sort(entities, function (g1, g2)
     return g1.pos.y < g2.pos.y
   end)
@@ -486,7 +486,7 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   if game.recruitCircle.radius then
     drawRecruitCircle(game.cursorPos, game.recruitCircle.radius)
-    for _, guy in tbl.ifilter(game.entities, function (entity)
+    for _, guy in require 'core.tbl'.ifilter(game.entities, function (entity)
       return mayRecruit(game, entity)
     end) do
       recruitableHighlight(guy.pos)
@@ -597,7 +597,7 @@ end
 local function nextFont()
   isUsingBoldFont = not isUsingBoldFont
   love.graphics.setFont(
-    require('Util').loadFont(
+    require('core.Util').loadFont(
       require('res/cga8.png'),
       8, 8,
       isUsingBoldFont

@@ -1,5 +1,5 @@
 local updateDrawState = require 'DrawState'.updateDrawState
-local Vector = require 'Vector'
+local Vector = require 'core.Vector'
 local updateGame = require 'Game'.updateGame
 local endRecruiting = require 'Game'.endRecruiting
 local getTile = require 'World'.getTile
@@ -18,7 +18,7 @@ local function saveGame()
   file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
   file:write('-- It was created at ' .. os.date() .. '\n')
 
-  file:write(require 'Util'.dump(game))
+  file:write(require 'core.Util'.dump(game))
   file:close()
 end
 
@@ -26,7 +26,7 @@ end
 ---@param loaders { [string]: function }
 ---@return fun()?, string? errorMessage
 local function loadGame(filename, loaders)
-  return require 'Util'.loadFileWithIndex(filename, function(t, k)
+  return require 'core.Util'.loadFileWithIndex(filename, function(t, k)
     return function(...)
       local loader = loaders[k]
       if loader ~= nil then
@@ -196,7 +196,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
   end
 
   if game.mode == 'focus' then
-    if require 'tbl'.has({ '1', '2', '3', '4' }, scancode) then
+    if require 'core.tbl'.has({ '1', '2', '3', '4' }, scancode) then
       DrawState:setWindowScale(tonumber(scancode) or 1)
     end
   elseif game.mode == 'normal' then

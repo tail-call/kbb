@@ -23,7 +23,7 @@
 ---@field quads TilesetQuads Quads this tileset provides
 ---@field regenerate fun(self: Tileset) Regenerates tileset. Need to call when video mode changes
 
-local withCanvas = require('Util').withCanvas
+local withCanvas = require('core.Util').withCanvas
 
 local timerCeil = 0.3
 

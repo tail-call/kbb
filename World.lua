@@ -29,7 +29,7 @@ local function vectorToLinearIndex(world, v)
   return (v.y - 1) * world.width + v.x
 end
 
-local M = require('Module').define{..., metatable = {
+local M = require('core.Module').define{..., metatable = {
   ---@type World
   __index = {
     revealFogOfWar = function (self, pos, value, dt)
@@ -81,7 +81,7 @@ function M.init(world)
   world.tileTypes = world.tileTypes or generateTiles(world.width, world.height)
   world.fogOfWar = world.fogOfWar or {}
 
-  local makeBufDumper = require('Util').makeBufDumper
+  local makeBufDumper = require('core.Util').makeBufDumper
   setmetatable(world.fogOfWar, {
     dump = makeBufDumper(world.fogOfWar, '%.3f,')
   })
@@ -205,7 +205,7 @@ function M.randomizePatch(world, patch)
       local tileAbove = M.getTile(world, { x = x, y = y - 1 })
       local tileToTheLeft = M.getTile(world, { x = x - 1, y = y })
 
-      local tile = require('Util').weightedRandom(weightTable)
+      local tile = require('core.Util').weightedRandom(weightTable)
       world:setTile({ x = x, y = y }, tile.tile)
 
       if tileAbove == tileToTheLeft and tileAbove ~= 'void' then

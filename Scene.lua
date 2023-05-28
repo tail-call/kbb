@@ -5,7 +5,7 @@
 ---@field keypressed fun(key: love.KeyConstant, scancode: love.Scancode, isRepeat: boolean) Handles key press
 ---@field mousemoved fun(x: number, y: number, dx: number, dy: number, isTouch: boolean) Handles mouse movement
 
-local M = require('Module').define{...}
+local M = require('core.Module').define{...}
 
 local drawState = require('DrawState').new()
 local rescuedCallbacks = {}
@@ -69,7 +69,7 @@ function M.loadScene(path, ...)
       require('Scene').setScene(prev, ...)
     end,
   }
-  require('Util').makeLanguage(index).doFile(path)
+  require('core.Util').makeLanguage(index).doFile(path)
   M.setScene(scene, ...)
 end
 
