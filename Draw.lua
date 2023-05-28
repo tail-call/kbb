@@ -63,7 +63,6 @@ end
 local function drawUI(drawState, ui)
   if ui.shouldDraw and not ui.shouldDraw() then return end
 
-  print(require 'core.Util'.dump(ui))
   local transform = ui.transform(drawState)
   love.graphics.applyTransform(transform)
 
