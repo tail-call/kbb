@@ -20,7 +20,6 @@ Game is an editable image.
  - [ ] BUG: Text objects are not passable
  - [ ] BUG: Text objects render over other objects
  - [ ] BUG: Game crashes when pressing any key in focus mode
- - [ ] BUG: Game crashes when opening a console
  - [ ] BUG: Recruiting doesn't work
  - [ ] BUG: Life bars are concealed behind other entities
 
@@ -261,6 +260,7 @@ Game is an editable image.
  - [x] BUGFIX: Game crashes when pressing Tab during game [2023-05-27T12:24]
  - [x] Game: move controls to scene/game.lua [2023-05-27T13:31]
  - [x] Syntax for required object fields [2023-05-27T16:16]
+ - [x] BUGFIX: Game crashes when opening a console [2023-05-28T20:04]
 
 # Sources
 

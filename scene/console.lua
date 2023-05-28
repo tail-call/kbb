@@ -2,8 +2,6 @@
 
 local buffer = require 'string.buffer'
 
-local withColor = require 'core.Util'.withColor
-
 local game = nil
 
 local output = ''
@@ -87,9 +85,19 @@ end
 
 OnDraw(function ()
   if game ~= nil then
-    require 'Draw'.drawGame(game, DrawState, {}, { r = 1, b = 1, g = 1 })
+    require 'Draw'.drawGame(
+      game,
+      DrawState,
+      {
+        transform = function ()
+          return love.math.newTransform()
+        end,
+        children = {},
+      },
+      { r = 1, b = 1, g = 1 }
+    )
   end
-  withColor(0, 0, 0, 0.8, function ()
+  require 'Draw'.withColor(0, 0, 0, 0.8, function ()
     local w, h = love.window.getMode()
     love.graphics.rectangle('fill', 0, 0, w, h)
   end)
