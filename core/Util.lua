@@ -1,26 +1,3 @@
----@generic T
----@param fun fun(): T
----@param cb fun(value: T): nil
-local function exhaust(fun, cb, ...)
-  local crt = coroutine.create(fun)
-  local isRunning, result = coroutine.resume(crt, ...)
-
-  local function doStuff()
-    -- Crash if coroutine fails
-    local stupidMessage = 'cannot resume dead coroutine'
-    if not isRunning and result ~= stupidMessage then
-      error(result)
-    end
-  end
-
-  doStuff()
-  while isRunning do
-    cb(result)
-    isRunning, result = coroutine.resume(crt)
-    doStuff()
-  end
-end
-
 ---@param canvas love.Canvas
 ---@param cb fun(canvas: love.Canvas): nil
 local function withCanvas(canvas, cb)
@@ -244,7 +221,7 @@ local function dump(object)
 
   local buf = require 'string.buffer'.new()
   buf:put('local O = {}\n' )
-  exhaust(process, function(part)
+  require 'core.coroutine'.exhaust(process, function(part)
     buf:put(part or '')
   end, object)
 
@@ -306,7 +283,6 @@ local function makeLanguage(dictionary)
   }
 end
 return {
-  exhaust = exhaust,
   withCanvas = withCanvas,
   withColor = withColor,
   withLineWidth = withLineWidth,
