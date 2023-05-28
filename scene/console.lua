@@ -87,7 +87,7 @@ end
 
 OnDraw(function ()
   if game ~= nil then
-    require 'Draw'.drawGame(game, DrawState, {})
+    require 'Draw'.drawGame(game, DrawState, {}, { r = 1, b = 1, g = 1 })
   end
   withColor(0, 0, 0, 0.8, function ()
     local w, h = love.window.getMode()
