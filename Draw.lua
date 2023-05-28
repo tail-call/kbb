@@ -451,7 +451,7 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   -- Draw entities
 
-  local entities = require 'core.tbl'.iclone(game.entities)
+  local entities = require 'core.table'.iclone(game.entities)
   table.sort(entities, function (g1, g2)
     return g1.pos.y < g2.pos.y
   end)
@@ -486,7 +486,7 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   if game.recruitCircle.radius then
     drawRecruitCircle(game.cursorPos, game.recruitCircle.radius)
-    for _, guy in require 'core.tbl'.ifilter(game.entities, function (entity)
+    for _, guy in require 'core.table'.ifilter(game.entities, function (entity)
       return mayRecruit(game, entity)
     end) do
       recruitableHighlight(guy.pos)

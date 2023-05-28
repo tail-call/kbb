@@ -51,7 +51,7 @@ M.mut = M.new {
   end,
   removeListener = function (self, aTable, listener)
     self.listeners[aTable] = self.listeners[aTable] or {}
-    require 'core.tbl'.maybeDrop(self.listeners, listener)
+    require 'core.table'.maybeDrop(self.listeners, listener)
   end,
 }
 

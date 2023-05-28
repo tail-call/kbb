@@ -196,7 +196,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
   end
 
   if game.mode == 'focus' then
-    if require 'core.tbl'.has({ '1', '2', '3', '4' }, scancode) then
+    if require 'core.table'.has({ '1', '2', '3', '4' }, scancode) then
       DrawState:setWindowScale(tonumber(scancode) or 1)
     end
   elseif game.mode == 'normal' then

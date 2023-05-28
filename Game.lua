@@ -88,7 +88,7 @@ local M = require 'core.Module'.define{..., metatable = {
       table.insert(self.entities, entity)
     end,
     removeEntity = function (self, entity)
-      require 'core.tbl'.maybeDrop(self.entities, entity)
+      require 'core.table'.maybeDrop(self.entities, entity)
 
       if entity.__module == 'Guy' then
         ---@cast entity Guy
@@ -188,7 +188,7 @@ end
 ---@param pos Vector
 ---@return { pos: Vector } | nil
 local function findEntityAtPos(game, pos)
-  return require 'core.tbl'.find(game.entities, function (entity)
+  return require 'core.table'.find(game.entities, function (entity)
     return Vector.equal(entity.pos, pos)
   end)
 end
@@ -205,7 +205,7 @@ function M.init(game)
   end)
   game.console = game.console or require 'Console'.new()
   game.score = game.score or 0
-  game.frozenEntities = require 'core.tbl'.weaken(game.frozenEntities or {}, 'k')
+  game.frozenEntities = require 'core.table'.weaken(game.frozenEntities or {}, 'k')
   game.time = game.time or (12 * 60)
   game.entities = game.entities or {}
   game.deathsCount = game.deathsCount or 0
@@ -242,7 +242,7 @@ function M.init(game)
 
   local Guy = require 'Guy'
 
-  if not require 'core.tbl'.has(game.entities, game.player) then
+  if not require 'core.table'.has(game.entities, game.player) then
     game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
   end
 
