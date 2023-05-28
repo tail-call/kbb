@@ -44,8 +44,6 @@ local revealVisionSourceFog = require 'World'.revealVisionSourceFog
 local behave = require 'Guy'.behave
 local addMoves = require 'GuyStats'.mut.addMoves
 
-local addListener = require 'core.Mutator'.mut.addListener
-
 ---@type Vector
 local LEADER_SPAWN_LOCATION = { x = 250, y = 250 }
 
@@ -249,8 +247,7 @@ function M.init(game)
   -- Subscribe to player stats
   do
     local function listenPlayerDeath()
-      addListener(
-       require 'GuyStats'.mut,
+      require 'GuyStats'.mut:addListener(
         game.player.stats,
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then

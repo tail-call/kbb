@@ -3,12 +3,22 @@
 ---@class Mutator
 ---@field listeners { [table] : MutatorListener[] } Maps objects to their mutator listeners
 ---@field [string] function
-
----@class MutatorMutator
 ---@field addListener fun(self: Mutator, table: table, listener: MutatorListener)
 ---@field removeListener fun(self: Mutator, table: table, listener: MutatorListener)
 
-local M = require('core.Module').define{...}
+local M = require 'core.Module'.define{..., metatable = {
+  ---@type Mutator
+  __index = {
+    addListener = function (self, aTable, listener)
+      self.listeners[aTable] = self.listeners[aTable] or {}
+      table.insert(self.listeners[aTable], listener)
+    end,
+    removeListener = function (self, aTable, listener)
+      self.listeners[aTable] = self.listeners[aTable] or {}
+      require 'core.table'.maybeDrop(self.listeners, listener)
+    end,
+  }
+}}
 
 ---@param mut Mutator
 function M.init(mut)
@@ -43,17 +53,4 @@ function M.init(mut)
   return mut
 end
 
----@type MutatorMutator
-M.mut = M.new {
-  addListener = function (self, aTable, listener)
-    self.listeners[aTable] = self.listeners[aTable] or {}
-    table.insert(self.listeners[aTable], listener)
-  end,
-  removeListener = function (self, aTable, listener)
-    self.listeners[aTable] = self.listeners[aTable] or {}
-    require 'core.table'.maybeDrop(self.listeners, listener)
-  end,
-}
-
----@alias MutatorModule `M`
 return M
