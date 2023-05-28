@@ -637,8 +637,8 @@ end
 local function nextFont()
   isUsingBoldFont = not isUsingBoldFont
   love.graphics.setFont(
-    require('core.Util').loadFont(
-      require('res/cga8.png'),
+    require 'core.Font'.load(
+      require 'res/cga8.png',
       8, 8,
       isUsingBoldFont
     )
