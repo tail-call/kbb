@@ -33,8 +33,12 @@ local cursor = {
   end,
 }
 
-local screen = ({
-  init = function (self)
+local screen = {
+  clear = function (self)
+    for _ = 1, SCREEN_TALL do
+      table.remove(self)
+    end
+
     for _ = 1, SCREEN_TALL do
       local line = {}
       for _ = 1, SCREEN_WIDE do
@@ -43,7 +47,7 @@ local screen = ({
       table.insert(self, line)
     end
 
-    self:echo('KB-DOS v15.1\n>')
+    cursor:locate { x = 0, y = 0 }
     return self
   end,
   scroll = function (self)
@@ -72,7 +76,10 @@ local screen = ({
       self:putChar(text:sub(i, i))
     end
   end,
-}):init()
+}
+
+screen:clear()
+screen:echo('KB-DOS v15.1\n>')
 
 local readline = {
   input = {},
@@ -103,12 +110,56 @@ local readline = {
   end,
 }
 
-local function executeLine()
+local function runCommand(words, commands)
+  local command = commands[words[1]]
+  if not command then
+    screen:echo(('command not found: %s\n'):format(words[1]))
+    return
+  end
+
+  command(unpack(words))
+end
+
+local function splitToWords(line)
+  local words = {}
+  for word in string.gmatch(line, '[^%s]+') do
+    table.insert(words, word)
+  end
+  return words
+end
+
+local function doStuff(words)
+  runCommand(
+    words,
+    {
+      cat = function (_, filename)
+        local file = io.open(filename)
+        if not file then
+          error('no file')
+        end
+        local content = file:read('*a')
+        file:close()
+        screen:echo(content)
+        screen:echo('\n')
+      end,
+      cls = function (_)
+        screen:clear()
+      end,
+    }
+  )
+
+  screen:echo('>')
+end
+
+local function fetchInput()
+  cursor:carriageReturn(function ()
+    screen:scroll()
+  end)
+
   local line = table.concat(readline.input)
   readline:clear()
 
-  screen:echo(string.format('You typed "%s"\n', line))
-  screen:echo('>')
+  return line
 end
 
 OnDraw(function ()
@@ -135,9 +186,6 @@ OnKeyPressed(function (key, scancode, isrepeat)
   elseif scancode == 'space' then
     readline:addChar(' ')
   elseif scancode == 'return' then
-    cursor:carriageReturn(function ()
-      screen:scroll()
-    end)
-    executeLine()
+    doStuff(splitToWords(fetchInput()))
   end
 end)
