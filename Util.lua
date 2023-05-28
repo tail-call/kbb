@@ -1,5 +1,3 @@
-local buffer = require('string.buffer')
-
 ---@generic T
 ---@param fun fun(): T
 ---@param cb fun(value: T): nil
@@ -244,7 +242,7 @@ local function dump(object)
     end
   end
 
-  local buf = buffer.new()
+  local buf = require 'string.buffer'.new()
   buf:put('local O = {}\n' )
   exhaust(process, function(part)
     buf:put(part or '')
@@ -262,7 +260,7 @@ end
 local function makeBufDumper (array, format)
   ---@param write fun(data: string)
   return function(write)
-    local buf = buffer.new()
+    local buf = require 'string.buffer'.new()
     buf:put('return{')
     for _, word in ipairs(array) do
       buf:put(string.format(format, word))

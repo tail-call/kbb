@@ -8,7 +8,7 @@ local getTile = require 'World'.getTile
 local game
 ---@type UIModel
 local uiModel = {}
-local ui = require 'ui/screen.lua'(uiModel)
+local ui = require 'ui.screen'(uiModel)
 local alternatingKeyIndex = 1
 
 local function saveGame()
@@ -182,7 +182,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
   elseif scancode == 'tab' then
     uiModel:nextTab()
   elseif scancode == 'return' then
-    require 'scene/console.lua'.go(game)
+    require 'scene.console'.go(game)
   elseif scancode == 'space' then
     game:switchMode()
   elseif scancode == 'g' then

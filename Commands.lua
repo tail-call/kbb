@@ -16,7 +16,7 @@ local function new(opts)
     package = package,
     o = opts.root,
     reload = function(moduleName)
-      require('Module').reload(moduleName)
+      require 'Module'.reload(moduleName)
     end,
     scribe = function(text)
       opts.scribe(text)
@@ -55,7 +55,7 @@ local function new(opts)
     end,
     quit = function ()
       package.loaded['MenuScene'] = nil
-      require('scene/menu.lua').go('fromgame')
+      require 'scene.menu'.go('fromgame')
     end,
   }
   helpPages = {
