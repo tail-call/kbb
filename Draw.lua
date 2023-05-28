@@ -1,9 +1,5 @@
-local isFrozen = require('Game').isFrozen
-local mayRecruit = require('Game').mayRecruit
-local vectorToLinearIndex = require('World').vectorToLinearIndex
-local getFog = require('World').getFog
-local TILE_HEIGHT = require('const').TILE_HEIGHT
-local TILE_WIDTH = require('const').TILE_WIDTH
+local TILE_HEIGHT = 16
+local TILE_WIDTH = 16
 
 -- Constants
 local MINIMAP_SIZE = 72
@@ -13,8 +9,6 @@ local WHITE_CURSOR_COLOR = { 1, 1, 1, 0.8 }
 local RED_COLOR = { 1, 0, 0, 0.8 }
 local YELLOW_COLOR = { 1, 1, 0, 0.8 }
 local GREEN_COLOR = { 0, 1, 0, 0.8 }
-
-local isUsingBoldFont = false
 
 ---@param transform love.Transform
 ---@param cb fun(): nil
@@ -321,7 +315,7 @@ local function drawTerrain(observerPos, world, drawState, sky)
       vec.x = x
       vec.y = y
 
-      local idx = vectorToLinearIndex(world, vec)
+      local idx = require 'World'.vectorToLinearIndex(world, vec)
       local fog = world.fogOfWar[idx] or 0
       local tileType = world.tileTypes[idx] or 'void'
       local tile = drawState.tileset.quads[tileType]
@@ -484,7 +478,7 @@ local function drawGame(game, drawState, ui, ambientColor)
       return
     end
 
-    local fog = getFog(game.world, obj.pos)
+    local fog = require 'World'.getFog(game.world, obj.pos)
     withColor(fog, fog, fog, 1, cb)
   end
 
@@ -513,7 +507,7 @@ local function drawGame(game, drawState, ui, ambientColor)
       end)
     elseif entity.__module == 'Guy' then
       ---@cast entity Guy
-      if not isFrozen(game, entity) then
+      if not require 'Game'.isFrozen(game, entity) then
         cullAndShade(entity, function ()
           drawGuy(entity)
         end)
@@ -526,7 +520,7 @@ local function drawGame(game, drawState, ui, ambientColor)
   if game.recruitCircle.radius then
     drawRecruitCircle(game.cursorPos, game.recruitCircle.radius)
     for _, guy in require 'core.table'.ifilter(game.entities, function (entity)
-      return mayRecruit(game, entity)
+      return require 'Game'.mayRecruit(game, entity)
     end) do
       recruitableHighlight(guy.pos)
     end
@@ -573,6 +567,7 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   -- Draw minimap
 
+  -- TODO: make a UI widget instead
   withTransform(love.math.newTransform(8, screenH - 16 - MINIMAP_SIZE), function ()
     local offsetX = game.player.pos.x - MINIMAP_SIZE / 2
     local offsetY = game.player.pos.y - MINIMAP_SIZE / 2
@@ -633,23 +628,12 @@ local function drawGame(game, drawState, ui, ambientColor)
   end)
 end
 
--- TODO: move to DrawState
-local function nextFont()
-  isUsingBoldFont = not isUsingBoldFont
-  love.graphics.setFont(
-    require 'core.Font'.load(
-      require 'res/cga8.png',
-      8, 8,
-      isUsingBoldFont
-    )
-  )
-end
-
 return {
   drawGame = drawGame,
   drawUI = drawUI,
-  nextFont = nextFont,
   drawPointer = drawPointer,
   withCanvas = withCanvas,
   withColor = withColor,
+  TILE_WIDTH = TILE_WIDTH,
+  TILE_HEIGHT = TILE_HEIGHT,
 }

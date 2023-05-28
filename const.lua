@@ -1,6 +1,4 @@
 return {
-  TILE_HEIGHT = 16,
-  TILE_WIDTH = 16,
   LOVE_CALLBACKS = {
     'draw',
     -- 'errorhandler', We cannot obtain default errorhandler
