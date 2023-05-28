@@ -23,8 +23,6 @@
 ---@field quads TilesetQuads Quads this tileset provides
 ---@field regenerate fun(self: Tileset) Regenerates tileset. Need to call when video mode changes
 
-local withCanvas = require('core.Util').withCanvas
-
 local timerCeil = 0.3
 
 ---@type Tileset
@@ -120,7 +118,7 @@ local function load()
     waterFrame = 4,
     image = image,
     regenerate = function (self)
-      withCanvas(self.tiles, function ()
+      require 'Draw'.withCanvas(self.tiles, function ()
         love.graphics.draw(self.image)
       end)
     end,
@@ -162,7 +160,7 @@ local function update(tileset, dt)
       tileset.waterFrame = 1
     end
 
-    withCanvas(tileset.tiles, function ()
+    require 'Draw'.withCanvas(tileset.tiles, function ()
       local quad = tileset.quads.waterFrames[tileset.waterFrame]
       local x, y = tileset.quads.water:getViewport()
       love.graphics.draw(tileset.image, quad, x, y)

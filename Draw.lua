@@ -1,6 +1,3 @@
-local withColor = require('core.Util').withColor
-local withLineWidth = require('core.Util').withLineWidth
-local withTransform = require('core.Util').withTransform
 local isFrozen = require('Game').isFrozen
 local mayRecruit = require('Game').mayRecruit
 local vectorToLinearIndex = require('World').vectorToLinearIndex
@@ -18,6 +15,48 @@ local YELLOW_COLOR = { 1, 1, 0, 0.8 }
 local GREEN_COLOR = { 0, 1, 0, 0.8 }
 
 local isUsingBoldFont = false
+
+---@param transform love.Transform
+---@param cb fun(): nil
+local function withTransform(transform, cb)
+  love.graphics.push('transform')
+  love.graphics.applyTransform(transform)
+  cb()
+  love.graphics.pop()
+end
+
+---@param canvas love.Canvas
+---@param cb fun(canvas: love.Canvas): nil
+local function withCanvas(canvas, cb)
+  love.graphics.setCanvas(canvas)
+  love.graphics.push('transform')
+  love.graphics.replaceTransform(love.math.newTransform())
+  cb(canvas)
+  love.graphics.pop()
+  love.graphics.setCanvas()
+end
+
+---@param r number
+---@param g number
+---@param b number
+---@param a number
+---@param cb fun(): nil
+local function withColor(r, g, b, a, cb)
+  local xr, xg, xb, xa = love.graphics.getColor()
+  love.graphics.setColor(r, g, b, a)
+  cb()
+  love.graphics.setColor(xr, xg, xb, xa)
+end
+
+---@param lineWidth number
+---@param cb fun(): nil
+local function withLineWidth(lineWidth, cb)
+  local xLineWidth = love.graphics.getLineWidth()
+  love.graphics.setLineWidth(lineWidth)
+  cb()
+  love.graphics.setLineWidth(xLineWidth)
+end
+
 
 ---@param drawState DrawState
 ---@param ui UI
@@ -594,6 +633,7 @@ local function drawGame(game, drawState, ui, ambientColor)
   end)
 end
 
+-- TODO: move to DrawState
 local function nextFont()
   isUsingBoldFont = not isUsingBoldFont
   love.graphics.setFont(
@@ -610,4 +650,5 @@ return {
   drawUI = drawUI,
   nextFont = nextFont,
   drawPointer = drawPointer,
+  withCanvas = withCanvas,
 }

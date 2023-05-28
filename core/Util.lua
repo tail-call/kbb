@@ -1,44 +1,3 @@
----@param canvas love.Canvas
----@param cb fun(canvas: love.Canvas): nil
-local function withCanvas(canvas, cb)
-  love.graphics.setCanvas(canvas)
-  love.graphics.push('transform')
-  love.graphics.replaceTransform(love.math.newTransform())
-  cb(canvas)
-  love.graphics.pop()
-  love.graphics.setCanvas()
-end
-
----@param r number
----@param g number
----@param b number
----@param a number
----@param cb fun(): nil
-local function withColor(r, g, b, a, cb)
-  local xr, xg, xb, xa = love.graphics.getColor()
-  love.graphics.setColor(r, g, b, a)
-  cb()
-  love.graphics.setColor(xr, xg, xb, xa)
-end
-
----@param lineWidth number
----@param cb fun(): nil
-local function withLineWidth(lineWidth, cb)
-  local xLineWidth = love.graphics.getLineWidth()
-  love.graphics.setLineWidth(lineWidth)
-  cb()
-  love.graphics.setLineWidth(xLineWidth)
-end
-
----@param transform love.Transform
----@param cb fun(): nil
-local function withTransform(transform, cb)
-  love.graphics.push('transform')
-  love.graphics.applyTransform(transform)
-  cb()
-  love.graphics.pop()
-end
-
 ---@return integer
 local function randomLetterCode()
   local letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -283,10 +242,6 @@ local function makeLanguage(dictionary)
   }
 end
 return {
-  withCanvas = withCanvas,
-  withColor = withColor,
-  withLineWidth = withLineWidth,
-  withTransform = withTransform,
   randomLetterCode = randomLetterCode,
   loadFont = loadFont,
   weightedRandom = weightedRandom,
