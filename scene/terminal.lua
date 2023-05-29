@@ -53,7 +53,7 @@ local readline = makeReadline {
   screen = screen
 }
 
-screen:echo('KB-DOS v15.1\n>')
+screen:echo('KB-DOS v15.1\nType "scene scene.menu" to play\n>')
 
 local function forceSlashAtEnd(str)
   for k in str:gmatch('.$') do
@@ -84,29 +84,6 @@ local function loadCommand(name)
   return lang.loadFile('bin/' .. name .. '.lua')
 end
 
-local function runCommand(words, commands)
-  local commandName = words[1]
-  local command = commands[commandName]
-
-  if not command then
-    command = loadCommand(commandName)
-  end
-
-  if not command then
-    screen:echo(('command not found: %s\n'):format(commandName))
-    return
-  end
-
-  xpcall(function ()
-    table.remove(words, 1)
-    command(unpack(words))
-    screen:putChar('\n')
-  end, function (err)
-    screen:echo(err)
-    screen:putChar('\n')
-  end)
-end
-
 local function splitToWords(line)
   local words = {}
   for word in string.gmatch(line, '[^%s]+') do
@@ -115,14 +92,40 @@ local function splitToWords(line)
   return words
 end
 
-local function doStuff(words)
+local function runCommand(input, builtinCommands)
+  xpcall(function ()
+    local args = splitToWords(input)
+    local commandName = args[1]
+    table.remove(args, 1)
+
+    local command = builtinCommands[commandName]
+
+    if not command then
+      command = loadCommand(commandName)
+    end
+
+    if not command then
+      screen:echo(('command not found: %s\n'):format(commandName))
+      return
+    end
+
+    command(unpack(args))
+
+    screen:putChar('\n')
+  end, function (err)
+    screen:echo(err)
+    screen:putChar('\n')
+  end)
+end
+
+local function doStuff(input)
   runCommand(
-    words,
+    input,
     {
-      cls = function (_)
+      cls = function ()
         screen:clear()
       end,
-      cd = function (_, path)
+      cd = function (path)
         if not path then
           screen:echo(('You are in %s.\n'):format(os.currentDir))
           return
@@ -130,7 +133,7 @@ local function doStuff(words)
 
         os:setCurrentDir(path)
       end,
-      dir = function (_, path)
+      dir = function (path)
         if not path then
           path = os.currentDir
         end
@@ -144,10 +147,12 @@ local function doStuff(words)
           screen:echo(('%s%s\n'):format(path, item))
         end
       end,
-      scene = function (_, sceneName, ...)
+      scene = function (sceneName, ...)
+        print(sceneName, ...)
         if not sceneName then
           screen:echo(sceneName)
-          screen:echo('Scene name is required\n')
+          screen:echo('\n')
+          screen:echo('scene: name is required\n')
           return
         end
         require(sceneName).go(...)
@@ -206,6 +211,6 @@ OnKeyPressed(function (key, scancode, isrepeat)
   if scancode == 'backspace' then
     readline:rubBack()
   elseif scancode == 'return' then
-    doStuff(splitToWords(fetchInput()))
+    doStuff(fetchInput())
   end
 end)

@@ -159,7 +159,6 @@ local function makeLanguage(dictionary)
   local lang
   lang = {
     loadFile = function(path)
-      print('doFile', path)
       local chunk, err = loadFileWithIndex(path, dictionary)
       if not chunk then
         error(err)

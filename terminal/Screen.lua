@@ -46,6 +46,9 @@ local M = require('core.Module').define{..., version = 0, metatable = {
     ---@param self table
     ---@param text string
     echo = function (self, text)
+      if text == nil then
+        text = 'nil'
+      end
       for i = 1, #text do
         self:putChar(text:sub(i, i))
       end

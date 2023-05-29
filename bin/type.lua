@@ -2,10 +2,18 @@
 
 local filename = ...
 
+if not filename then
+  print 'USAGE:\ntype <filename>'
+  return
+end
+
 local file = io.open(filename)
 if not file then
-  error(('file not found: %s'):format(filename))
+  print(('file not found: %s'):format(filename))
+  return
 end
+
 local content = file:read('*a')
 file:close()
+
 print(content)
