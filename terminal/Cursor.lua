@@ -3,6 +3,7 @@
 ---@field timer Timer
 ---@field screenSize { tall: integer, wide: integer }
 ---@field locate fun(self: terminal.Cursor, newPos: core.Vector)
+---@field goHome fun(self: terminal.Cursor)
 ---@field carriageReturn fun(self: terminal.Cursor, onOverflow: fun())
 ---@field advance fun(self: terminal.Cursor, onOverflow: fun())
 ---@field retreat fun(self: terminal.Cursor)
@@ -11,6 +12,9 @@ local M = require 'core.Module'.define{..., metatable = {
   __index = {
     locate = function (self, newPos)
       self.pos = newPos
+    end,
+    goHome = function (self, newPos)
+      self:locate(require 'core.Vector'.new { x = 0, y = 0 })
     end,
     carriageReturn = function (self, onOverflow)
       self.pos.x = 0

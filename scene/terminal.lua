@@ -1,5 +1,6 @@
 local screenSize = { wide = 80, tall = 24 }
 
+---@type terminal.Screen
 local screen = require 'terminal.Screen'.new {
   screenSize = screenSize,
   cursor = require 'terminal.Cursor'.new {
@@ -7,6 +8,7 @@ local screen = require 'terminal.Screen'.new {
   }
 }
 
+---@type terminal.Readline
 local readline = require 'terminal.Readline'.new {
   screen = screen
 }
@@ -35,6 +37,10 @@ local function splitToWords(line)
 end
 
 local function runCommand(input)
+  local function onFinish()
+    screen:setShouldScroll(true)
+    screen:putChar('\n')
+  end
   xpcall(function ()
     local lang = require 'core.Dump'.makeLanguage {
       print = function (...)
@@ -44,6 +50,7 @@ local function runCommand(input)
         screen:echo('\n')
       end,
       Sys = {
+        screen = screen,
         goToScene = function (sceneName, ...)
           require(sceneName).go(...)
         end,
@@ -73,16 +80,16 @@ local function runCommand(input)
 
     lang.call(command, unpack(args))
 
-    screen:putChar('\n')
+    onFinish()
   end, function (err)
     screen:echo(err)
-    screen:putChar('\n')
+    onFinish()
   end)
 end
 
 local function fetchInput()
-  readline.screen.cursor:carriageReturn(function ()
-    readline.screen:scroll()
+  screen.cursor:carriageReturn(function ()
+    screen:scroll()
   end)
 
   local line = table.concat(readline.input)
@@ -101,7 +108,7 @@ OnDraw(function ()
       love.graphics.translate(0.5, 0)
       love.graphics.setColor(1, 1, 1, 0.5)
     end
-    for i, line in ipairs(readline.screen) do
+    for i, line in ipairs(screen.chars) do
       for x = 1, #line do
         love.graphics.print(line[x], (x - 1) * 8, (i - 1) * 8)
       end

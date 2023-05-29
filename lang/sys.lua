@@ -1,7 +1,8 @@
----@class core.System
+---@class lang.System
+---@field screen terminal.Screen
 ---@field goToScene fun(name: string, ...)
 ---@field setCurrentDir fun(path: string)
 ---@field getCurrentDir fun()
 
----@type core.System
+---@type lang.System
 Sys = {}
