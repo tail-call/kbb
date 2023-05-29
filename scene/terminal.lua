@@ -77,7 +77,12 @@ local function runCommand(words, commands)
     return
   end
 
-  command(unpack(words))
+  xpcall(function ()
+    command(unpack(words))
+  end, function (err)
+    readline.screen:echo(err)
+    readline.screen:putChar('\n')
+  end)
 end
 
 local function splitToWords(line)
@@ -95,7 +100,7 @@ local function doStuff(words)
       type = function (_, filename)
         local file = io.open(filename)
         if not file then
-          error('no file')
+          error(('file not found: %s'):format(filename))
         end
         local content = file:read('*a')
         file:close()
