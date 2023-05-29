@@ -4,7 +4,7 @@
 ---# Properties
 ---@field texture love.Texture
 ---@field quad love.Quad
----@field pos Vector
+---@field pos core.Vector
 ---@field isFlipped boolean
 ---@field transform love.Transform
 ---@field isRightStep boolean
@@ -12,8 +12,8 @@
 ---@field targetTransform love.Transform
 ---@field color number[]
 ---# Methods
----@field playSpawnAnimation fun(self: Pixie, pos: Vector): nil
----@field move fun(self: Pixie, pos: Vector): nil
+---@field playSpawnAnimation fun(self: Pixie, pos: core.Vector): nil
+---@field move fun(self: Pixie, pos: core.Vector): nil
 ---@field update fun(self: Pixie, dt: number): nil
 
 local M = require('core.Module').define{..., metatable = {

@@ -1,119 +1,168 @@
 local SCREEN_WIDE = 80
 local SCREEN_TALL = 24
 
-local cursor = {
-  ---@type Vector
-  pos = require 'core.Vector'.new { x = 0, y = 0 },
-  ---@type Timer
-  timer = require 'Timer'.new { threshold = 1/4 },
-  locate = function (self, newPos)
-    self.pos = newPos
-  end,
-  carriageReturn = function (self, onOverflow)
-    self.pos.x = 0
-    self.pos.y = self.pos.y + 1
+---@class terminal.Cursor
+---@field pos core.Vector
+---@field timer Timer
+---@field locate fun(self: terminal.Cursor, newPos: core.Vector)
+---@field carriageReturn fun(self: terminal.Cursor, onOverflow: fun())
+---@field advance fun(self: terminal.Cursor, onOverflow: fun())
+---@field retreat fun(self: terminal.Cursor)
 
-    if self.pos.y >= SCREEN_TALL then
-      onOverflow()
-    end
-  end,
-  advance = function (self, onOverflow)
-    self.pos.x = self.pos.x + 1
+---@class terminal.Screen
+---@field cursor terminal.Cursor
+---@field clear fun(self: terminal.Screen)
+---@field scroll fun(self: terminal.Screen)
+---@field putChar fun(self: terminal.Screen, char: string)
+---@field echo fun(self: terminal.Screen, text: string)
 
-    if self.pos.x >= SCREEN_WIDE then
-      self:carriageReturn(onOverflow)
-    end
-  end,
-  retreat = function (self)
-    self.pos.x = self.pos.x - 1
+---@class terminal.Readline
+---@field screen terminal.Screen
+---@field input string[]
+---@field pos integer
+---@field clear fun(self: terminal.Readline)
+---@field addChar fun(self: terminal.Readline, char: string)
+---@field rubBack fun(self: terminal.Readline)
+---@field rubForward fun(self: terminal.Readline)
 
-    if self.pos.x < 0 then
-      error('underflow')
-    end
-  end,
-}
+---@return terminal.Cursor
+local function makeCursor()
+  return {
+    ---@type core.Vector
+    pos = require 'core.Vector'.new { x = 0, y = 0 },
+    ---@type Timer
+    timer = require 'Timer'.new { threshold = 1/4 },
+    locate = function (self, newPos)
+      self.pos = newPos
+    end,
+    carriageReturn = function (self, onOverflow)
+      self.pos.x = 0
+      self.pos.y = self.pos.y + 1
 
-local screen = {
-  clear = function (self)
-    for _ = 1, SCREEN_TALL do
-      table.remove(self)
-    end
-
-    for _ = 1, SCREEN_TALL do
-      local line = {}
-      for _ = 1, SCREEN_WIDE do
-        table.insert(line, ' ')
+      if self.pos.y >= SCREEN_TALL then
+        onOverflow()
       end
-      table.insert(self, line)
-    end
+    end,
+    advance = function (self, onOverflow)
+      self.pos.x = self.pos.x + 1
 
-    cursor:locate { x = 0, y = 0 }
-    return self
-  end,
-  scroll = function (self)
-    table.remove(self, 1)
-    table.insert(self, {})
-    for _ = 1, SCREEN_WIDE do
-      table.insert(self[SCREEN_TALL - 1], ' ')
-    end
-    cursor:locate { x = 0, y = SCREEN_TALL - 1 }
-  end,
-  putChar = function (self, char)
-    local function onOverflow()
-      self:scroll()
-    end
-    if char == '\n' then
-      cursor:carriageReturn(onOverflow)
-    else
-      self[cursor.pos.y + 1][cursor.pos.x + 1] = char
-      cursor:advance(onOverflow)
-    end
-  end,
-  ---@param self table
-  ---@param text string
-  echo = function (self, text)
-    for i = 1, #text do
-      self:putChar(text:sub(i, i))
-    end
-  end,
+      if self.pos.x >= SCREEN_WIDE then
+        self:carriageReturn(onOverflow)
+      end
+    end,
+    retreat = function (self)
+      self.pos.x = self.pos.x - 1
+
+      if self.pos.x < 0 then
+        error('underflow')
+      end
+    end,
+  }
+end
+
+---@return terminal.Screen
+local function makeScreen(opts)
+  return {
+    cursor = opts.cursor,
+    clear = function (self)
+      for _ = 1, SCREEN_TALL do
+        table.remove(self)
+      end
+
+      for _ = 1, SCREEN_TALL do
+        local line = {}
+        for _ = 1, SCREEN_WIDE do
+          table.insert(line, ' ')
+        end
+        table.insert(self, line)
+      end
+
+      self.cursor:locate { x = 0, y = 0 }
+      return self
+    end,
+    scroll = function (self)
+      table.remove(self, 1)
+      table.insert(self, {})
+      for _ = 1, SCREEN_WIDE do
+        table.insert(self[SCREEN_TALL - 1], ' ')
+      end
+      self.cursor:locate { x = 0, y = SCREEN_TALL - 1 }
+    end,
+    putChar = function (self, char)
+      local function onOverflow()
+        self:scroll()
+      end
+      if char == '\n' then
+        self.cursor:carriageReturn(onOverflow)
+      else
+        self[self.cursor.pos.y + 1][self.cursor.pos.x + 1] = char
+        self.cursor:advance(onOverflow)
+      end
+    end,
+    ---@param self table
+    ---@param text string
+    echo = function (self, text)
+      for i = 1, #text do
+        self:putChar(text:sub(i, i))
+      end
+    end,
+  }
+end
+
+---@return terminal.Readline
+local function makeReadline(opts)
+  return {
+    screen = opts.screen,
+    input = {},
+    pos = 1,
+    clear = function (self)
+      self.input = {}
+      self.pos = 1
+    end,
+    addChar = function (self, char)
+      self.screen:putChar(char)
+      table.insert(self.input, char)
+      self.pos = self.pos + 1
+    end,
+    rubBack = function (self)
+      if #self.input == 0 then
+        return
+      end
+      self.cursor:retreat()
+      table.remove(self.input)
+      self.pos = self.pos - 1
+    end,
+    rubForward = function (self)
+      if #self.input == 0 then
+        return
+      end
+      table.remove(self.input)
+      self.pos = self.pos - 1
+    end,
+  }
+end
+
+local readline = makeReadline {
+  screen = makeScreen {
+    cursor = makeCursor(),
+  }
 }
 
-screen:clear()
-screen:echo('KB-DOS v15.1\n>')
+readline.screen:clear()
+readline.screen:echo('KB-DOS v15.1\n>')
 
-local readline = {
-  input = {},
-  pos = 1,
-  clear = function (self)
-    self.input = {}
-    self.pos = 1
-  end,
-  addChar = function (self, char)
-    screen:putChar(char)
-    table.insert(self.input, char)
-    self.pos = self.pos + 1
-  end,
-  rubBack = function (self)
-    if #self.input == 0 then
-      return
-    end
-    cursor:retreat()
-    table.remove(self.input)
-    self.pos = self.pos - 1
-  end,
-  rubForward = function (self)
-    if #self.input == 0 then
-      return
-    end
-    table.remove(self.input)
-    self.pos = self.pos - 1
-  end,
+local os = {
+  currentDir = '/',
+
+  setCurrentDir = function (self, path)
+    self.currentDir = path
+  end
 }
 
 local function runCommand(words, commands)
   local command = commands[words[1]]
   if not command then
-    screen:echo(('command not found: %s\n'):format(words[1]))
+    readline.screen:echo(('command not found: %s\n'):format(words[1]))
     return
   end
 
@@ -139,11 +188,24 @@ local function doStuff(words)
         end
         local content = file:read('*a')
         file:close()
-        screen:echo(content)
-        screen:echo('\n')
+        readline.screen:echo(content)
+        readline.screen:echo('\n')
       end,
       cls = function (_)
-        screen:clear()
+        readline.screen:clear()
+      end,
+      cd = function (_, path)
+        if not path then
+          readline.screen:echo(('You are in %s.\n'):format(os.currentDir))
+          return
+        end
+        os:setCurrentDir(path)
+      end,
+      dir = function (_)
+        local items = love.filesystem.getDirectoryItems(os.currentDir)
+        for _, item in ipairs(items) do
+          readline.screen:echo(('%s\n'):format(item))
+        end
       end,
       run = function (_)
         require 'scene.menu'.go('initial')
@@ -151,12 +213,12 @@ local function doStuff(words)
     }
   )
 
-  screen:echo('>')
+  readline.screen:echo('>')
 end
 
 local function fetchInput()
-  cursor:carriageReturn(function ()
-    screen:scroll()
+  readline.screen.cursor:carriageReturn(function ()
+    readline.screen:scroll()
   end)
 
   local line = table.concat(readline.input)
@@ -167,35 +229,36 @@ end
 
 OnDraw(function ()
   love.graphics.scale(1.5, 3)
-  for i = 1, 2 do
-    if i == 1 then
+  for rep = 1, 2 do
+    if rep == 1 then
       love.graphics.setColor(1, 1, 1, 1)
-    elseif i == 2 then
+    elseif rep == 2 then
       love.graphics.translate(0.5, 0)
       love.graphics.setColor(1, 1, 1, 0.5)
     end
-    for i, line in ipairs(screen) do
+    for i, line in ipairs(readline.screen) do
       for x = 1, #line do
         love.graphics.print(line[x], (x - 1) * 8, (i - 1) * 8)
       end
     end
-    if cursor.timer.value > cursor.timer.threshold / 2 then
-      love.graphics.print('_', cursor.pos.x * 8, cursor.pos.y * 8)
-    end
+  end
+  love.graphics.setColor(1, 1, 1, 1)
+  if readline.screen.cursor.timer.value > readline.screen.cursor.timer.threshold / 2 then
+    love.graphics.print('_', readline.screen.cursor.pos.x * 8, readline.screen.cursor.pos.y * 8)
   end
 end)
 
 OnUpdate(function (dt)
-  cursor.timer:advance(dt)
+  readline.screen.cursor.timer:advance(dt)
+end)
+
+OnTextInput(function (text)
+  readline:addChar(text)
 end)
 
 OnKeyPressed(function (key, scancode, isrepeat)
-  if #key == 1 then
-    readline:addChar(key)
-  elseif scancode == 'backspace' then
+  if scancode == 'backspace' then
     readline:rubBack()
-  elseif scancode == 'space' then
-    readline:addChar(' ')
   elseif scancode == 'return' then
     doStuff(splitToWords(fetchInput()))
   end

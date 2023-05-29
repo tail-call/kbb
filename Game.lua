@@ -13,7 +13,7 @@
 ---@field player Guy A guy controlled by the player
 ---@field score integer Score the player has accumulated
 ---@field time number Time of day in seconds, max is 24*60
----@field cursorPos Vector Points to a square player's cursor is aimed at
+---@field cursorPos core.Vector Points to a square player's cursor is aimed at
 ---@field magnificationFactor number How much the camera is zoomed in
 ---@field mode GameMode Current game mode. Affects how player's input is handled.
 ---@field console Console Bottom console
@@ -44,7 +44,7 @@ local revealVisionSourceFog = require 'World'.revealVisionSourceFog
 local behave = require 'Guy'.behave
 local addMoves = require 'GuyStats'.mut.addMoves
 
----@type Vector
+---@type core.Vector
 local LEADER_SPAWN_LOCATION = { x = 250, y = 250 }
 
 local SCORES_TABLE = {
@@ -151,7 +151,7 @@ local NONE_COLLISION = { type = 'none' }
 local TERRAIN_COLLISION = { type = 'terrain' }
 
 ---@param game Game
----@param collider fun(self: Game, v: Vector): CollisionInfo Function that performs collision checks between game world objects
+---@param collider fun(self: Game, v: core.Vector): CollisionInfo Function that performs collision checks between game world objects
 ---@return GuyDelegate
 local function makeGuyDelegate(game, collider)
   ---@type GuyDelegate
@@ -183,8 +183,8 @@ function M.isFrozen(game, object)
 end
 
 ---@param game Game
----@param pos Vector
----@return { pos: Vector } | nil
+---@param pos core.Vector
+---@return { pos: core.Vector } | nil
 local function findEntityAtPos(game, pos)
   return require 'core.table'.find(game.entities, function (entity)
     return Vector.equal(entity.pos, pos)
@@ -368,7 +368,7 @@ end
 ---@param game Game Game object
 ---@param dt number Time since last update
 ---@param visibility number How far we should see in tiles
----@param movementDirections Vector[] Momentarily pressed movement directions
+---@param movementDirections core.Vector[] Momentarily pressed movement directions
 function M.updateGame(game, dt, movementDirections, visibility)
   local visionSources = {{
     pos = game.player.pos,

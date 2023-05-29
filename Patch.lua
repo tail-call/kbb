@@ -2,7 +2,7 @@
 ---@class Patch
 ---@field name string Name of the patch
 ---@field world World Containing world
----@field coords Vector Coordinates
+---@field coords core.Vector Coordinates
 
 local M = require('core.Module').define{...}
 

@@ -1,7 +1,7 @@
 ---@alias GuyTeam 'good' | 'evil' | 'neutral'
 
 ---@class GuyDelegate
----@field collider fun(v: Vector): CollisionInfo Function that performs collision checks between game world objects
+---@field collider fun(v: core.Vector): CollisionInfo Function that performs collision checks between game world objects
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil Begins a battle between an attacker and defender
 ---@field enterHouse fun(guest: Guy, building: Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
 
@@ -18,8 +18,8 @@
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
 ---# Methods
----@field move fun(self: Guy, pos: Vector) Changes guy's position
----@field warp fun(self: Guy, pos: Vector) Changes guy's position instantly
+---@field move fun(self: Guy, pos: core.Vector) Changes guy's position
+---@field warp fun(self: Guy, pos: core.Vector) Changes guy's position instantly
 ---@field update fun(self: Guy, dt: number)
 
 ---@alias CollisionInfo { type: 'entity' | 'terrain' | 'none', entity: Object2D | nil }
@@ -67,9 +67,9 @@ local function checkIfRivals(team1, team2)
 end
 
 ---@param guy Guy
----@param vec Vector
+---@param vec core.Vector
 ---@param delegate GuyDelegate
----@return Vector newPosition
+---@return core.Vector newPosition
 function M.moveGuy(guy, vec, delegate)
   if not guy.mayMove or guy.stats.moves < 1 then return guy.pos end
 
@@ -145,7 +145,7 @@ function M.init(guy, load)
   guy.pixie:playSpawnAnimation(guy.pos)
 end
 
----@param pos Vector
+---@param pos core.Vector
 function M.makeLeader(pos)
   local tileset = require('Tileset').getTileset()
 
@@ -160,7 +160,7 @@ function M.makeLeader(pos)
   return guy
 end
 
----@param pos Vector
+---@param pos core.Vector
 function M.makeHuman(pos)
   local tileset = require('Tileset').getTileset()
 
@@ -176,7 +176,7 @@ function M.makeHuman(pos)
   }
 end
 
----@param pos Vector
+---@param pos core.Vector
 function M.makeGoodGuy(pos)
   local tileset = require('Tileset').getTileset()
 
@@ -191,7 +191,7 @@ function M.makeGoodGuy(pos)
   }
 end
 
----@param pos Vector
+---@param pos core.Vector
 function M.makeEvilGuy(pos)
   local tileset = require('Tileset').getTileset()
 
@@ -210,7 +210,7 @@ function M.makeEvilGuy(pos)
   return guy
 end
 
----@param pos Vector
+---@param pos core.Vector
 function M.makeStrongEvilGuy(pos)
   local tileset = require('Tileset').getTileset()
 

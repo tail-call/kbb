@@ -10,7 +10,7 @@
 ---@field waterTimer Timer Water animation timer
 ---# Methods
 ---@field setWindowScale fun(self: DrawState, windowScale: number) Changes window scale
----@field setCamera fun(self: DrawState, offset: Vector, z: number, magn: number)
+---@field setCamera fun(self: DrawState, offset: core.Vector, z: number, magn: number)
 ---@field nextFont fun(self: DrawState)
 
 local lerp3 = require 'core.Vector3'.lerp3
@@ -72,7 +72,7 @@ end
 
 ---@param drawState DrawState
 ---@param dt number
----@param lookingAt Vector
+---@param lookingAt core.Vector
 ---@param magn number
 ---@param isAltCentering boolean
 function M.updateDrawState(drawState, dt, lookingAt, magn, isAltCentering)

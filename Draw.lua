@@ -96,7 +96,7 @@ local function drawUI(drawState, ui)
   love.graphics.applyTransform(transform:inverse())
 end
 
----@param pos Vector
+---@param pos core.Vector
 local function recruitableHighlight(pos)
   local x = pos.x * TILE_WIDTH + TILE_WIDTH / 2
   local y = pos.y * TILE_HEIGHT + TILE_HEIGHT / 2
@@ -110,7 +110,7 @@ local function recruitableHighlight(pos)
   end)
 end
 
----@param pos Vector
+---@param pos core.Vector
 local function drawRecruitCircle(pos, radius)
   -- Concentric circles
   for i = 1, radius + 2 do
@@ -226,7 +226,7 @@ local function drawGuy(guy)
 end
 
 ---@param text string
----@param pos Vector
+---@param pos core.Vector
 ---@param maxWidth integer
 local function textAtTile(text, pos, maxWidth)
   love.graphics.printf(
@@ -238,7 +238,7 @@ local function textAtTile(text, pos, maxWidth)
 end
 
 ---@param tileset Tileset
----@param pos Vector
+---@param pos core.Vector
 local function drawHouse(tileset, pos)
   love.graphics.draw(
     tileset.tiles,
@@ -258,7 +258,7 @@ local function getCursorCoords()
 end
 
 ---@param drawState DrawState
----@param pos Vector
+---@param pos core.Vector
 ---@param mode GameMode
 ---@param moves number
 local function drawCursor(drawState, pos, mode, moves)
@@ -296,7 +296,7 @@ local function drawCursor(drawState, pos, mode, moves)
   end)
 end
 
----@param observerPos Vector
+---@param observerPos core.Vector
 ---@param world World
 ---@param drawState DrawState
 ---@param sky { r: number, b: number, g: number }
@@ -464,7 +464,7 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   -- Draw visible objects
 
-  ---@param obj { pos: Vector }
+  ---@param obj { pos: core.Vector }
   local function cullAndShade(obj, cb)
     if drawn[obj] then return end
     drawn[obj] = true

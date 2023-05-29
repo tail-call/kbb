@@ -2,7 +2,7 @@
 ---@field __module string
 
 ---@class Object2D: Object
----@field pos Vector Object's position in the world
+---@field pos core.Vector Object's position in the world
 
 local function moduleNameToPath(name)
   name = string.gsub(name, '%.', '/')

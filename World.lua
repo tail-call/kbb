@@ -5,8 +5,8 @@
 ---@field revealedTilesCount number Number of tiles player had revealed
 ---@field tileTypes WorldTile[] Tile types of each square in the world
 ---@field fogOfWar number[] How visible is each square in the world. Numbers from 0 to 1
----@field revealFogOfWar fun(self: World, pos: Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
----@field setTile fun(self: World, v: Vector, tile: WorldTile) Changes a tile at specific pos
+---@field revealFogOfWar fun(self: World, pos: core.Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
+---@field setTile fun(self: World, v: core.Vector, tile: WorldTile) Changes a tile at specific pos
 
 ---@alias WorldTile
 ---| 'grass'
@@ -23,7 +23,7 @@ local FOG_REVEAL_SPEED = 1
 local SQUARE_REVEAL_THRESHOLD = 0.5
 
 ---@param world World
----@param v Vector
+---@param v core.Vector
 ---@return integer
 local function vectorToLinearIndex(world, v)
   return (v.y - 1) * world.width + v.x
@@ -55,7 +55,7 @@ local calcVisionDistance = require 'VisionSource'.calcVisionDistance
 local isVisible = require 'VisionSource'.isVisible
 
 ---@param world World
----@param v Vector
+---@param v core.Vector
 ---@return integer
 function M.vectorToLinearIndex(world, v)
   return vectorToLinearIndex(world, v)
@@ -107,21 +107,21 @@ function M.init(world)
 end
 
 ---@param world World
----@param v Vector
+---@param v core.Vector
 function M.isPassable(world, v)
   local t = world.tileTypes[M.vectorToLinearIndex(world, v)]
   return t == 'grass' or t == 'forest' or t == 'sand' or t == 'void' or t == 'cave' or t == 'snow'
 end
 
 ---@param world World
----@param v Vector
+---@param v core.Vector
 ---@return WorldTile
 function M.getTile(world, v)
   return world.tileTypes[M.vectorToLinearIndex(world, v)]
 end
 
 ---@param world World
----@param v Vector
+---@param v core.Vector
 ---@return number transparency
 function M.getFog(world, v)
   return world.fogOfWar[M.vectorToLinearIndex(world, v)]
@@ -161,7 +161,7 @@ function M.revealVisionSourceFog(world, visionSource, light, dt)
 end
 
 ---@param world World
----@param pos Vector
+---@param pos core.Vector
 ---@return Patch
 function M.patchAt(world, pos)
   return require 'Patch'.new {
