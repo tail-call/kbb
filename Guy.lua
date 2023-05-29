@@ -1,16 +1,9 @@
----@alias GuyTeam 'good' | 'evil' | 'neutral'
-
----@class GuyDelegate
----@field collider fun(v: core.Vector): CollisionInfo Function that performs collision checks between game world objects
----@field beginBattle fun(attacker: Guy, defender: Guy): nil Begins a battle between an attacker and defender
----@field enterHouse fun(guest: Guy, building: Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
-
 ---@class Guy: Object2D
 ---@field __module 'Guy'
 ---# Properties
 ---@field mayMove boolean True if may move
 ---@field name string Guy's name
----@field team GuyTeam Guy's team
+---@field team Guy.team Guy's team
 ---@field pixie Pixie Graphical representation of the guy
 ---@field stats GuyStats RPG stats
 ---@field timer number Movement timer
@@ -22,15 +15,24 @@
 ---@field warp fun(self: Guy, pos: core.Vector) Changes guy's position instantly
 ---@field update fun(self: Guy, dt: number)
 
----@alias CollisionInfo { type: 'entity' | 'terrain' | 'none', entity: Object2D | nil }
+---@class Guy.delegate
+---@field collider fun(v: core.Vector): Guy.collision Function that performs collision checks between game world objects
+---@field beginBattle fun(attacker: Guy, defender: Guy): nil Begins a battle between an attacker and defender
+---@field enterHouse fun(guest: Guy, building: Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
 
-local Vector = require('core.Vector')
-local abilities = require('Ability').abilities
+---@alias Guy.team 'good' | 'evil' | 'neutral'
 
-local addMoves = require('GuyStats').mut.addMoves
-local setMaxHp = require('GuyStats').mut.setMaxHp
+---@class Guy.collision
+---@field type 'entity' | 'terrain' | 'none'
+---@field entity Object2D | nil
 
-local M = require('core.Module').define{..., metatable = {
+local Vector = require 'core.Vector'
+local abilities = require 'Ability'.abilities
+
+local addMoves = require 'GuyStats'.mut.addMoves
+local setMaxHp = require 'GuyStats'.mut.setMaxHp
+
+local M = require 'core.Module'.define{..., metatable = {
   ---@type Guy
   __index = {
     move = function (self, pos)
@@ -58,8 +60,8 @@ local M = require('core.Module').define{..., metatable = {
   }
 }}
 
----@param team1 GuyTeam
----@param team2 GuyTeam
+---@param team1 Guy.team
+---@param team2 Guy.team
 ---@return boolean
 local function checkIfRivals(team1, team2)
   return team1 == 'good' and team2 == 'evil'
@@ -68,7 +70,7 @@ end
 
 ---@param guy Guy
 ---@param vec core.Vector
----@param delegate GuyDelegate
+---@param delegate Guy.delegate
 ---@return core.Vector newPosition
 function M.moveGuy(guy, vec, delegate)
   if not guy.mayMove or guy.stats.moves < 1 then return guy.pos end
@@ -112,7 +114,7 @@ function M.moveGuy(guy, vec, delegate)
 end
 
 ---@param guy Guy
----@param delegate GuyDelegate
+---@param delegate Guy.delegate
 function M.behave(guy, delegate)
   if guy.behavior == 'wander' then
     M.moveGuy(guy, ({
@@ -147,7 +149,7 @@ end
 
 ---@param pos core.Vector
 function M.makeLeader(pos)
-  local tileset = require('Tileset').getTileset()
+  local tileset = require 'Tileset'.getTileset()
 
   local guy = M.new{
     pixie = {
@@ -162,7 +164,7 @@ end
 
 ---@param pos core.Vector
 function M.makeHuman(pos)
-  local tileset = require('Tileset').getTileset()
+  local tileset = require 'Tileset'.getTileset()
 
   return M.new {
     name = 'Maria',
@@ -178,7 +180,7 @@ end
 
 ---@param pos core.Vector
 function M.makeGoodGuy(pos)
-  local tileset = require('Tileset').getTileset()
+  local tileset = require 'Tileset'.getTileset()
 
   return M.new {
     name = 'Good Guy',
@@ -193,7 +195,7 @@ end
 
 ---@param pos core.Vector
 function M.makeEvilGuy(pos)
-  local tileset = require('Tileset').getTileset()
+  local tileset = require 'Tileset'.getTileset()
 
   local guy = M.new {
     name = 'Evil Guy',
@@ -212,7 +214,7 @@ end
 
 ---@param pos core.Vector
 function M.makeStrongEvilGuy(pos)
-  local tileset = require('Tileset').getTileset()
+  local tileset = require 'Tileset'.getTileset()
 
   local guy = M.new{
     pixie = {

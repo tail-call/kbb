@@ -8,7 +8,7 @@
 ---@field resources Resources Resources player may spend on upgrades
 ---@field entities Object2D[] Things in the game world
 ---@field deathsCount number Number of times player has died
----@field guyDelegate GuyDelegate Object that talks to guys
+---@field guyDelegate Guy.delegate Object that talks to guys
 ---@field squad Squad A bunch of guys that follow player's movement
 ---@field player Guy A guy controlled by the player
 ---@field score integer Score the player has accumulated
@@ -145,16 +145,16 @@ local M = require 'core.Module'.define{..., metatable = {
   }
 }}
 
----@type CollisionInfo
+---@type Guy.collision
 local NONE_COLLISION = { type = 'none' }
----@type CollisionInfo
+---@type Guy.collision
 local TERRAIN_COLLISION = { type = 'terrain' }
 
 ---@param game Game
----@param collider fun(self: Game, v: core.Vector): CollisionInfo Function that performs collision checks between game world objects
----@return GuyDelegate
+---@param collider fun(self: Game, v: core.Vector): Guy.collision Function that performs collision checks between game world objects
+---@return Guy.delegate
 local function makeGuyDelegate(game, collider)
-  ---@type GuyDelegate
+  ---@type Guy.delegate
   local guyDelegate = {
     beginBattle = function (attacker, defender)
       game:beginBattle(attacker, defender)

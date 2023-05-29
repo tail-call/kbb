@@ -1,5 +1,5 @@
 ---State of the renderer
----@class DrawState: Object
+---@class DrawState: core.Object
 ---@field __module 'DrawState'
 ---# Properties
 ---@field windowScale number Window scale

@@ -1,0 +1,2 @@
+---@class core.Object
+---@field __module string

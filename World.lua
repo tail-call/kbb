@@ -3,12 +3,12 @@
 ---@field width integer World's width in squares
 ---@field height integer World's height in squares
 ---@field revealedTilesCount number Number of tiles player had revealed
----@field tileTypes WorldTile[] Tile types of each square in the world
+---@field tileTypes World.tile[] Tile types of each square in the world
 ---@field fogOfWar number[] How visible is each square in the world. Numbers from 0 to 1
 ---@field revealFogOfWar fun(self: World, pos: core.Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
----@field setTile fun(self: World, v: core.Vector, tile: WorldTile) Changes a tile at specific pos
+---@field setTile fun(self: World, v: core.Vector, tile: World.tile) Changes a tile at specific pos
 
----@alias WorldTile
+---@alias World.tile
 ---| 'grass'
 ---| 'rock'
 ---| 'water'
@@ -115,7 +115,7 @@ end
 
 ---@param world World
 ---@param v core.Vector
----@return WorldTile
+---@return World.tile
 function M.getTile(world, v)
   return world.tileTypes[M.vectorToLinearIndex(world, v)]
 end

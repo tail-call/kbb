@@ -1,0 +1,2 @@
+---@class Object2D: core.Object
+---@field pos core.Vector Object's position in the world
