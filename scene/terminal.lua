@@ -53,11 +53,20 @@ local readline = makeReadline {
 
 readline.screen:echo('KB-DOS v15.1\n>')
 
+local function forceSlashAtEnd(str)
+  for k in str:gmatch('.$') do
+    if k ~= '/' then
+      str = str .. '/'
+    end
+  end
+  return str
+end
+
 local os = {
   currentDir = '/',
 
   setCurrentDir = function (self, path)
-    self.currentDir = path
+    self.currentDir = forceSlashAtEnd(path)
   end
 }
 
@@ -101,12 +110,21 @@ local function doStuff(words)
           readline.screen:echo(('You are in %s.\n'):format(os.currentDir))
           return
         end
+
         os:setCurrentDir(path)
       end,
-      dir = function (_)
-        local items = love.filesystem.getDirectoryItems(os.currentDir)
+      dir = function (_, path)
+        if not path then
+          path = os.currentDir
+        end
+        path = forceSlashAtEnd(path)
+        local items = love.filesystem.getDirectoryItems(path)
         for _, item in ipairs(items) do
-          readline.screen:echo(('%s\n'):format(item))
+          local info = love.filesystem.getInfo(item)
+          if info.type == 'directory' then
+            item = forceSlashAtEnd(item)
+          end
+          readline.screen:echo(('%s%s\n'):format(path, item))
         end
       end,
       run = function (_)
