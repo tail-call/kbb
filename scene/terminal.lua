@@ -144,9 +144,14 @@ local function doStuff(words)
           screen:echo(('%s%s\n'):format(path, item))
         end
       end,
-      run = function (_)
-        require 'scene.menu'.go('initial')
-      end
+      scene = function (_, sceneName, ...)
+        if not sceneName then
+          screen:echo(sceneName)
+          screen:echo('Scene name is required\n')
+          return
+        end
+        require(sceneName).go(...)
+      end,
     }
   )
 
@@ -165,6 +170,7 @@ local function fetchInput()
 end
 
 OnDraw(function ()
+  love.graphics.push('transform')
   love.graphics.scale(1.5, 3)
   for rep = 1, 2 do
     if rep == 1 then
@@ -183,6 +189,9 @@ OnDraw(function ()
   if readline.screen.cursor.timer.value > readline.screen.cursor.timer.threshold / 2 then
     love.graphics.print('_', readline.screen.cursor.pos.x * 8, readline.screen.cursor.pos.y * 8)
   end
+
+  love.graphics.pop()
+  love.graphics.scale(3, 3)
 end)
 
 OnUpdate(function (dt)
