@@ -3,7 +3,7 @@ local function dep(obj, cb)
   setmetatable(impostor, {
     __index = function (t, k)
       if obj[k] == nil then
-        error(k .. ' is required', 2)
+        error(k .. ' is required', 6)
       end
       return obj[k]
     end

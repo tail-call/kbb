@@ -1,14 +1,6 @@
 local SCREEN_WIDE = 80
 local SCREEN_TALL = 24
 
----@class terminal.Cursor
----@field pos core.Vector
----@field timer Timer
----@field locate fun(self: terminal.Cursor, newPos: core.Vector)
----@field carriageReturn fun(self: terminal.Cursor, onOverflow: fun())
----@field advance fun(self: terminal.Cursor, onOverflow: fun())
----@field retreat fun(self: terminal.Cursor)
-
 ---@class terminal.Screen
 ---@field cursor terminal.Cursor
 ---@field clear fun(self: terminal.Screen)
@@ -24,41 +16,6 @@ local SCREEN_TALL = 24
 ---@field addChar fun(self: terminal.Readline, char: string)
 ---@field rubBack fun(self: terminal.Readline)
 ---@field rubForward fun(self: terminal.Readline)
-
----@return terminal.Cursor
-local function makeCursor()
-  return {
-    ---@type core.Vector
-    pos = require 'core.Vector'.new { x = 0, y = 0 },
-    ---@type Timer
-    timer = require 'Timer'.new { threshold = 1/4 },
-    locate = function (self, newPos)
-      self.pos = newPos
-    end,
-    carriageReturn = function (self, onOverflow)
-      self.pos.x = 0
-      self.pos.y = self.pos.y + 1
-
-      if self.pos.y >= SCREEN_TALL then
-        onOverflow()
-      end
-    end,
-    advance = function (self, onOverflow)
-      self.pos.x = self.pos.x + 1
-
-      if self.pos.x >= SCREEN_WIDE then
-        self:carriageReturn(onOverflow)
-      end
-    end,
-    retreat = function (self)
-      self.pos.x = self.pos.x - 1
-
-      if self.pos.x < 0 then
-        error('underflow')
-      end
-    end,
-  }
-end
 
 ---@return terminal.Screen
 local function makeScreen(opts)
@@ -128,7 +85,7 @@ local function makeReadline(opts)
       if #self.input == 0 then
         return
       end
-      self.cursor:retreat()
+      self.screen.cursor:retreat()
       table.remove(self.input)
       self.pos = self.pos - 1
     end,
@@ -144,7 +101,9 @@ end
 
 local readline = makeReadline {
   screen = makeScreen {
-    cursor = makeCursor(),
+    cursor = require 'terminal.Cursor'.new {
+      screenSize = { tall = SCREEN_TALL, wide = SCREEN_WIDE }
+    }
   }
 }
 
