@@ -41,17 +41,19 @@ local function makeReadline(opts)
 end
 
 local screenSize = { wide = 80, tall = 24 }
-
-local readline = makeReadline {
-  screen = require 'terminal.Screen'.new {
-    screenSize = screenSize,
-    cursor = require 'terminal.Cursor'.new {
-      screenSize = screenSize
-    }
+local screen = require 'terminal.Screen'.new {
+  screenSize = screenSize,
+  cursor = require 'terminal.Cursor'.new {
+    screenSize = screenSize
   }
 }
 
-readline.screen:echo('KB-DOS v15.1\n>')
+
+local readline = makeReadline {
+  screen = screen
+}
+
+screen:echo('KB-DOS v15.1\n>')
 
 local function forceSlashAtEnd(str)
   for k in str:gmatch('.$') do
@@ -70,18 +72,37 @@ local os = {
   end
 }
 
+local function loadCommand(name)
+  local lang = require 'core.Dump'.makeLanguage {
+    print = function (...)
+      for k, v in ipairs {...} do
+        screen:echo(v)
+      end
+    end
+  }
+  return lang.loadFile('bin/' .. name .. '.lua')
+end
+
 local function runCommand(words, commands)
-  local command = commands[words[1]]
+  local commandName = words[1]
+  local command = commands[commandName]
+
   if not command then
-    readline.screen:echo(('command not found: %s\n'):format(words[1]))
+    command = loadCommand(commandName)
+  end
+
+  if not command then
+    screen:echo(('command not found: %s\n'):format(commandName))
     return
   end
 
   xpcall(function ()
+    table.remove(words, 1)
     command(unpack(words))
+    screen:putChar('\n')
   end, function (err)
-    readline.screen:echo(err)
-    readline.screen:putChar('\n')
+    screen:echo(err)
+    screen:putChar('\n')
   end)
 end
 
@@ -104,15 +125,15 @@ local function doStuff(words)
         end
         local content = file:read('*a')
         file:close()
-        readline.screen:echo(content)
-        readline.screen:echo('\n')
+        screen:echo(content)
+        screen:echo('\n')
       end,
       cls = function (_)
-        readline.screen:clear()
+        screen:clear()
       end,
       cd = function (_, path)
         if not path then
-          readline.screen:echo(('You are in %s.\n'):format(os.currentDir))
+          screen:echo(('You are in %s.\n'):format(os.currentDir))
           return
         end
 
@@ -129,7 +150,7 @@ local function doStuff(words)
           if info.type == 'directory' then
             item = forceSlashAtEnd(item)
           end
-          readline.screen:echo(('%s%s\n'):format(path, item))
+          screen:echo(('%s%s\n'):format(path, item))
         end
       end,
       run = function (_)
@@ -138,7 +159,7 @@ local function doStuff(words)
     }
   )
 
-  readline.screen:echo('>')
+  screen:echo('>')
 end
 
 local function fetchInput()

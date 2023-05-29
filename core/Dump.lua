@@ -156,16 +156,24 @@ end
 local function makeLanguage(dictionary)
   setmetatable(dictionary, { __index = _G })
 
-  return {
-    doFile = function(path)
+  local lang
+  lang = {
+    loadFile = function(path)
+      print('doFile', path)
       local chunk, err = loadFileWithIndex(path, dictionary)
       if not chunk then
         error(err)
       end
-      return chunk()
+      return chunk
+    end,
+    doFile = function(path)
+      return lang.loadFile(path)()
     end
   }
+
+  return lang
 end
+
 return {
   dump = dump,
   makeBufDumper = makeBufDumper,
