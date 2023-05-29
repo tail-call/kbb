@@ -1,13 +1,3 @@
-local SCREEN_WIDE = 80
-local SCREEN_TALL = 24
-
----@class terminal.Screen
----@field cursor terminal.Cursor
----@field clear fun(self: terminal.Screen)
----@field scroll fun(self: terminal.Screen)
----@field putChar fun(self: terminal.Screen, char: string)
----@field echo fun(self: terminal.Screen, text: string)
-
 ---@class terminal.Readline
 ---@field screen terminal.Screen
 ---@field input string[]
@@ -16,55 +6,6 @@ local SCREEN_TALL = 24
 ---@field addChar fun(self: terminal.Readline, char: string)
 ---@field rubBack fun(self: terminal.Readline)
 ---@field rubForward fun(self: terminal.Readline)
-
----@return terminal.Screen
-local function makeScreen(opts)
-  return {
-    cursor = opts.cursor,
-    clear = function (self)
-      for _ = 1, SCREEN_TALL do
-        table.remove(self)
-      end
-
-      for _ = 1, SCREEN_TALL do
-        local line = {}
-        for _ = 1, SCREEN_WIDE do
-          table.insert(line, ' ')
-        end
-        table.insert(self, line)
-      end
-
-      self.cursor:locate { x = 0, y = 0 }
-      return self
-    end,
-    scroll = function (self)
-      table.remove(self, 1)
-      table.insert(self, {})
-      for _ = 1, SCREEN_WIDE do
-        table.insert(self[SCREEN_TALL - 1], ' ')
-      end
-      self.cursor:locate { x = 0, y = SCREEN_TALL - 1 }
-    end,
-    putChar = function (self, char)
-      local function onOverflow()
-        self:scroll()
-      end
-      if char == '\n' then
-        self.cursor:carriageReturn(onOverflow)
-      else
-        self[self.cursor.pos.y + 1][self.cursor.pos.x + 1] = char
-        self.cursor:advance(onOverflow)
-      end
-    end,
-    ---@param self table
-    ---@param text string
-    echo = function (self, text)
-      for i = 1, #text do
-        self:putChar(text:sub(i, i))
-      end
-    end,
-  }
-end
 
 ---@return terminal.Readline
 local function makeReadline(opts)
@@ -99,15 +40,17 @@ local function makeReadline(opts)
   }
 end
 
+local screenSize = { wide = 80, tall = 24 }
+
 local readline = makeReadline {
-  screen = makeScreen {
+  screen = require 'terminal.Screen'.new {
+    screenSize = screenSize,
     cursor = require 'terminal.Cursor'.new {
-      screenSize = { tall = SCREEN_TALL, wide = SCREEN_WIDE }
+      screenSize = screenSize
     }
   }
 }
 
-readline.screen:clear()
 readline.screen:echo('KB-DOS v15.1\n>')
 
 local os = {

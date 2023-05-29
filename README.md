@@ -25,6 +25,7 @@ Game is an editable image.
 
 ## Quality of life
 
+ - [ ] Compile resources to lua bytecode
  - [ ] Game world is a part of UI layout
  - [ ] Clickable buttons
  - [ ] Prefer requiring without parens
