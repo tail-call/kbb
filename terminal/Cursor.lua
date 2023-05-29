@@ -1,6 +1,6 @@
 ---@class terminal.Cursor
 ---@field pos core.Vector
----@field timer Timer
+---@field timer core.Timer
 ---@field screenSize { tall: integer, wide: integer }
 ---@field locate fun(self: terminal.Cursor, newPos: core.Vector)
 ---@field goHome fun(self: terminal.Cursor)
@@ -46,7 +46,7 @@ function M.init(cursor)
     return { want.screenSize }
   end)
   cursor.pos = cursor.pos or require 'core.Vector'.new { x = 0, y = 0 }
-  cursor.timer = cursor.timer or require 'Timer'.new { threshold = 1/4 }
+  cursor.timer = cursor.timer or require 'core.Timer'.new { threshold = 1/4 }
 end
 
 return M

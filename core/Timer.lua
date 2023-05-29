@@ -1,19 +1,19 @@
 ---A looping timer
----@class Timer
----@field __module 'Timer'
+---@class core.Timer
+---@field __module 'core.Timer'
 ---# Properties
 ---@field speed number Time multiplication factor
 ---@field value number Current timer value
 ---@field threshold number Timer resets when value exceeds threshold
 ---# Methods
----@field package update fun(self: Timer, dt: number) Advances timer's value
+---@field package update fun(self: core.Timer, dt: number) Advances timer's value
 
----@type { [Timer]: true }
+---@type { [core.Timer]: true }
 local timers = require 'core.table'.weaken({}, 'k')
 
 ---@type Module
 local M = require 'core.Module'.define{..., version = 0, metatable = {
-  ---@type Timer
+  ---@type core.Timer
   __index = {
     update = function (self, dt)
       self.value = (
@@ -30,7 +30,7 @@ function M.update(dt)
   end
 end
 
----@param obj Timer
+---@param obj core.Timer
 function M.init(obj)
   obj.speed = obj.speed or 1
   obj.value = obj.value or 0

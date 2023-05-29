@@ -5,9 +5,9 @@
 ---@field windowScale number Window scale
 ---@field tileset Tileset Tileset used for drawing
 ---@field camera Vector3 Camera position in the world
----@field cursorTimer Timer Cursor animation timer
----@field battleTimer Timer Battle animation timer
----@field waterTimer Timer Water animation timer
+---@field cursorTimer core.Timer Cursor animation timer
+---@field battleTimer core.Timer Battle animation timer
+---@field waterTimer core.Timer Water animation timer
 ---# Methods
 ---@field setWindowScale fun(self: DrawState, windowScale: number) Changes window scale
 ---@field setCamera fun(self: DrawState, offset: core.Vector, z: number, magn: number)
@@ -52,7 +52,7 @@ local M = require 'core.Module'.define{..., version = 0, metatable = {
 
 ---@param obj DrawState
 function M.init(obj)
-  local Timer = require 'Timer'.new
+  local Timer = require 'core.Timer'.new
   obj.isUsingBoldFont = obj.isUsingBoldFont or false
   obj.windowScale = obj.windowScale or 3
   obj.tileset = obj.tileset or require 'Tileset'.getTileset()
