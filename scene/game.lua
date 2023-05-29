@@ -23,17 +23,11 @@ local function saveGame()
 end
 
 ---@param filename string
----@param loaders { [string]: function }
 ---@return fun()?, string? errorMessage
-local function loadGame(filename, loaders)
+local function loadGame(filename)
   return require 'core.Dump'.loadFileWithIndex(filename, function(t, k)
     return function(...)
-      local loader = loaders[k]
-      if loader ~= nil then
-        return loader(...)
-      else
-        return require(k).new(...)
-      end
+      return require(k).new(...)
     end
   end)
 end
@@ -97,15 +91,7 @@ OnLoad(function (savefileName)
       recruitCircle = require 'RecruitCircle'.new(),
     }
   else
-    local gameFunction, err = loadGame(savefileName, {
-      buf = function (props)
-        local compressedData = love.data.decode('data', 'base64', props.base64)
-        local data = love.data.decompress('string', 'zlib', compressedData)
-        ---@cast data string
-        local array = loadstring(data)()
-        return array
-      end,
-    })
+    local gameFunction, err = loadGame(savefileName)
     game = gameFunction and gameFunction() or error(err)
   end
   uiModel.game = game
