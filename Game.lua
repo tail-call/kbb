@@ -7,11 +7,10 @@
 ---@field world World Game world
 ---@field resources Resources Resources player may spend on upgrades
 ---@field entities Object2D[] Things in the game world
----@field deathsCount number Number of times player has died
 ---@field guyDelegate Guy.delegate Object that talks to guys
 ---@field squad Squad A bunch of guys that follow player's movement
 ---@field player Guy A guy controlled by the player
----@field score integer Score the player has accumulated
+---@field stats number Game stats like player score etc.
 ---@field time number Time of day in seconds, max is 24*60
 ---@field cursorPos core.Vector Points to a square player's cursor is aimed at
 ---@field magnificationFactor number How much the camera is zoomed in
@@ -21,12 +20,10 @@
 ---@field frozenEntities { [Object2D]: true } Entities that should be not rendered and should not behave
 ---# Methods
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
----@field addScore fun(self: Game, count: integer) Increases score count
 ---@field switchMode fun(self: Game) Switches to next mode
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
 ---@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
 ---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
----@field addDeaths fun(self: Game, count: integer) Adds a death to a game
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
@@ -64,9 +61,6 @@ local BUILDING_COST = 5
 local M = require 'core.Module'.define{..., metatable = {
   ---@type Game
   __index = {
-    addDeaths = function (self, guy)
-      self.deathsCount = self.deathsCount + 1
-    end,
     addPlayer = function (self, guy)
       if self.player ~= nil then
         self:removeEntity(self.player)
@@ -78,9 +72,6 @@ local M = require 'core.Module'.define{..., metatable = {
     end,
     advanceClock = function (self, dt)
       self.time = (self.time + dt) % (24 * 60)
-    end,
-    addScore = function(self, count)
-      self.score = self.score + count
     end,
     addEntity = function (self, entity)
       table.insert(self.entities, entity)
@@ -202,11 +193,10 @@ function M.init(game)
     }
   end)
   game.console = game.console or require 'Console'.new()
-  game.score = game.score or 0
+  game.stats = game.stats or require 'GameStats'.new()
   game.frozenEntities = require 'core.table'.weaken(game.frozenEntities or {}, 'k')
   game.time = game.time or (12 * 60)
   game.entities = game.entities or {}
-  game.deathsCount = game.deathsCount or 0
   game.cursorPos = game.cursorPos or { x = 0, y = 0 }
   game.magnificationFactor = game.magnificationFactor or 1
   game.mode = game.mode or 'normal'
@@ -524,6 +514,15 @@ function M.orderDismiss(game)
     addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
     dismissSquad(game)
   end
+end
+
+-- TODO: delete this
+function M.migrate(bak)
+  bak.stats = {
+    score = bak.score,
+    deathsCount = bak.deathsCount
+  }
+  return bak
 end
 
 return M

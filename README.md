@@ -22,6 +22,7 @@ Game is an editable image.
  - [ ] BUG: Game crashes when pressing any key in focus mode
  - [ ] BUG: Recruiting doesn't work
  - [ ] BUG: Life bars are concealed behind other entities
+ - [ ] BUG: Segfault on save
 
 ## Quality of life
 
