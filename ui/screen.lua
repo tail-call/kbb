@@ -54,7 +54,7 @@ SetModel {
         game.player.timer,
         game.player.speed,
         game.player.stats.moves,
-        game.deathsCount
+        game.stats.deathsCount
       )
     elseif idx == 2 then
       return ''
@@ -91,7 +91,7 @@ SetModel {
       WHITE_COLOR,
       string.format(
         'Score: %d | Revealed: %d/%d %0.ffps\n',
-        game.score,
+        game.stats.score,
         game.world.revealedTilesCount,
         game.world.height * game.world.width,
         love.timer.getFPS()

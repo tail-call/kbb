@@ -241,9 +241,9 @@ function M.init(game)
         game.player.stats,
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then
-            game:addDeaths(1)
-            game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
-            game:addScore(SCORES_TABLE.dead)
+            game.stats:addDeaths(1)
+            game.stats:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
+            game.stats:addScore(SCORES_TABLE.dead)
             listenPlayerDeath()
           end
         end
@@ -348,7 +348,7 @@ local function die(guy, game, battle)
 
   if guy.team == 'evil' then
     game.resources:add { pretzels = 1 }
-    game:addScore(SCORES_TABLE.killedAnEnemy)
+    game.stats:addScore(SCORES_TABLE.killedAnEnemy)
   end
 
   game:removeEntity(guy)
@@ -490,7 +490,7 @@ function M.orderBuild(game)
   game.resources:add { wood = -BUILDING_COST }
   addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
   game:addEntity(require 'Building'.new { pos = pos })
-  game:addScore(SCORES_TABLE.builtAHouse)
+  game.stats:addScore(SCORES_TABLE.builtAHouse)
 end
 
 ---@param game Game
@@ -519,8 +519,8 @@ end
 -- TODO: delete this
 function M.migrate(bak)
   bak.stats = {
-    score = bak.score,
-    deathsCount = bak.deathsCount
+    score = bak.score or 0,
+    deathsCount = bak.deathsCount or 0
   }
   return bak
 end
