@@ -76,10 +76,6 @@ end
 ---@param magn number
 ---@param isAltCentering boolean
 function M.updateDrawState(drawState, dt, lookingAt, magn, isAltCentering)
-  drawState.cursorTimer:advance(dt)
-  drawState.battleTimer:advance(dt)
-  drawState.waterTimer:advance(dt)
-
   local yOffset = isAltCentering and SCREEN_HEIGHT/magn/8 or 0
   local offset = VectorModule.add(
     VectorModule.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }

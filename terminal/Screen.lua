@@ -43,7 +43,7 @@ local M = require 'core.Module'.define{..., metatable = {
       if char == '\n' then
         self.cursor:carriageReturn(onOverflow)
       else
-        local y = self.cursor.pos.y + 1
+        local y = math.min(self.cursor.pos.y + 1, self.screenSize.tall)
         local x = self.cursor.pos.x + 1
         self.chars[y][x] = char
         self.cursor:advance(onOverflow)

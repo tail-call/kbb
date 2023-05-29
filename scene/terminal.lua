@@ -128,7 +128,6 @@ OnLoad(function ()
 end)
 
 OnUpdate(function (dt)
-  readline.screen.cursor.timer:advance(dt)
 end)
 
 OnTextInput(function (text)

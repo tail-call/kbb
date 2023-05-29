@@ -8,7 +8,8 @@
 ---# Methods
 ---@field advance fun(self: Timer, dt: number) Advances timer's value
 
--- TODO: hook timers up to some global timer manager
+---@type { [Timer]: true }
+local timers = require 'core.table'.weaken({}, 'k')
 
 ---@type Module
 local M = require 'core.Module'.define{..., version = 0, metatable = {
@@ -22,11 +23,20 @@ local M = require 'core.Module'.define{..., version = 0, metatable = {
   }
 }}
 
+---@param dt number
+function M.update(dt)
+  for timer in pairs(timers) do
+    timer:advance(dt)
+  end
+end
+
 ---@param obj Timer
 function M.init(obj)
   obj.speed = obj.speed or 1
   obj.value = obj.value or 0
   obj.threshold = obj.threshold or 1
+
+  timers[obj] = true
 end
 
 return M

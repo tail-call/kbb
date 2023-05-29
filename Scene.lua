@@ -35,6 +35,7 @@ function M.loadScene(path, ...)
     OnUpdate = function (update)
       scene.update = function (dt)
         update(dt, drawState)
+        require 'Timer'.update(dt)
       end
     end,
     Tooltip = function (tooltips)
