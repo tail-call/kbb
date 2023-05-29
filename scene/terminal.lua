@@ -1,5 +1,7 @@
 local screenSize = { wide = 80, tall = 24 }
 
+local keyListener = nil
+
 ---@type terminal.Screen
 local screen = require 'terminal.Screen'.new {
   screenSize = screenSize,
@@ -49,8 +51,12 @@ local function runCommand(input)
         end
         screen:echo('\n')
       end,
+      ---@type lang.System
       Sys = {
         screen = screen,
+        getKey = function ()
+          return coroutine.yield('getKey')
+        end,
         goToScene = function (sceneName, ...)
           require(sceneName).go(...)
         end,
@@ -78,7 +84,15 @@ local function runCommand(input)
       return
     end
 
-    lang.call(command, unpack(args))
+    require 'core.coroutine'.exhaust(function ()
+      return lang.call(command, unpack(args))
+    end, function (request, resume)
+      if request == 'getKey' then
+        keyListener = resume
+      else
+        error('oh no')
+      end
+    end)
 
     onFinish()
   end, function (err)
@@ -131,10 +145,17 @@ OnUpdate(function (dt)
 end)
 
 OnTextInput(function (text)
-  readline:addChar(text)
+  if not keyListener then
+    readline:addChar(text)
+  end
 end)
 
 OnKeyPressed(function (key, scancode, isrepeat)
+  if keyListener then
+    keyListener(key)
+    return
+  end
+
   if scancode == 'backspace' then
     readline:rubBack()
   elseif scancode == 'return' then

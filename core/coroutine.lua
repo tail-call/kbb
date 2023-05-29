@@ -1,24 +1,24 @@
 ---@generic T
 ---@param fun fun(): T
----@param cb fun(value: T): nil
+---@param cb fun(value: T, resume: fun(...)): nil
 local function exhaust(fun, cb, ...)
-  local crt = coroutine.create(fun)
-  local isRunning, result = coroutine.resume(crt, ...)
+  local thread = coroutine.create(fun)
+  local isRunning, result = coroutine.resume(thread, ...)
 
-  local function doStuff()
+  local function run()
     -- Crash if coroutine fails
     local stupidMessage = 'cannot resume dead coroutine'
     if not isRunning and result ~= stupidMessage then
       error(result)
     end
+
+    cb(result, function (...)
+      isRunning, result = coroutine.resume(thread, ...)
+      run()
+    end)
   end
 
-  doStuff()
-  while isRunning do
-    cb(result)
-    isRunning, result = coroutine.resume(crt)
-    doStuff()
-  end
+  run()
 end
 
 return {

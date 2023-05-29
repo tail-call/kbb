@@ -30,4 +30,29 @@ do
     print(editor.lines[i])
   end
   Sys.screen.cursor:goHome()
+  while true do
+    local key = Sys.getKey()
+    if key == 'l' then
+      Sys.screen.cursor:advance(function ()
+        error('oh no')
+      end)
+    elseif key == 'h' then
+      Sys.screen.cursor:locate {
+        x = Sys.screen.cursor.pos.x - 1,
+        y = Sys.screen.cursor.pos.y,
+      }
+    elseif key == 'k' then
+      Sys.screen.cursor:locate {
+        x = Sys.screen.cursor.pos.x,
+        y = Sys.screen.cursor.pos.y - 1,
+      }
+    elseif key == 'j' then
+      Sys.screen.cursor:locate {
+        x = Sys.screen.cursor.pos.x,
+        y = Sys.screen.cursor.pos.y + 1,
+      }
+    end
+  end
+  print('done')
+  Sys.screen.cursor:goHome()
 end

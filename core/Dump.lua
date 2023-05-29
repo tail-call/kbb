@@ -105,8 +105,9 @@ local function dump(object)
 
   local buf = require 'string.buffer'.new()
   buf:put('local O = {}\n' )
-  require 'core.coroutine'.exhaust(process, function(part)
+  require 'core.coroutine'.exhaust(process, function(part, resume)
     buf:put(part or '')
+    resume()
   end, object)
 
   buf:put('return O[#O]')
