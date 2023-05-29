@@ -158,6 +158,11 @@ local function makeLanguage(dictionary)
 
   local lang
   lang = {
+    call = function (fun, ...)
+      local oldEnv = getfenv(fun)
+      setfenv(fun, dictionary)(...)
+      setfenv(fun, oldEnv)
+    end,
     loadFile = function(path)
       local chunk, err = loadFileWithIndex(path, dictionary)
       if not chunk then

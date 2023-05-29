@@ -41,6 +41,7 @@ local function makeReadline(opts)
 end
 
 local screenSize = { wide = 80, tall = 24 }
+
 local screen = require 'terminal.Screen'.new {
   screenSize = screenSize,
   cursor = require 'terminal.Cursor'.new {
@@ -48,41 +49,24 @@ local screen = require 'terminal.Screen'.new {
   }
 }
 
-
 local readline = makeReadline {
   screen = screen
 }
 
-screen:echo('KB-DOS v15.1\nType "scene scene.menu" to play\n>')
-
-local function forceSlashAtEnd(str)
-  for k in str:gmatch('.$') do
-    if k ~= '/' then
-      str = str .. '/'
-    end
-  end
-  return str
-end
+local builtinCommands = {
+  cls = function ()
+    screen:clear()
+  end,
+}
 
 local os = {
   currentDir = '/',
 
   setCurrentDir = function (self, path)
-    self.currentDir = forceSlashAtEnd(path)
+    self.currentDir = require 'core.string'
+      .forceSlashAtEnd(path)
   end
 }
-
-local function loadCommand(name)
-  local lang = require 'core.Dump'.makeLanguage {
-    print = function (...)
-      for k, v in ipairs {...} do
-        screen:echo(v)
-      end
-      screen:echo('\n')
-    end
-  }
-  return lang.loadFile('bin/' .. name .. '.lua')
-end
 
 local function splitToWords(line)
   local words = {}
@@ -92,8 +76,28 @@ local function splitToWords(line)
   return words
 end
 
-local function runCommand(input, builtinCommands)
+local function runCommand(input)
   xpcall(function ()
+    local lang = require 'core.Dump'.makeLanguage {
+      print = function (...)
+        for k, v in ipairs {...} do
+          screen:echo(v)
+        end
+        screen:echo('\n')
+      end,
+      Sys = {
+        goToScene = function (sceneName, ...)
+          require(sceneName).go(...)
+        end,
+        setCurrentDir = function (path)
+          os:setCurrentDir(path)
+        end,
+        getCurrentDir = function ()
+          return os.currentDir
+        end,
+      }
+    }
+
     local args = splitToWords(input)
     local commandName = args[1]
     table.remove(args, 1)
@@ -101,7 +105,7 @@ local function runCommand(input, builtinCommands)
     local command = builtinCommands[commandName]
 
     if not command then
-      command = loadCommand(commandName)
+      command = loadfile('bin/' .. commandName .. '.lua')
     end
 
     if not command then
@@ -109,58 +113,13 @@ local function runCommand(input, builtinCommands)
       return
     end
 
-    command(unpack(args))
+    lang.call(command, unpack(args))
 
     screen:putChar('\n')
   end, function (err)
     screen:echo(err)
     screen:putChar('\n')
   end)
-end
-
-local function doStuff(input)
-  runCommand(
-    input,
-    {
-      cls = function ()
-        screen:clear()
-      end,
-      cd = function (path)
-        if not path then
-          screen:echo(('You are in %s.\n'):format(os.currentDir))
-          return
-        end
-
-        os:setCurrentDir(path)
-      end,
-      dir = function (path)
-        if not path then
-          path = os.currentDir
-        end
-        path = forceSlashAtEnd(path)
-        local items = love.filesystem.getDirectoryItems(path)
-        for _, item in ipairs(items) do
-          local info = love.filesystem.getInfo(item)
-          if info.type == 'directory' then
-            item = forceSlashAtEnd(item)
-          end
-          screen:echo(('%s%s\n'):format(path, item))
-        end
-      end,
-      scene = function (sceneName, ...)
-        print(sceneName, ...)
-        if not sceneName then
-          screen:echo(sceneName)
-          screen:echo('\n')
-          screen:echo('scene: name is required\n')
-          return
-        end
-        require(sceneName).go(...)
-      end,
-    }
-  )
-
-  screen:echo('>')
 end
 
 local function fetchInput()
@@ -199,6 +158,10 @@ OnDraw(function ()
   love.graphics.scale(3, 3)
 end)
 
+OnLoad(function ()
+  screen:echo('KB-DOS v15.1\nType "scene scene.menu" to play\n>')
+end)
+
 OnUpdate(function (dt)
   readline.screen.cursor.timer:advance(dt)
 end)
@@ -211,6 +174,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
   if scancode == 'backspace' then
     readline:rubBack()
   elseif scancode == 'return' then
-    doStuff(fetchInput())
+    runCommand(fetchInput())
+    screen:echo('>')
   end
 end)
