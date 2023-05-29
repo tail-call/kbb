@@ -6,7 +6,7 @@
 ---# Methods
 ---@field setDemoProp fun(self: ${name}, newValue: any)
 
-local M = require('core.Module').define{..., version = 0, metatable = {
+local M = require 'core.Module'.define{..., metatable = {
   ---@type ${name}
   __index = {
     setDemoProp = function (self, newValue)

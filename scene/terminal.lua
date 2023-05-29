@@ -1,45 +1,3 @@
----@class terminal.Readline
----@field screen terminal.Screen
----@field input string[]
----@field pos integer
----@field clear fun(self: terminal.Readline)
----@field addChar fun(self: terminal.Readline, char: string)
----@field rubBack fun(self: terminal.Readline)
----@field rubForward fun(self: terminal.Readline)
-
----@return terminal.Readline
-local function makeReadline(opts)
-  return {
-    screen = opts.screen,
-    input = {},
-    pos = 1,
-    clear = function (self)
-      self.input = {}
-      self.pos = 1
-    end,
-    addChar = function (self, char)
-      self.screen:putChar(char)
-      table.insert(self.input, char)
-      self.pos = self.pos + 1
-    end,
-    rubBack = function (self)
-      if #self.input == 0 then
-        return
-      end
-      self.screen.cursor:retreat()
-      table.remove(self.input)
-      self.pos = self.pos - 1
-    end,
-    rubForward = function (self)
-      if #self.input == 0 then
-        return
-      end
-      table.remove(self.input)
-      self.pos = self.pos - 1
-    end,
-  }
-end
-
 local screenSize = { wide = 80, tall = 24 }
 
 local screen = require 'terminal.Screen'.new {
@@ -49,7 +7,7 @@ local screen = require 'terminal.Screen'.new {
   }
 }
 
-local readline = makeReadline {
+local readline = require 'terminal.Readline'.new {
   screen = screen
 }
 

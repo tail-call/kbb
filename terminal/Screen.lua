@@ -6,7 +6,7 @@
 ---@field putChar fun(self: terminal.Screen, char: string)
 ---@field echo fun(self: terminal.Screen, text: string)
 
-local M = require('core.Module').define{..., version = 0, metatable = {
+local M = require 'core.Module'.define{..., metatable = {
   ---@type terminal.Screen
   __index = {
     clear = function (self)
