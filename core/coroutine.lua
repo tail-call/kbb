@@ -5,20 +5,22 @@ local function exhaust(fun, cb, ...)
   local thread = coroutine.create(fun)
   local isRunning, result = coroutine.resume(thread, ...)
 
-  local function run()
+  while true do
     -- Crash if coroutine fails
     local stupidMessage = 'cannot resume dead coroutine'
+
     if not isRunning and result ~= stupidMessage then
       error(result)
     end
 
+    if not isRunning then
+      return
+    end
+
     cb(result, function (...)
       isRunning, result = coroutine.resume(thread, ...)
-      run()
     end)
   end
-
-  run()
 end
 
 return {

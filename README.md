@@ -22,7 +22,6 @@ Game is an editable image.
  - [ ] BUG: Game crashes when pressing any key in focus mode
  - [ ] BUG: Recruiting doesn't work
  - [ ] BUG: Life bars are concealed behind other entities
- - [ ] BUG: Segfault on save
 
 ## Quality of life
 
@@ -263,6 +262,7 @@ Game is an editable image.
  - [x] Game: move controls to scene/game.lua [2023-05-27T13:31]
  - [x] Syntax for required object fields [2023-05-27T16:16]
  - [x] BUGFIX: Game crashes when opening a console [2023-05-28T20:04]
+ - [x] BUGFIX: Segfault on save [2023-05-30T00:12]
 
 # Sources
 
