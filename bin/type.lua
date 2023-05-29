@@ -1,3 +1,5 @@
+#!/usr/bin/env luajit
+
 local filename = ...
 
 local file = io.open(filename)
