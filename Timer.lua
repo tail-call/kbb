@@ -6,7 +6,7 @@
 ---@field value number Current timer value
 ---@field threshold number Timer resets when value exceeds threshold
 ---# Methods
----@field advance fun(self: Timer, dt: number) Advances timer's value
+---@field package update fun(self: Timer, dt: number) Advances timer's value
 
 ---@type { [Timer]: true }
 local timers = require 'core.table'.weaken({}, 'k')
@@ -15,7 +15,7 @@ local timers = require 'core.table'.weaken({}, 'k')
 local M = require 'core.Module'.define{..., version = 0, metatable = {
   ---@type Timer
   __index = {
-    advance = function (self, dt)
+    update = function (self, dt)
       self.value = (
         self.value + self.speed * dt
       ) % self.threshold
@@ -26,7 +26,7 @@ local M = require 'core.Module'.define{..., version = 0, metatable = {
 ---@param dt number
 function M.update(dt)
   for timer in pairs(timers) do
-    timer:advance(dt)
+    timer:update(dt)
   end
 end
 
