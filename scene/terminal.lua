@@ -78,6 +78,7 @@ local function loadCommand(name)
       for k, v in ipairs {...} do
         screen:echo(v)
       end
+      screen:echo('\n')
     end
   }
   return lang.loadFile('bin/' .. name .. '.lua')
@@ -118,16 +119,6 @@ local function doStuff(words)
   runCommand(
     words,
     {
-      type = function (_, filename)
-        local file = io.open(filename)
-        if not file then
-          error(('file not found: %s'):format(filename))
-        end
-        local content = file:read('*a')
-        file:close()
-        screen:echo(content)
-        screen:echo('\n')
-      end,
       cls = function (_)
         screen:clear()
       end,
