@@ -98,9 +98,6 @@ OnLoad(function (savefileName)
     }
   else
     local gameFunction, err = loadGame(savefileName, {
-      quad = function (...)
-        return love.graphics.newQuad(...)
-      end,
       buf = function (props)
         local compressedData = love.data.decode('data', 'base64', props.base64)
         local data = love.data.decompress('string', 'zlib', compressedData)
