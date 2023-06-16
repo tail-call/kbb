@@ -66,6 +66,7 @@ Game is an editable image.
 
 ## Game ideas
 
+ - [ ] Turning left or right takes an extra turn
  - [ ] Corruption factor: as you collect resources, it goes up
  - [ ] As corruption factor grows, enemies will spawn
  - [ ] More powerful and plentiful enemies are spawned as corruption goes up
