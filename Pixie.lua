@@ -6,6 +6,7 @@
 ---@field quad love.Quad
 ---@field pos core.Vector
 ---@field isFlipped boolean
+---@field isFloating boolean
 ---@field transform love.Transform
 ---@field isRightStep boolean
 ---@field transformSpeed number
@@ -15,6 +16,7 @@
 ---@field playSpawnAnimation fun(self: Pixie, pos: core.Vector): nil
 ---@field move fun(self: Pixie, pos: core.Vector): nil
 ---@field update fun(self: Pixie, dt: number): nil
+---@field setIsFloating fun(self: Pixie, value: boolean): nil
 
 local M = require('core.Module').define{..., metatable = {
   ---@type Pixie
@@ -36,13 +38,16 @@ local M = require('core.Module').define{..., metatable = {
       self.targetTransform:setTransformation(
         pos.x * 16, pos.y * 16
       )
+
       local hDirection = pos.x - self.pos.x
       if hDirection < 0 and self.isFlipped then
         self.isFlipped = false
       end
       if hDirection > 0 or self.isFlipped then
         self.targetTransform:scale(-1, 1)
-        self.targetTransform:translate(-16, 0)
+        if not self.isFloating then
+          self.targetTransform:translate(-16, 0)
+        end
         self.isFlipped = true
       end
       local vDirection = pos.y - self.pos.y
@@ -50,17 +55,19 @@ local M = require('core.Module').define{..., metatable = {
       if hDirection ~= 0 then
         -- Do nothing
       end
-      -- Moving vertically
-      if vDirection < 0 then
-        self.transform:scale(1, 1.1)
-      else
-        self.transform:scale(1, 0.9)
-      end
-      -- Moving vertically
-      if self.isRightStep then
-        self.transform:rotate(0.1)
-      else
-        self.transform:rotate(-0.1)
+      if not self.isFloating then
+        -- Moving vertically
+        if vDirection < 0 then
+          self.transform:scale(1, 1.1)
+        else
+          self.transform:scale(1, 0.9)
+        end
+        -- Moving vertically
+        if self.isRightStep then
+          self.transform:rotate(0.1)
+        else
+          self.transform:rotate(-0.1)
+        end
       end
       self.pos = pos
     end,
@@ -75,6 +82,9 @@ local M = require('core.Module').define{..., metatable = {
 
       self.transform:setMatrix(unpack(m3))
     end,
+    setIsFloating = function (self, value)
+      self.isFloating = value
+    end,
   }
 }}
 
@@ -85,7 +95,8 @@ function M.init(pixie)
   pixie.quad = pixie.quad
   pixie.isRightStep = pixie.isRightStep or false
   pixie.pos = { x = 0, y = 0 }
-  pixie.isFlipped = false
+  pixie.isFlipped = pixie.isFlipped or false
+  pixie.isFloating = pixie.isFloating or false
   pixie.transform = love.math.newTransform()
   pixie.transformSpeed = 1
   pixie.color = pixie.color or { 1, 1, 1, 1 }

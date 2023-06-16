@@ -200,6 +200,10 @@ local function drawPixie(pixie)
     end)
 
     -- Texture
+    if pixie.isFloating then
+      love.graphics.translate(0, -TILE_HEIGHT / 2)
+    end
+    
     local r, g, b, a = unpack(pixie.color)
     withColor(r * ambR, g * ambG, b * ambB, a * ambA, function ()
       love.graphics.draw(pixie.texture, pixie.quad, 0, 0)
@@ -547,7 +551,7 @@ local function drawGame(game, drawState, ui, ambientColor)
       game.cursorPos = cursorPos
     end
 
-    local collision = game.guyDelegate.collider(game.cursorPos)
+    local collision = game.guyDelegate.collider(game.cursorPos, game.player)
 
     if collision.type == 'terrain' then
       cursorColor = RED_COLOR

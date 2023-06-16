@@ -7,6 +7,7 @@
 ---@field pixie Pixie Graphical representation of the guy
 ---@field stats GuyStats RPG stats
 ---@field timer number Movement timer
+---@field isFlying boolean True if flies
 ---@field speed number Delay in seconds between moves
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
@@ -16,7 +17,7 @@
 ---@field update fun(self: Guy, dt: number)
 
 ---@class Guy.delegate
----@field collider fun(v: core.Vector): Guy.collision Function that performs collision checks between game world objects
+---@field collider fun(v: core.Vector, guy: Guy): Guy.collision Function that performs collision checks between game world objects
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil Begins a battle between an attacker and defender
 ---@field enterHouse fun(guest: Guy, building: Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
 
@@ -84,7 +85,7 @@ function M.moveGuy(guy, vec, delegate)
   )
 
   for _, pos in ipairs{ stepForward, diagonalStepLeft, diagonalStepRight } do
-    local collision = delegate.collider(pos)
+    local collision = delegate.collider(pos, guy)
     if collision.type == 'none' then
       guy:move(pos)
       return pos

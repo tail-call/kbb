@@ -10,7 +10,7 @@
 ---@field guyDelegate Guy.delegate Object that talks to guys
 ---@field squad Squad A bunch of guys that follow player's movement
 ---@field player Guy A guy controlled by the player
----@field stats number Game stats like player score etc.
+---@field stats GameStats Game stats like player score etc.
 ---@field time number Time of day in seconds, max is 24*60
 ---@field cursorPos core.Vector Points to a square player's cursor is aimed at
 ---@field magnificationFactor number How much the camera is zoomed in
@@ -54,6 +54,11 @@ local MOVE_COSTS_TABLE = {
   dismissSquad = 1,
   summon = 25,
   build = 50,
+}
+
+local TILE_SPEEDS = {
+  forest = 1/2,
+  void = 1/8,
 }
 
 local BUILDING_COST = 5
@@ -142,9 +147,17 @@ local NONE_COLLISION = { type = 'none' }
 local TERRAIN_COLLISION = { type = 'terrain' }
 
 ---@param game Game
----@param collider fun(self: Game, v: core.Vector): Guy.collision Function that performs collision checks between game world objects
+---@param pos core.Vector
+---@return { pos: core.Vector } | nil
+local function findEntityAtPos(game, pos)
+  return require 'core.table'.find(game.entities, function (entity)
+    return Vector.equal(entity.pos, pos)
+  end)
+end
+
+---@param game Game
 ---@return Guy.delegate
-local function makeGuyDelegate(game, collider)
+local function makeGuyDelegate(game)
   ---@type Guy.delegate
   local guyDelegate = {
     beginBattle = function (attacker, defender)
@@ -158,8 +171,19 @@ local function makeGuyDelegate(game, collider)
       game:removeEntity(building)
       return 'shouldMove'
     end,
-    collider = function (pos)
-      return collider(game, pos)
+    collider = function (pos, guy)
+      local someEntityThere = findEntityAtPos(game, pos)
+      if someEntityThere then
+        return { type = 'entity', entity = someEntityThere }
+      end
+
+      if guy.pixie.isFloating then
+        return NONE_COLLISION
+      elseif isPassable(game.world, pos) then
+        return NONE_COLLISION
+      end
+
+      return TERRAIN_COLLISION
     end,
   }
   return guyDelegate
@@ -171,15 +195,6 @@ end
 ---@return boolean
 function M.isFrozen(game, object)
   return game.frozenEntities[object] or false
-end
-
----@param game Game
----@param pos core.Vector
----@return { pos: core.Vector } | nil
-local function findEntityAtPos(game, pos)
-  return require 'core.table'.find(game.entities, function (entity)
-    return Vector.equal(entity.pos, pos)
-  end)
 end
 
 ---@param game Game
@@ -201,16 +216,7 @@ function M.init(game)
   game.magnificationFactor = game.magnificationFactor or 1
   game.mode = game.mode or 'normal'
 
-  game.guyDelegate = makeGuyDelegate(game, function(self, v)
-    local someEntityThere = findEntityAtPos(self, v)
-    if someEntityThere then
-      return { type = 'entity', entity = someEntityThere }
-    end
-    if isPassable(self.world, v) then
-      return NONE_COLLISION
-    end
-    return TERRAIN_COLLISION
-  end)
+  game.guyDelegate = makeGuyDelegate(game)
 
   local messages = {
     'This is your first day of ruling your own Kobold tribe.',
@@ -242,7 +248,7 @@ function M.init(game)
         function (playerStats, key, value, oldValue)
           if key == 'hp' and value <= 0 then
             game.stats:addDeaths(1)
-            game.stats:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
+            game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
             game.stats:addScore(SCORES_TABLE.dead)
             listenPlayerDeath()
           end
@@ -409,16 +415,22 @@ function M.updateGame(game, dt, movementDirections, visibility)
     end
   end
 
+  ---Returns a speed factor that a guy should have on a specified tile
+  ---@param guy Guy
+  ---@param tile World.tile
+  ---@return number
+  local function speedFactor(guy, tile)
+    if guy.pixie.isFloating then
+      return 1
+    end
+
+    return TILE_SPEEDS[tile] or 1
+  end
+
   for _, entity in ipairs(game.entities) do
     if entity.__module == 'Guy' then
-      ---@cast entity Guy
-      if getTile(game.world, entity.pos) == 'forest' then
-        entity:update(dt / 2)
-      elseif getTile(game.world, entity.pos) == 'void' then
-        entity:update(dt / 8)
-      else
-        entity:update(dt)
-      end
+        ---@cast entity Guy
+      entity:update(dt * speedFactor(entity, getTile(game.world, entity.pos)))
       if not M.isFrozen(game, entity) then
         behave(entity, game.guyDelegate)
       end
@@ -514,15 +526,6 @@ function M.orderDismiss(game)
     addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
     dismissSquad(game)
   end
-end
-
--- TODO: delete this
-function M.migrate(bak)
-  bak.stats = {
-    score = bak.score or 0,
-    deathsCount = bak.deathsCount or 0
-  }
-  return bak
 end
 
 return M

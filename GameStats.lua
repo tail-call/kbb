@@ -5,8 +5,8 @@
 ---@field score integer Score the player has accumulated
 ---@field deathsCount number Number of times player has died
 ---# Methods
----@field addScore fun(self: Game, count: integer) Increases score count
----@field addDeaths fun(self: Game, count: integer) Adds a death to a game
+---@field addScore fun(self: GameStats, count: integer) Increases score count
+---@field addDeaths fun(self: GameStats, count: integer) Adds a death to a game
 
 local M = require 'core.Module'.define{..., metatable = {
   ---@type GameStats

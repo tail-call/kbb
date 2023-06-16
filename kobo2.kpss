@@ -2206,5 +2206,5 @@ O[2150] = ConsoleMessage{lifetime=0,__module="ConsoleMessage",__version=0,text="
 O[2151] = {[4]=O[2147],[1]=O[2148],[2]=O[2149],[3]=O[2150],}
 O[2152] = Console{__module="Console",messages=O[2151],__version=0,}
 O[2153] = {console=O[2152],prompt=" ",activeTab=0,}
-O[2154] = Game{deathsCount=15,resources=O[1],console=O[10],isFocused=true,ui=O[30],fogOfWarTimer=0.305138434,texts=O[85],frozenGuys=O[86],guys=O[1088],frozenEntities=O[1089],recruitCircle=O[1090],time=168.4237266193,cursorPos=O[1091],world=O[1095],score=21100,alternatingKeyIndex=0,magnificationFactor=0.66666666666667,player=O[1593],squad=O[1135],guyDelegate=O[1136],__module="Game",mode="normal",entities=O[2146],__version=0,uiModel=O[2153],}
+O[2154] = Game{stats=GameStats{deathsCount=15,score=21100},resources=O[1],console=O[10],isFocused=true,ui=O[30],fogOfWarTimer=0.305138434,texts=O[85],frozenGuys=O[86],guys=O[1088],frozenEntities=O[1089],recruitCircle=O[1090],time=168.4237266193,cursorPos=O[1091],world=O[1095],alternatingKeyIndex=0,magnificationFactor=0.66666666666667,player=O[1593],squad=O[1135],guyDelegate=O[1136],__module="Game",mode="normal",entities=O[2146],__version=0,uiModel=O[2153],}
 return O[#O]

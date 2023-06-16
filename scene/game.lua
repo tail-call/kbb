@@ -176,6 +176,8 @@ OnKeyPressed(function (key, scancode, isrepeat)
     game.squad:toggleFollow()
   elseif scancode == 'b' then
     require 'Game'.orderBuild(game)
+  elseif scancode == 'x' then
+    game.player.pixie:setIsFloating(not game.player.pixie.isFloating)
   end
 
   if game.mode == 'focus' then

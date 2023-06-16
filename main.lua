@@ -42,5 +42,9 @@ function love.load()
   love.graphics.setLineStyle('rough')
   love.mouse.setVisible(false)
   require 'Tileset'.load()
-  require 'scene.terminal'.go()
+  if true then
+    require 'scene.menu'.go()
+  else
+    require 'scene.terminal'.go()
+  end
 end
