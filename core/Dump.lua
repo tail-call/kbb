@@ -27,7 +27,7 @@ local function dump(object)
   local function dumpPrimitive(obj)
     local t = type(obj)
     if t == 'boolean' then
-      return t and 'true' or 'false'
+      return obj and 'true' or 'false'
     elseif t == 'function' then
       return ('nil--[[%s]]'):format(obj)
     elseif t == 'number' then
@@ -45,62 +45,63 @@ local function dump(object)
       withRecord(obj, function ()
         coroutine.yield(('O[%d]'):format(references[obj]))
       end)
-    elseif type(obj) == 'table' then
-      local metatable = getmetatable(obj)
-      local customDump = metatable and metatable.dump or nil
-      if customDump then
-        withRecord(obj, function ()
-          customDump(coroutine.yield)
-        end)
-      else
-        -- First dump all dependencies
-        for k, v in pairs(obj) do
-          if not isPrimitive(v) then
-            process(v)
-          end
-        end
-
-        withRecord(obj, function ()
-          if obj.__module then
-            coroutine.yield(obj.__module)
-          end
-
-          coroutine.yield('{')
+    else require 'core.flow'.ETypeCase(obj) {
+      'table', function ()
+        local metatable = getmetatable(obj)
+        local customDump = metatable and metatable.dump or nil
+        if customDump then
+          withRecord(obj, function ()
+            customDump(coroutine.yield)
+          end)
+        else
+          -- First dump all dependencies
           for k, v in pairs(obj) do
-            if type(k) == 'number' then
-              coroutine.yield('['..k..']')
-            else
-              coroutine.yield(k)
+            if not isPrimitive(v) then
+              process(v)
             end
-
-            coroutine.yield('=')
-            if isPrimitive(v) then
-              coroutine.yield(dumpPrimitive(v))
-            else
-              coroutine.yield(('O[%d]'):format(references[v]))
-            end
-            coroutine.yield(',')
           end
 
-          coroutine.yield('}')
+          withRecord(obj, function ()
+            if obj.__module then
+              coroutine.yield(obj.__module)
+            end
+
+            coroutine.yield('{')
+            for k, v in pairs(obj) do
+              if type(k) == 'number' then
+                coroutine.yield('['..k..']')
+              else
+                coroutine.yield(k)
+              end
+
+              coroutine.yield('=')
+              if isPrimitive(v) then
+                coroutine.yield(dumpPrimitive(v))
+              else
+                coroutine.yield(('O[%d]'):format(references[v]))
+              end
+              coroutine.yield(',')
+            end
+
+            coroutine.yield('}')
+          end)
+        end
+      end,
+      'userdata', function ()
+        withRecord(obj, function ()
+          if obj:type() == 'Quad' then
+            ---@cast obj love.Quad
+            coroutine.yield('quad(')
+            local x, y, w, h = obj:getViewport()
+            local sw, sh = obj:getTextureDimensions()
+            coroutine.yield(('%s,%s,%s,%s,%s,%s'):format(x, y, w, h, sw, sh))
+            coroutine.yield(')')
+          else
+            coroutine.yield(obj:type())
+          end
         end)
       end
-    elseif type(obj) == 'userdata' then
-      withRecord(obj, function ()
-        if obj:type() == 'Quad' then
-          ---@cast obj love.Quad
-          coroutine.yield('quad(')
-          local x, y, w, h = obj:getViewport()
-          local sw, sh = obj:getTextureDimensions()
-          coroutine.yield(('%s,%s,%s,%s,%s,%s'):format(x, y, w, h, sw, sh))
-          coroutine.yield(')')
-        else
-          coroutine.yield(obj:type())
-        end
-      end)
-    else
-      error(('dump: unsupported type %s of object %s'):format(type(obj), obj))
-    end
+    } end
   end
 
   local buf = require 'string.buffer'.new()
