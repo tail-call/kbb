@@ -52,11 +52,14 @@ local function makePanel(bak)
   panel.w = bak[1][2] or function () return 0 end
   panel.h = bak[1][3] or function () return 0 end
   panel.background = { r = 0, g = 0, b = 0, a = 1 }
-  if type(bak[3].fun) == 'function' then
-    panel.background = bak[3].fun
-  else
-    panel.background = bak[3]
-  end
+  require 'core.flow'.TypeCase(bak[3].fun) {
+    'function', function ()
+      panel.background = bak[3].fun
+    end,
+    nil, function ()
+      panel.background = bak[3]
+    end,
+  }
 
   if type(bak[2]) == 'string' then
     panel.text = bak[2]

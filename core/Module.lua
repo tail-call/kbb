@@ -1,6 +1,5 @@
 ---@class Module
 ---@field __modulename string
----@field mut Mutator Mutator object
 ---@field new fun(bak: table): table Makes a new object
 ---@field init fun(bak: table, strategy: fun(moduleName: string, dep: table): table): any Initializes an object
 ---@field deinit fun(bak: table)  Deinitializes an object
@@ -18,13 +17,15 @@ function M.define(opts)
 
   local module
   module = {
-    mut = {},
     __modulename = name,
     ---@generic T
     ---@param bak T
     ---@param strategy fun(moduleName: string, bak: T)
     init = function (bak, strategy)
       return bak
+    end,
+    type = function ()
+      return metatable
     end,
     deinit = function (bak)
       -- Do nothing
