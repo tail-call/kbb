@@ -83,6 +83,9 @@ local function dump(object)
                 'number', function ()
                   coroutine.yield('['..k..']')
                 end,
+                'table', function ()
+                  error('tables as keys are not supported')
+                end,
                 nil, function ()
                   coroutine.yield(k)
                 end,
