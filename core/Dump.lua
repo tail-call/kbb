@@ -1,3 +1,9 @@
+--- Functions for translating Lua objects into Lua source
+--- It's like JSON but for Lua and not dumbed down
+
+local TypeCase = require 'core.flow'.TypeCase
+local ETypeCase = require 'core.flow'.ETypeCase
+
 ---Dumps an object to Lua code
 ---@param object any
 ---@return string
@@ -14,29 +20,34 @@ local function dump(object)
   end
 
   local function isPrimitive(obj)
-    local t = type(obj)
-    return (
-      t == 'boolean'
-      or t == 'function'
-      or t == 'number'
-      or t == 'string'
-      or t == 'nil'
-    )
+    return TypeCase(obj) {
+      'boolean', true,
+      'function', true,
+      'number', true,
+      'string', true,
+      'nil', true,
+      nil, false,
+    }
   end
 
   local function dumpPrimitive(obj)
-    local t = type(obj)
-    if t == 'boolean' then
-      return obj and 'true' or 'false'
-    elseif t == 'function' then
-      return ('nil--[[%s]]'):format(obj)
-    elseif t == 'number' then
-      return tostring(obj)
-    elseif t == 'string' then
-      return ('%q'):format(obj)
-    elseif t == 'nil' then
-      return 'nil'
-    end
+    return TypeCase(obj) {
+      'boolean', function ()
+        return obj and 'true' or 'false'
+      end,
+      'function', function ()
+        return ('nil--[[%s]]'):format(obj)
+      end,
+      'number', function ()
+        return tostring(obj)
+      end,
+      'string', function ()
+        return ('%q'):format(obj)
+      end,
+      'nil', function ()
+        return 'nil'
+      end,
+    }
   end
 
   ---@param obj any
@@ -45,7 +56,7 @@ local function dump(object)
       withRecord(obj, function ()
         coroutine.yield(('O[%d]'):format(references[obj]))
       end)
-    else require 'core.flow'.ETypeCase(obj) {
+    else ETypeCase(obj) {
       'table', function ()
         local metatable = getmetatable(obj)
         local customDump = metatable and metatable.dump or nil
@@ -68,11 +79,14 @@ local function dump(object)
 
             coroutine.yield('{')
             for k, v in pairs(obj) do
-              if type(k) == 'number' then
-                coroutine.yield('['..k..']')
-              else
-                coroutine.yield(k)
-              end
+              TypeCase(k) {
+                'number', function ()
+                  coroutine.yield('['..k..']')
+                end,
+                nil, function ()
+                  coroutine.yield(k)
+                end,
+              }
 
               coroutine.yield('=')
               if isPrimitive(v) then
@@ -106,6 +120,7 @@ local function dump(object)
 
   local buf = require 'string.buffer'.new()
   buf:put('local O = {}\n' )
+
   require 'core.coroutine'.exhaust(process, function(part, resume)
     buf:put(part or '')
     resume()

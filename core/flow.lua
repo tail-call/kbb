@@ -39,7 +39,7 @@ end
 
 local function ETypeCase (obj)
   return TypeCase(obj, function ()
-    error('An object fell through TypeCase expression: ' .. tostring(obj))
+    error('An object fell through ETypeCase expression: ' .. tostring(obj))
   end)
 end
 
