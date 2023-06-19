@@ -2,6 +2,10 @@
 
 See https://github.com/LuaLS/lua-language-server/wiki/Annotations
 
+# How do I run it?
+
+      ./run.lua
+
 # Plot
 
 You're a magical kobold princess. You lead your tribe to the prosperity.
