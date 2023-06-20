@@ -84,10 +84,10 @@ function M.init(world)
   local makeBufDumper = require 'core.Dump'.makeBufDumper
   -- TODO: call setmetatable for return values
   setmetatable(world.fogOfWar, {
-    dump = makeBufDumper(world.fogOfWar, '%.3f,')
+    dump = makeBufDumper('%.3f,')
   })
   setmetatable(world.tileTypes, {
-    dump = makeBufDumper(world.tileTypes, '%q,')
+    dump = makeBufDumper('%q,')
   })
 
   ---@type World

@@ -12,7 +12,7 @@ local function emit(formatString, ...)
   )
 end
 
-local function isPrimitive(obj)
+local function shouldInline(obj)
   return ETypeCase(obj) {
     'boolean', true,
     'function', true,
@@ -23,56 +23,56 @@ local function isPrimitive(obj)
   }
 end
 
----@class RecordWriter
+---@class core.dump.ChildEmitter
 ---@field references table Record table
----@field withRecord fun(self: RecordWriter, obj: any, cb: fun()) Emits a record
----@field referenceForObject fun(self: RecordWriter, obj: any): number | nil Returns a reference number for an object if any
+---@field emitChild fun(self: core.dump.ChildEmitter, obj: any, cb: fun()) Emits a record
+---@field idOfChild fun(self: core.dump.ChildEmitter, obj: any): number | nil Returns a reference number for an object if any
 
----Creates and returns a new record writer
----@return RecordWriter
-local function makeRecordWriter()
-  local lastReference = 0
-  local references = {}
+---Creates and returns a new child emitter
+---@return core.dump.ChildEmitter
+local function makeChildEmitter()
+  local lastId = 0
+  local childrenToIds = {}
 
   return {
-    withRecord = function (self, obj, cb)
-      emit('O[%d] = ', lastReference + 1)
+    emitChild = function (self, child, cb)
+      emit('O[%d] = ', lastId + 1)
       cb()
-      lastReference = lastReference + 1
-      references[obj] = lastReference
+      lastId = lastId + 1
+      childrenToIds[child] = lastId
       emit('\n')
     end,
-    referenceForObject = function (self, obj)
-      return references[obj]
+    idOfChild = function (self, obj)
+      return childrenToIds[obj]
     end,
   }
 end
 
 ---@param obj any
----@param recordWriter RecordWriter
-local function process(obj, recordWriter)
-  local reference = recordWriter:referenceForObject(obj)
-  if reference then
-    recordWriter:withRecord(obj, function ()
-      emit('O[%d]', reference)
+---@param childEmitter core.dump.ChildEmitter
+local function emitTable(obj, childEmitter)
+  local objId = childEmitter:idOfChild(obj)
+  if objId then
+    childEmitter:emitChild(obj, function ()
+      emit('O[%d]', objId)
     end)
   else ETypeCase(obj) {
     'table', function ()
       local metatable = getmetatable(obj)
       local customDump = metatable and metatable.dump or nil
       if customDump then
-        recordWriter:withRecord(obj, function ()
-          customDump()
+        childEmitter:emitChild(obj, function ()
+          customDump(obj)
         end)
       else
-        -- First dump all dependencies
-        for k, v in pairs(obj) do
-          if not isPrimitive(v) then
-            process(v, recordWriter)
+        -- First dump all children
+        for _, v in pairs(obj) do
+          if not shouldInline(v) then
+            emitTable(v, childEmitter)
           end
         end
 
-        recordWriter:withRecord(obj, function ()
+        childEmitter:emitChild(obj, function ()
           if obj.__module then
             emit(obj.__module)
           end
@@ -92,21 +92,21 @@ local function process(obj, recordWriter)
             }
 
             emit('=')
-            if isPrimitive(v) then
+            if shouldInline(v) then
               ETypeCase(v) {
                 'function', function ()
                   -- Will emit a function's address
-                  return emit('nil--[[%s]]', v)
+                  emit('nil--[[%s]]', v)
                 end,
                 'string', function ()
-                  return emit('%q', v)
+                  emit('%q', v)
                 end,
                 nil, function ()
                   emit(tostring(v))
                 end,
               }
             else
-              emit('O[%d]', recordWriter:referenceForObject(v))
+              emit('O[%d]', childEmitter:idOfChild(v))
             end
             emit(',')
           end
@@ -116,7 +116,7 @@ local function process(obj, recordWriter)
       end
     end,
     'userdata', function ()
-      recordWriter:withRecord(obj, function ()
+      childEmitter:emitChild(obj, function ()
         if obj:type() == 'Quad' then
           ---@cast obj love.Quad
           emit('quad(')
@@ -136,12 +136,11 @@ end
 ---@param object any
 ---@return string
 local function dump(object)
-  local recordWriter = makeRecordWriter()
   local buf = require 'string.buffer'.new()
   buf:put('local O = {}\n' )
 
   require 'core.coroutine'.exhaust(function (o)
-    return process(o, recordWriter)
+    return emitTable(o, makeChildEmitter())
   end, function(part, resume)
     buf:put(part or '')
     resume()
@@ -153,11 +152,10 @@ local function dump(object)
 end
 
 ---Returns a function that will dump an array into a base64 encoded buffer
----@param array any
 ---@param format any
 ---@return function
-local function makeBufDumper (array, format)
-  return function()
+local function makeBufDumper (format)
+  return function(array)
     local buf = require 'string.buffer'.new()
     buf:put('return{')
     for _, word in ipairs(array) do
