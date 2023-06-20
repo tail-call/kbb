@@ -8,9 +8,10 @@
 ---@field addScore fun(self: GameStats, count: integer) Increases score count
 ---@field addDeaths fun(self: GameStats, count: integer) Adds a death to a game
 
-local M = require 'core.class'.define{..., metatable = {
+local GameStats = require 'core.class'.define {
+  ...,
   ---@type GameStats
-  __index = {
+  index = {
     addScore = function(self, count)
       self.score = self.score + count
     end,
@@ -18,12 +19,12 @@ local M = require 'core.class'.define{..., metatable = {
       self.deathsCount = self.deathsCount + 1
     end,
   }
-}}
+}
 
 ---@param obj GameStats
-function M.init(obj)
+function GameStats.init(obj)
   obj.score = obj.score or 0
   obj.deathsCount = obj.deathsCount or 0
 end
 
-return M
+return GameStats
