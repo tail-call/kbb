@@ -9,9 +9,10 @@
 ---@field echo fun(self: terminal.Screen, text: string)
 ---@field setShouldScroll fun(self: terminal.Screen, value: boolean)
 
-local M = require 'core.Module'.define{..., metatable = {
+local M = require 'core.Module'.define {
+  ...,
   ---@type terminal.Screen
-  __index = {
+  index = {
     clear = function (self)
       self.chars = {}
 
@@ -63,7 +64,7 @@ local M = require 'core.Module'.define{..., metatable = {
       self.shouldScroll = value
     end,
   }
-}}
+}
 
 function M.init(obj)
   require 'core.Dep' (obj, function (want)

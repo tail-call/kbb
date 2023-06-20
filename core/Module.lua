@@ -15,6 +15,10 @@ function M.define(opts)
   local version = opts.version or 0
   local name = opts[1]
 
+  if opts.index then
+    metatable = { __index = opts.index }
+  end
+
   local module
   module = {
     __modulename = name,

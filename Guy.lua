@@ -33,9 +33,10 @@ local abilities = require 'Ability'.abilities
 local addMoves = require 'GuyStats'.mut.addMoves
 local setMaxHp = require 'GuyStats'.mut.setMaxHp
 
-local M = require 'core.Module'.define{..., metatable = {
+local Guy = require 'core.Module'.define {
+  ...,
   ---@type Guy
-  __index = {
+  index = {
     move = function (self, pos)
       self.mayMove = false
       self.timer = 0
@@ -59,7 +60,7 @@ local M = require 'core.Module'.define{..., metatable = {
       end
     end,
   }
-}}
+}
 
 ---@param team1 Guy.team
 ---@param team2 Guy.team
@@ -73,7 +74,7 @@ end
 ---@param vec core.Vector
 ---@param delegate Guy.delegate
 ---@return core.Vector newPosition
-function M.moveGuy(guy, vec, delegate)
+function Guy.moveGuy(guy, vec, delegate)
   if not guy.mayMove or guy.stats.moves < 1 then return guy.pos end
 
   local stepForward = Vector.add(guy.pos, vec)
@@ -116,9 +117,9 @@ end
 
 ---@param guy Guy
 ---@param delegate Guy.delegate
-function M.behave(guy, delegate)
+function Guy.behave(guy, delegate)
   if guy.behavior == 'wander' then
-    M.moveGuy(guy, ({
+    Guy.moveGuy(guy, ({
       Vector.dir.up,
       Vector.dir.down,
       Vector.dir.left,
@@ -128,7 +129,7 @@ function M.behave(guy, delegate)
 end
 
 ---@param guy Guy
-function M.init(guy, load)
+function Guy.init(guy, load)
   guy.stats = load('GuyStats', guy.stats)
   guy.pixie = load('Pixie', guy.pixie)
   guy.name = guy.name or 'Unnamed'
@@ -149,10 +150,10 @@ function M.init(guy, load)
 end
 
 ---@param pos core.Vector
-function M.makeLeader(pos)
+function Guy.makeLeader(pos)
   local tileset = require 'Tileset'.getTileset()
 
-  local guy = M.new{
+  local guy = Guy.new {
     pixie = {
       quad = tileset.quads.guy,
       color = { 1, 1, 0, 1 },
@@ -164,10 +165,10 @@ function M.makeLeader(pos)
 end
 
 ---@param pos core.Vector
-function M.makeHuman(pos)
+function Guy.makeHuman(pos)
   local tileset = require 'Tileset'.getTileset()
 
-  return M.new {
+  return Guy.new {
     name = 'Maria',
     team = 'neutral',
     pixie = {
@@ -180,10 +181,10 @@ function M.makeHuman(pos)
 end
 
 ---@param pos core.Vector
-function M.makeGoodGuy(pos)
+function Guy.makeGoodGuy(pos)
   local tileset = require 'Tileset'.getTileset()
 
-  return M.new {
+  return Guy.new {
     name = 'Good Guy',
     team = 'neutral',
     pixie = {
@@ -195,10 +196,10 @@ function M.makeGoodGuy(pos)
 end
 
 ---@param pos core.Vector
-function M.makeEvilGuy(pos)
+function Guy.makeEvilGuy(pos)
   local tileset = require 'Tileset'.getTileset()
 
-  local guy = M.new {
+  local guy = Guy.new {
     name = 'Evil Guy',
     team = 'evil',
     speed = 0.5,
@@ -214,10 +215,10 @@ function M.makeEvilGuy(pos)
 end
 
 ---@param pos core.Vector
-function M.makeStrongEvilGuy(pos)
+function Guy.makeStrongEvilGuy(pos)
   local tileset = require 'Tileset'.getTileset()
 
-  local guy = M.new{
+  local guy = Guy.new {
     pixie = {
       quad = tileset.quads.guy,
       color = { 1, 0, 1, 1 },
@@ -235,14 +236,14 @@ end
 
 ---@param guy Guy
 ---@return boolean
-function M.canRecruitGuy(guy)
+function Guy.canRecruitGuy(guy)
   return guy.team == 'good'
 end
 
 ---@param guy Guy
 ---@return string
-function M.tooltipText(guy)
+function Guy.tooltipText(guy)
   return ('%s\n%s/%s'):format(guy.name, guy.stats.hp, guy.stats.maxHp)
 end
 
-return M
+return Guy
