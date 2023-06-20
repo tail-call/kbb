@@ -1,4 +1,4 @@
----@class Scene: Module
+---@class Scene: core.Module
 ---@field load fun(...) Initializes the scene
 ---@field draw fun() Draws the scene on the screen
 ---@field update fun(dt: number) Updates the scene state
