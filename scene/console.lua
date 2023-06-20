@@ -1,5 +1,3 @@
----@module 'lang/scene'
-
 local buffer = require 'string.buffer'
 
 local game = nil

@@ -1,8 +1,8 @@
----@alias Vector3 { x: number, y: number, z: number }
+---@alias core.Vector3 { x: number, y: number, z: number }
 
----@param v1 Vector3
----@param v2 Vector3
----@return Vector3
+---@param v1 core.Vector3
+---@param v2 core.Vector3
+---@return core.Vector3
 local function lerp3(v1, v2, factor)
   return {
     x = v1.x + (v2.x - v1.x) * factor,

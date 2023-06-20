@@ -4,7 +4,7 @@
 ---# Properties
 ---@field windowScale number Window scale
 ---@field tileset Tileset Tileset used for drawing
----@field camera Vector3 Camera position in the world
+---@field camera core.Vector3 Camera position in the world
 ---@field cursorTimer core.Timer Cursor animation timer
 ---@field battleTimer core.Timer Battle animation timer
 ---@field waterTimer core.Timer Water animation timer
