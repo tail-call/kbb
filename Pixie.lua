@@ -18,9 +18,10 @@
 ---@field update fun(self: Pixie, dt: number): nil
 ---@field setIsFloating fun(self: Pixie, value: boolean): nil
 
-local M = require('core.class').define{..., metatable = {
+local Pixie = require 'core.class'.define {
+  ...,
   ---@type Pixie
-  __index = {
+  index = {
     playSpawnAnimation = function (self, pos)
       self.transformSpeed = 8
       self.transform:setTransformation(
@@ -86,11 +87,11 @@ local M = require('core.class').define{..., metatable = {
       self.isFloating = value
     end,
   }
-}}
+}
 
 ---@param pixie Pixie
 ---@return Pixie
-function M.init(pixie)
+function Pixie.init(pixie)
   pixie.texture = require('Tileset').getTileset().image
   pixie.quad = pixie.quad
   pixie.isRightStep = pixie.isRightStep or false
@@ -105,4 +106,4 @@ function M.init(pixie)
   return pixie
 end
 
-return M
+return Pixie

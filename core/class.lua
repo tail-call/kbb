@@ -5,22 +5,30 @@
 ---@field deinit fun(bak: table)  Deinitializes an object
 ---@field reload fun(bak: table) Reloads an object from its originating module
 
-local M = {}
-
 ---@generic T
 ---@param opts table
 ---@return T
-function M.define(opts)
-  local metatable = opts.metatable or nil
+local function define(opts)
+  local metatable = nil
+  if opts.metatable then
+    require 'core.warning'.deprecated {
+      'core.class', 'define', 'opts', 'metatable'
+    }
+    metatable = opts.metatable or nil
+  end
+  if opts.version then
+    require 'core.warning'.deprecated {
+      'core.class', 'define', 'opts', 'version'
+    }
+  end
   local version = opts.version or 0
   local name = opts[1]
-
   if opts.index then
     metatable = { __index = opts.index }
   end
 
-  local module
-  module = {
+  local class
+  class = {
     __modulename = name,
     ---@generic T
     ---@param bak T
@@ -41,33 +49,36 @@ function M.define(opts)
     ---@param bak T
     ---@return T
     new = function (bak)
-      local obj = module.migrate(bak or {})
+      local obj = class.migrate(bak or {})
       if obj == nil then
         error('migrate must return a value')
       end
       obj.__module = name
       obj.__version = version
       setmetatable(obj, metatable)
-      module.init(obj, function (moduleName, dep)
+      class.init(obj, function (moduleName, dep)
         return require(moduleName).new(dep)
       end)
       return obj
     end,
     reload = function (obj)
       setmetatable(obj, metatable)
-      module.deinit(obj)
-      module.init(obj, function (moduleName, dep)
+      class.deinit(obj)
+      class.init(obj, function (moduleName, dep)
         require(moduleName).reload(dep)
       end)
       return obj
     end,
   }
-  return module
+  return class
 end
 
-function M.reload(name)
+local function reload(name)
   package.loaded[name] = nil
   return require(name)
 end
 
-return M
+return {
+  define = define,
+  reload = reload,
+}

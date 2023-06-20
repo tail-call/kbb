@@ -12,26 +12,27 @@
 local timers = require 'core.table'.weaken({}, 'k')
 
 ---@type core.class
-local M = require 'core.class'.define{..., version = 0, metatable = {
+local Timer = require 'core.class'.define {
+  ...,
   ---@type core.Timer
-  __index = {
+  index = {
     update = function (self, dt)
       self.value = (
         self.value + self.speed * dt
       ) % self.threshold
     end
   }
-}}
+}
 
 ---@param dt number
-function M.update(dt)
+function Timer.update(dt)
   for timer in pairs(timers) do
     timer:update(dt)
   end
 end
 
 ---@param obj core.Timer
-function M.init(obj)
+function Timer.init(obj)
   obj.speed = obj.speed or 1
   obj.value = obj.value or 0
   obj.threshold = obj.threshold or 1
@@ -39,4 +40,4 @@ function M.init(obj)
   timers[obj] = true
 end
 
-return M
+return Timer

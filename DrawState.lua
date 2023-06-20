@@ -22,9 +22,10 @@ local SCREEN_HEIGHT = 200
 
 local CAMERA_LERP_SPEED = 10
 
-local M = require 'core.class'.define{..., version = 0, metatable = {
+local DrawState = require 'core.class'.define {
+  ...,
   ---@type DrawState
-  __index = {
+  index = {
     setWindowScale = function (self, windowScale)
       self.windowScale = windowScale
 
@@ -48,10 +49,10 @@ local M = require 'core.class'.define{..., version = 0, metatable = {
       )
     end
   }
-}}
+}
 
 ---@param obj DrawState
-function M.init(obj)
+function DrawState.init(obj)
   local Timer = require 'core.Timer'.new
   obj.isUsingBoldFont = obj.isUsingBoldFont or false
   obj.windowScale = obj.windowScale or 3
@@ -75,7 +76,7 @@ end
 ---@param lookingAt core.Vector
 ---@param magn number
 ---@param isAltCentering boolean
-function M.updateDrawState(drawState, dt, lookingAt, magn, isAltCentering)
+function DrawState.updateDrawState(drawState, dt, lookingAt, magn, isAltCentering)
   local yOffset = isAltCentering and SCREEN_HEIGHT/magn/8 or 0
   local offset = VectorModule.add(
     VectorModule.scale(lookingAt, TILE_WIDTH), { x = 0, y = yOffset }
@@ -85,4 +86,4 @@ function M.updateDrawState(drawState, dt, lookingAt, magn, isAltCentering)
   updateTileset(drawState.tileset, dt)
 end
 
-return M
+return DrawState

@@ -5,20 +5,20 @@
 ---@field lifetime number Seconds before message is faded out
 ---@field fadeOut fun(self: ConsoleMessage, dt: number) Applies fade out to the message
 
-local M = require('core.class').define{..., metatable = {
+local ConsoleMessage = require 'core.class'.define {
   ---@type ConsoleMessage
-  __index = {
+  index = {
     fadeOut = function (self, dt)
       self.lifetime = math.max(self.lifetime - dt, 0)
     end,
-  }
-}}
+  },
+}
 
 ---@param message ConsoleMessage
-function M.init(message)
+function ConsoleMessage.init(message)
   require 'core.Dep' (message, function (want)
     return { want.text, want.lifetime }
   end)
 end
 
-return M
+return ConsoleMessage

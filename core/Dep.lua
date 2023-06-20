@@ -1,4 +1,7 @@
 local function dep(obj, cb)
+  require 'core.warning'.deprecated {
+    'core.Dep', 'dep'
+  }
   local impostor = {}
   setmetatable(impostor, {
     __index = function (t, k)
