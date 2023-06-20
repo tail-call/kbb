@@ -1,6 +1,9 @@
 GlobalOptions = {
+  -- Default values, DO NOT edit these, use conf.lua
   shouldCrashOnWarnings = false
 }
+
+dofile('conf.lua')
 
 local function moduleNameToPath(name)
   name = string.gsub(name, '%.', '/')

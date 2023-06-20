@@ -1,3 +1,7 @@
+if GlobalOptions then
+  GlobalOptions.shouldCrashOnWarnings = true
+end
+
 function love.conf(t)
   t.window.title = 'Kobold Princess Simulator'
   t.window.resizable = true
