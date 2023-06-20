@@ -1,5 +1,5 @@
 ---@generic T
----@param fun fun(): T
+---@param fun fun(...): T
 ---@param cb fun(value: T, resume: fun(...)): nil
 local function exhaust(fun, cb, ...)
   local thread = coroutine.create(fun)
