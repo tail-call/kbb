@@ -4,6 +4,15 @@
 local TypeCase = require 'core.flow'.TypeCase
 local ETypeCase = require 'core.flow'.ETypeCase
 
+---`coroutine.yield`s a formatted string
+---@param formatString string
+---@param ... any
+local function emit(formatString, ...)
+  coroutine.yield(
+    string.format(formatString, ...)
+  )
+end
+
 ---Dumps an object to Lua code
 ---@param object any
 ---@return string
@@ -12,11 +21,11 @@ local function dump(object)
   local lastReference = 0
 
   local function withRecord(obj, cb)
-    coroutine.yield(('O[%d] = '):format(lastReference + 1))
+    emit('O[%d] = ', lastReference + 1)
     cb()
     lastReference = lastReference + 1
     references[obj] = lastReference
-    coroutine.yield('\n')
+    emit('\n')
   end
 
   local function isPrimitive(obj)
@@ -54,7 +63,7 @@ local function dump(object)
   local function process(obj)
     if references[obj] then
       withRecord(obj, function ()
-        coroutine.yield(('O[%d]'):format(references[obj]))
+        emit('O[%d]', references[obj])
       end)
     else ETypeCase(obj) {
       'table', function ()
@@ -62,7 +71,7 @@ local function dump(object)
         local customDump = metatable and metatable.dump or nil
         if customDump then
           withRecord(obj, function ()
-            customDump(coroutine.yield)
+            customDump(emit)
           end)
         else
           -- First dump all dependencies
@@ -74,33 +83,33 @@ local function dump(object)
 
           withRecord(obj, function ()
             if obj.__module then
-              coroutine.yield(obj.__module)
+              emit(obj.__module)
             end
 
-            coroutine.yield('{')
+            emit('{')
             for k, v in pairs(obj) do
-              TypeCase(k) {
+              ETypeCase(k) {
                 'number', function ()
-                  coroutine.yield('['..k..']')
+                  emit('['..k..']')
                 end,
                 'table', function ()
                   error('tables as keys are not supported')
                 end,
                 nil, function ()
-                  coroutine.yield(k)
+                  emit(k)
                 end,
               }
 
-              coroutine.yield('=')
+              emit('=')
               if isPrimitive(v) then
-                coroutine.yield(dumpPrimitive(v))
+                emit(dumpPrimitive(v))
               else
-                coroutine.yield(('O[%d]'):format(references[v]))
+                emit('O[%d]', references[v])
               end
-              coroutine.yield(',')
+              emit(',')
             end
 
-            coroutine.yield('}')
+            emit('}')
           end)
         end
       end,
@@ -108,13 +117,13 @@ local function dump(object)
         withRecord(obj, function ()
           if obj:type() == 'Quad' then
             ---@cast obj love.Quad
-            coroutine.yield('quad(')
+            emit('quad(')
             local x, y, w, h = obj:getViewport()
             local sw, sh = obj:getTextureDimensions()
-            coroutine.yield(('%s,%s,%s,%s,%s,%s'):format(x, y, w, h, sw, sh))
-            coroutine.yield(')')
+            emit('%s,%s,%s,%s,%s,%s', x, y, w, h, sw, sh)
+            emit(')')
           else
-            coroutine.yield(obj:type())
+            emit(obj:type())
           end
         end)
       end
