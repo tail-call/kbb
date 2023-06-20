@@ -30,7 +30,7 @@
 local Vector = require 'core.Vector'
 local abilities = require 'Ability'.abilities
 
-local Guy = require 'core.class'.define {
+local Guy = Class {
   ...,
   ---@type Guy
   index = {

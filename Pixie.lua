@@ -18,7 +18,7 @@
 ---@field update fun(self: Pixie, dt: number): nil
 ---@field setIsFloating fun(self: Pixie, value: boolean): nil
 
-local Pixie = require 'core.class'.define {
+local Pixie = Class {
   ...,
   ---@type Pixie
   index = {

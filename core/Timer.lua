@@ -12,7 +12,7 @@
 local timers = require 'core.table'.weaken({}, 'k')
 
 ---@type core.class
-local Timer = require 'core.class'.define {
+local Timer = Class {
   ...,
   ---@type core.Timer
   index = {

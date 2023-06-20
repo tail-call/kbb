@@ -5,7 +5,7 @@
 ---@field lifetime number Seconds before message is faded out
 ---@field fadeOut fun(self: ConsoleMessage, dt: number) Applies fade out to the message
 
-local ConsoleMessage = require 'core.class'.define {
+local ConsoleMessage = Class {
   ...,
   ---@type ConsoleMessage
   index = {

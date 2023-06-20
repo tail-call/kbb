@@ -9,7 +9,7 @@
 ---@field echo fun(self: terminal.Screen, text: string)
 ---@field setShouldScroll fun(self: terminal.Screen, value: boolean)
 
-local M = require 'core.class'.define {
+local M = Class {
   ...,
   ---@type terminal.Screen
   index = {

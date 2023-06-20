@@ -8,7 +8,7 @@
 ---@field water integer Amount of water owned
 ---@field add fun(self: Resources, delta: Resources) Get more resources
 
-local Resources = require 'core.class'.define {
+local Resources = Class {
   ...,
   index = {
     add = function (self, delta)

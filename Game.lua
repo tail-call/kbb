@@ -62,7 +62,7 @@ local TILE_SPEEDS = {
 
 local BUILDING_COST = 5
 
-local Game = require 'core.class'.define {
+local Game = Class {
   ...,
   requiredProperties = {
     'world',

@@ -9,7 +9,7 @@
 ---@field setMaxHp fun(self: GuyStats, maxHp: number) Sets maximum health points and fully heals
 ---@field addMoves fun(self: GuyStats, amount: number) Adds moves
 
-local GuyStats = require 'core.class'.define {
+local GuyStats = Class {
   ...,
   ---@type GuyStats
   index = {

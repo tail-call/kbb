@@ -5,6 +5,8 @@ GlobalOptions = {
 
 dofile('conf.lua')
 
+Class = require 'core.class'.define
+
 local function moduleNameToPath(name)
   name = string.gsub(name, '%.', '/')
   name = string.gsub(name, '$', '.lua')

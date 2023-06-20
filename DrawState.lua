@@ -22,7 +22,7 @@ local SCREEN_HEIGHT = 200
 
 local CAMERA_LERP_SPEED = 10
 
-local DrawState = require 'core.class'.define {
+local DrawState = Class {
   ...,
   ---@type DrawState
   index = {

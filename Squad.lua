@@ -7,7 +7,7 @@
 ---@field startFollowing fun(self: Squad) Squad will begin following the player
 ---@field toggleFollow fun(self: Squad) Toggle follow mode for squad
 
-local M = require 'core.class'.define {
+local M = Class {
   ...,
   ---@type Squad
   index = {

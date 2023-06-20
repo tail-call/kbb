@@ -1,5 +1,5 @@
 if GlobalOptions then
-  GlobalOptions.shouldCrashOnWarnings = true
+  GlobalOptions.shouldCrashOnWarnings = false
 end
 
 function love.conf(t)

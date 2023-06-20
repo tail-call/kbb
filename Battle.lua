@@ -10,7 +10,7 @@
 
 local BATTLE_ROUND_DURATION = 0.5
 
-local M = require 'core.class'.define{..., metatable = {
+local M = Class{..., metatable = {
   ---@type Battle
   __index = {
     advanceTimer = function (self, dt)

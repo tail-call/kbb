@@ -4,7 +4,7 @@
 ---@field messages ConsoleMessage[] List of displayed messages
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
 
-local Console = require 'core.class'.define {
+local Console = Class {
   ..., 
   ---@type Console
   index = {

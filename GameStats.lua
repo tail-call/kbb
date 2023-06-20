@@ -8,7 +8,7 @@
 ---@field addScore fun(self: GameStats, count: integer) Increases score count
 ---@field addDeaths fun(self: GameStats, count: integer) Adds a death to a game
 
-local GameStats = require 'core.class'.define {
+local GameStats = Class {
   ...,
   ---@type GameStats
   index = {

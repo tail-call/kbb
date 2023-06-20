@@ -7,7 +7,7 @@ local DOWN = { x =  0, y =  1 }
 local LEFT = { x = -1, y =  0 }
 local RIGHT = { x =  1, y =  0 }
 
-local Vector = require 'core.class'.define {
+local Vector = Class {
   ...,
   ---@type core.Vector
   index = {},

@@ -7,7 +7,7 @@
 ---@field reset fun(self: RecruitCircle) -- Activates recruit circle
 ---@field clear fun(self: RecruitCircle) -- Deactivates recruit circle
 
-local M = require 'core.class'.define {
+local M = Class {
   ...,
   ---@type RecruitCircle
   index = {

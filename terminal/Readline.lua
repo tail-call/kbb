@@ -7,7 +7,7 @@
 ---@field rubBack fun(self: terminal.Readline)
 ---@field rubForward fun(self: terminal.Readline)
 
-local M = require 'core.class'.define{..., metatable = {
+local M = Class{..., metatable = {
   ---@type terminal.Readline
   __index = {
     clear = function (self)
