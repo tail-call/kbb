@@ -10,6 +10,11 @@
 ---@return T
 local function define(opts)
   local metatable = nil
+  local version = opts.version or 0
+  local name = opts[1]
+  local requiredProperties = opts.requiredProperties or {}
+  local class
+
   if opts.metatable then
     require 'core.warning'.deprecated {
       'core.class', 'define', 'opts', 'metatable'
@@ -21,20 +26,17 @@ local function define(opts)
       'core.class', 'define', 'opts', 'version'
     }
   end
-  local version = opts.version or 0
-  local name = opts[1]
   if opts.index then
     metatable = { __index = opts.index }
   end
 
-  local class
   class = {
     __modulename = name,
     ---@generic T
     ---@param bak T
     ---@param strategy fun(moduleName: string, bak: T)
     init = function (bak, strategy)
-      return bak
+
     end,
     type = function ()
       return metatable
@@ -46,20 +48,25 @@ local function define(opts)
       return bak
     end,
     ---@generic T
-    ---@param bak T
+    ---@param backup T
     ---@return T
-    new = function (bak)
-      local obj = class.migrate(bak or {})
-      if obj == nil then
+    new = function (backup)
+      local object = class.migrate(backup or {})
+      if object == nil then
         error('migrate must return a value')
       end
-      obj.__module = name
-      obj.__version = version
-      setmetatable(obj, metatable)
-      class.init(obj, function (moduleName, dep)
+      for _, property in ipairs(requiredProperties) do
+        if object[property] == nil then
+          error(property .. ' is required', 6)
+        end
+      end
+      object.__module = name
+      object.__version = version
+      setmetatable(object, metatable)
+      class.init(object, function (moduleName, dep)
         return require(moduleName).new(dep)
       end)
-      return obj
+      return object
     end,
     reload = function (obj)
       setmetatable(obj, metatable)
@@ -70,6 +77,7 @@ local function define(opts)
       return obj
     end,
   }
+
   return class
 end
 

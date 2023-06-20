@@ -1,3 +1,7 @@
+GlobalOptions = {
+  shouldCrashOnWarnings = true
+}
+
 local function moduleNameToPath(name)
   name = string.gsub(name, '%.', '/')
   name = string.gsub(name, '$', '.lua')

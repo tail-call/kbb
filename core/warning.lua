@@ -1,9 +1,14 @@
 return {
   deprecated = function (path)
     local message = string.format(
-      'WARNING: %s is deprecated',
+      '%s is deprecated',
       table.concat(path, ': ')
     )
-    print(debug.traceback(message, 3))
+    local level = 3
+    if GlobalOptions.shouldCrashOnWarnings then
+      error(message, level)
+    else
+      print(debug.traceback('WARNING: ' .. message, level))
+    end
   end,
 }

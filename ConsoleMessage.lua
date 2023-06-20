@@ -12,13 +12,7 @@ local ConsoleMessage = require 'core.class'.define {
       self.lifetime = math.max(self.lifetime - dt, 0)
     end,
   },
+  requiredProperties = { 'text', 'lifetime' },
 }
-
----@param message ConsoleMessage
-function ConsoleMessage.init(message)
-  require 'core.Dep' (message, function (want)
-    return { want.text, want.lifetime }
-  end)
-end
 
 return ConsoleMessage
