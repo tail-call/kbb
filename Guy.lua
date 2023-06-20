@@ -33,7 +33,7 @@ local abilities = require 'Ability'.abilities
 local addMoves = require 'GuyStats'.mut.addMoves
 local setMaxHp = require 'GuyStats'.mut.setMaxHp
 
-local Guy = require 'core.Module'.define {
+local Guy = require 'core.class'.define {
   ...,
   ---@type Guy
   index = {

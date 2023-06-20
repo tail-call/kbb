@@ -29,7 +29,7 @@ local function vectorToLinearIndex(world, v)
   return (v.y - 1) * world.width + v.x
 end
 
-local M = require 'core.Module'.define{..., metatable = {
+local M = require 'core.class'.define{..., metatable = {
   ---@type World
   __index = {
     revealFogOfWar = function (self, pos, value, dt)

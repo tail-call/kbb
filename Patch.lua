@@ -4,7 +4,7 @@
 ---@field world World Containing world
 ---@field coords core.Vector Coordinates
 
-local M = require('core.Module').define{...}
+local M = require('core.class').define{...}
 
 ---@param patch Patch
 function M.init(patch)

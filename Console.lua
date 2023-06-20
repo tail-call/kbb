@@ -4,9 +4,10 @@
 ---@field messages ConsoleMessage[] List of displayed messages
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
 
-local M = require('core.Module').define{..., metatable = {
+local Console = require 'core.class'.define{
+  ..., 
   ---@type Console
-  __index = {
+  index = {
     say = function (self, message)
       io.stdout:write(('\tEcho: %s\n'):format(message.text))
       table.insert(self.messages, message)
@@ -15,19 +16,19 @@ local M = require('core.Module').define{..., metatable = {
       end
     end
   }
-}}
+}
 
 ---@param console Console
-function M.init(console)
+function Console.init(console)
   console.messages = console.messages or {}
 end
 
 ---@param console Console
 ---@param dt number
-function M.updateConsole(console, dt)
+function Console.updateConsole(console, dt)
   for _, message in ipairs(console.messages) do
     message:fadeOut(dt)
   end
 end
 
-return M
+return Console

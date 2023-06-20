@@ -63,7 +63,7 @@ local TILE_SPEEDS = {
 
 local BUILDING_COST = 5
 
-local M = require 'core.Module'.define{..., metatable = {
+local M = require 'core.class'.define{..., metatable = {
   ---@type Game
   __index = {
     addPlayer = function (self, guy)

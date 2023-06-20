@@ -8,7 +8,7 @@
 ---@field addScore fun(self: GameStats, count: integer) Increases score count
 ---@field addDeaths fun(self: GameStats, count: integer) Adds a death to a game
 
-local M = require 'core.Module'.define{..., metatable = {
+local M = require 'core.class'.define{..., metatable = {
   ---@type GameStats
   __index = {
     addScore = function(self, count)

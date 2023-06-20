@@ -8,7 +8,7 @@
 ---@field water integer Amount of water owned
 ---@field add fun(self: Resources, delta: Resources) Get more resources
 
-local M = require 'core.Module'.define{..., metatable = {
+local M = require 'core.class'.define{..., metatable = {
   __index = {
     add = function (self, delta)
       self.pretzels = self.pretzels + (delta.pretzels or 0)

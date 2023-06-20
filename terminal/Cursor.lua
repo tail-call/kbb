@@ -8,7 +8,7 @@
 ---@field advance fun(self: terminal.Cursor, onOverflow: fun())
 ---@field retreat fun(self: terminal.Cursor)
 
-local M = require 'core.Module'.define{..., metatable = {
+local M = require 'core.class'.define{..., metatable = {
   __index = {
     locate = function (self, newPos)
       self.pos = newPos

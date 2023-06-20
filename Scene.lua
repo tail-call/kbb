@@ -1,11 +1,11 @@
----@class Scene: core.Module
+---@class Scene: core.class
 ---@field load fun(...) Initializes the scene
 ---@field draw fun() Draws the scene on the screen
 ---@field update fun(dt: number) Updates the scene state
 ---@field keypressed fun(key: love.KeyConstant, scancode: love.Scancode, isRepeat: boolean) Handles key press
 ---@field mousemoved fun(x: number, y: number, dx: number, dy: number, isTouch: boolean) Handles mouse movement
 
-local M = require 'core.Module'.define{...}
+local M = require 'core.class'.define{...}
 
 local drawState = require 'DrawState'.new()
 local rescuedCallbacks = {}

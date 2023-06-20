@@ -11,7 +11,7 @@
 ---@field setMaxHp fun(self: GuyStats, maxHp: number) Sets maximum health points and fully heals
 ---@field addMoves fun(self: GuyStats, amount: number) Adds moves
 
-local M = require 'core.Module'.define{...}
+local M = require 'core.class'.define{...}
 
 ---@type GuyStatsMutator
 M.mut = require 'core.Mutator'.new {

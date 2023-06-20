@@ -22,7 +22,7 @@ local SCREEN_HEIGHT = 200
 
 local CAMERA_LERP_SPEED = 10
 
-local M = require 'core.Module'.define{..., version = 0, metatable = {
+local M = require 'core.class'.define{..., version = 0, metatable = {
   ---@type DrawState
   __index = {
     setWindowScale = function (self, windowScale)

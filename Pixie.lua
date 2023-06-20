@@ -18,7 +18,7 @@
 ---@field update fun(self: Pixie, dt: number): nil
 ---@field setIsFloating fun(self: Pixie, value: boolean): nil
 
-local M = require('core.Module').define{..., metatable = {
+local M = require('core.class').define{..., metatable = {
   ---@type Pixie
   __index = {
     playSpawnAnimation = function (self, pos)

@@ -16,7 +16,7 @@ local function new(opts)
     package = package,
     o = opts.root,
     reload = function(moduleName)
-      require 'core.Module'.reload(moduleName)
+      require 'core.class'.reload(moduleName)
     end,
     scribe = function(text)
       opts.scribe(text)

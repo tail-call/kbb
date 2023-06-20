@@ -6,7 +6,7 @@
 ---@field addListener fun(self: Mutator, table: table, listener: MutatorListener)
 ---@field removeListener fun(self: Mutator, table: table, listener: MutatorListener)
 
-local M = require 'core.Module'.define{..., metatable = {
+local M = require 'core.class'.define{..., metatable = {
   ---@type Mutator
   __index = {
     addListener = function (self, aTable, listener)

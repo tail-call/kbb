@@ -11,8 +11,8 @@
 ---@type { [core.Timer]: true }
 local timers = require 'core.table'.weaken({}, 'k')
 
----@type core.Module
-local M = require 'core.Module'.define{..., version = 0, metatable = {
+---@type core.class
+local M = require 'core.class'.define{..., version = 0, metatable = {
   ---@type core.Timer
   __index = {
     update = function (self, dt)

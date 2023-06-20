@@ -7,7 +7,7 @@ local DOWN = { x =  0, y =  1 }
 local LEFT = { x = -1, y =  0 }
 local RIGHT = { x =  1, y =  0 }
 
-local M = require 'core.Module'.define{..., metatable = {
+local M = require 'core.class'.define{..., metatable = {
   ---@type core.Vector
   __index = {}
 }}
