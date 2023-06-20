@@ -7,13 +7,13 @@
 
 local ConsoleMessage = Class {
   ...,
+  slots = { '!text', '!lifetime' },
   ---@type ConsoleMessage
   index = {
     fadeOut = function (self, dt)
       self.lifetime = math.max(self.lifetime - dt, 0)
     end,
   },
-  requiredProperties = { 'text', 'lifetime' },
 }
 
 return ConsoleMessage

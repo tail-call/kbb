@@ -1,5 +1,5 @@
 local function dep(obj, cb)
-  require 'core.warning'.deprecated {
+  require 'core.log'.deprecated {
     'core.Dep', 'dep'
   }
   local impostor = {}

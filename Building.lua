@@ -2,19 +2,14 @@
 ---@class Building: Object2D
 ---@field __module "Building"
 
-local M = require('core.class').define{...}
+local Building = Class {
+  ...,
+  slots = { '!pos' },
+}
 
----@param building Building
-function M.init(building)
-  require 'core.Dep' (building, function (want)
-    return { want.pos }
-  end)
-end
-
----@param building Building
 ---@return string
-function M.tooltipText(building)
+function Building.tooltipText()
   return 'It\'s a house'
 end
 
-return M
+return Building

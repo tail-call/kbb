@@ -5,33 +5,73 @@
 ---@field deinit fun(bak: table)  Deinitializes an object
 ---@field reload fun(bak: table) Reloads an object from its originating module
 
+---@class core.class.options
+---@field metatable nil Deprecated
+---@field version nil Deprecated
+---@field slots string[] Names of properties required for object initialization
+---@field index table Table to be set as value of object's metatable's `__index` key
+
+---@class core.class.slot
+---@field name string Slot name
+---@field isRequired string Does slot have to be initialized?
+
+---@param slotString string String passed to `slots` parameter in `defineClass`, like `'normal'` or `'!required'`
+---@return core.class.slot
+local function slotStringToSlot(slotString)
+  if slotString:sub(1, 1) == '!' then
+    return {
+      name = slotString:sub(2),
+      isRequired = true
+    }
+  else
+    return {
+      name = slotString,
+      isRequired = false
+    }
+  end
+end
+
 ---@generic T
----@param opts table
+---@param opts core.class.options
 ---@return T
-local function define(opts)
+local function defineClass(opts)
   local metatable = nil
-  local version = opts.version or 0
   local name = opts[1] or error('name is required')
-  local requiredProperties = opts.requiredProperties or {}
+  local slots = {}
   local class
 
+  local function findSlot(slotName)
+    for _, slot in ipairs(slots) do
+      if slot.name == slotName then
+        return slot
+      end
+    end
+    return nil
+  end
+
   if opts.metatable then
-    require 'core.warning'.deprecated {
+    require 'core.log'.deprecated {
       'core.class', 'define', 'opts', 'metatable'
     }
     metatable = opts.metatable or nil
   end
   if opts.version then
-    require 'core.warning'.deprecated {
+    require 'core.log'.deprecated {
       'core.class', 'define', 'opts', 'version'
     }
   end
+
+  for _, slot in ipairs(opts.slots or {}) do
+    table.insert(slots, slotStringToSlot(slot))
+  end
+
   if opts.index then
     metatable = { __index = opts.index }
   end
 
   class = {
     __modulename = name,
+    slots = slots,
     ---@generic T
     ---@param bak T
     ---@param strategy fun(moduleName: string, bak: T)
@@ -55,13 +95,12 @@ local function define(opts)
       if object == nil then
         error('migrate must return a value')
       end
-      for _, property in ipairs(requiredProperties) do
-        if object[property] == nil then
-          error(property .. ' is required', 6)
+      for _, slot in ipairs(slots) do
+        if slot.isRequired and not object[slot.name] then
+          error(slot.name .. ' is required', 6)
         end
       end
       object.__module = name
-      object.__version = version
       setmetatable(object, metatable)
       class.init(object, function (moduleName, dep)
         return require(moduleName).new(dep)
@@ -87,6 +126,6 @@ local function reload(name)
 end
 
 return {
-  define = define,
+  defineClass = defineClass,
   reload = reload,
 }

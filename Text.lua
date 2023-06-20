@@ -3,7 +3,7 @@
 ---@field text string Text content
 ---@field maxWidth number Maximum width of displayed text
 
-local M = require('core.class').define{...}
+local M = require('core.class').defineClass{...}
 
 ---@param bak Text
 function M.init(bak)

@@ -64,11 +64,11 @@ local BUILDING_COST = 5
 
 local Game = Class {
   ...,
-  requiredProperties = {
-    'world',
-    'squad',
-    'recruitCircle',
-    'resources',
+  slots = {
+    '!world',
+    '!squad',
+    '!recruitCircle',
+    '!resources',
   },
   index = {
     addPlayer = function (self, guy)
@@ -248,7 +248,7 @@ function Game.init(game)
       end
     end
 
-    require 'core.warning'.warn 'you don\'t listen for player death'
+    require 'core.log'.warn 'you don\'t listen for player death'
   end
 
   if game.player == nil then
