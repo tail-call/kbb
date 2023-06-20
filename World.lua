@@ -29,9 +29,10 @@ local function vectorToLinearIndex(world, v)
   return (v.y - 1) * world.width + v.x
 end
 
-local M = require 'core.class'.define{..., metatable = {
+local M = require 'core.class'.define {
+  ...,
   ---@type World
-  __index = {
+  index = {
     revealFogOfWar = function (self, pos, value, dt)
       local idx = vectorToLinearIndex(self, pos)
       local oldValue = self.fogOfWar[idx] or 0
@@ -49,7 +50,7 @@ local M = require 'core.class'.define{..., metatable = {
       self.tileTypes[id] = t
     end,
   }
-}}
+}
 
 local calcVisionDistance = require 'VisionSource'.calcVisionDistance
 local isVisible = require 'VisionSource'.isVisible

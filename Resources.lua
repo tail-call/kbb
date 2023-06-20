@@ -8,8 +8,9 @@
 ---@field water integer Amount of water owned
 ---@field add fun(self: Resources, delta: Resources) Get more resources
 
-local M = require 'core.class'.define{..., metatable = {
-  __index = {
+local Resources = require 'core.class'.define {
+  ...,
+  index = {
     add = function (self, delta)
       self.pretzels = self.pretzels + (delta.pretzels or 0)
       self.wood = self.wood + (delta.wood or 0)
@@ -17,11 +18,11 @@ local M = require 'core.class'.define{..., metatable = {
       self.stone = self.stone + (delta.stone or 0)
       self.water = self.water + (delta.water or 0)
     end
-  }
-}}
+  },
+}
 
 ---@param res Resources
-function M.init(res)
+function Resources.init(res)
   res.pretzels = res.pretzels or 0
   res.wood = res.wood or 0
   res.stone = res.stone or 0
@@ -29,4 +30,4 @@ function M.init(res)
   res.water = res.water or 0
 end
 
-return M
+return Resources

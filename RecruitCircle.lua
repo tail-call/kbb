@@ -7,9 +7,10 @@
 ---@field reset fun(self: RecruitCircle) -- Activates recruit circle
 ---@field clear fun(self: RecruitCircle) -- Deactivates recruit circle
 
-local M = require 'core.class'.define{..., metatable = {
+local M = require 'core.class'.define {
+  ...,
   ---@type RecruitCircle
-  __index = {
+  index = {
     reset = function(self)
       self.radius = 0
     end,
@@ -23,7 +24,7 @@ local M = require 'core.class'.define{..., metatable = {
       )
     end,
   }
-}}
+}
 
 local RECRUIT_CIRCLE_MAX_RADIUS = 6
 local RECRUIT_CIRCLE_GROWTH_SPEED = 6

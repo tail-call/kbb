@@ -7,9 +7,10 @@
 ---@field startFollowing fun(self: Squad) Squad will begin following the player
 ---@field toggleFollow fun(self: Squad) Toggle follow mode for squad
 
-local M = require('core.class').define{..., metatable = {
+local M = require 'core.class'.define {
+  ...,
   ---@type Squad
-  __index = {
+  index = {
     removeFromSquad = function(self, guy)
       self.followers[guy] = nil
     end,
@@ -23,7 +24,7 @@ local M = require('core.class').define{..., metatable = {
       self.shouldFollow = not self.shouldFollow
     end,
   }
-}}
+}
 
 ---@param squad Squad
 function M.init(squad)

@@ -62,9 +62,15 @@ local TILE_SPEEDS = {
 
 local BUILDING_COST = 5
 
-local M = require 'core.class'.define{..., metatable = {
-  ---@type Game
-  __index = {
+local Game = require 'core.class'.define {
+  ...,
+  requiredProperties = {
+    'world',
+    'squad',
+    'recruitCircle',
+    'resources',
+  },
+  index = {
     addPlayer = function (self, guy)
       if self.player ~= nil then
         self:removeEntity(self.player)
@@ -138,7 +144,7 @@ local M = require 'core.class'.define{..., metatable = {
       })
     end,
   }
-}}
+}
 
 ---@type Guy.collision
 local NONE_COLLISION = { type = 'none' }
@@ -192,20 +198,12 @@ end
 ---@param game Game
 ---@param object Object2D
 ---@return boolean
-function M.isFrozen(game, object)
+function Game.isFrozen(game, object)
   return game.frozenEntities[object] or false
 end
 
 ---@param game Game
-function M.init(game)
-  require 'core.Dep' (game, function (want)
-    return {
-      want.world,
-      want.squad,
-      want.recruitCircle,
-      want.resources
-    }
-  end)
+function Game.init(game)
   game.console = game.console or require 'Console'.new()
   game.stats = game.stats or require 'GameStats'.new()
   game.frozenEntities = require 'core.table'.weaken(game.frozenEntities or {}, 'k')
@@ -270,7 +268,7 @@ end
 ---@param game Game
 ---@param entity Object2D
 ---@return boolean
-function M.mayRecruit(game, entity)
+function Game.mayRecruit(game, entity)
   if not entity.__module == 'Guy' then return false end
   ---@cast entity Guy
   if not isRecruitCircleActive(game.recruitCircle) then return false end
@@ -290,15 +288,15 @@ local function dismissSquad(game)
 end
 
 ---@param game Game
-function M.beginRecruiting(game)
+function Game.beginRecruiting(game)
   if game.mode ~= 'normal' then return end
   game.recruitCircle:reset()
 end
 
 ---@param game Game
-function M.endRecruiting(game)
+function Game.endRecruiting(game)
   for _, entity in ipairs(game.entities) do
-    if M.mayRecruit(game, entity) then
+    if Game.mayRecruit(game, entity) then
       if entity.__module == 'Guy' then
         ---@cast entity Guy
         game.squad:addToSquad(entity)
@@ -321,7 +319,7 @@ end
 ---@param game Game
 local function orderGather(game)
   for entity in pairs(game.squad.followers) do
-    if not M.isFrozen(game, entity) then
+    if not Game.isFrozen(game, entity) then
       local destination = { x = 0, y = 0 }
       local guyDist = Vector.dist(entity.pos, game.player.pos)
       for _, direction in ipairs{
@@ -360,7 +358,7 @@ end
 ---@param dt number Time since last update
 ---@param visibility number How far we should see in tiles
 ---@param movementDirections core.Vector[] Momentarily pressed movement directions
-function M.updateGame(game, dt, movementDirections, visibility)
+function Game.updateGame(game, dt, movementDirections, visibility)
   local visionSources = {{
     pos = game.player.pos,
     sight = 10
@@ -426,7 +424,7 @@ function M.updateGame(game, dt, movementDirections, visibility)
     if entity.__module == 'Guy' then
         ---@cast entity Guy
       entity:update(dt * speedFactor(entity, getTile(game.world, entity.pos)))
-      if not M.isFrozen(game, entity) then
+      if not Game.isFrozen(game, entity) then
         behave(entity, game.guyDelegate)
       end
     end
@@ -438,7 +436,7 @@ end
 local function maybeCollect(game, guy)
   local Guy = require 'Guy'
 
-  if M.isFrozen(game, guy) then return end
+  if Game.isFrozen(game, guy) then return end
 
   local pos = guy.pos
   local patch = require 'World'.patchAt(game.world, pos)
@@ -469,7 +467,7 @@ local function maybeCollect(game, guy)
 end
 
 ---@param game Game
-function M.orderCollect(game)
+function Game.orderCollect(game)
   maybeCollect(game, game.player)
   for guy in pairs(game.squad.followers) do
     maybeCollect(game, guy)
@@ -477,7 +475,7 @@ function M.orderCollect(game)
 end
 
 ---@param game Game
-function M.orderBuild(game)
+function Game.orderBuild(game)
   local pos = game.cursorPos
 
   -- Check if no other entities
@@ -501,7 +499,7 @@ function M.orderBuild(game)
 end
 
 ---@param game Game
-function M.orderSummon(game)
+function Game.orderSummon(game)
   game.resources:add { pretzels = -1 }
   game.player.stats:addMoves(-MOVE_COSTS_TABLE.summon)
   local guy = require 'Guy'.makeGoodGuy(game.cursorPos)
@@ -511,16 +509,16 @@ function M.orderSummon(game)
 end
 
 ---@param game Game
-function M.orderPaint(game)
+function Game.orderPaint(game)
   game.world:setTile(game.cursorPos, 'grass')
 end
 
 ---@param game Game
-function M.orderDismiss(game)
+function Game.orderDismiss(game)
   if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
     game.player.stats:addMoves(-MOVE_COSTS_TABLE.dismissSquad)
     dismissSquad(game)
   end
 end
 
-return M
+return Game
