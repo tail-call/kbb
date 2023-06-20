@@ -39,7 +39,6 @@ local isRecruitCircleActive = require 'RecruitCircle'.isRecruitCircleActive
 local isAFollower = require 'Squad'.isAFollower
 local revealVisionSourceFog = require 'World'.revealVisionSourceFog
 local behave = require 'Guy'.behave
-local addMoves = require 'GuyStats'.mut.addMoves
 
 ---@type core.Vector
 local LEADER_SPAWN_LOCATION = { x = 250, y = 250 }
@@ -167,7 +166,7 @@ local function makeGuyDelegate(game)
       if guy.team ~= 'good' then
         return 'shouldNotMove'
       end
-      require 'GuyStats'.mut.setMaxHp(guy.stats, guy.stats.maxHp + 1)
+      guy.stats:setMaxHp(guy.stats.maxHp + 1)
       game:removeEntity(building)
       return 'shouldMove'
     end,
@@ -242,20 +241,16 @@ function M.init(game)
 
   -- Subscribe to player stats
   do
-    local function listenPlayerDeath()
-      require 'GuyStats'.mut:addListener(
-        game.player.stats,
-        function (playerStats, key, value, oldValue)
-          if key == 'hp' and value <= 0 then
-            game.stats:addDeaths(1)
-            game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
-            game.stats:addScore(SCORES_TABLE.dead)
-            listenPlayerDeath()
-          end
-        end
-      )
+    local function something(playerStats, key, value, oldValue)
+      if key == 'hp' and value <= 0 then
+        game.stats:addDeaths(1)
+        game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
+        game.stats:addScore(SCORES_TABLE.dead)
+        _G['listenPlayerDeath']()
+      end
     end
-    listenPlayerDeath()
+
+    require 'core.warning'.warn 'you don\'t listen for player death'
   end
 
   if game.player == nil then
@@ -466,7 +461,7 @@ local function maybeCollect(game, guy)
   elseif tile == 'grass' then
     game.resources:add { grass = 1 }
     game.world:setTile(pos, 'sand')
-    require 'GuyStats'.mut.heal(guy.stats, 1)
+    guy.stats:heal(1)
   elseif tile == 'water' then
     game.resources:add { water = 1 }
     game.world:setTile(pos, 'sand')
@@ -500,7 +495,7 @@ function M.orderBuild(game)
 
   -- Build
   game.resources:add { wood = -BUILDING_COST }
-  addMoves(game.player.stats, -MOVE_COSTS_TABLE.build)
+  game.player.stats:addMoves(-MOVE_COSTS_TABLE.build)
   game:addEntity(require 'Building'.new { pos = pos })
   game.stats:addScore(SCORES_TABLE.builtAHouse)
 end
@@ -508,7 +503,7 @@ end
 ---@param game Game
 function M.orderSummon(game)
   game.resources:add { pretzels = -1 }
-  addMoves(game.player.stats, -MOVE_COSTS_TABLE.summon)
+  game.player.stats:addMoves(-MOVE_COSTS_TABLE.summon)
   local guy = require 'Guy'.makeGoodGuy(game.cursorPos)
   echo(game, ('%s was summonned.'):format(guy.name))
   game:addEntity(guy)
@@ -523,7 +518,7 @@ end
 ---@param game Game
 function M.orderDismiss(game)
   if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
-    addMoves(game.player.stats, -MOVE_COSTS_TABLE.dismissSquad)
+    game.player.stats:addMoves(-MOVE_COSTS_TABLE.dismissSquad)
     dismissSquad(game)
   end
 end

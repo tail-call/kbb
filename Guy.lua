@@ -30,9 +30,6 @@
 local Vector = require 'core.Vector'
 local abilities = require 'Ability'.abilities
 
-local addMoves = require 'GuyStats'.mut.addMoves
-local setMaxHp = require 'GuyStats'.mut.setMaxHp
-
 local Guy = require 'core.class'.define {
   ...,
   ---@type Guy
@@ -40,7 +37,7 @@ local Guy = require 'core.class'.define {
     move = function (self, pos)
       self.mayMove = false
       self.timer = 0
-      addMoves(self.stats, -2)
+      self.stats:addMoves(-2)
       self.pos = pos
       self.pixie:move(self.pos)
     end,
@@ -56,7 +53,7 @@ local Guy = require 'core.class'.define {
       while self.timer >= self.speed do
         self.mayMove = true
         self.timer = self.timer % self.speed
-        addMoves(self.stats, 1)
+        self.stats:addMoves(1)
       end
     end,
   }
@@ -226,7 +223,7 @@ function Guy.makeStrongEvilGuy(pos)
     pos = pos,
     tileset = tileset,
   }
-  setMaxHp(guy.stats, 50)
+  guy.stats:setMaxHp(50)
   guy.speed = 0.25
   guy.behavior = 'wander'
   guy.team = 'evil'

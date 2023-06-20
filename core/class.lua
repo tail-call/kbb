@@ -11,7 +11,7 @@
 local function define(opts)
   local metatable = nil
   local version = opts.version or 0
-  local name = opts[1]
+  local name = opts[1] or error('name is required')
   local requiredProperties = opts.requiredProperties or {}
   local class
 

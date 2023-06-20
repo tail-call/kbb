@@ -26,8 +26,6 @@ local M = require 'core.class'.define{..., metatable = {
 
 local Ability = require('Ability')
 
-local hurt = require('GuyStats').mut.hurt
-
 ---@param battle Battle
 function M.init(battle)
   require 'core.Dep' (battle, function (want)
@@ -54,7 +52,7 @@ local function fight(game, attacker, defender, damageModifier, say)
   ---@param guy Guy
   ---@param damage number
   local function dealDamage(guy, damage)
-    hurt(guy.stats, damage * damageModifier)
+    guy.stats:hurt(damage * damageModifier)
     say(('%s got %s damage, has %s hp now.'):format(guy.name, damage, guy.stats.hp))
   end
 

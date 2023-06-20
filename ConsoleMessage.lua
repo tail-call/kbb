@@ -6,6 +6,7 @@
 ---@field fadeOut fun(self: ConsoleMessage, dt: number) Applies fade out to the message
 
 local ConsoleMessage = require 'core.class'.define {
+  ...,
   ---@type ConsoleMessage
   index = {
     fadeOut = function (self, dt)

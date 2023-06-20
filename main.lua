@@ -1,5 +1,5 @@
 GlobalOptions = {
-  shouldCrashOnWarnings = true
+  shouldCrashOnWarnings = false
 }
 
 local function moduleNameToPath(name)
