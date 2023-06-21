@@ -1,6 +1,10 @@
-GlobalOptions = {
-  -- Default values, DO NOT edit these, use conf.lua
-  shouldCrashOnWarnings = false
+---Global variables. `main.lua` defines default values, `conf.lua`
+---contains actual configuration.
+Global = {
+  ---If true, warning functions from `core.log` module will crash the program
+  shouldCrashOnWarnings = false,
+  ---Module to be required and used as a starting scene
+  initialScene = '<not a scene>',
 }
 
 dofile('conf.lua')
@@ -51,9 +55,5 @@ function love.load()
   love.graphics.setLineStyle('rough')
   love.mouse.setVisible(false)
   require 'Tileset'.load()
-  if true then
-    require 'scene.menu'.go()
-  else
-    require 'scene.terminal'.go()
-  end
+  require(Global.initialScene).go()
 end

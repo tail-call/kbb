@@ -1,5 +1,11 @@
-if GlobalOptions then
-  GlobalOptions.shouldCrashOnWarnings = false
+-- If `Global` table exists, then `conf.lua` was called for configuration
+if Global then
+  Global.shouldCrashOnWarnings = false
+  if true then
+    Global.initialScene = 'scene.menu'
+  else
+    Global.initialScene = 'scene.terminal'
+  end
 end
 
 function love.conf(t)
