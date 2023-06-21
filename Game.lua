@@ -62,6 +62,22 @@ local TILE_SPEEDS = {
 
 local BUILDING_COST = 5
 
+-- local Game = KClass(function (C)
+--   C.slot { 'world', type = 'required' }
+--   C.slot { 'time',
+--     default = Class.constantly(12 * 60),
+--   }
+--   C.slot { 'stats',
+--     -- Works like 'default' if provided
+--     class = require 'GameStats',
+--   }
+--   C.index {
+--     doStuff = function (self)
+--       print('do stuff')
+--     end,
+--   }
+-- end)
+
 local Game = Class {
   ...,
   slots = {
@@ -145,6 +161,8 @@ local Game = Class {
     end,
   }
 }
+
+require 'core.debug'.inspect(Game)
 
 ---@type Guy.collision
 local NONE_COLLISION = { type = 'none' }

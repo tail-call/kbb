@@ -5,30 +5,60 @@
 ---@field deinit fun(bak: table)  Deinitializes an object
 ---@field reload fun(bak: table) Reloads an object from its originating module
 
----@class core.class.options
----@field metatable nil Deprecated
----@field version nil Deprecated
----@field slots string[] Names of properties required for object initialization
----@field index table Table to be set as value of object's metatable's `__index` key
+---@alias core.class.slotType 'normal' | 'required'
 
 ---@class core.class.slot
 ---@field name string Slot name
----@field isRequired string Does slot have to be initialized?
+---@field type core.class.slotType Slot type
 
----@param slotString string String passed to `slots` parameter in `defineClass`, like `'normal'` or `'!required'`
+---@alias core.class.slotdef string | { [1]: string, type: core.class.slotType }
+
+---@class core.class.options
+---@field metatable nil Deprecated
+---@field version nil Deprecated
+---@field slots core.class.slotdef[] Names of properties required for object initialization
+---@field index table Table to be set as value of object's metatable's `__index` key
+
+local function asString(value)
+  if type(value) == 'string' then
+    return value
+  end
+
+  error('not a string: ' .. tostring(value))
+end
+
+local function asSlotType(slotType)
+  if slotType == 'normal' or slotType == 'required' then
+    return value
+  end
+
+  error('not a slot type: ' .. slotType)
+end
+
+---@param slotdef core.class.slotdef Slot definition passed to `slots` parameter in `defineClass`
 ---@return core.class.slot
-local function slotStringToSlot(slotString)
-  if slotString:sub(1, 1) == '!' then
+local function slotdefToSlot(slotdef)
+  local t = type(slotdef)
+  if t == 'string' then
+    if slotdef:sub(1, 1) == '!' then
+      return {
+        name = slotdef:sub(2),
+        type = 'required',
+      }
+    else
+      return {
+        name = slotdef,
+        type = 'normal',
+      }
+    end
+  elseif t == 'table' then
+    ---@cast slotdef table
     return {
-      name = slotString:sub(2),
-      isRequired = true
-    }
-  else
-    return {
-      name = slotString,
-      isRequired = false
+      name = asString(slotdef[1]),
+      type = asSlotType(slotdef.type),
     }
   end
+  error('invalid type of slotdef: ' .. t)
 end
 
 ---@generic T
@@ -37,17 +67,9 @@ end
 local function defineClass(opts)
   local metatable = nil
   local name = opts[1] or error('name is required')
+  ---@type core.class.slot[]
   local slots = {}
   local class
-
-  local function findSlot(slotName)
-    for _, slot in ipairs(slots) do
-      if slot.name == slotName then
-        return slot
-      end
-    end
-    return nil
-  end
 
   if opts.metatable then
     require 'core.log'.deprecated {
@@ -62,7 +84,7 @@ local function defineClass(opts)
   end
 
   for _, slot in ipairs(opts.slots or {}) do
-    table.insert(slots, slotStringToSlot(slot))
+    table.insert(slots, slotdefToSlot(slot))
   end
 
   if opts.index then
@@ -96,7 +118,7 @@ local function defineClass(opts)
         error('migrate must return a value')
       end
       for _, slot in ipairs(slots) do
-        if slot.isRequired and not object[slot.name] then
+        if slot.type == 'required' and not object[slot.name] then
           error(slot.name .. ' is required', 6)
         end
       end
