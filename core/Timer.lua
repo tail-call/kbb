@@ -1,5 +1,5 @@
 ---A looping timer
----@class core.Timer
+---@class core.Timer: core.Object
 ---@field __module 'core.Timer'
 ---# Properties
 ---@field speed number Time multiplication factor
@@ -11,7 +11,6 @@
 ---@type { [core.Timer]: true }
 local timers = require 'core.table'.weaken({}, 'k')
 
----@type core.class
 local Timer = Class {
   ...,
   ---@type core.Timer

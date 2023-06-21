@@ -63,7 +63,7 @@ end
 
 ---@generic T
 ---@param opts core.class.options
----@return T
+---@return core.class 
 local function defineClass(opts)
   local metatable = nil
   local name = opts[1] or error('name is required')
