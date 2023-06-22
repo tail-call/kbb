@@ -110,22 +110,32 @@ local Game = Class {
 
         local tile = self.world:getTile(entity.pos)
 
-        -- TODO: make it data driven
-        if entity.team == 'evil' then
-          if tile == 'sand' then
-            self.world:setTile(entity.pos, 'grass')
-          elseif tile == 'grass' then
-            self.world:setTile(entity.pos, 'forest')
-          elseif tile == 'forest' then
-            self.world:setTile(entity.pos, 'water')
-          end
-        elseif entity.team == 'good' then
-          if tile == 'sand' then
-            self.world:setTile(entity.pos, 'rock')
-          else
-            self.world:setTile(entity.pos, 'sand')
-          end
+        local guyRemovedEffects = {
+          evil = {
+            sand = { set = 'grass' },
+            grass = { set = 'forest' },
+            forest = { set = 'water' },
+          },
+          good = {
+            sand = { set = 'rock' },
+            ['*'] = { set = 'sand' },
+          },
+        }
+
+        local function globRef(tbl, glob)
+          return tbl[glob] or tbl['*']
         end
+
+        local teamEffects = globRef(guyRemovedEffects, entity.team)
+        if not teamEffects then return end
+
+        local tileEffects = globRef(teamEffects, tile)
+        if not tileEffects then return end
+
+        local newTile = tileEffects.set
+        if not newTile then return end
+
+        self.world:setTile(entity.pos, newTile)
       end
     end,
     switchMode = function (self)
