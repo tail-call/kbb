@@ -70,6 +70,10 @@ Game is an editable image.
 
 ## Game ideas
 
+ - [ ] You gain *Power* when killing enemies and reaching objective
+ - [ ] You spend *Power* to upgrade your character, upgrade other characters or recruit new characters
+ - [ ] There are many characters in the world and you may *hire* any of them by spending *Power*
+ - [ ] Free moving camera
  - [ ] Turning left or right takes an extra turn
  - [ ] Corruption factor: as you collect resources, it goes up
  - [ ] As corruption factor grows, enemies will spawn

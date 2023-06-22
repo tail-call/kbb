@@ -29,7 +29,6 @@
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 
-local canRecruitGuy = require 'Guy'.canRecruitGuy
 local moveGuy = require 'Guy'.moveGuy
 local getTile = require 'World'.getTile
 local isPassable = require 'World'.isPassable
@@ -62,7 +61,7 @@ local TILE_SPEEDS = {
 
 local BUILDING_COST = 5
 
--- local Game = KClass(function (C)
+-- local Game = Class(function (C)
 --   C.slot { 'world', type = 'required' }
 --   C.slot { 'time',
 --     default = Class.constantly(12 * 60),
@@ -283,12 +282,12 @@ end
 ---@param entity Object2D
 ---@return boolean
 function Game.mayRecruit(game, entity)
-  if not entity.__module == 'Guy' then return false end
+  if entity.__module ~= 'Guy' then return false end
   ---@cast entity Guy
   if not isRecruitCircleActive(game.recruitCircle) then return false end
   if isGuyAPlayer(game, entity) then return false end
   if isAFollower(game.squad, entity) then return false end
-  if not canRecruitGuy(entity) then return false end
+  if entity.team ~= game.player.team then return false end
   return Vector.dist(entity.pos, game.cursorPos) < game.recruitCircle.radius + 0.5
 end
 
@@ -452,31 +451,45 @@ local function maybeCollect(game, guy)
 
   if Game.isFrozen(game, guy) then return end
 
+  local collectEffects = {
+    forest = {
+      give = { wood = 1 },
+      replaceTile = 'grass',
+      spawn = Guy.makeEvilGuy,
+    },
+    rock = {
+      give = { stone = 1 },
+      replaceTile = 'cave',
+      spawn = Guy.makeStrongEvilGuy,
+    },
+    grass = {
+      give = { grass = 1 },
+      replaceTile = 'sand',
+    },
+    water = {
+      give = { water = 1 },
+      replaceTile = 'sand',
+    },
+  }
+
   local pos = guy.pos
   local patch = require 'World'.patchAt(game.world, pos)
   local patchCenterX, patchCenterY = require 'Patch'.patchCenter(patch)
   local tile = getTile(game.world, pos)
-  if tile == 'forest' then
-    game.resources:add { wood = 1 }
-    game.world:setTile(pos, 'grass')
-    game:addEntity(Guy.makeEvilGuy {
-      x = patchCenterX,
-      y = patchCenterY,
-    })
-  elseif tile == 'rock' then
-    game.resources:add { stone = 1 }
-    game.world:setTile(pos, 'cave')
-    game:addEntity(Guy.makeStrongEvilGuy {
-      x = patchCenterX,
-      y = patchCenterY,
-    })
-  elseif tile == 'grass' then
-    game.resources:add { grass = 1 }
-    game.world:setTile(pos, 'sand')
-    guy.stats:heal(1)
-  elseif tile == 'water' then
-    game.resources:add { water = 1 }
-    game.world:setTile(pos, 'sand')
+
+  local effect = collectEffects[tile]
+  if effect and effect.give then
+    if effect.give then
+      game.resources:add(effect.give)
+    end
+
+    if effect.replaceTile then
+      game.world:setTile(pos, effect.replaceTile)
+    end
+
+    if effect.spawn then
+      game:addEntity(effect.spawn { x = patchCenterX, y = patchCenterY })
+    end
   end
 end
 

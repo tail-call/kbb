@@ -232,12 +232,6 @@ function Guy.makeStrongEvilGuy(pos)
 end
 
 ---@param guy Guy
----@return boolean
-function Guy.canRecruitGuy(guy)
-  return guy.team == 'good'
-end
-
----@param guy Guy
 ---@return string
 function Guy.tooltipText(guy)
   return ('%s\n%s/%s'):format(guy.name, guy.stats.hp, guy.stats.maxHp)
