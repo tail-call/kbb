@@ -1,3 +1,41 @@
+---Evaluates a rule from the rulebook
+---@param rule table
+---@param game Game
+---@param entity Object2D
+---@param tile World.tile
+local function evalRule(rule, game, entity, tile)
+  if rule.exec then
+    rule.exec(game, entity, tile)
+  end
+
+  local shouldEval = true
+
+  if rule.ifTeam then
+    -- TODO: cast to Guy when needed
+    shouldEval = rule.ifTeam == entity['team']
+  end
+
+  if rule.ifTile then
+    shouldEval = rule.ifTile == tile
+  end
+
+  if rule.ifPlayer then
+    shouldEval = game.player == entity
+  end
+
+  if shouldEval then
+    if rule.setTile then
+      game.world:setTile(entity.pos, rule.setTile)
+    end
+
+    for _, childRule in ipairs(rule) do
+      evalRule(childRule, game, entity, tile)
+    end
+  elseif rule.default then
+    evalRule(rule.default, game, entity, tile)
+  end
+end
+
 local ruleBook
 
 ruleBook = {
@@ -89,5 +127,6 @@ ruleBook = {
 }
 
 return {
+  evalRule = evalRule,
   ruleBook = ruleBook,
 }

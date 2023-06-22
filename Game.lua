@@ -38,6 +38,7 @@ local isAFollower = require 'Squad'.isAFollower
 local revealVisionSourceFog = require 'World'.revealVisionSourceFog
 local behave = require 'Guy'.behave
 local ruleBook = require 'ruleBook'.ruleBook
+local evalRule = require 'ruleBook'.evalRule
 
 local TILE_SPEEDS = {
   forest = 1/2,
@@ -60,46 +61,6 @@ local TILE_SPEEDS = {
 --   }
 -- end)
 
-
-
-
----Evaluates a rule from the rulebook
----@param rule table
----@param game Game
----@param entity Object2D
----@param tile World.tile
-local function evalRule(rule, game, entity, tile)
-  if rule.exec then
-    rule.exec(game, entity, tile)
-  end
-
-  local shouldEval = true
-
-  if rule.ifTeam then
-    -- TODO: cast to Guy when needed
-    shouldEval = rule.ifTeam == entity['team']
-  end
-
-  if rule.ifTile then
-    shouldEval = rule.ifTile == tile
-  end
-
-  if rule.ifPlayer then
-    shouldEval = game.player == entity
-  end
-
-  if shouldEval then
-    if rule.setTile then
-      game.world:setTile(entity.pos, rule.setTile)
-    end
-
-    for _, childRule in ipairs(rule) do
-      evalRule(childRule, game, entity, tile)
-    end
-  elseif rule.default then
-    evalRule(rule.default, game, entity, tile)
-  end
-end
 
 
 local Game = Class {
@@ -138,8 +99,12 @@ local Game = Class {
         end
 
         if shouldGenerateEvent then
-          local tile = self.world:getTile(entity.pos)
-          evalRule(ruleBook.onGuyRemoved, self, entity, tile)
+          evalRule(
+            ruleBook.onGuyRemoved,
+            self,
+            entity,
+            self.world:getTile(entity.pos)
+          )
         end
       end
     end,
@@ -492,16 +457,17 @@ function Game.orderBuild(game)
     end
   end
 
+  local tile = game.world:getTile(pos)
+
   -- Is building on rock?
-  if game.world:getTile(pos) == 'rock' then
+  if tile == 'rock' then
     game.resources:add { stone = 1 }
     game.world:setTile(pos, 'sand')
   end
 
-  -- TODO: use evalRule
-  local building = require 'Building'.new { pos = pos } 
+  local building = require 'Building'.new { pos = pos }
   game:addEntity(building)
-  ruleBook.onBuild.exec(game)
+  evalRule(ruleBook.onBuild, game, building, tile)
 end
 
 ---@param game Game
@@ -510,8 +476,7 @@ function Game.orderSummon(game)
   game:addEntity(guy)
   game.squad:addToSquad(guy)
   echo(game, ('%s was summonned.'):format(guy.name))
-  -- TODO: use evalRule
-  ruleBook.onSummon.exec(game)
+  evalRule(ruleBook.onSummon, game, guy, game.world:getTile(guy.pos))
 end
 
 ---@param game Game
