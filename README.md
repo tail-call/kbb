@@ -37,6 +37,7 @@ B. Methods are for user-defined code, not for the class system.
 
 ## Quality of life
 
+ - [ ] Console: commented out lines are gray
  - [ ] Compile resources to lua bytecode
  - [ ] Game world is a part of UI layout
  - [ ] Clickable buttons

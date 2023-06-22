@@ -15,6 +15,7 @@ local function new(opts)
     require = require,
     package = package,
     o = opts.root,
+    Global = Global,
     reload = function(moduleName)
       require 'core.class'.reload(moduleName)
     end,
@@ -36,6 +37,7 @@ local function new(opts)
       echo(unpack(items))
     end,
     clear = opts.clear,
+    -- TODO: make it data-driven
     help = function (arg)
       if arg == nil then
         echo 'try these commands or hit escape if confused:\n'
@@ -59,6 +61,11 @@ local function new(opts)
     end,
   }
   helpPages = {
+    [env.Global] = function ()
+      echo [[
+---Global variables
+print(Global)]]
+    end,
     [env.o] = function ()
       echo [[
 ---Root game object
