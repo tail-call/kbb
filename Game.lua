@@ -162,8 +162,6 @@ local Game = Class {
   }
 }
 
-require 'core.debug'.inspect(Game)
-
 ---@type Guy.collision
 local NONE_COLLISION = { type = 'none' }
 ---@type Guy.collision
@@ -272,8 +270,6 @@ function Game.init(game)
   if game.player == nil then
     error 'no player'
   end
-
-  return game
 end
 
 ---@param game Game

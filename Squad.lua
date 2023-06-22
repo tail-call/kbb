@@ -31,7 +31,6 @@ function M.init(squad)
   ---@type Squad
   squad.followers = squad.followers or {}
   squad.shouldFollow = squad.shouldFollow or true
-  return squad
 end
 
 ---@param squad Squad

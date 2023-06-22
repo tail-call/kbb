@@ -1,8 +1,8 @@
 ---@class core.class
 ---@field __modulename string
----@field new fun(bak: table): table Makes a new object
----@field init fun(bak: table, strategy: fun(moduleName: string, dep: table): table): any Initializes an object
----@field deinit fun(bak: table)  Deinitializes an object
+---@field new fun(bak?: table): any Makes a new object
+---@field init fun(bak: table, strategy: fun(moduleName: string, dep: table): table) Initializes an object
+---@field deinit fun(bak: table) Deinitializes an object
 ---@field reload fun(bak: table) Reloads an object from its originating module
 
 ---@alias core.class.slotType 'normal' | 'required'
@@ -109,9 +109,8 @@ local function defineClass(opts)
     migrate = function (bak)
       return bak
     end,
-    ---@generic T
-    ---@param backup T
-    ---@return T
+    ---@param backup? core.Object
+    ---@return core.Object 
     new = function (backup)
       local object = class.migrate(backup or {})
       if object == nil then

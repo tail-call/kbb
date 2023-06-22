@@ -102,8 +102,6 @@ function Pixie.init(pixie)
   pixie.transformSpeed = 1
   pixie.color = pixie.color or { 1, 1, 1, 1 }
   pixie.targetTransform = love.math.newTransform()
-
-  return pixie
 end
 
 return Pixie

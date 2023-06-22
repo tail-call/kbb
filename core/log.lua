@@ -1,6 +1,6 @@
 ---Logs a warning message.
 ---@param message string
----@param level integer
+---@param level? integer
 local function warn(message, level)
   if Global.shouldCrashOnWarnings then
     error(message, level)
