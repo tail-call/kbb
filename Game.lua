@@ -37,25 +37,12 @@ local isRecruitCircleActive = require 'RecruitCircle'.isRecruitCircleActive
 local isAFollower = require 'Squad'.isAFollower
 local revealVisionSourceFog = require 'World'.revealVisionSourceFog
 local behave = require 'Guy'.behave
-
-local SCORES_TABLE = {
-  killedAnEnemy = 100,
-  builtAHouse = 500,
-  dead = -1000,
-}
-
-local MOVE_COSTS_TABLE = {
-  dismissSquad = 1,
-  summon = 25,
-  build = 50,
-}
+local ruleBook = require 'ruleBook'.ruleBook
 
 local TILE_SPEEDS = {
   forest = 1/2,
   void = 1/8,
 }
-
-local BUILDING_COST = 5
 
 -- local Game = Class(function (C)
 --   C.slot { 'world', type = 'required' }
@@ -75,68 +62,22 @@ local BUILDING_COST = 5
 
 
 
-local ruleBook = {
-  onGuyRemoved = {
-    {
-      ifPlayer = true,
-      exec = function (game)
-        game:addPlayer()
-        -- TODO: build these into rules instead
-        game.stats:addDeaths(1)
-        game.stats:addScore(SCORES_TABLE.dead)
-      end,
-    },
-    {
-      ifTeam = 'evil',
-      { ifTile = 'sand', setTile = 'grass' },
-      { ifTile = 'grass', setTile = 'forest' },
-      { ifTile = 'forest', setTile = 'water' },
-    },
-    {
-      ifTeam = 'good',
-      {
-        ifTile = 'sand',
-        setTile = 'rock',
-        default = { setTile = 'rock' },
-      },
-    },
-  },
-  onCollect = {
-    forest = {
-      give = { wood = 1 },
-      replaceTile = 'grass',
-      spawn = require 'Guy'.makeEvilGuy,
-    },
-    rock = {
-      give = { stone = 1 },
-      replaceTile = 'cave',
-      spawn = require 'Guy'.makeStrongEvilGuy,
-    },
-    grass = {
-      give = { grass = 1 },
-      replaceTile = 'sand',
-    },
-    water = {
-      give = { water = 1 },
-      replaceTile = 'sand',
-    },
-  },
-}
 
 ---Evaluates a rule from the rulebook
 ---@param rule table
 ---@param game Game
----@param guy Guy
+---@param entity Object2D
 ---@param tile World.tile
-local function evalRule(rule, game, guy, tile)
+local function evalRule(rule, game, entity, tile)
   if rule.exec then
-    rule.exec(game, guy, tile)
+    rule.exec(game, entity, tile)
   end
 
   local shouldEval = true
 
   if rule.ifTeam then
-    shouldEval = rule.ifTeam == guy.team
+    -- TODO: cast to Guy when needed
+    shouldEval = rule.ifTeam == entity['team']
   end
 
   if rule.ifTile then
@@ -144,19 +85,19 @@ local function evalRule(rule, game, guy, tile)
   end
 
   if rule.ifPlayer then
-    shouldEval = game.player == guy
+    shouldEval = game.player == entity
   end
 
   if shouldEval then
     if rule.setTile then
-      game.world:setTile(guy.pos, rule.setTile)
+      game.world:setTile(entity.pos, rule.setTile)
     end
 
     for _, childRule in ipairs(rule) do
-      evalRule(childRule, game, guy, tile)
+      evalRule(childRule, game, entity, tile)
     end
   elseif rule.default then
-    evalRule(rule.default, game, guy, tile)
+    evalRule(rule.default, game, entity, tile)
   end
 end
 
@@ -420,11 +361,6 @@ end
 local function die(guy, game, battle)
   echo(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
 
-  if guy.team == 'evil' then
-    game.resources:add { pretzels = 1 }
-    game.stats:addScore(SCORES_TABLE.killedAnEnemy)
-  end
-
   game:removeEntity(guy, true)
   game:removeEntity(battle, true)
 end
@@ -562,21 +498,20 @@ function Game.orderBuild(game)
     game.world:setTile(pos, 'sand')
   end
 
-  -- Build
-  game.resources:add { wood = -BUILDING_COST }
-  game.player.stats:addMoves(-MOVE_COSTS_TABLE.build)
-  game:addEntity(require 'Building'.new { pos = pos })
-  game.stats:addScore(SCORES_TABLE.builtAHouse)
+  -- TODO: use evalRule
+  local building = require 'Building'.new { pos = pos } 
+  game:addEntity(building)
+  ruleBook.onBuild.exec(game)
 end
 
 ---@param game Game
 function Game.orderSummon(game)
-  game.resources:add { pretzels = -1 }
-  game.player.stats:addMoves(-MOVE_COSTS_TABLE.summon)
   local guy = require 'Guy'.makeGoodGuy(game.cursorPos)
-  echo(game, ('%s was summonned.'):format(guy.name))
   game:addEntity(guy)
   game.squad:addToSquad(guy)
+  echo(game, ('%s was summonned.'):format(guy.name))
+  -- TODO: use evalRule
+  ruleBook.onSummon.exec(game)
 end
 
 ---@param game Game
@@ -586,10 +521,10 @@ end
 
 ---@param game Game
 function Game.orderDismiss(game)
-  if game.player.stats.moves >= MOVE_COSTS_TABLE.dismissSquad then
-    game.player.stats:addMoves(-MOVE_COSTS_TABLE.dismissSquad)
+  -- TODO: use evalRule
+  ruleBook.onDismiss.exec(game, function ()
     dismissSquad(game)
-  end
+  end)
 end
 
 return Game
