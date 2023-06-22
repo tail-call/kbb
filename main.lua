@@ -9,7 +9,7 @@ Global = {
   defaultGraphicsScale = 2,
 }
 
-dofile('conf.lua')
+dofile 'conf.lua'
 
 Class = require 'core.class'.defineClass
 

@@ -84,6 +84,9 @@ Major goals:
 
 ## Game ideas
 
+ - [ ] Logic is stored as *rules* in the *rulebook*
+ - [ ] Player may redefine *rules* in the *editor*
+ - [ ] Rules may be changed during the game by using special items
  - [ ] You gain *Power* when killing enemies and reaching objective
  - [ ] You spend *Power* to upgrade your character, upgrade other characters or recruit new characters
  - [ ] There are many characters in the world and you may *hire* any of them by spending *Power*
