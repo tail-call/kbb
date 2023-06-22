@@ -486,10 +486,8 @@ end
 
 ---@param game Game
 function Game.orderDismiss(game)
-  -- TODO: use evalRule
-  ruleBook.onDismiss.exec(game, function ()
-    dismissSquad(game)
-  end)
+  dismissSquad(game)
+  evalRule(ruleBook.onDismiss, game, game.player, game.world:getTile(game.player.pos))
 end
 
 return Game

@@ -65,10 +65,9 @@ ruleBook = {
     end,
   },
   onDismiss = {
-    exec = function (game, cb)
+    exec = function (game)
       if game.player.stats.moves >= ruleBook.moveCostsTable.dismissSquad then
         game.player.stats:addMoves(-ruleBook.moveCostsTable.dismissSquad)
-        cb()
       end
     end,
   },
