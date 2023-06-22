@@ -22,6 +22,10 @@ A. Class is responsible for creating objects, so it should initialize them as we
 
 B. Methods are for user-defined code, not for the class system.
 
+# On rulebook system
+
+I decided I will only use tables for rulebook rather than functions because I want to be able to serialize them and to make them tweaked from within the editor or the game.
+
 # Plan
 
 Major goals:

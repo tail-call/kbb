@@ -76,16 +76,23 @@ local BUILDING_COST = 5
 --   }
 -- end)
 
+
+
 local rulebook = {
   onGuyRemoved = {
-    evil = {
-      sand = { set = 'grass' },
-      grass = { set = 'forest' },
-      forest = { set = 'water' },
+    {
+      ifTeam = 'evil',
+      { ifTile = 'sand', setTile = 'grass' },
+      { ifTile = 'grass', setTile = 'forest' },
+      { ifTile = 'forest', setTile = 'water' },
     },
-    good = {
-      sand = { set = 'rock' },
-      ['*'] = { set = 'sand' },
+    {
+      ifTeam = 'good',
+      {
+        ifTile = 'sand',
+        setTile = 'rock',
+        ['else'] = { setTile = 'rock' },
+      },
     },
   },
   onCollect = {
@@ -110,9 +117,30 @@ local rulebook = {
   },
 }
 
-local function globRef(tbl, glob)
-  return tbl[glob] or tbl['*']
+---Evaluates a rule from the rulebook
+---@param rule table
+---@param game Game
+---@param guy Guy
+---@param tile World.tile
+local function evalRule(rule, game, guy, tile)
+  local shouldEval = true
+    and (rule.ifTeam and rule.ifTeam == guy.team or true)
+    and (rule.ifTile and tile == rule.ifTile or true)
+    and (rule.ifPlayer and guy.team == game.player or true)
+
+  if shouldEval then
+    if rule.setTile then
+      game.world:setTile(guy.pos, rule.setTile)
+    end
+
+    for _, childRule in ipairs(rule) do
+      evalRule(childRule, game, guy, tile)
+    end
+  elseif rule['else'] then
+    evalRule(rule['else'], game, guy, tile)
+  end
 end
+
 
 local Game = Class {
   ...,
@@ -122,6 +150,7 @@ local Game = Class {
     '!recruitCircle',
     '!resources',
   },
+  ---@type Game
   index = {
     addPlayer = function (self, guy)
       if self.player ~= nil then
@@ -148,20 +177,7 @@ local Game = Class {
 
         local tile = self.world:getTile(entity.pos)
 
-        local teamEffects = globRef(
-          rulebook.onGuyRemoved,
-          entity.team
-        )
-
-        if not teamEffects then return end
-
-        local tileEffects = globRef(teamEffects, tile)
-        if not tileEffects then return end
-
-        local newTile = tileEffects.set
-        if not newTile then return end
-
-        self.world:setTile(entity.pos, newTile)
+        evalRule(rulebook.onGuyRemoved, self, entity, tile)
       end
     end,
     switchMode = function (self)
@@ -305,6 +321,8 @@ function Game.init(game)
   if game.player == nil then
     error 'no player'
   end
+
+  game.player.stats:heal(4000)
 end
 
 ---@param game Game
