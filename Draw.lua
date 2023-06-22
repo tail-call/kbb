@@ -319,9 +319,8 @@ local function drawTerrain(observerPos, world, drawState, sky)
       vec.x = x
       vec.y = y
 
-      local idx = require 'World'.vectorToLinearIndex(world, vec)
-      local fog = world.fogOfWar[idx] or 0
-      local tileType = world.tileTypes[idx] or 'void'
+      local fog = world:getFog(vec)
+      local tileType = world:getTile(vec)
       local tile = drawState.tileset.quads[tileType]
 
       local function drawFragmentedTile(fragmentedTile)
@@ -482,7 +481,7 @@ local function drawGame(game, drawState, ui, ambientColor)
       return
     end
 
-    local fog = require 'World'.getFog(game.world, obj.pos)
+    local fog = game.world:getFog(obj.pos)
     withColor(fog, fog, fog, 1, cb)
   end
 

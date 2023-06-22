@@ -1,12 +1,18 @@
----@class World
+---@class World: World.props, World.methods
+
+---@class World.props
 ---@field image love.Image Minimap image
 ---@field width integer World's width in squares
 ---@field height integer World's height in squares
 ---@field revealedTilesCount number Number of tiles player had revealed
 ---@field tileTypes World.tile[] Tile types of each square in the world
 ---@field fogOfWar number[] How visible is each square in the world. Numbers from 0 to 1
+
+---@class World.methods
 ---@field revealFogOfWar fun(self: World, pos: core.Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
----@field setTile fun(self: World, v: core.Vector, tile: World.tile) Changes a tile at specific pos
+---@field getTile fun(self: World, pos: core.Vector): World.tile Gets a tile at a specific position
+---@field setTile fun(self: World, pos: core.Vector, tile: World.tile) Changes a tile at a specific position
+---@field getFog fun(self: World, pos: core.Vector): number Gets a fog value at a specified position
 
 ---@alias World.tile
 ---| 'grass'
@@ -31,7 +37,7 @@ end
 
 local M = Class {
   ...,
-  ---@type World
+  ---@type World.methods
   index = {
     revealFogOfWar = function (self, pos, value, dt)
       local idx = vectorToLinearIndex(self, pos)
@@ -45,22 +51,21 @@ local M = Class {
         self.revealedTilesCount = self.revealedTilesCount + 1
       end
     end,
-    setTile = function (self, v, t)
-      local id = vectorToLinearIndex(self, v)
-      self.tileTypes[id] = t
+    setTile = function (self, pos, tileType)
+      local id = vectorToLinearIndex(self, pos)
+      self.tileTypes[id] = tileType
+    end,
+    getTile = function (self, pos)
+      return self.tileTypes[vectorToLinearIndex(self, pos)] or 'void'
+    end,
+    getFog = function (self, pos)
+      return self.fogOfWar[vectorToLinearIndex(self, pos)] or 0
     end,
   }
 }
 
 local calcVisionDistance = require 'VisionSource'.calcVisionDistance
 local isVisible = require 'VisionSource'.isVisible
-
----@param world World
----@param v core.Vector
----@return integer
-function M.vectorToLinearIndex(world, v)
-  return vectorToLinearIndex(world, v)
-end
 
 local function generateTiles(width, height)
   local tileTypes = {}
@@ -110,22 +115,8 @@ end
 ---@param world World
 ---@param v core.Vector
 function M.isPassable(world, v)
-  local t = world.tileTypes[M.vectorToLinearIndex(world, v)]
+  local t = world.tileTypes[vectorToLinearIndex(world, v)]
   return t == 'grass' or t == 'forest' or t == 'sand' or t == 'void' or t == 'cave' or t == 'snow'
-end
-
----@param world World
----@param v core.Vector
----@return World.tile
-function M.getTile(world, v)
-  return world.tileTypes[M.vectorToLinearIndex(world, v)]
-end
-
----@param world World
----@param v core.Vector
----@return number transparency
-function M.getFog(world, v)
-  return world.fogOfWar[M.vectorToLinearIndex(world, v)]
 end
 
 ---@param world World
@@ -204,8 +195,8 @@ function M.randomizePatch(world, patch)
   }}
   for y = patch.coords.y * 8, patch.coords.y * 8 + 8 - 1 do
     for x = patch.coords.x * 8, patch.coords.x * 8 + 8 - 1 do
-      local tileAbove = M.getTile(world, { x = x, y = y - 1 })
-      local tileToTheLeft = M.getTile(world, { x = x - 1, y = y })
+      local tileAbove = world:getTile { x = x, y = y - 1 }
+      local tileToTheLeft = world:getTile { x = x - 1, y = y }
 
       local tile = require 'core.numeric'.weightedRandom(weightTable)
       world:setTile({ x = x, y = y }, tile.tile)

@@ -2,7 +2,6 @@ local updateDrawState = require 'DrawState'.updateDrawState
 local Vector = require 'core.Vector'
 local updateGame = require 'Game'.updateGame
 local endRecruiting = require 'Game'.endRecruiting
-local getTile = require 'World'.getTile
 
 ---@type Game
 local game
@@ -59,7 +58,7 @@ Tooltip(function ()
     return {}
   end
 
-  local line1 = getTile(game.world, game.cursorPos) or '???'
+  local line1 = game.world:getTile(game.cursorPos) or '???'
   local line2 = Vector.formatVector(game.cursorPos)
   local entity = {}
   -- Detect entities under cursor

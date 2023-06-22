@@ -30,7 +30,6 @@
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 
 local moveGuy = require 'Guy'.moveGuy
-local getTile = require 'World'.getTile
 local isPassable = require 'World'.isPassable
 local Vector = require 'core.Vector'
 local updateConsole = require 'Console'.updateConsole
@@ -109,8 +108,9 @@ local Game = Class {
         self.squad:removeFromSquad(entity)
         self.frozenEntities[entity] = nil
 
-        local tile = getTile(self.world, entity.pos)
+        local tile = self.world:getTile(entity.pos)
 
+        -- TODO: make it data driven
         if entity.team == 'evil' then
           if tile == 'sand' then
             self.world:setTile(entity.pos, 'grass')
@@ -436,7 +436,7 @@ function Game.updateGame(game, dt, movementDirections, visibility)
   for _, entity in ipairs(game.entities) do
     if entity.__module == 'Guy' then
         ---@cast entity Guy
-      entity:update(dt * speedFactor(entity, getTile(game.world, entity.pos)))
+      entity:update(dt * speedFactor(entity, game.world:getTile(entity.pos)))
       if not Game.isFrozen(game, entity) then
         behave(entity, game.guyDelegate)
       end
@@ -475,7 +475,7 @@ local function maybeCollect(game, guy)
   local pos = guy.pos
   local patch = require 'World'.patchAt(game.world, pos)
   local patchCenterX, patchCenterY = require 'Patch'.patchCenter(patch)
-  local tile = getTile(game.world, pos)
+  local tile = game.world:getTile(pos)
 
   local effect = collectEffects[tile]
   if effect and effect.give then
@@ -513,7 +513,7 @@ function Game.orderBuild(game)
   end
 
   -- Is building on rock?
-  if getTile(game.world, pos) == 'rock' then
+  if game.world:getTile(pos) == 'rock' then
     game.resources:add { stone = 1 }
     game.world:setTile(pos, 'sand')
   end
