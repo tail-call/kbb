@@ -409,13 +409,22 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   -- Draw visible terrain
 
-  drawTerrain(game.player.pos, game.world, drawState, ambientColor)
+  -- TODO: Should I make nilable player a standard interface?
+  -- TODO: this is garbage
+  ---@type Guy | nil
+  local player = game.player
+  local playerStats = player and player.stats or require 'GuyStats'.new()
+  local playerPos = player and player.pos or Global.leaderSpawnLocation
+  local playerPixie = player and player.pixie or require 'Pixie'.new()
+  local playerX, playerY = playerPixie.transform:transformPoint(8, 16)
+
+  drawTerrain(playerPos, game.world, drawState, ambientColor)
 
   -- Draw patch highlight
   if game.mode == 'paint' then
     withColor(0, 0, 0, 1, function ()
       local patchWidth, patchHeight = 8 * TILE_WIDTH, 8 * TILE_HEIGHT
-      local patch = require('World').patchAt(game.world, game.player.pos)
+      local patch = require('World').patchAt(game.world, playerPos)
       love.graphics.rectangle(
         'line',
         patch.coords.x * patchWidth,
@@ -447,7 +456,6 @@ local function drawGame(game, drawState, ui, ambientColor)
           love.graphics.setColor(0.3, 0.3, 0.4, 0.5)
         end
 
-        local playerX, playerY = game.player.pixie.transform:transformPoint(8, 16)
         local guyX, guyY = entity.pixie.transform:transformPoint(8, 16)
 
         love.graphics.line(
@@ -474,7 +482,7 @@ local function drawGame(game, drawState, ui, ambientColor)
 
     -- Is within screen?
     local ox, oy = obj.pos.x, obj.pos.y
-    local px, py = game.player.pos.x, game.player.pos.y
+    local px, py = playerPos.x, playerPos.y
     local d = 16
 
     if ox < px - d or ox > px + d or oy < py - d or oy > py + d then
@@ -533,10 +541,10 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   local curX, curY = getCursorCoords()
   local curDistance = 12
-  curX = math.min(game.player.pos.x + curDistance, curX)
-  curX = math.max(game.player.pos.x - curDistance, curX)
-  curY = math.min(game.player.pos.y + curDistance, curY)
-  curY = math.max(game.player.pos.y - curDistance, curY)
+  curX = math.min(playerPos.x + curDistance, curX)
+  curX = math.max(playerPos.x - curDistance, curX)
+  curY = math.min(playerPos.y + curDistance, curY)
+  curY = math.max(playerPos.y - curDistance, curY)
   do
     local cursorPos = { x = curX, y = curY }
     local cursorColor = WHITE_CURSOR_COLOR
@@ -550,7 +558,13 @@ local function drawGame(game, drawState, ui, ambientColor)
       game.cursorPos = cursorPos
     end
 
-    local collision = game.guyDelegate.collider(game.cursorPos, game.player)
+    ---@type Guy.collision
+    local collision
+    if player then
+      collision = game.guyDelegate.collider(game.cursorPos, player)
+    else
+      collision = { type = 'none' }
+    end
 
     if collision.type == 'terrain' then
       cursorColor = RED_COLOR
@@ -558,7 +572,7 @@ local function drawGame(game, drawState, ui, ambientColor)
 
     local r, g, b, a = unpack(cursorColor)
     withColor(r, g, b, a, function ()
-      drawCursor(drawState, game.cursorPos, game.mode, game.player.stats.moves)
+      drawCursor(drawState, game.cursorPos, game.mode, playerStats.moves)
     end)
   end
 
@@ -572,8 +586,8 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   -- TODO: make a UI widget instead
   withTransform(love.math.newTransform(8, screenH - 16 - MINIMAP_SIZE), function ()
-    local offsetX = game.player.pos.x - MINIMAP_SIZE / 2
-    local offsetY = game.player.pos.y - MINIMAP_SIZE / 2
+    local offsetX = playerPos.x - MINIMAP_SIZE / 2
+    local offsetY = playerPos.y - MINIMAP_SIZE / 2
 
     local quad = love.graphics.newQuad(
       offsetX, offsetY,

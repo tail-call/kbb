@@ -2,6 +2,10 @@
 ---@param message string
 ---@param level? integer
 local function warn(message, level)
+  if not Global.shouldLogWarnings then
+    return
+  end
+
   if Global.shouldCrashOnWarnings then
     error(message, level)
   else

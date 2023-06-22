@@ -36,6 +36,8 @@ SetModel {
     local idx = 1 + (Model.activeTab % 2)
 
     if idx == 1 then
+      if not game.player then return 'Player\nis nil' end
+
       return string.format(
         ''
           .. header
@@ -81,6 +83,8 @@ SetModel {
   topPanelText = function ()
     local game = Model.game
     local player = game.player
+    if not player then return 'Press H to revive or game will crash' end
+
     local controls = ''
     if game.mode == 'normal' then
       controls = 'Space] paint\nLMB] recruit\n8] save\nZ] zoom\nF] follow\nQ] gather\nT] warp\nC] collect\nX] fly\nH] respawn\n'

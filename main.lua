@@ -3,15 +3,21 @@
 Global = {
   ---If true, warning functions from `core.log` module will crash the program
   shouldCrashOnWarnings = false,
+  ---If true, warnings will be printed to the console
+  shouldLogWarnings = true,
   ---Module to be required and used as a starting scene
   initialScene = '<not a scene>',
   ---Default scale of the graphics
   defaultGraphicsScale = 2,
+  ---Where to spawn the leader at when she dies
+  leaderSpawnLocation = { x = 250, y = 250 },
 }
 
 dofile 'conf.lua'
 
 Class = require 'core.class'.defineClass
+-- TODO: replace all require 'core.log's with Log
+Log = require 'core.log'
 
 local function moduleNameToPath(name)
   name = string.gsub(name, '%.', '/')

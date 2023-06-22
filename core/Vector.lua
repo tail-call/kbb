@@ -22,10 +22,6 @@ Vector.dir = {
   a = LEFT,
   s = DOWN,
   d = RIGHT,
-  h = LEFT,
-  j = DOWN,
-  k = UP,
-  l = RIGHT,
 }
 
 ---@param v1 core.Vector

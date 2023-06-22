@@ -9,7 +9,7 @@
 ---@field entities Object2D[] Things in the game world
 ---@field guyDelegate Guy.delegate Object that talks to guys
 ---@field squad Squad A bunch of guys that follow player's movement
----@field player Guy A guy controlled by the player
+---@field player Guy | nil A guy controlled by the player
 ---@field stats GameStats Game stats like player score etc.
 ---@field time number Time of day in seconds, max is 24*60
 ---@field cursorPos core.Vector Points to a square player's cursor is aimed at
@@ -22,7 +22,7 @@
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field switchMode fun(self: Game) Switches to next mode
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
----@field removeEntity fun(self: Game, entity: Object2D) Adds a building to the world
+---@field removeEntity fun(self: Game, entity: Object2D, shouldGenerateEvent: boolean) Adds a building to the world
 ---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
@@ -37,9 +37,6 @@ local isRecruitCircleActive = require 'RecruitCircle'.isRecruitCircleActive
 local isAFollower = require 'Squad'.isAFollower
 local revealVisionSourceFog = require 'World'.revealVisionSourceFog
 local behave = require 'Guy'.behave
-
----@type core.Vector
-local LEADER_SPAWN_LOCATION = { x = 250, y = 250 }
 
 local SCORES_TABLE = {
   killedAnEnemy = 100,
@@ -81,6 +78,12 @@ local BUILDING_COST = 5
 local ruleBook = {
   onGuyRemoved = {
     {
+      ifPlayer = true,
+      exec = function (game)
+        game:addPlayer()
+      end,
+    },
+    {
       ifTeam = 'evil',
       { ifTile = 'sand', setTile = 'grass' },
       { ifTile = 'grass', setTile = 'forest' },
@@ -91,9 +94,7 @@ local ruleBook = {
       {
         ifTile = 'sand',
         setTile = 'rock',
-        default = { setTile = 'rock', peek = function (...)
-          print(...)
-        end },
+        default = { setTile = 'rock' },
       },
     },
   },
@@ -125,8 +126,8 @@ local ruleBook = {
 ---@param guy Guy
 ---@param tile World.tile
 local function evalRule(rule, game, guy, tile)
-  if rule.peek then
-    rule.peek(game, guy, tile)
+  if rule.exec then
+    rule.exec(game, guy, tile)
   end
 
   local shouldEval = true
@@ -169,8 +170,7 @@ local Game = Class {
   index = {
     addPlayer = function (self, guy)
       if self.player ~= nil then
-        self:removeEntity(self.player)
-        self.player = nil
+        self:removeEntity(self.player, true)
       end
 
       self.player = guy
@@ -182,17 +182,21 @@ local Game = Class {
     addEntity = function (self, entity)
       table.insert(self.entities, entity)
     end,
-    removeEntity = function (self, entity)
+    removeEntity = function (self, entity, shouldGenerateEvent)
       require 'core.table'.maybeDrop(self.entities, entity)
 
       if entity.__module == 'Guy' then
         ---@cast entity Guy
         self.squad:removeFromSquad(entity)
         self.frozenEntities[entity] = nil
+        if entity == self.player then
+          self.player = nil
+        end
 
-        local tile = self.world:getTile(entity.pos)
-
-        evalRule(ruleBook.onGuyRemoved, self, entity, tile)
+        if shouldGenerateEvent then
+          local tile = self.world:getTile(entity.pos)
+          evalRule(ruleBook.onGuyRemoved, self, entity, tile)
+        end
       end
     end,
     switchMode = function (self)
@@ -255,7 +259,7 @@ local function makeGuyDelegate(game)
         return 'shouldNotMove'
       end
       guy.stats:setMaxHp(guy.stats.maxHp + 1)
-      game:removeEntity(building)
+      game:removeEntity(building, true)
       return 'shouldMove'
     end,
     collider = function (pos, guy)
@@ -316,7 +320,7 @@ function Game.init(game)
   local Guy = require 'Guy'
 
   if not require 'core.table'.has(game.entities, game.player) then
-    game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
+    game:addPlayer(Guy.makeLeader(Global.leaderSpawnLocation))
   end
 
   -- Subscribe to player stats
@@ -324,7 +328,7 @@ function Game.init(game)
     local function something(playerStats, key, value, oldValue)
       if key == 'hp' and value <= 0 then
         game.stats:addDeaths(1)
-        game:addPlayer(Guy.makeLeader(LEADER_SPAWN_LOCATION))
+        game:addPlayer(Guy.makeLeader(Global.leaderSpawnLocation))
         game.stats:addScore(SCORES_TABLE.dead)
         _G['listenPlayerDeath']()
       end
@@ -432,8 +436,8 @@ local function die(guy, game, battle)
     game.stats:addScore(SCORES_TABLE.killedAnEnemy)
   end
 
-  game:removeEntity(guy)
-  game:removeEntity(battle)
+  game:removeEntity(guy, true)
+  game:removeEntity(battle, true)
 end
 
 ---@param game Game Game object
@@ -441,6 +445,11 @@ end
 ---@param visibility number How far we should see in tiles
 ---@param movementDirections core.Vector[] Momentarily pressed movement directions
 function Game.updateGame(game, dt, movementDirections, visibility)
+  if not game.player then
+    require 'core.log'.warn 'no player, game stopped'
+    return
+  end
+
   local visionSources = {{
     pos = game.player.pos,
     sight = 10

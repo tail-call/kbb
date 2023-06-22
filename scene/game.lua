@@ -97,7 +97,7 @@ OnLoad(function (savefileName)
 end)
 
 OnUpdate(function (dt)
-  local pv = game.player.pos
+  local pv = game.player and game.player.pos or Global.leaderSpawnLocation
   local cv = game.cursorPos
   updateDrawState(
     DrawState,
@@ -187,7 +187,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
     if scancode == 'c' then
       require 'Game'.orderCollect(game)
     elseif scancode == 'h' then
-      game:addPlayer(require 'Guy'.makeLeader(game.player.pos))
+      game:addPlayer(require 'Guy'.makeLeader(Global.leaderSpawnLocation))
     elseif scancode == 'e' then
       local patch = require 'World'.patchAt(game.world, game.player.pos)
       require 'World'.randomizePatch(game.world, patch)
