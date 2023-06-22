@@ -3,9 +3,30 @@
 ---@param game Game
 ---@param entity Object2D
 ---@param tile World.tile
-local function evalRule(rule, game, entity, tile)
-  if rule.exec then
-    rule.exec(game, entity, tile)
+---@param ruleBook table
+local function evalRule(rule, game, entity, tile, ruleBook)
+  local function doExec()
+    if rule.exec then
+      local t = type(rule.exec)
+      if t == 'string' then
+        local env = {
+          game = game,
+          entity = entity,
+          tile = tile,
+          ruleBook = ruleBook,
+        }
+        local fn = loadstring(rule.exec, 'evalRule exec')
+        if not fn then
+          Log.warn('can\'t compile exec program: ' .. rule.exec)
+          return
+        end
+        setfenv(fn, env)
+        fn()
+      elseif t == 'function' then
+        Log.deprecated { 'evalRule', 'rule', 'exec', 'function' }
+        rule.exec(game, entity, tile)
+      end
+    end
   end
 
   local shouldEval = true
@@ -28,11 +49,13 @@ local function evalRule(rule, game, entity, tile)
       game.world:setTile(entity.pos, rule.setTile)
     end
 
+    doExec()
+
     for _, childRule in ipairs(rule) do
-      evalRule(childRule, game, entity, tile)
+      evalRule(childRule, game, entity, tile, ruleBook)
     end
   elseif rule.default then
-    evalRule(rule.default, game, entity, tile)
+    evalRule(rule.default, game, entity, tile, ruleBook)
   end
 end
 
@@ -59,10 +82,10 @@ ruleBook = {
     end,
   },
   onSummon = {
-    exec = function (game)
+    exec = [[
       game.resources:add { pretzels = -1 }
       game.player.stats:addMoves(-ruleBook.moveCostsTable.summon)
-    end,
+    ]],
   },
   onDismiss = {
     exec = function (game)

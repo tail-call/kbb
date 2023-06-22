@@ -103,7 +103,8 @@ local Game = Class {
             ruleBook.onGuyRemoved,
             self,
             entity,
-            self.world:getTile(entity.pos)
+            self.world:getTile(entity.pos),
+            ruleBook
           )
         end
       end
@@ -467,7 +468,7 @@ function Game.orderBuild(game)
 
   local building = require 'Building'.new { pos = pos }
   game:addEntity(building)
-  evalRule(ruleBook.onBuild, game, building, tile)
+  evalRule(ruleBook.onBuild, game, building, tile, ruleBook)
 end
 
 ---@param game Game
@@ -476,7 +477,7 @@ function Game.orderSummon(game)
   game:addEntity(guy)
   game.squad:addToSquad(guy)
   echo(game, ('%s was summonned.'):format(guy.name))
-  evalRule(ruleBook.onSummon, game, guy, game.world:getTile(guy.pos))
+  evalRule(ruleBook.onSummon, game, guy, game.world:getTile(guy.pos), ruleBook)
 end
 
 ---@param game Game
@@ -487,7 +488,7 @@ end
 ---@param game Game
 function Game.orderDismiss(game)
   dismissSquad(game)
-  evalRule(ruleBook.onDismiss, game, game.player, game.world:getTile(game.player.pos))
+  evalRule(ruleBook.onDismiss, game, game.player, game.world:getTile(game.player.pos), ruleBook)
 end
 
 return Game
