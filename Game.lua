@@ -76,6 +76,44 @@ local BUILDING_COST = 5
 --   }
 -- end)
 
+local rulebook = {
+  onGuyRemoved = {
+    evil = {
+      sand = { set = 'grass' },
+      grass = { set = 'forest' },
+      forest = { set = 'water' },
+    },
+    good = {
+      sand = { set = 'rock' },
+      ['*'] = { set = 'sand' },
+    },
+  },
+  onCollect = {
+    forest = {
+      give = { wood = 1 },
+      replaceTile = 'grass',
+      spawn = require 'Guy'.makeEvilGuy,
+    },
+    rock = {
+      give = { stone = 1 },
+      replaceTile = 'cave',
+      spawn = require 'Guy'.makeStrongEvilGuy,
+    },
+    grass = {
+      give = { grass = 1 },
+      replaceTile = 'sand',
+    },
+    water = {
+      give = { water = 1 },
+      replaceTile = 'sand',
+    },
+  },
+}
+
+local function globRef(tbl, glob)
+  return tbl[glob] or tbl['*']
+end
+
 local Game = Class {
   ...,
   slots = {
@@ -110,23 +148,11 @@ local Game = Class {
 
         local tile = self.world:getTile(entity.pos)
 
-        local guyRemovedEffects = {
-          evil = {
-            sand = { set = 'grass' },
-            grass = { set = 'forest' },
-            forest = { set = 'water' },
-          },
-          good = {
-            sand = { set = 'rock' },
-            ['*'] = { set = 'sand' },
-          },
-        }
+        local teamEffects = globRef(
+          rulebook.onGuyRemoved,
+          entity.team
+        )
 
-        local function globRef(tbl, glob)
-          return tbl[glob] or tbl['*']
-        end
-
-        local teamEffects = globRef(guyRemovedEffects, entity.team)
         if not teamEffects then return end
 
         local tileEffects = globRef(teamEffects, tile)
@@ -457,37 +483,14 @@ end
 ---@param game Game
 ---@param guy Guy
 local function maybeCollect(game, guy)
-  local Guy = require 'Guy'
-
   if Game.isFrozen(game, guy) then return end
-
-  local collectEffects = {
-    forest = {
-      give = { wood = 1 },
-      replaceTile = 'grass',
-      spawn = Guy.makeEvilGuy,
-    },
-    rock = {
-      give = { stone = 1 },
-      replaceTile = 'cave',
-      spawn = Guy.makeStrongEvilGuy,
-    },
-    grass = {
-      give = { grass = 1 },
-      replaceTile = 'sand',
-    },
-    water = {
-      give = { water = 1 },
-      replaceTile = 'sand',
-    },
-  }
 
   local pos = guy.pos
   local patch = require 'World'.patchAt(game.world, pos)
   local patchCenterX, patchCenterY = require 'Patch'.patchCenter(patch)
   local tile = game.world:getTile(pos)
 
-  local effect = collectEffects[tile]
+  local effect = rulebook.onCollect[tile]
   if effect and effect.give then
     if effect.give then
       game.resources:add(effect.give)
