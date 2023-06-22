@@ -81,6 +81,9 @@ local ruleBook = {
       ifPlayer = true,
       exec = function (game)
         game:addPlayer()
+        -- TODO: build these into rules instead
+        game.stats:addDeaths(1)
+        game.stats:addScore(SCORES_TABLE.dead)
       end,
     },
     {
@@ -321,20 +324,6 @@ function Game.init(game)
 
   if not require 'core.table'.has(game.entities, game.player) then
     game:addPlayer(Guy.makeLeader(Global.leaderSpawnLocation))
-  end
-
-  -- Subscribe to player stats
-  do
-    local function something(playerStats, key, value, oldValue)
-      if key == 'hp' and value <= 0 then
-        game.stats:addDeaths(1)
-        game:addPlayer(Guy.makeLeader(Global.leaderSpawnLocation))
-        game.stats:addScore(SCORES_TABLE.dead)
-        _G['listenPlayerDeath']()
-      end
-    end
-
-    Log.warn 'you don\'t listen for player death'
   end
 
   if game.player == nil then
