@@ -24,6 +24,12 @@ B. Methods are for user-defined code, not for the class system.
 
 # Plan
 
+Major goals:
+
+- [ ] MVP gameplay
+- [ ] MVP editor
+- [ ] Show to people
+
 ## Bugs
 
  - [ ] BUG: Game crashes when saving game if a squad is not empty
@@ -44,7 +50,6 @@ B. Methods are for user-defined code, not for the class system.
  - [ ] Prefer requiring without parens
        %s/require(\('.*'\))/require \1
  - [ ] Require scenes and UI layouts
- - [ ] 'lang/model'
  - [ ] Store object's __module in metatable
  - [ ] dep.lua: read ---@class declaration to check dependency types
  - [ ] love APIs are buried deep in core modules
@@ -281,6 +286,7 @@ B. Methods are for user-defined code, not for the class system.
  - [x] Syntax for required object fields [2023-05-27T16:16]
  - [x] BUGFIX: Game crashes when opening a console [2023-05-28T20:04]
  - [x] BUGFIX: Segfault on save [2023-05-30T00:12]
+ - [x] ~~'lang/model'~~
 
 # Sources
 
