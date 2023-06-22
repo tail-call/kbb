@@ -72,13 +72,13 @@ local function defineClass(opts)
   local class
 
   if opts.metatable then
-    require 'core.log'.deprecated {
+    Log.deprecated {
       'core.class', 'define', 'opts', 'metatable'
     }
     metatable = opts.metatable or nil
   end
   if opts.version then
-    require 'core.log'.deprecated {
+    Log.deprecated {
       'core.class', 'define', 'opts', 'version'
     }
   end

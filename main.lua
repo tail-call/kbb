@@ -16,7 +16,6 @@ Global = {
 dofile 'conf.lua'
 
 Class = require 'core.class'.defineClass
--- TODO: replace all require 'core.log's with Log
 Log = require 'core.log'
 
 local function moduleNameToPath(name)

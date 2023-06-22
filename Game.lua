@@ -334,7 +334,7 @@ function Game.init(game)
       end
     end
 
-    require 'core.log'.warn 'you don\'t listen for player death'
+    Log.warn 'you don\'t listen for player death'
   end
 
   if game.player == nil then
@@ -446,7 +446,7 @@ end
 ---@param movementDirections core.Vector[] Momentarily pressed movement directions
 function Game.updateGame(game, dt, movementDirections, visibility)
   if not game.player then
-    require 'core.log'.warn 'no player, game stopped'
+    Log.warn 'no player, game stopped'
     return
   end
 
