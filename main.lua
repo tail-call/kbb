@@ -5,6 +5,8 @@ Global = {
   shouldCrashOnWarnings = false,
   ---Module to be required and used as a starting scene
   initialScene = '<not a scene>',
+  ---Default scale of the graphics
+  defaultGraphicsScale = 2,
 }
 
 dofile('conf.lua')

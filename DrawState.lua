@@ -55,7 +55,7 @@ local DrawState = Class {
 function DrawState.init(obj)
   local Timer = require 'core.Timer'.new
   obj.isUsingBoldFont = obj.isUsingBoldFont or false
-  obj.windowScale = obj.windowScale or 3
+  obj.windowScale = obj.windowScale or Global.defaultGraphicsScale
   obj.tileset = obj.tileset or require 'Tileset'.getTileset()
   obj.camera = obj.camera or { x = 266 * 16, y = 229 * 16, z = 0.01 }
   obj.cursorTimer = obj.cursorTimer or Timer {
