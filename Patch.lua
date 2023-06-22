@@ -11,9 +11,6 @@ local Patch = Class {
 
 ---@param patch Patch
 function Patch.init(patch)
-  require 'core.Dep' (patch, function (want)
-    return { want.world, want.coords }
-  end)
   patch.name = patch.name or string.format(
     'PATCH (%d,%d)', patch.coords.x, patch.coords.y
   )

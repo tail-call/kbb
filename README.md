@@ -14,6 +14,14 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 Game is an editable image.
 
+# On class system
+
+I decided `init()` should be a function in the class rather than method in the object.
+
+A. Class is responsible for creating objects, so it should initialize them as well.
+
+B. Methods are for user-defined code, not for the class system.
+
 # Plan
 
 ## Bugs

@@ -10,9 +10,11 @@
 
 local BATTLE_ROUND_DURATION = 0.5
 
-local M = Class{..., metatable = {
+local Battle = Class {
+  ...,
+  slots = { '!attacker', '!defender' },
   ---@type Battle
-  __index = {
+  index = {
     advanceTimer = function (self, dt)
       self.timer = self.timer - dt
     end,
@@ -22,16 +24,12 @@ local M = Class{..., metatable = {
       self.round = self.round + 1
     end,
   }
-}}
+}
 
 local Ability = require('Ability')
 
 ---@param battle Battle
-function M.init(battle)
-  require 'core.Dep' (battle, function (want)
-    battle.attacker = want.attacker
-    battle.defender = want.defender
-  end)
+function Battle.init(battle)
   battle.pos = battle.defender.pos
   battle.round = battle.round or 1
   battle.timer = BATTLE_ROUND_DURATION
@@ -86,7 +84,7 @@ end
 ---@param dt number
 ---@param say fun(text: string)
 ---@param fightIsOver fun()
-function M.updateBattle(game, battle, dt, say, fightIsOver)
+function Battle.updateBattle(game, battle, dt, say, fightIsOver)
   battle:advanceTimer(dt)
   if battle.timer < 0 then
     fight(game, battle.attacker, battle.defender, 1, say)
@@ -98,4 +96,4 @@ function M.updateBattle(game, battle, dt, say, fightIsOver)
   end
 end
 
-return M
+return Battle

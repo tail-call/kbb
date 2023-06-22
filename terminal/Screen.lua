@@ -9,8 +9,9 @@
 ---@field echo fun(self: terminal.Screen, text: string)
 ---@field setShouldScroll fun(self: terminal.Screen, value: boolean)
 
-local M = Class {
+local Screen = Class {
   ...,
+  slots = { '!screenSize', '!cursor' },
   ---@type terminal.Screen
   index = {
     clear = function (self)
@@ -66,14 +67,10 @@ local M = Class {
   }
 }
 
-function M.init(obj)
-  require 'core.Dep' (obj, function (want)
-    return { want.screenSize, want.cursor }
-  end)
-
-  if not obj.chars then
-    obj:clear()
+function Screen.init(screen)
+  if not screen.chars then
+    screen:clear()
   end
 end
 
-return M
+return Screen

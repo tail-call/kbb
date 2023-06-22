@@ -8,8 +8,10 @@
 ---@field advance fun(self: terminal.Cursor, onOverflow: fun())
 ---@field retreat fun(self: terminal.Cursor)
 
-local M = Class{..., metatable = {
-  __index = {
+local Cursor = Class {
+  ...,
+  slots = { '!screenSize' },
+  index = {
     locate = function (self, newPos)
       self.pos = newPos
     end,
@@ -39,14 +41,11 @@ local M = Class{..., metatable = {
       end
     end,
   }
-}}
+}
 
-function M.init(cursor)
-  require 'core.Dep' (cursor, function (want)
-    return { want.screenSize }
-  end)
+function Cursor.init(cursor)
   cursor.pos = cursor.pos or require 'core.Vector'.new { x = 0, y = 0 }
   cursor.timer = cursor.timer or require 'core.Timer'.new { threshold = 1/4 }
 end
 
-return M
+return Cursor

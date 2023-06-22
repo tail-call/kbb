@@ -7,9 +7,10 @@
 ---@field rubBack fun(self: terminal.Readline)
 ---@field rubForward fun(self: terminal.Readline)
 
-local M = Class{..., metatable = {
+local Readline = Class {
+  ...,
   ---@type terminal.Readline
-  __index = {
+  index = {
     clear = function (self)
       self.input = {}
       self.pos = 1
@@ -35,15 +36,12 @@ local M = Class{..., metatable = {
       self.pos = self.pos - 1
     end,
   }
-}}
+}
 
 ---@param obj terminal.Readline
-function M.init(obj)
-  require 'core.Dep' (obj, function (want)
-    return { want.screen }
-  end)
+function Readline.init(obj)
   obj.input = obj.input or {}
   obj.pos = obj.pos or 1
 end
 
-return M
+return Readline

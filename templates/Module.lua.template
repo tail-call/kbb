@@ -1,25 +1,25 @@
 ---Description of a class
----@class ${name}
----@field __module '${name}'
----# Properties
+---@class ${name}: ${name}.slots, ${name}.methods
+
+---@class ${name}.slots
 ---@field demoProp any Any property
----# Methods
+
+---@class ${name}.methods
 ---@field setDemoProp fun(self: ${name}, newValue: any)
 
-local M = Class{..., metatable = {
+local M = Class{
+  ...,
+  slots = { '!demoProp' }
   ---@type ${name}
-  __index = {
+  index = {
     setDemoProp = function (self, newValue)
       self.demoProp = newValue
     end,
   }
-}}
+}
 
 ---@param obj ${name}
 function M.init(obj)
-  require 'core.Dep' (obj, function (want)
-    return { want.demoProp }
-  end)
 end
 
 return M
