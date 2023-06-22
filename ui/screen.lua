@@ -83,7 +83,7 @@ SetModel {
     local player = game.player
     local controls = ''
     if game.mode == 'normal' then
-      controls = 'Space] paint\nLMB] recruit\n8] save\nZ] zoom\nF] follow\nQ] gather\nT] warp\nC] collect\nX] fly\n'
+      controls = 'Space] paint\nLMB] recruit\n8] save\nZ] zoom\nF] follow\nQ] gather\nT] warp\nC] collect\nX] fly\nH] respawn\n'
     elseif game.mode == 'paint' then
       controls = 'Space] focus\nLMB] paint\n'
     end

@@ -78,7 +78,7 @@ local BUILDING_COST = 5
 
 
 
-local rulebook = {
+local ruleBook = {
   onGuyRemoved = {
     {
       ifTeam = 'evil',
@@ -91,7 +91,9 @@ local rulebook = {
       {
         ifTile = 'sand',
         setTile = 'rock',
-        ['else'] = { setTile = 'rock' },
+        default = { setTile = 'rock', peek = function (...)
+          print(...)
+        end },
       },
     },
   },
@@ -123,10 +125,23 @@ local rulebook = {
 ---@param guy Guy
 ---@param tile World.tile
 local function evalRule(rule, game, guy, tile)
+  if rule.peek then
+    rule.peek(game, guy, tile)
+  end
+
   local shouldEval = true
-    and (rule.ifTeam and rule.ifTeam == guy.team or true)
-    and (rule.ifTile and tile == rule.ifTile or true)
-    and (rule.ifPlayer and guy.team == game.player or true)
+
+  if rule.ifTeam then
+    shouldEval = rule.ifTeam == guy.team
+  end
+
+  if rule.ifTile then
+    shouldEval = rule.ifTile == tile
+  end
+
+  if rule.ifPlayer then
+    shouldEval = game.player == guy
+  end
 
   if shouldEval then
     if rule.setTile then
@@ -136,8 +151,8 @@ local function evalRule(rule, game, guy, tile)
     for _, childRule in ipairs(rule) do
       evalRule(childRule, game, guy, tile)
     end
-  elseif rule['else'] then
-    evalRule(rule['else'], game, guy, tile)
+  elseif rule.default then
+    evalRule(rule.default, game, guy, tile)
   end
 end
 
@@ -177,7 +192,7 @@ local Game = Class {
 
         local tile = self.world:getTile(entity.pos)
 
-        evalRule(rulebook.onGuyRemoved, self, entity, tile)
+        evalRule(ruleBook.onGuyRemoved, self, entity, tile)
       end
     end,
     switchMode = function (self)
@@ -508,7 +523,7 @@ local function maybeCollect(game, guy)
   local patchCenterX, patchCenterY = require 'Patch'.patchCenter(patch)
   local tile = game.world:getTile(pos)
 
-  local effect = rulebook.onCollect[tile]
+  local effect = ruleBook.onCollect[tile]
   if effect and effect.give then
     if effect.give then
       game.resources:add(effect.give)

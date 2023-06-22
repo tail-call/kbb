@@ -186,6 +186,8 @@ OnKeyPressed(function (key, scancode, isrepeat)
   elseif game.mode == 'normal' then
     if scancode == 'c' then
       require 'Game'.orderCollect(game)
+    elseif scancode == 'h' then
+      game:addPlayer(require 'Guy'.makeLeader(game.player.pos))
     elseif scancode == 'e' then
       local patch = require 'World'.patchAt(game.world, game.player.pos)
       require 'World'.randomizePatch(game.world, patch)
