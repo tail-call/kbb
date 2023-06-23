@@ -25,6 +25,12 @@ end
 ---@return fun()?, string? errorMessage
 local function loadGame(filename)
   return require 'core.Dump'.loadFileWithIndex(filename, function(t, k)
+    -- TODO: make any module loadable
+    if k == 'game' then
+      return {
+        GuyStats = require 'game.GuyStats'.new
+      }
+    end
     return function(...)
       return require(k).new(...)
     end

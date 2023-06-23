@@ -409,11 +409,10 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   -- Draw visible terrain
 
-  -- TODO: Should I make nilable player a standard interface?
   -- TODO: this is garbage
   ---@type Guy | nil
   local player = game.player
-  local playerStats = player and player.stats or require 'GuyStats'.new()
+  local playerStats = player and player.stats or require 'game.GuyStats'.new()
   local playerPos = player and player.pos or Global.leaderSpawnLocation
   local playerPixie = player and player.pixie or require 'Pixie'.new()
   local playerX, playerY = playerPixie.transform:transformPoint(8, 16)

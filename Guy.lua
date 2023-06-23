@@ -5,7 +5,7 @@
 ---@field name string Guy's name
 ---@field team Guy.team Guy's team
 ---@field pixie Pixie Graphical representation of the guy
----@field stats GuyStats RPG stats
+---@field stats game.GuyStats RPG stats
 ---@field timer number Movement timer
 ---@field isFlying boolean True if flies
 ---@field speed number Delay in seconds between moves
@@ -126,9 +126,9 @@ function Guy.behave(guy, delegate)
 end
 
 ---@param guy Guy
-function Guy.init(guy, load)
-  guy.stats = load('GuyStats', guy.stats)
-  guy.pixie = load('Pixie', guy.pixie)
+function Guy.init(guy)
+  guy.stats = guy.stats or require 'game.GuyStats'.new()
+  guy.pixie = guy.pixie or require 'Pixie'.new()
   guy.name = guy.name or 'Unnamed'
   guy.timer = guy.timer or 0
   guy.behavior = guy.behavior or 'none'
@@ -142,6 +142,7 @@ function Guy.init(guy, load)
   guy.speed = guy.speed or 0.15
   guy.pos = guy.pos or { x = 0, y = 0 }
 
+  require 'core.debug'.qdump(guy.pixie)
   guy.pixie:move(guy.pos)
   guy.pixie:playSpawnAnimation(guy.pos)
 end
@@ -151,7 +152,7 @@ function Guy.makeLeader(pos)
   local tileset = require 'Tileset'.getTileset()
 
   local guy = Guy.new {
-    pixie = {
+    pixie = require 'Pixie'.new {
       quad = tileset.quads.guy,
       color = { 1, 1, 0, 1 },
     },
@@ -168,7 +169,7 @@ function Guy.makeHuman(pos)
   return Guy.new {
     name = 'Maria',
     team = 'neutral',
-    pixie = {
+    pixie = require 'Pixie'.new {
       quad = tileset.quads.human,
       color = { 1, 1, 1, 1 },
     },
@@ -184,7 +185,7 @@ function Guy.makeGoodGuy(pos)
   return Guy.new {
     name = 'Good Guy',
     team = 'neutral',
-    pixie = {
+    pixie = require 'Pixie'.new {
       quad = tileset.quads.guy
     },
     pos = pos,
@@ -201,7 +202,7 @@ function Guy.makeEvilGuy(pos)
     team = 'evil',
     speed = 0.5,
     behavior = 'wander',
-    pixie = {
+    pixie = require 'Pixie'.new {
       quad = tileset.quads.guy,
       color = { 1, 0, 0, 1 },
     },
@@ -216,7 +217,7 @@ function Guy.makeStrongEvilGuy(pos)
   local tileset = require 'Tileset'.getTileset()
 
   local guy = Guy.new {
-    pixie = {
+    pixie = require 'Pixie'.new {
       quad = tileset.quads.guy,
       color = { 1, 0, 1, 1 },
     },
