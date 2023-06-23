@@ -7,6 +7,7 @@ local state = {
   successCount = 0,
   failCount = 0,
   title = '?',
+  failures = {},
   reset = function (self)
     self.successCount = 0
     self.failCount = 0
@@ -20,6 +21,8 @@ local state = {
   end,
   fail = function (self)
     self.failCount = self.failCount + 1
+    debug.getinfo()
+    table.insert(self.failures, debug.traceback('Test failed', 3))
   end,
 }
 
@@ -79,6 +82,11 @@ local function runTests()
 
     ::continue::
   end
+
+  for _, v in ipairs(state.failures) do
+    print(v)
+  end
+
   dir:close()
 end
 
