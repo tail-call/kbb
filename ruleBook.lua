@@ -36,8 +36,13 @@ local function evalRule(rule, game, entity, tile, ruleBook)
   local shouldEval = true
 
   if rule.ifTeam then
-    -- TODO: cast to Guy when needed
-    shouldEval = rule.ifTeam == entity['team']
+    if entity.__module == 'Guy' then
+      ---@cast entity Guy
+      shouldEval = rule.ifTeam == entity.team
+    else
+      -- Only guys have teams, so if it's not a guy, do nothing
+      shouldEval = false
+    end
   end
 
   if rule.ifTile then
