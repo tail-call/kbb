@@ -1,20 +1,18 @@
 #!/usr/bin/env luajit
 
-local commandName = ...
+local printf = require 'core.log'.printf
 
-local printf = function (fmt, ...)
-  return print(string.format(fmt, ...))
-end
+local commandName = ...
 
 if commandName == 'game' then
   os.execute('/Applications/love.app/Contents/MacOS/love .')
 elseif commandName == 'test' then
   require 'core.test'.runTests()
 else
-  printf('Kobold Princess Simulator Launch Utility')
-  printf('')
-  printf('Usage:')
-  printf('  %s game - run game', arg[0])
-  printf('  %s test - run tests', arg[0])
+  printf('Kobold Princess Simulator Launch Utility\n')
+  printf('\n')
+  printf('Usage:\n')
+  printf('  %s game - run game\n', arg[0])
+  printf('  %s test - run tests\n', arg[0])
   os.exit(1)
 end

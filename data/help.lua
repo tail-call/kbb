@@ -1,39 +1,39 @@
 -- These are used in Commands.lua for help() function
 return {
   Global = {
-    'print(Global)',
-    'Global variables'
+    'Global variables',
+    example = 'print(Global)',
   },
   o = {
-    'o',
-    'Root game object'
+    'Root game object',
+    example = 'o',
   },
   help = {
-    'help(name)',
     'Outputs info about a command in the console',
-    '@param name string'
+    '@param name string',
+    example = 'help(name)',
   },
   print = {
-    'print(...)',
     'Prints objects to a console',
-    '@param ... any[]'
+    '@param ... any[]',
+    example = 'print(...)',
   },
   clear = {
-    'clear()',
-    'Clears the screen'
+    'Clears the screen',
+    example = 'clear()',
   },
   scribe = {
-    'scribe(message)',
     'Scribes a message in the world',
-    '@param message string'
+    '@param message string',
+    example = 'scribe(message)',
   },
   reload = {
-    'reload(moduleName)',
     'Reloads a module',
-    '@param moduleName string'
+    '@param moduleName string',
+    example = 'reload(moduleName)',
   },
   quit = {
-    'quit()',
-    'Quits to the main menu'
+    'Quits to the main menu',
+    example = 'quit()',
   },
 }

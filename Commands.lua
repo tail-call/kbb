@@ -16,16 +16,6 @@ local function new(opts)
   local scribe = opts.scribe or error('opts.scribe is required', 2)
   local helpTable = opts.helpTable or error('opts.helpTable is required', 2)
 
-  local function makeHelpEntry(example, ...)
-    local description = { ... }
-    return function ()
-      for _, v in ipairs(description) do
-        echo('---', v)
-      end
-      echo(example)
-    end
-  end
-
   -- Will be populated later
   local helpPages = {}
 
@@ -77,8 +67,20 @@ local function new(opts)
     end,
   }
 
-  for key, page in pairs(helpTable) do
-    helpPages[env[key]] = makeHelpEntry(unpack(page))
+  do -- Populate help pages
+    local function makeHelpEntry(example, ...)
+      local description = { ... }
+      return function ()
+        for _, v in ipairs(description) do
+          echo('---', v)
+        end
+        echo(example)
+      end
+    end
+
+    for key, page in pairs(helpTable) do
+      helpPages[env[key]] = makeHelpEntry(unpack(page))
+    end
   end
 
   return env

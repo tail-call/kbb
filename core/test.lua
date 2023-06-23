@@ -36,14 +36,16 @@ local function assertEq(exprA, exprB)
 end
 
 local function group(name, cb)
-  print('\tRunning group ' .. name .. ':')
+  print('\t  Group ' .. name .. ':')
   state.title = name
   cb()
   print(
     string.format(
-      '%s\t%s done, %d succeeded, %d failed',
+      '%s\t  Endgroup "%s", %d/%d succeeded, %d failed;',
       state.failCount == 0 and '' or '!',
-      state.title, state.successCount, state.failCount
+      state.title, state.successCount,
+      state.successCount + state.failCount,
+      state.failCount
     )
   )
 end
@@ -68,10 +70,10 @@ local function runTests()
 
     local filename = prefix .. line
     if endsWith(filename, 'test.lua') then
-      print('\tRunning test file ' .. filename .. ':')
+      print('\tFile ' .. filename .. ':')
       dofile(filename)
       state:reset()
-      print('\tTest file ' .. filename .. ' done')
+      print('\tEndfile ' .. filename .. ';')
       print()
     end
 

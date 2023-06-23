@@ -11,13 +11,13 @@ group('Commands/new', function ()
   local scribben = {}
   local helpTable = {
     o = {
-      'o',
       'test test',
+      example = 'o',
     },
     scribe = {
-      'scribe(msg)',
       'scribes a message',
       '@param msg string',
+      example = 'scribe(msg)',
     }
   }
 
