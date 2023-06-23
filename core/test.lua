@@ -21,7 +21,6 @@ local state = {
   end,
   fail = function (self)
     self.failCount = self.failCount + 1
-    debug.getinfo()
     table.insert(self.failures, debug.traceback('Test failed', 3))
   end,
 }

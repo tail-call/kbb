@@ -68,18 +68,17 @@ local function new(opts)
   }
 
   do -- Populate help pages
-    local function makeHelpEntry(example, ...)
-      local description = { ... }
+    local function makeHelpEntry(description)
       return function ()
         for _, v in ipairs(description) do
           echo('---', v)
         end
-        echo(example)
+        echo(description.example)
       end
     end
 
     for key, page in pairs(helpTable) do
-      helpPages[env[key]] = makeHelpEntry(unpack(page))
+      helpPages[env[key]] = makeHelpEntry(page)
     end
   end
 
