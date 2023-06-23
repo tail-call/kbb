@@ -4,6 +4,7 @@
 ---@field scribe fun(text: string)
 ---@field root table
 ---@field global table
+---@field helpTable table
 
 ---@param opts CommandsOptions
 ---@return table
@@ -13,6 +14,7 @@ local function new(opts)
   local global = opts.global or error('opts.global is required', 2)
   local clear = opts.clear or error('opts.clear is required', 2)
   local scribe = opts.scribe or error('opts.scribe is required', 2)
+  local helpTable = opts.helpTable or error('opts.helpTable is required', 2)
 
   local function makeHelpEntry(example, ...)
     local description = { ... }
@@ -52,7 +54,6 @@ local function new(opts)
       end
       echo(unpack(items))
     end,
-    -- TODO: make it data-driven
     help = function (arg)
       if arg == nil then
         echo 'try these commands or hit escape if confused:\n'
@@ -76,47 +77,8 @@ local function new(opts)
     end,
   }
 
-  local blueprint = {
-    [env.Global] = {
-      'print(Global)',
-      'Global variables'
-    },
-    [env.o] = {
-      'o',
-      'Root game object'
-    },
-    [env.help] = {
-      'help(name)',
-      'Outputs info about a command in the console',
-      '@param name string'
-    },
-    [env.print] = {
-      'print(...)',
-      'Prints objects to a console',
-      '@param ... any[]'
-    },
-    [env.clear] = {
-      'clear()',
-      'Clears the screen'
-    },
-    [env.scribe] = {
-      'scribe(message)',
-      'Scribes a message in the world',
-      '@param message string'
-    },
-    [env.reload] = {
-      'reload(moduleName)',
-      'Reloads a module',
-      '@param moduleName string'
-    },
-    [env.quit] = {
-      'quit()',
-      'Quits to the main menu'
-    },
-  }
-
-  for k, page in pairs(blueprint) do
-    helpPages[k] = makeHelpEntry(unpack(page))
+  for key, page in pairs(helpTable) do
+    helpPages[env[key]] = makeHelpEntry(unpack(page))
   end
 
   return env

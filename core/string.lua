@@ -9,4 +9,9 @@ function M.forceSlashAtEnd(str)
   return str
 end
 
+function M.startsWith(str, prefix)
+  if prefix == '' then return true end
+  return str:sub(1, #prefix) == prefix
+end
+
 return M

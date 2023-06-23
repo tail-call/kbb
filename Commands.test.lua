@@ -9,6 +9,17 @@ group('Commands/new', function ()
   local global = {}
   local root = {}
   local scribben = {}
+  local helpTable = {
+    o = {
+      'o',
+      'test test',
+    },
+    scribe = {
+      'scribe(msg)',
+      'scribes a message',
+      '@param msg string',
+    }
+  }
 
   local clear = function ()
     echoes = {}
@@ -22,6 +33,7 @@ group('Commands/new', function ()
     echo = function (...)
       table.insert(echoes, table.concat({ ... }))
     end,
+    helpTable = helpTable,
     global = global,
     root = root,
     clear = clear,
@@ -40,24 +52,22 @@ group('Commands/new', function ()
   end
 
   do --Check help commands
-    local function testHelp(item, pattern)
+    local function testHelp(item, sample, test)
+      if not test then
+        test = function (a, b)
+          return a == b
+        end
+      end
       env.help(item)
       local output = table.concat(echoes, '\n')
-      local isFound = output:find(pattern, 1, true)
       clear()
-      return isFound
+      return test(output, sample)
     end
 
-    assert(testHelp(nil, 'try these commands'))
-    assert(testHelp('random letters', '---Don\'t'))
-    assert(testHelp(env.Global, '---Global'))
-    assert(testHelp(env.o, '---Root'))
-    assert(testHelp(env.help, '---Outputs'))
-    assert(testHelp(env.print, '---Prints'))
-    assert(testHelp(env.clear, '---Clears'))
-    assert(testHelp(env.scribe, '---Scribes'))
-    assert(testHelp(env.reload, '---Reloads'))
-    assert(testHelp(env.quit, '---Quits'))
+    assert(testHelp(nil, 'try these commands', require 'core.string'.startsWith))
+    assert(testHelp(env.o, '---test test\no'))
+    assert(testHelp(env.scribe, '---scribes a message\n---@param msg string\nscribe(msg)'))
+    assert(not testHelp(env.scribe, 'random garbage'))
   end
 
 end)

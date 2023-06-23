@@ -44,6 +44,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
     echo('lua>' .. savedPrompt)
     if chunk ~= nil then
       setfenv(chunk, require 'Commands'.new {
+        heplPages = dofile './data/help.lua',
         root = game,
         echo = echo,
         global = Global,
