@@ -142,7 +142,6 @@ function Guy.init(guy)
   guy.speed = guy.speed or 0.15
   guy.pos = guy.pos or { x = 0, y = 0 }
 
-  require 'core.debug'.qdump(guy.pixie)
   guy.pixie:move(guy.pos)
   guy.pixie:playSpawnAnimation(guy.pos)
 end
