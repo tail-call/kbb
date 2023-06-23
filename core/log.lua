@@ -32,7 +32,6 @@ local printf = function (fmt, ...)
   return io.write(string.format(fmt, ...))
 end
 
-
 return {
   warn = warn,
   deprecated = deprecated,
