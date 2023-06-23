@@ -132,13 +132,13 @@ OnUpdate(function (dt)
 
         if game.squad.shouldFollow then
           for guy in pairs(game.squad.followers) do
-            if not require 'Game'.isFrozen(game, guy) then
+            if not game:isFrozen(guy) then
               require 'Guy'.moveGuy(guy, vec, game.guyDelegate)
             end
           end
         end
 
-        if not require 'Game'.isFrozen(game, game.player) then
+        if not game:isFrozen(game.player) then
           local oldPos = game.player.pos
           local newPos = require 'Guy'.moveGuy(
             game.player,

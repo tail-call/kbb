@@ -28,6 +28,7 @@
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
+---@field isFrozen fun(self: Game, entity: Object2D): boolean Returns true if an entity is marked as frozen
 
 local moveGuy = require 'Guy'.moveGuy
 local isPassable = require 'World'.isPassable
@@ -139,6 +140,9 @@ local Game = Class {
         defender = defender,
       })
     end,
+    isFrozen = function (self, entity)
+      return self.frozenEntities[entity] or false
+    end,
   }
 }
 
@@ -188,14 +192,6 @@ local function makeGuyDelegate(game)
     end,
   }
   return guyDelegate
-end
-
----Returns true if guy is marked as frozen
----@param game Game
----@param object Object2D
----@return boolean
-function Game.isFrozen(game, object)
-  return game.frozenEntities[object] or false
 end
 
 ---@param game Game
@@ -301,7 +297,7 @@ end
 ---@param game Game
 local function orderGather(game)
   for entity in pairs(game.squad.followers) do
-    if not Game.isFrozen(game, entity) then
+    if not game:isFrozen(entity) then
       local destination = { x = 0, y = 0 }
       local guyDist = Vector.dist(entity.pos, game.player.pos)
       for _, direction in ipairs{
@@ -406,7 +402,7 @@ function Game.updateGame(game, dt, movementDirections, visibility)
     if entity.__module == 'Guy' then
         ---@cast entity Guy
       entity:update(dt * speedFactor(entity, game.world:getTile(entity.pos)))
-      if not Game.isFrozen(game, entity) then
+      if not game:isFrozen(entity) then
         behave(entity, game.guyDelegate)
       end
     end
@@ -416,7 +412,7 @@ end
 ---@param game Game
 ---@param guy Guy
 local function maybeCollect(game, guy)
-  if Game.isFrozen(game, guy) then return end
+  if game:isFrozen(guy) then return end
 
   local pos = guy.pos
   local patch = require 'World'.patchAt(game.world, pos)

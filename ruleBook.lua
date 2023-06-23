@@ -1,5 +1,5 @@
 ---Evaluates a rule from the rulebook
----@param rule table
+---@param rule table | string
 ---@param game Game
 ---@param entity Object2D
 ---@param tile World.tile
@@ -9,24 +9,28 @@ local function evalRule(rule, game, entity, tile, ruleBook)
     if rule.exec then
       local t = type(rule.exec)
       if t == 'string' then
-        local env = {
-          game = game,
-          entity = entity,
-          tile = tile,
-          ruleBook = ruleBook,
-        }
-        local fn = loadstring(rule.exec, 'evalRule exec')
-        if not fn then
-          Log.warn('can\'t compile exec program: ' .. rule.exec)
-          return
-        end
-        setfenv(fn, env)
-        fn()
+        error('exec as string is not supported')
       elseif t == 'function' then
         Log.deprecated { 'evalRule', 'rule', 'exec', 'function' }
         rule.exec(game, entity, tile)
       end
     end
+  end
+
+  if type(rule) == 'string' then
+    local env = {
+      game = game,
+      entity = entity,
+      tile = tile,
+      ruleBook = ruleBook,
+    }
+    local fn = loadstring(rule, 'evalRule exec')
+    if not fn then
+      Log.warn('can\'t compile dynamic rule: ' .. rule)
+      return
+    end
+    setfenv(fn, env)
+    return fn()
   end
 
   local shouldEval = true
@@ -81,25 +85,22 @@ ruleBook = {
       game.stats:addScore(ruleBook.scoresTable.builtAHouse)
     end,
   },
-  onSummon = {
-    exec = [[
-      game.resources:add { pretzels = -1 }
-      game.player.stats:addMoves(-ruleBook.moveCostsTable.summon)
-    ]],
-  },
-  onDismiss = {
-    exec = function (game)
-      if game.player.stats.moves >= ruleBook.moveCostsTable.dismissSquad then
-        game.player.stats:addMoves(-ruleBook.moveCostsTable.dismissSquad)
-      end
-    end,
-  },
+  onSummon = [[
+    game.resources:add { pretzels = -1 }
+    game.player.stats:addMoves(-ruleBook.moveCostsTable.summon)
+  ]],
+  onDismiss = [[
+    if game.player.stats.moves >= ruleBook.moveCostsTable.dismissSquad then
+      game.player.stats:addMoves(-ruleBook.moveCostsTable.dismissSquad)
+    end
+  ]],
   onGuyRemoved = {
     {
       ifPlayer = true,
       exec = function (game)
-        game:addPlayer()
+        -- TODO: this doesn't work
         -- TODO: build these into rules instead
+        game:addPlayer()
         game.stats:addDeaths(1)
         game.stats:addScore(ruleBook.scoresTable.dead)
       end,

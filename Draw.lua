@@ -518,7 +518,7 @@ local function drawGame(game, drawState, ui, ambientColor)
       end)
     elseif entity.__module == 'Guy' then
       ---@cast entity Guy
-      if not require 'Game'.isFrozen(game, entity) then
+      if not game:isFrozen(entity) then
         cullAndShade(entity, function ()
           drawGuy(entity)
         end)
