@@ -24,7 +24,10 @@ local function new(opts)
     end
   end
 
-  local env, helpPages
+  -- Will be populated later
+  local helpPages = {}
+
+  local env
   env = {
     pairs = pairs,
     ipairs = ipairs,
@@ -73,44 +76,49 @@ local function new(opts)
     end,
   }
 
-  helpPages = {
-    [env.Global] = makeHelpEntry(
+  local blueprint = {
+    [env.Global] = {
       'print(Global)',
       'Global variables'
-    ),
-    [env.o] = makeHelpEntry(
+    },
+    [env.o] = {
       'o',
       'Root game object'
-    ),
-    [env.help] = makeHelpEntry(
+    },
+    [env.help] = {
       'help(name)',
       'Outputs info about a command in the console',
       '@param name string'
-    ),
-    [env.print] = makeHelpEntry(
+    },
+    [env.print] = {
       'print(...)',
       'Prints objects to a console',
       '@param ... any[]'
-    ),
-    [env.clear] = makeHelpEntry(
+    },
+    [env.clear] = {
       'clear()',
       'Clears the screen'
-    ),
-    [env.scribe] = makeHelpEntry(
+    },
+    [env.scribe] = {
       'scribe(message)',
       'Scribes a message in the world',
       '@param message string'
-    ),
-    [env.reload] = makeHelpEntry(
+    },
+    [env.reload] = {
       'reload(moduleName)',
       'Reloads a module',
       '@param moduleName string'
-    ),
-    [env.quit] = makeHelpEntry(
+    },
+    [env.quit] = {
       'quit()',
       'Quits to the main menu'
-    ),
+    },
   }
+
+  for k, page in pairs(blueprint) do
+    helpPages[k] = makeHelpEntry(unpack(page))
+  end
+
   return env
 end
 
