@@ -14,6 +14,16 @@ local function new(opts)
   local clear = opts.clear or error('opts.clear is required', 2)
   local scribe = opts.scribe or error('opts.scribe is required', 2)
 
+  local function makeHelpEntry(example, ...)
+    local description = { ... }
+    return function ()
+      for _, v in ipairs(description) do
+        echo('---', v)
+      end
+      echo(example)
+    end
+  end
+
   local env, helpPages
   env = {
     pairs = pairs,
@@ -62,51 +72,44 @@ local function new(opts)
       require 'scene.menu'.go('fromgame')
     end,
   }
+
   helpPages = {
-    [env.Global] = function ()
-      echo [[
----Global variables
-print(Global)]]
-    end,
-    [env.o] = function ()
-      echo [[
----Root game object
-o]]
-    end,
-    [env.help] = function ()
-      echo [[
----Outputs info about a command in the console
----@param name string
-help(name)]]
-    end,
-    [env.print] = function ()
-      echo [[
----Prints objects to a console
----@param ... any[]
-print(...)]]
-    end,
-    [env.clear] = function ()
-      echo [[
----Clears the screen
-clear()]]
-    end,
-    [env.scribe] = function ()
-      echo [[
----Scribes a message in the world
----@param message string
-scribe(message)]]
-    end,
-    [env.reload] = function ()
-      echo [[
----Reloads a module
----@param moduleName string
-reload(moduleName)]]
-    end,
-    [env.quit] = function ()
-      echo [[
----Quits to the main menu
-quit()]]
-    end,
+    [env.Global] = makeHelpEntry(
+      'print(Global)',
+      'Global variables'
+    ),
+    [env.o] = makeHelpEntry(
+      'o',
+      'Root game object'
+    ),
+    [env.help] = makeHelpEntry(
+      'help(name)',
+      'Outputs info about a command in the console',
+      '@param name string'
+    ),
+    [env.print] = makeHelpEntry(
+      'print(...)',
+      'Prints objects to a console',
+      '@param ... any[]'
+    ),
+    [env.clear] = makeHelpEntry(
+      'clear()',
+      'Clears the screen'
+    ),
+    [env.scribe] = makeHelpEntry(
+      'scribe(message)',
+      'Scribes a message in the world',
+      '@param message string'
+    ),
+    [env.reload] = makeHelpEntry(
+      'reload(moduleName)',
+      'Reloads a module',
+      '@param moduleName string'
+    ),
+    [env.quit] = makeHelpEntry(
+      'quit()',
+      'Quits to the main menu'
+    ),
   }
   return env
 end
