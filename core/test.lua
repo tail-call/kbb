@@ -31,6 +31,10 @@ local function assert(expr)
   end
 end
 
+local function assertEq(exprA, exprB)
+  return assert(exprA == exprB)
+end
+
 local function group(name, cb)
   print('\tRunning group ' .. name .. ':')
   state.title = name
@@ -87,7 +91,6 @@ if IsTesting then
     _assert(endsWith('abba', 'ba'))
     _assert(endsWith('abba', ''))
     _assert(not endsWith('user', 'root'))
-    _assert(false)
   end)
 end
 
@@ -95,4 +98,5 @@ return {
   runTests = runTests,
   group = group,
   assert = assert,
+  assertEq = assertEq,
 }

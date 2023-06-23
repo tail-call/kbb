@@ -46,6 +46,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
       setfenv(chunk, require 'Commands'.new {
         root = game,
         echo = echo,
+        global = Global,
         clear = function ()
           output = ''
         end,
