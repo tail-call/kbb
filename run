@@ -7,8 +7,17 @@ local commandName, commandOption = ...
 local function sh (...)
   local args = { ... }
   return function (commandFormat)
-    return os.execute(string.format(commandFormat, unpack(args)))
+    local command = string.format(commandFormat, unpack(args))
+    print(command)
+    return os.execute(command)
   end
+end
+
+local function builddeps()
+  sh() [[
+    cd extra/jlibtool
+    make clean && make
+  ]]
 end
 
 if commandName == 'game' then
@@ -18,14 +27,18 @@ if commandName == 'game' then
 elseif commandName == 'test' then
   require 'core.test'.runTests()
 elseif commandName == 'builddeps' then
-  sh() [[
-    cd extra/jlibtool
-    make clean && make
-  ]]
+  builddeps()
 elseif commandName == 'buildnative' then
   local prefix = ''
   if commandOption == 'debug' then
-    prefix = 'lldb -o run -o bt --'
+    builddeps()
+    prefix = [[
+      lldb \
+        --local-lldbinit \
+        -o 'b jlibtool.c:1948' \
+        -o 'run' \
+        -- \
+    ]]
   end
 
   sh(prefix) [[
