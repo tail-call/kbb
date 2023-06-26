@@ -13,7 +13,7 @@ end
 
 if commandName == 'game' then
   sh() [[
-    /Applications/love.app/Contents/MacOS/love
+    /Applications/love.app/Contents/MacOS/love .
   ]]
 elseif commandName == 'test' then
   require 'core.test'.runTests()
