@@ -91,6 +91,7 @@ Major goals:
 
 ## Research
 
+ - [ ] Use SQLite for data storage
  - [ ] Libtool for native code extensions? Or maybe CMake? Jlibtool?
  - [ ] Random terrain generation in a selected area
  - [ ] Use FFI for huge arrays like fog of war
