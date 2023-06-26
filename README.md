@@ -91,6 +91,7 @@ Major goals:
 
 ## Research
 
+ - [ ] Libtool for native code extensions? Or maybe CMake? Jlibtool?
  - [ ] Random terrain generation in a selected area
  - [ ] Use FFI for huge arrays like fog of war
  - [ ] Try using native code with ffi
