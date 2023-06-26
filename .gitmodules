@@ -1,0 +1,3 @@
+[submodule "extra/jlibtool"]
+	path = extra/jlibtool
+	url = git@github.com:alandekok/jlibtool.git
