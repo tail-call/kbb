@@ -3,7 +3,7 @@
 ---@field defence AbilityEffect
 ---@field treeCut AbilityEffect
 
-local Effect = require('AbilityEffect')
+local Effect = require 'AbilityEffect'
 
 ---@type { [string]: Ability }
 local abilities = {
