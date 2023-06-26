@@ -14,6 +14,12 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 Game is an editable image.
 
+# On deities
+
+- Zirnitra - a dragon, goddess of all kobolds.
+- Elbereth - elvish goddess. She scares away monsters, like kobolds. You get 
+  damage if you walk over Elbereth's name.
+
 # On class system
 
 I decided `init()` should be a function in the class rather than method in the object.
@@ -31,6 +37,12 @@ I decided I will only use tables for rulebook rather than functions because I wa
 Major goals:
 
 - [ ] MVP gameplay
+  - [ ] You are in the dungeon.
+  - [ ] You pick up a Crystal Ball and now you can control people.
+  - [ ] You help a guy switch a lever and he follows you.
+  - [ ] You learn combat.
+  - [ ] You learn about Power.
+  - [ ] You learn to summon new guys.
 - [ ] MVP editor
 - [ ] Show to people
 

@@ -6,29 +6,17 @@ local afterDrawTimer = nil
 
 local uiModel = {
   extraText = '',
-  cursorTimer = 0,
   doNothingCounter = 0,
 }
 
 local ui = require 'ui.menu'(uiModel)
 
 OnLoad(function (kind)
-  local extraText
-  if kind == 'initial' then
-    extraText = ''
-  elseif kind == 'reload' then
-    extraText = 'Reload successful.\n'
-  else
-    extraText = 'You came back from game.\n'
-  end
-  uiModel.extraText = extraText
+  local source = love.audio.newSource('music/title.xm', 'stream')
+  source:play()
 end)
 
 OnUpdate(function (dt)
-  uiModel.cursorTimer = uiModel.cursorTimer + 4 * dt
-  if uiModel.cursorTimer > 1 then
-    uiModel.cursorTimer = 0
-  end
   if afterDrawTimer ~= nil then
     afterDrawTimer = afterDrawTimer - dt
     if afterDrawTimer <= 0 then
@@ -63,10 +51,6 @@ OnKeyPressed(function (key, scancode, isrepeat)
     afterDraw = function ()
       GoBack()
     end
-  elseif scancode == 'f' then
-    uiModel.extraText = '\nRELOADING...'
-    require 'Draw'.nextFont()
-    require(Self.path).go('reload')
   else
     uiModel.doNothingCounter = uiModel.doNothingCounter + 1
     uiModel.extraText = scancode:upper()

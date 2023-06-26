@@ -10,33 +10,6 @@ local uiModel = {}
 local ui = require 'ui.screen'(uiModel)
 local alternatingKeyIndex = 1
 
-local function saveGame()
-  local file = io.open('./kobo2.kpss', 'w+')
-  if file == nil then error('no file') end
-
-  file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
-  file:write('-- It was created at ' .. os.date() .. '\n')
-
-  file:write(require 'core.Dump'.dump(game))
-  file:close()
-end
-
----@param filename string
----@return fun()?, string? errorMessage
-local function loadGame(filename)
-  return require 'core.Dump'.loadFileWithIndex(filename, function(t, k)
-    -- TODO: make any module loadable
-    if k == 'game' then
-      return {
-        GuyStats = require 'game.GuyStats'.new
-      }
-    end
-    return function(...)
-      return require(k).new(...)
-    end
-  end)
-end
-
 ---@param time number
 ---@return { r: number, g: number, b: number }
 local function skyColorAtTime(time)
@@ -96,8 +69,9 @@ OnLoad(function (savefileName)
       recruitCircle = require 'RecruitCircle'.new(),
     }
   else
-    local gameFunction, err = loadGame(savefileName)
-    game = gameFunction and gameFunction() or error(err)
+    local loadGame, err = require 'core.class'
+      .loadObject(savefileName)
+    game = loadGame and loadGame() or error(err)
   end
   uiModel.game = game
 end)
@@ -164,7 +138,7 @@ end)
 
 OnKeyPressed(function (key, scancode, isrepeat)
   if scancode == '8' then
-    saveGame()
+    require 'core.class'.saveObject(game, './kobo2.kpss')
   elseif scancode == 'z' then
     game:nextMagnificationFactor()
   elseif scancode == 'tab' then

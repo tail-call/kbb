@@ -146,7 +146,37 @@ local function reload(name)
   return require(name)
 end
 
+local function saveObject(object, filename)
+  local file = io.open(filename, 'w+')
+  if file == nil then error('no file') end
+
+  file:write('-- This is a Kobold Princess Simulator v0.4 savefile. You should not run it.\n')
+  file:write('-- It was created at ' .. os.date() .. '\n')
+
+  file:write(require 'core.Dump'.dump(object))
+  file:close()
+end
+
+---@param filename string
+---@return fun()?, string? errorMessage
+local function loadObject(filename)
+  return require 'core.Dump'.loadFileWithIndex(filename, function(t, k)
+    -- TODO: make any class loadable
+    if k == 'game' then
+      return {
+        GuyStats = require 'game.GuyStats'.new
+      }
+    end
+    return function(...)
+      return require(k).new(...)
+    end
+  end)
+end
+
+
 return {
   defineClass = defineClass,
   reload = reload,
+  saveObject = saveObject,
+  loadObject = loadObject,
 }
