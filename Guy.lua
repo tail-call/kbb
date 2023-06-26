@@ -28,7 +28,7 @@
 ---@field entity Object2D | nil
 
 local Vector = require 'core.Vector'
-local abilities = require 'Ability'.abilities
+local abilities = require 'game.Ability'.abilities
 
 local Guy = Class {
   ...,

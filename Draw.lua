@@ -10,6 +10,10 @@ local RED_COLOR = { 1, 0, 0, 0.8 }
 local YELLOW_COLOR = { 1, 1, 0, 0.8 }
 local GREEN_COLOR = { 0, 1, 0, 0.8 }
 
+local MOCK_PIXIE = require 'Pixie'.new {
+  quad = love.graphics.newQuad(0, 0, 0, 0, 0, 0)
+}
+
 ---@param transform love.Transform
 ---@param cb fun(): nil
 local function withTransform(transform, cb)
@@ -17,17 +21,6 @@ local function withTransform(transform, cb)
   love.graphics.applyTransform(transform)
   cb()
   love.graphics.pop()
-end
-
----@param canvas love.Canvas
----@param cb fun(canvas: love.Canvas): nil
-local function withCanvas(canvas, cb)
-  love.graphics.setCanvas(canvas)
-  love.graphics.push('transform')
-  love.graphics.replaceTransform(love.math.newTransform())
-  cb(canvas)
-  love.graphics.pop()
-  love.graphics.setCanvas()
 end
 
 ---@param r number
@@ -414,7 +407,7 @@ local function drawGame(game, drawState, ui, ambientColor)
   local player = game.player
   local playerStats = player and player.stats or require 'game.GuyStats'.new()
   local playerPos = player and player.pos or Global.leaderSpawnLocation
-  local playerPixie = player and player.pixie or require 'Pixie'.new()
+  local playerPixie = player and player.pixie or MOCK_PIXIE
   local playerX, playerY = playerPixie.transform:transformPoint(8, 16)
 
   drawTerrain(playerPos, game.world, drawState, ambientColor)
@@ -648,7 +641,6 @@ return {
   drawGame = drawGame,
   drawUI = drawUI,
   drawPointer = drawPointer,
-  withCanvas = withCanvas,
   withColor = withColor,
   TILE_WIDTH = TILE_WIDTH,
   TILE_HEIGHT = TILE_HEIGHT,

@@ -92,8 +92,8 @@ local Pixie = Class {
 ---@param pixie Pixie
 ---@return Pixie
 function Pixie.init(pixie)
-  pixie.texture = require('Tileset').getTileset().image
-  pixie.quad = pixie.quad or error('quad is required')
+  pixie.texture = require 'Tileset'.getTileset().image
+  pixie.quad = pixie.quad or error 'quad is required'
   pixie.isRightStep = pixie.isRightStep or false
   pixie.pos = { x = 0, y = 0 }
   pixie.isFlipped = pixie.isFlipped or false

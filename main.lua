@@ -61,6 +61,5 @@ function love.load()
   love.graphics.setDefaultFilter('linear', 'nearest')
   love.graphics.setLineStyle('rough')
   love.mouse.setVisible(false)
-  require 'Tileset'.load()
   require(Global.initialScene).go()
 end

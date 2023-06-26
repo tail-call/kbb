@@ -28,10 +28,6 @@ local timerCeil = 0.3
 ---@type Tileset
 local tileset
 
-local function getTileset()
-  return tileset
-end
-
 ---@param baseX number
 ---@param baseY number
 ---@param offsetX number
@@ -118,7 +114,7 @@ local function load()
     waterFrame = 4,
     image = image,
     regenerate = function (self)
-      require 'Draw'.withCanvas(self.tiles, function ()
+      require 'core.canvas'.withCanvas(self.tiles, function ()
         love.graphics.draw(self.image)
       end)
     end,
@@ -149,6 +145,14 @@ local function load()
   aTileset:regenerate()
   tileset = aTileset
 end
+
+local function getTileset()
+  if not tileset then
+    load()
+  end
+  return tileset
+end
+
 ---@param tileset Tileset
 ---@param dt number
 local function update(tileset, dt)
@@ -160,7 +164,7 @@ local function update(tileset, dt)
       tileset.waterFrame = 1
     end
 
-    require 'Draw'.withCanvas(tileset.tiles, function ()
+    require 'core.canvas'.withCanvas(tileset.tiles, function ()
       local quad = tileset.quads.waterFrames[tileset.waterFrame]
       local x, y = tileset.quads.water:getViewport()
       love.graphics.draw(tileset.image, quad, x, y)
@@ -169,7 +173,6 @@ local function update(tileset, dt)
 end
 
 return {
-  load = load,
   update = update,
   getTileset = getTileset,
   parallaxTile = parallaxTile,

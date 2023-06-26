@@ -26,8 +26,6 @@ local Battle = Class {
   }
 }
 
-local Ability = require('Ability')
-
 ---@param battle Battle
 function Battle.init(battle)
   battle.pos = battle.defender.pos
@@ -53,6 +51,8 @@ local function fight(game, attacker, defender, damageModifier, say)
     guy.stats:hurt(damage * damageModifier)
     say(('%s got %s damage, has %s hp now.'):format(guy.name, damage, guy.stats.hp))
   end
+
+  local Ability = require 'game.Ability'
 
   if defenderEffect == Ability.effects.defence.parry then
     if attackerEffect == Ability.effects.combat.normalAttack then

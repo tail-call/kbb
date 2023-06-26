@@ -3,24 +3,24 @@
 ---@field defence AbilityEffect
 ---@field treeCut AbilityEffect
 
-local Effect = require 'AbilityEffect'
+local AbilityEffect = require 'game.AbilityEffect'
 
 ---@type { [string]: Ability }
 local abilities = {
   normalFail = {
-    combat = Effect.combat.miss,
-    defence = Effect.defence.takeDamage,
-    treeCut = Effect.treeCut.loiter,
+    combat = AbilityEffect.combat.miss,
+    defence = AbilityEffect.defence.takeDamage,
+    treeCut = AbilityEffect.treeCut.loiter,
   },
   normalSuccess = {
-    combat = Effect.combat.normalAttack,
-    defence = Effect.defence.takeDamage,
-    treeCut = Effect.treeCut.normalChop,
+    combat = AbilityEffect.combat.normalAttack,
+    defence = AbilityEffect.defence.takeDamage,
+    treeCut = AbilityEffect.treeCut.normalChop,
   },
   normalCriticalSuccess = {
-    combat = Effect.combat.criticalAttack,
-    defence = Effect.defence.parry,
-    treeCut = Effect.treeCut.criticalChop,
+    combat = AbilityEffect.combat.criticalAttack,
+    defence = AbilityEffect.defence.parry,
+    treeCut = AbilityEffect.treeCut.criticalChop,
   },
 }
 
@@ -36,6 +36,6 @@ end
 
 return {
   abilities = abilities,
-  effects = Effect,
+  effects = AbilityEffect,
   pickAbility = pickAbility,
 }
