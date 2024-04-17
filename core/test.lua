@@ -41,9 +41,16 @@ local function group(name, cb)
   print('\t  Group ' .. name .. ':')
   state.title = name
   cb()
+
+  local textColor = state.failCount == 0 and '\x1B[32m' or  '\x1B[31m'
+  local stopColor = '\x1B[0m'
+  
+
   print(
     string.format(
-      '%s\t  Endgroup "%s", %d/%d succeeded, %d failed;',
+      textColor
+        .. '%s\t  Endgroup "%s", %d/%d succeeded, %d failed;'
+        .. stopColor,
       state.failCount == 0 and '' or '!',
       state.title, state.successCount,
       state.successCount + state.failCount,
