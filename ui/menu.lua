@@ -23,13 +23,14 @@ local INTRO = [[
 
                 Engraze
 
+             N) New Game in
+                Empty World
 
-             N) new game in
-                empty world
-             L) load world
-             Q) Quit game
+             L) Load World
 
+             D) KoBolDOS
 
+             Q) Quit Game
 ]]
 
 -- From <https://love2d.org/wiki/HSV_color>

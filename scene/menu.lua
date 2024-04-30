@@ -51,6 +51,11 @@ OnKeyPressed(function (key, scancode, isrepeat)
     afterDraw = function ()
       GoBack()
     end
+  elseif scancode == 'd' then
+    uiModel.extraText = '\nDOSSING...'
+    afterDraw = function ()
+      require 'scene.terminal'.go()
+    end
   else
     uiModel.doNothingCounter = uiModel.doNothingCounter + 1
     uiModel.extraText = scancode:upper()
