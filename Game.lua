@@ -111,6 +111,7 @@ local Game = Class {
       end
     end,
     switchMode = function (self)
+      require 'sfx'.playBoop()
       if self.mode == 'normal' then
         self.mode = 'paint'
       elseif self.mode == 'paint' then

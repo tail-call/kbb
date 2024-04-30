@@ -152,6 +152,7 @@ end)
 
 OnKeyPressed(function (key, scancode, isrepeat)
   if keyListener then
+    require 'sfx'.playBoop()
     keyListener(key)
     return
   end

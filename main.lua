@@ -41,6 +41,9 @@ do
   package.preload['scene.terminal'] = sceneLoader
 
   math.randomseed(os.time())
+
+  -- XXX May rewrite this in terms of package.preload
+  require 'sfx'.init()
 end
 
 function love.load()
