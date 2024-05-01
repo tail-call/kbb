@@ -164,6 +164,8 @@ local function Keymap(bindings)
   }
 end
 
+local selectNextTile = require 'World'.makeTileTypesIterator()
+
 local commonKeyPressMap = Keymap {
   ['8'] = function()
     require 'core.class'.saveObject(game, './kobo2.kpss')
@@ -194,6 +196,9 @@ local commonKeyPressMap = Keymap {
   end,
   ['x'] = function()
     game.player.pixie:setIsFloating(not game.player.pixie.isFloating)
+  end,
+  ['c'] = function()
+    game.painterTile = selectNextTile()
   end,
 }
 

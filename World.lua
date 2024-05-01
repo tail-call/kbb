@@ -2,11 +2,11 @@
 
 ---@class World.props
 ---@field image love.Image Minimap image
----@field width integer World's width in squares
----@field height integer World's height in squares
+---@field width integer World's width in tiles
+---@field height integer World's height in tiles
 ---@field revealedTilesCount number Number of tiles player had revealed
----@field tileTypes World.tile[] Tile types of each square in the world
----@field fogOfWar number[] How visible is each square in the world. Numbers from 0 to 1
+---@field tileTypes World.tile[] Tile types of each tile in the world
+---@field fogOfWar number[] How visible is each tile in the world. Numbers from 0 to 1
 
 ---@class World.methods
 ---@field revealFogOfWar fun(self: World, pos: core.Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
@@ -61,7 +61,7 @@ local M = Class {
     getFog = function (self, pos)
       return self.fogOfWar[vectorToLinearIndex(self, pos)] or 0
     end,
-  }
+  },
 }
 
 local calcVisionDistance = require 'VisionSource'.calcVisionDistance
@@ -205,6 +205,35 @@ function M.randomizePatch(world, patch)
         world:setTile({ x = x, y = y }, tileAbove or 'grass')
       end
     end
+  end
+end
+
+function M.makeTileTypesIterator()
+  local function iterate()
+    local tiles = {
+      'grass',
+      'rock',
+      'water',
+      'forest',
+      'sand',
+      'void',
+      'snow',
+      'cave',
+      'wall',
+    }
+
+    while true do
+      for _, tile in ipairs(tiles) do
+        coroutine.yield(tile)
+      end
+    end
+  end
+  
+  local thread = coroutine.create(iterate)
+  
+  return function()
+    local _, value = coroutine.resume(thread)
+    return value
   end
 end
 

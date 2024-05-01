@@ -89,7 +89,10 @@ SetModel {
     if game.mode == 'normal' then
       controls = 'Space] paint\nLMB] recruit\n8] save\nZ] zoom\nF] follow\nE] wonder\nQ] gather\nT] warp\nC] collect\nX] fly\nH] respawn\n'
     elseif game.mode == 'paint' then
-      controls = 'Space] focus\nLMB] paint\n'
+      controls = string.format(
+        'Space] focus\nLMB] paint\nC] %s\n',
+        game.painterTile
+      )
     end
     return {
       WHITE_COLOR,
