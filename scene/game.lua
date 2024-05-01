@@ -136,28 +136,69 @@ OnUpdate(function (dt)
   updateGame(game, dt, directions, skyColorAtTime(game.time).g)
 end)
 
-OnKeyPressed(function (key, scancode, isrepeat)
-  if scancode == '8' then
+---@class Keymap
+---@field bindings table
+---@field handleScancode fun(self: Keymap, scancode: string)
+
+---@param bindings table
+---@return Keymap
+local function Keymap(bindings)
+  return {
+    bindings = bindings,
+    handleScancode = function(self, scancode)
+      local handler = self.bindings[scancode]
+
+      if handler == nil then
+        return
+      end
+
+      if type(handler) ~= "function" then
+        error(string.format(
+          "handleScancode: handler for scancode %s is not a function",
+          scancode
+        ))
+      end
+      
+      handler()
+    end,
+  }
+end
+
+local commonKeyPressMap = Keymap {
+  ['8'] = function()
     require 'core.class'.saveObject(game, './kobo2.kpss')
-  elseif scancode == 'z' then
+  end,
+  ['z'] = function()
     game:nextMagnificationFactor()
-  elseif scancode == 'tab' then
+  end,
+  ['tab'] = function()
     uiModel:nextTab()
-  elseif scancode == 'return' then
+  end,
+  ['return'] = function()
     require 'scene.console'.go(game)
-  elseif scancode == 'space' then
+  end,
+  ['space'] = function()
     game:switchMode()
-  elseif scancode == 'g' then
+  end,
+  ['g'] = function()
     require 'Game'.orderDismiss(game)
-  elseif scancode == 'r' then
+  end,
+  ['r'] = function()
     require 'Game'.orderSummon(game)
-  elseif scancode == 'f' then
+  end,
+  ['f'] = function()
     game.squad:toggleFollow()
-  elseif scancode == 'b' then
+  end,
+  ['b'] = function()
     require 'Game'.orderBuild(game)
-  elseif scancode == 'x' then
+  end,
+  ['x'] = function()
     game.player.pixie:setIsFloating(not game.player.pixie.isFloating)
-  end
+  end,
+}
+
+OnKeyPressed(function (key, scancode, isrepeat)
+  commonKeyPressMap:handleScancode(scancode)
 
   if game.mode == 'focus' then
     if require 'core.table'.has({ '1', '2', '3', '4' }, scancode) then
