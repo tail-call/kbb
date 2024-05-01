@@ -10,45 +10,58 @@ local function moduleNameToPath(name)
   return name
 end
 
-local function uiLoader(moduleName)
-  return function (...)
-    return require 'UI'.makeUIScript(
-      moduleNameToPath(moduleName), ...
-    )
+local function preloadResources(resources)
+  for k, v in pairs(resources) do
+    package.preload[k] = v
   end
 end
 
-local function sceneLoader(path)
-  return {
-    go = function (...)
-      return require 'Scene'.loadScene(
-        moduleNameToPath(path), ...
+local loader = {
+  image = love.graphics.newImage,
+  imageData = love.image.newImageData,
+  ui = function(moduleName)
+    return function (...)
+      return require 'UI'.makeUIScript(
+        moduleNameToPath(moduleName), ...
       )
     end
-  }
-end
+  end,
+  scene = function(path)
+    return {
+      go = function (...)
+        return require 'Scene'.loadScene(
+          moduleNameToPath(path), ...
+        )
+      end
+    }
+  end,
+}
 
--- Initialization
-do
-  package.preload['res/map.png'] = love.image.newImageData
-  package.preload['res/cga8.png'] = love.image.newImageData
-  package.preload['res/tiles.png'] = love.graphics.newImage
-  package.preload['ui.screen'] = uiLoader
-  package.preload['ui.menu'] = uiLoader
-  package.preload['scene.menu'] = sceneLoader
-  package.preload['scene.game'] = sceneLoader
-  package.preload['scene.console'] = sceneLoader
-  package.preload['scene.terminal'] = sceneLoader
-
-  math.randomseed(os.time())
-
-  -- XXX May rewrite this in terms of package.preload
-  require 'sfx'.init()
+local function startGame()
+  require(Global.initialScene).go()
 end
 
 function love.load()
   love.graphics.setDefaultFilter('linear', 'nearest')
   love.graphics.setLineStyle('rough')
   love.mouse.setVisible(false)
-  require(Global.initialScene).go()
+
+  preloadResources {
+    ['res/map.png'] = loader.imageData,
+    ['res/cga8.png'] = loader.imageData,
+    ['res/tiles.png'] = loader.image,
+    ['ui.screen'] = loader.ui,
+    ['ui.menu'] = loader.ui,
+    ['scene.menu'] = loader.scene,
+    ['scene.game'] = loader.scene,
+    ['scene.console'] = loader.scene,
+    ['scene.terminal'] = loader.scene,
+  }
+
+  math.randomseed(os.time())
+
+  -- XXX May rewrite this in terms of package.preload
+  require 'sfx'.init()
+
+  startGame()
 end
