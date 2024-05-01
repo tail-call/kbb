@@ -18,6 +18,7 @@
 ---@field console Console Bottom console
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field frozenEntities { [Object2D]: true } Entities that should be not rendered and should not behave
+---@field painterTile World.tile Current selected tile in paint mode
 ---# Methods
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field switchMode fun(self: Game) Switches to next mode
@@ -46,6 +47,7 @@ local TILE_SPEEDS = {
   void = 1/8,
 }
 
+--XXX Evaluate
 -- local Game = Class(function (C)
 --   C.slot { 'world', type = 'required' }
 --   C.slot { 'time',
@@ -62,8 +64,6 @@ local TILE_SPEEDS = {
 --   }
 -- end)
 
-
-
 local Game = Class {
   ...,
   slots = {
@@ -71,6 +71,7 @@ local Game = Class {
     '!squad',
     '!recruitCircle',
     '!resources',
+    'painterTile',
   },
   ---@type Game
   index = {
@@ -205,6 +206,7 @@ function Game.init(game)
   game.cursorPos = game.cursorPos or { x = 0, y = 0 }
   game.magnificationFactor = game.magnificationFactor or 1
   game.mode = game.mode or 'normal'
+  game.painterTile = 'rock'
 
   game.guyDelegate = makeGuyDelegate(game)
 
@@ -479,7 +481,7 @@ end
 
 ---@param game Game
 function Game.orderPaint(game)
-  game.world:setTile(game.cursorPos, 'grass')
+  game.world:setTile(game.cursorPos, game.painterTile)
 end
 
 ---@param game Game
