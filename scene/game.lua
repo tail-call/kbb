@@ -37,7 +37,13 @@ Tooltip(function ()
     return {}
   end
 
-  local line1 = game.world:getTile(game.cursorPos) or '???'
+  local line1
+  if game.mode == 'paint' then
+    line1 = 'C=' .. game.painterTile
+  else
+    line1 = game.world:getTile(game.cursorPos) or '???'
+  end
+
   local line2 = Vector.formatVector(game.cursorPos)
   local entity = {}
   -- Detect entities under cursor

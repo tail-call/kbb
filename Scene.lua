@@ -44,7 +44,7 @@ function M.loadScene(path, ...)
     OnDraw = function (draw)
       scene.draw = function ()
         draw(drawState)
-        require 'Draw'.drawPointer(drawState, scene.tooltips)
+        require 'Draw'.drawPointerAndTooltips(drawState, scene.tooltips)
       end
     end,
     OnKeyPressed = function (keypressed)

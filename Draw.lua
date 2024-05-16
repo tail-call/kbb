@@ -345,7 +345,7 @@ end
 
 ---@param drawState DrawState
 ---@param tooltips fun(): string[]
-local function drawPointer(drawState, tooltips)
+local function drawPointerAndTooltips(drawState, tooltips)
   local x, y = love.mouse.getPosition()
   x = x / drawState.windowScale
   y = y / drawState.windowScale
@@ -675,7 +675,7 @@ end
 return {
   drawGame = drawGame,
   drawUI = drawUI,
-  drawPointer = drawPointer,
+  drawPointerAndTooltips = drawPointerAndTooltips,
   withColor = withColor,
   TILE_WIDTH = TILE_WIDTH,
   TILE_HEIGHT = TILE_HEIGHT,
