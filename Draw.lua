@@ -5,11 +5,10 @@ local TILE_WIDTH = 16
 local MINIMAP_SIZE = 72
 local HIGHLIGHT_CIRCLE_RADIUS = 10
 
-local color = {
+local Color = {
   cursorWhite = { 1, 1, 1, 0.8 },
   cursorRed = { 1, 0, 0, 0.8 },
   cursorYellow = { 1, 1, 0, 0.8 },
--- local GREEN_COLOR = { 0, 1, 0, 0.8 }
   cursorGreen = { 0, 1, 0, 0.8 },
 }
 
@@ -542,12 +541,12 @@ local function drawGame(game, drawState, ui, ambientColor)
   curY = math.max(playerPos.y - curDistance, curY)
   do
     local cursorPos = { x = curX, y = curY }
-    local cursorColor = color.cursorWhite
+    local cursorColor = Color.cursorWhite
 
     if game.mode == 'focus' then
-      cursorColor = color.cursorYellow
+      cursorColor = Color.cursorYellow
     elseif game.mode == 'paint' then
-      cursorColor = color.cursorGreen
+      cursorColor = Color.cursorGreen
       game.cursorPos = cursorPos
     elseif game.mode == 'normal' then
       game.cursorPos = cursorPos
@@ -562,7 +561,7 @@ local function drawGame(game, drawState, ui, ambientColor)
     end
 
     if collision.type == 'terrain' then
-      cursorColor = color.cursorRed
+      cursorColor = Color.cursorRed
     end
 
     local r, g, b, a = unpack(cursorColor)
