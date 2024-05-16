@@ -377,6 +377,82 @@ local function drawPointer(drawState, tooltips)
   end)
 end
 
+---@param transform love.Transform
+---@param offsetX number
+---@param offsetY number
+---@param image love.Image
+---@param alpha number
+---@param entities Object2D[]
+---@param curX number
+---@param curY number
+---@param messages ConsoleMessage[]
+local function drawMinimapAndConsoleMessages(
+  transform,
+  offsetX,
+  offsetY,
+  image,
+  alpha,
+  entities,
+  curX,
+  curY,
+  messages
+)
+  withTransform(transform, function ()
+    local quad = love.graphics.newQuad(
+      offsetX, offsetY,
+      MINIMAP_SIZE, MINIMAP_SIZE,
+      image:getWidth(),
+      image:getHeight()
+    )
+
+
+    -- Overlay
+    withColor(1, 1, 1, alpha, function ()
+      love.graphics.draw(image, quad, 0, 0)
+      love.graphics.print('R A D A R', 0, -8)
+      love.graphics.setColor(0, 0, 0, 0.25)
+      love.graphics.print('    N    ', 0, 0)
+      love.graphics.print('W       E', 0, 32)
+      love.graphics.print('    S    ', 0, 64)
+    end)
+
+    -- Entities
+    for _, entity in ipairs(entities) do
+      local color = { 0.5, 0.5, 0.5, 1 }
+      if entity.__module == 'Guy' then
+        ---@cast entity Guy
+        color = entity.pixie.color
+      end
+      local pointX = entity.pos.x - 1 - offsetX
+      local pointY = entity.pos.y - 1 - offsetY
+      if pointX >= 0
+        and pointX < MINIMAP_SIZE
+        and pointY >= 0
+        and pointY < MINIMAP_SIZE
+      then
+        withColor(color[1], color[2], color[3], 1, function ()
+          love.graphics.rectangle('fill', pointX, pointY, 1, 1)
+        end)
+      end
+    end
+
+    -- Cursor
+    withColor(1, 1, 1, 0.5, function ()
+      love.graphics.rectangle('fill', curX - offsetX, curY - offsetY, 1, 1)
+    end)
+
+    -- Console messages
+    withTransform(love.math.newTransform(88, 32):scale(2/3, 2/3), function ()
+      for i, message in ipairs(messages) do
+        local fadeOut = math.min(message.lifetime, 1)
+        withColor(1, 1, 1, alpha * fadeOut, function ()
+          love.graphics.print(message.text, 0, 8 * i)
+        end)
+      end
+    end)
+  end)
+end
+
 ---@param game Game
 ---@param drawState DrawState
 ---@param ui UI
@@ -572,71 +648,28 @@ local function drawGame(game, drawState, ui, ambientColor)
 
   love.graphics.pop()
 
-  -- Draw UI
-
   drawUI(drawState, ui)
 
-  -- Draw minimap
+  local minimapTransform = love.math.newTransform(
+    8,
+    screenH - 16 - MINIMAP_SIZE
+  )
 
-  -- TODO: make a UI widget instead
-  withTransform(love.math.newTransform(8, screenH - 16 - MINIMAP_SIZE), function ()
-    local offsetX = playerPos.x - MINIMAP_SIZE / 2
-    local offsetY = playerPos.y - MINIMAP_SIZE / 2
-
-    local quad = love.graphics.newQuad(
-      offsetX, offsetY,
-      MINIMAP_SIZE, MINIMAP_SIZE,
-      game.world.image:getWidth(),
-      game.world.image:getHeight()
-    )
-
-    local alpha = (game.mode == 'focus') and 1 or 0.25
-
-    -- Overlay
-    withColor(1, 1, 1, alpha, function ()
-      love.graphics.draw(game.world.image, quad, 0, 0)
-      love.graphics.print('R A D A R', 0, -8)
-      love.graphics.setColor(0, 0, 0, 0.25)
-      love.graphics.print('    N    ', 0, 0)
-      love.graphics.print('W       E', 0, 32)
-      love.graphics.print('    S    ', 0, 64)
-    end)
-
-    -- Entities
-    for _, entity in ipairs(game.entities) do
-      local color = { 0.5, 0.5, 0.5, 1 }
-      if entity.__module == 'Guy' then
-        ---@cast entity Guy
-        color = entity.pixie.color
-      end
-      local pointX = entity.pos.x - 1 - offsetX
-      local pointY = entity.pos.y - 1 - offsetY
-      if pointX >= 0
-        and pointX < MINIMAP_SIZE
-        and pointY >= 0
-        and pointY < MINIMAP_SIZE
-      then
-        withColor(color[1], color[2], color[3], 1, function ()
-          love.graphics.rectangle('fill', pointX, pointY, 1, 1)
-        end)
-      end
-    end
-
-    -- Cursor
-    withColor(1, 1, 1, 0.5, function ()
-      love.graphics.rectangle('fill', curX - offsetX, curY - offsetY, 1, 1)
-    end)
-
-    -- Console messages
-    withTransform(love.math.newTransform(88, 32):scale(2/3, 2/3), function ()
-      for i, message in ipairs(game.console.messages) do
-        local fadeOut = math.min(message.lifetime, 1)
-        withColor(1, 1, 1, alpha * fadeOut, function ()
-          love.graphics.print(message.text, 0, 8 * i)
-        end)
-      end
-    end)
-  end)
+  local offsetX = playerPos.x - MINIMAP_SIZE / 2
+  local offsetY = playerPos.y - MINIMAP_SIZE / 2
+  local minimapAlpha = (game.mode == 'focus') and 1 or 0.25
+  
+  drawMinimapAndConsoleMessages(
+    minimapTransform,
+    offsetX,
+    offsetY,
+    game.world.image,
+    minimapAlpha,
+    game.entities,
+    curX,
+    curY,
+    game.console.messages
+  )
 end
 
 return {
