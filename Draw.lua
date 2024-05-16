@@ -5,10 +5,13 @@ local TILE_WIDTH = 16
 local MINIMAP_SIZE = 72
 local HIGHLIGHT_CIRCLE_RADIUS = 10
 
-local WHITE_CURSOR_COLOR = { 1, 1, 1, 0.8 }
-local RED_COLOR = { 1, 0, 0, 0.8 }
-local YELLOW_COLOR = { 1, 1, 0, 0.8 }
-local GREEN_COLOR = { 0, 1, 0, 0.8 }
+local color = {
+  cursorWhite = { 1, 1, 1, 0.8 },
+  cursorRed = { 1, 0, 0, 0.8 },
+  cursorYellow = { 1, 1, 0, 0.8 },
+-- local GREEN_COLOR = { 0, 1, 0, 0.8 }
+  cursorGreen = { 0, 1, 0, 0.8 },
+}
 
 local MOCK_PIXIE = require 'Pixie'.new {
   quad = love.graphics.newQuad(0, 0, 0, 0, 0, 0)
@@ -539,12 +542,12 @@ local function drawGame(game, drawState, ui, ambientColor)
   curY = math.max(playerPos.y - curDistance, curY)
   do
     local cursorPos = { x = curX, y = curY }
-    local cursorColor = WHITE_CURSOR_COLOR
+    local cursorColor = color.cursorWhite
 
     if game.mode == 'focus' then
-      cursorColor = YELLOW_COLOR
+      cursorColor = color.cursorYellow
     elseif game.mode == 'paint' then
-      cursorColor = GREEN_COLOR
+      cursorColor = color.cursorGreen
       game.cursorPos = cursorPos
     elseif game.mode == 'normal' then
       game.cursorPos = cursorPos
@@ -559,7 +562,7 @@ local function drawGame(game, drawState, ui, ambientColor)
     end
 
     if collision.type == 'terrain' then
-      cursorColor = RED_COLOR
+      cursorColor = color.cursorRed
     end
 
     local r, g, b, a = unpack(cursorColor)
