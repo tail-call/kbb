@@ -50,7 +50,7 @@ function love.load()
     ['res/map.png'] = loader.imageData,
     ['res/cga8.png'] = loader.imageData,
     ['res/tiles.png'] = loader.image,
-    ['ui.screen'] = loader.ui,
+    ['ui.hud'] = loader.ui,
     ['ui.menu'] = loader.ui,
     ['scene.menu'] = loader.scene,
     ['scene.game'] = loader.scene,

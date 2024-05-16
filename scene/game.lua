@@ -7,7 +7,7 @@ local endRecruiting = require 'Game'.endRecruiting
 local game
 ---@type UIModel
 local uiModel = {}
-local ui = require 'ui.screen'(uiModel)
+local ui = require 'ui.hud'(uiModel)
 local alternatingKeyIndex = 1
 
 ---@param time number
