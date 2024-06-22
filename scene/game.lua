@@ -124,7 +124,7 @@ OnUpdate(function (dt)
           end
         end
 
-        if not game:isFrozen(game.player) then
+        if game.player and not game:isFrozen(game.player) then
           local oldPos = game.player.pos
           local newPos = require 'Guy'.moveGuy(
             game.player,

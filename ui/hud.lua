@@ -83,7 +83,7 @@ SetModel {
   topPanelText = function ()
     local game = Model.game
     local player = game.player
-    if not player then return 'Press H to revive or game will crash' end
+    if not player then return 'Wow, you lose! Press H to revive' end
 
     local controls = ''
     if game.mode == 'normal' then
