@@ -71,14 +71,6 @@ Guy = Class {
   }
 }
 
----@param team1 Guy.team
----@param team2 Guy.team
----@return boolean
-local function checkIfRivals(team1, team2)
-  return team1 == 'good' and team2 == 'evil'
-    or team1 == 'evil' and team2 == 'good'
-end
-
 ---@param guy Guy
 ---@param vec core.Vector
 ---@param delegate Guy.delegate
@@ -110,10 +102,17 @@ function Guy.moveGuy(guy, vec, delegate)
             return pos
           end
         elseif collision.entity.__module == 'Guy' then
+          local collisionEntity = collision.entity
+
+          ---@cast collisionEntity Guy
           ---@cast entity Guy
-          if checkIfRivals(guy.team, collision.entity.team) then
+
+          if require 'ruleBook'.checkIfRivals(
+            guy.team,
+            collisionEntity.team
+          ) then
             guy:move(pos)
-            delegate.beginBattle(guy, entity)
+            delegate.beginBattle(guy, collisionEntity)
             return pos
           end
         end

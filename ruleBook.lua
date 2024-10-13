@@ -154,7 +154,18 @@ ruleBook = {
   },
 }
 
+---@param team1 Guy.team
+---@param team2 Guy.team
+---@return boolean
+local function checkIfRivals(team1, team2)
+  return (
+    team1 == 'good' and team2 == 'evil'
+    or team1 == 'evil' and team2 == 'good'
+  )
+end
+
 return {
   evalRule = evalRule,
   ruleBook = ruleBook,
+  checkIfRivals = checkIfRivals,
 }
