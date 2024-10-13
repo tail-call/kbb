@@ -15,6 +15,7 @@
 ---@field move fun(self: Guy, pos: core.Vector) Changes guy's position
 ---@field warp fun(self: Guy, pos: core.Vector) Changes guy's position instantly
 ---@field update fun(self: Guy, dt: number)
+---@field behave fun(self: Guy, delegate: Guy.delegate) Changes guy's position
 
 ---@class Guy.delegate
 ---@field collider fun(v: core.Vector, guy: Guy): Guy.collision Function that performs collision checks between game world objects
@@ -30,9 +31,10 @@
 local Vector = require 'core.Vector'
 local abilities = require 'game.Ability'.abilities
 
-local Guy = Class {
+local Guy
+Guy = Class {
   ...,
-  ---@type Guy
+  slots = { 'mayMove', 'timer', '!pos', '!pixie' },
   index = {
     move = function (self, pos)
       self.mayMove = false
@@ -54,6 +56,16 @@ local Guy = Class {
         self.mayMove = true
         self.timer = self.timer % self.speed
         self.stats:addMoves(1)
+      end
+    end,
+    behave = function (self, delegate)
+      if self.behavior == 'wander' then
+        Guy.moveGuy(self, ({
+          Vector.dir.up,
+          Vector.dir.down,
+          Vector.dir.left,
+          Vector.dir.right,
+        })[math.random(1, 4)], delegate)
       end
     end,
   }
@@ -110,19 +122,6 @@ function Guy.moveGuy(guy, vec, delegate)
   end
 
   return guy.pos
-end
-
----@param guy Guy
----@param delegate Guy.delegate
-function Guy.behave(guy, delegate)
-  if guy.behavior == 'wander' then
-    Guy.moveGuy(guy, ({
-      Vector.dir.up,
-      Vector.dir.down,
-      Vector.dir.left,
-      Vector.dir.right,
-    })[math.random(1, 4)], delegate)
-  end
 end
 
 ---@param guy Guy

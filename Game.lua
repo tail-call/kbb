@@ -38,10 +38,10 @@ local updateConsole = require 'Console'.updateConsole
 local isRecruitCircleActive = require 'RecruitCircle'.isRecruitCircleActive
 local isAFollower = require 'Squad'.isAFollower
 local revealVisionSourceFog = require 'World'.revealVisionSourceFog
-local behave = require 'Guy'.behave
 local ruleBook = require 'ruleBook'.ruleBook
 local evalRule = require 'ruleBook'.evalRule
 
+--XXX To rulebook??
 local TILE_SPEEDS = {
   forest = 1/2,
   void = 1/8,
@@ -389,6 +389,7 @@ function Game.updateGame(game, dt, movementDirections, visibility)
     end
   end
 
+  --XXX To rulebook??
   ---Returns a speed factor that a guy should have on a specified tile
   ---@param guy Guy
   ---@param tile World.tile
@@ -404,9 +405,14 @@ function Game.updateGame(game, dt, movementDirections, visibility)
   for _, entity in ipairs(game.entities) do
     if entity.__module == 'Guy' then
         ---@cast entity Guy
-      entity:update(dt * speedFactor(entity, game.world:getTile(entity.pos)))
+      entity:update(
+        dt * speedFactor(
+          entity,
+          game.world:getTile(entity.pos)
+        )
+      )
       if not game:isFrozen(entity) then
-        behave(entity, game.guyDelegate)
+        entity:behave(game.guyDelegate)
       end
     end
   end
