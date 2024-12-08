@@ -221,8 +221,8 @@ OnKeyPressed(function (key, scancode, isrepeat)
     elseif scancode == 'h' then
       game:addPlayer(require 'Guy'.makeLeader(Global.leaderSpawnLocation))
     elseif scancode == 'e' then
-      local patch = require 'World'.patchAt(game.world, game.player.pos)
-      require 'World'.randomizePatch(game.world, patch)
+      -- local patch = require 'World'.patchAt(game.world, game.player.pos)
+      -- require 'World'.randomizePatch(game.world, patch)
     elseif scancode == 't' then
       game.player:warp(game.cursorPos)
     end

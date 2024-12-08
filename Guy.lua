@@ -21,6 +21,7 @@
 ---@field collider fun(v: core.Vector, guy: Guy): Guy.collision Function that performs collision checks between game world objects
 ---@field beginBattle fun(attacker: Guy, defender: Guy): nil Begins a battle between an attacker and defender
 ---@field enterHouse fun(guest: Guy, building: Building): 'shouldMove' | 'shouldNotMove' Tells whether the guy may enter the building
+---@field enterHealingRune fun(healee: Guy, rune: HealingRune) Action that happens whn a guy enters the healing rune
 
 ---@alias Guy.team 'good' | 'evil' | 'neutral'
 
@@ -94,6 +95,7 @@ function Guy.moveGuy(guy, vec, delegate)
       return pos
     elseif collision.type == 'entity' then
       local entity = collision.entity
+      --- XXX This is game logic, must be in Game
       if entity ~= nil then
         if entity.__module == 'Building' then
           ---@cast entity Building
@@ -102,6 +104,9 @@ function Guy.moveGuy(guy, vec, delegate)
             guy:move(pos)
             return pos
           end
+        elseif collision.entity.__module == 'HealingRune' then
+          guy.stats:heal(1)
+          guy:move(pos)
         elseif collision.entity.__module == 'Guy' then
           local collisionEntity = collision.entity
 

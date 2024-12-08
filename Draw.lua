@@ -271,6 +271,16 @@ local function drawHouse(tileset, pos)
   )
 end
 
+---@param rune HealingRune
+local function drawHealingRune(rune)
+  love.graphics.circle(
+    'line',
+    (rune.pos.x + 0.5) * TILE_WIDTH,
+    (rune.pos.y + 0.5) * TILE_HEIGHT,
+    TILE_HEIGHT * 0.4
+  )
+end
+
 ---@return number, number
 local function getCursorCoords()
   local x, y = love.graphics.inverseTransformPoint(
@@ -630,28 +640,37 @@ local function drawGame(game, drawState, ui, ambientColor)
   end)
 
   for _, entity in ipairs(entities) do
-    if entity.__module == 'Building' then
+    local className = entity.__module
+
+    if className == 'Building' then
       ---@cast entity Building
       cullAndShade(entity, function ()
         drawHouse(drawState.tileset, entity.pos)
       end)
-    elseif entity.__module == 'Battle' then
+    elseif className == 'Battle' then
       ---@cast entity Battle
       cullAndShade(entity, function ()
         drawBattle(drawState, entity)
       end)
-    elseif entity.__module == 'Text' then
+    elseif className == 'Text' then
       ---@cast entity Text
       cullAndShade(entity, function ()
         textAtTile(entity.text, entity.pos, entity.maxWidth)
       end)
-    elseif entity.__module == 'Guy' then
+    elseif className == 'Guy' then
       ---@cast entity Guy
       if not game:isFrozen(entity) then
         cullAndShade(entity, function ()
           drawGuy(entity)
         end)
       end
+    elseif className == 'HealingRune' then
+      ---@cast entity HealingRune
+      cullAndShade(entity, function ()
+        drawHealingRune(entity)
+      end)
+    else
+      error(string.format('drawing routine for class %s is not defined', className))
     end
   end
 

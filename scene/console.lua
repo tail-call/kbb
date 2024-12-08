@@ -63,12 +63,22 @@ OnKeyPressed(function (key, scancode, isrepeat)
         noon = function ()
           game.time = 12 * 60
         end,
+        spawnHealingRune = function (restoredHp, rechargeTime)
+          game:addEntity(
+            require 'HealingRune'.new {
+              restoredHp = restoredHp,
+              rechargeTime = rechargeTime,
+              pos = game.cursorPos,
+            }
+          )
+        end,
       }
 
       setfenv(chunk, require 'Commands'.new(opts))
       local isSuccess, errorMessage = pcall(chunk)
       if not isSuccess then
-        echo(errorMessage)
+        echo('Error:', errorMessage)
+        io.stderr:write(string.format('Error: %s\n', errorMessage))
       end
     else
       echo(compileErrorMessage or 'Unknown error')

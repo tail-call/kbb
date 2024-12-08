@@ -40,4 +40,8 @@ return {
     'Sets time to 12:00',
     example = 'noon()',
   },
+  shr = {
+    'Spawns a healing rune under cursor.',
+    example = 'shr(restoredHp, rechargeTime)',
+  }
 }

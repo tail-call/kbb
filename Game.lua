@@ -92,6 +92,7 @@ local Game = Class {
       self.time = (self.time + dt) % (24 * 60)
     end,
     addEntity = function (self, entity)
+      Log.printf('Welcome, %s\n', entity.__module)
       table.insert(self.entities, entity)
     end,
     removeEntity = function (self, entity, shouldGenerateEvent)
@@ -210,6 +211,14 @@ local function makeGuyDelegate(game)
   local guyDelegate = {
     beginBattle = function (attacker, defender)
       game:beginBattle(attacker, defender)
+    end,
+    enterHouse = function (guy, building)
+      if guy.team ~= 'good' then
+        return 'shouldNotMove'
+      end
+      guy.stats:setMaxHp(guy.stats.maxHp + 1)
+      game:removeEntity(building, true)
+      return 'shouldMove'
     end,
     enterHouse = function (guy, building)
       if guy.team ~= 'good' then

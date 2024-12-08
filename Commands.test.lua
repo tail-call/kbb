@@ -21,12 +21,23 @@ group('Commands/new', function ()
     }
   }
 
+  local currentTime = 0
+  local currentTimeExpected = 1200
+
   local clear = function ()
     echoes = {}
   end
 
   local scribe = function (text)
     table.insert(scribben, text)
+  end
+
+  local function noon ()
+    currentTime = currentTimeExpected
+  end
+
+  local function spawnHealingRune ()
+    currentTime = currentTimeExpected
   end
 
   local env = Commands.new {
@@ -38,6 +49,8 @@ group('Commands/new', function ()
     root = root,
     clear = clear,
     scribe = scribe,
+    noon = noon,
+    spawnHealingRune = spawnHealingRune,
   }
 
   do -- Check if functions are loaded properly

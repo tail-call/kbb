@@ -6,6 +6,7 @@
 ---@field noon fun(...)
 ---@field global table
 ---@field helpTable table
+---@field spawnHealingRune fun(a: number, b: number)
 
 ---@param opts CommandsOptions
 ---@return table
@@ -16,6 +17,7 @@ local function new(opts)
   local clear = opts.clear or error('opts.clear is required', 2)
   local scribe = opts.scribe or error('opts.scribe is required', 2)
   local noon = opts.noon or error('opts.noon is required', 2)
+  local spawnHealingRune = opts.spawnHealingRune or error('opts.spawnHealingRune is required', 2)
   local helpTable = opts.helpTable or error('opts.helpTable is required', 2)
 
   -- Will be populated later
@@ -70,6 +72,9 @@ local function new(opts)
     noon = function ()
       noon()
     end,
+    shr = function (restoredHp, rechargeTime)
+      spawnHealingRune(restoredHp, rechargeTime)
+    end,
   }
 
   do -- Populate help pages
@@ -83,7 +88,11 @@ local function new(opts)
     end
 
     for key, page in pairs(helpTable) do
-      helpPages[env[key]] = makeHelpEntry(page)
+      local value = env[key]
+      if value == nil then
+        error(string.format('no value for key "%s" in env', key))
+      end
+      helpPages[value] = makeHelpEntry(page)
     end
   end
 
