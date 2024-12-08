@@ -53,7 +53,6 @@ Major goals:
  - [ ] BUG: Life bars are positioned weirdly a lot of times
  - [ ] BUG: Game crashes when saving game if a squad is not empty
  - [ ] BUG: Vision source shape has a L-shaped notch at the left edge
- - [ ] BUG: Friendly units won't fight enemies
  - [ ] BUG: Text objects are not passable
  - [ ] BUG: Text objects render over other objects
  - [ ] BUG: Game crashes when pressing any key in focus mode
@@ -312,6 +311,7 @@ Major goals:
  - [x] BUGFIX: Game crashes when opening a console [2023-05-28T20:04]
  - [x] BUGFIX: Segfault on save [2023-05-30T00:12]
  - [x] ~~'lang/model'~~
+ - [x] BUG: Friendly units won't fight enemies [Sun 8 Dec 2024]
 
 # Sources
 

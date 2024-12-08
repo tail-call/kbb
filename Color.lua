@@ -4,6 +4,7 @@ local Color = {
   cursorYellow = { 1, 1, 0, 0.8 },
   cursorGreen = { 0, 1, 0, 0.8 },
   gray50 = { 0.5, 0.5, 0.5, 1 },
+  goodGuy = { 0.77, 1, 0.79, 1 },
 }
 
 return Color

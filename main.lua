@@ -60,7 +60,6 @@ function love.load()
 
   math.randomseed(os.time())
 
-  -- XXX May rewrite this in terms of package.preload
   require 'sfx'.init()
 
   startGame()

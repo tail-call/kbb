@@ -293,11 +293,18 @@ end
 ---@return boolean
 function Game.mayRecruit(game, entity)
   if entity.__module ~= 'Guy' then return false end
+
   ---@cast entity Guy
-  if not isRecruitCircleActive(game.recruitCircle) then return false end
-  if isGuyAPlayer(game, entity) then return false end
-  if isAFollower(game.squad, entity) then return false end
-  if entity.team ~= game.player.team then return false end
+  if not isRecruitCircleActive(game.recruitCircle) then
+    return false
+  elseif isGuyAPlayer(game, entity) then
+    return false
+  elseif isAFollower(game.squad, entity) then
+    return false
+  elseif entity.team ~= game.player.team then
+    return false
+  end
+
   return Vector.dist(entity.pos, game.cursorPos) < game.recruitCircle.radius + 0.5
 end
 
@@ -320,7 +327,6 @@ end
 function Game.endRecruiting(game)
   for _, entity in ipairs(game.entities) do
     local mayRecruit = Game.mayRecruit(game, entity)
-    print("mayRecruit =", mayRecruit, "entity.pos =", formatVector(entity.pos))
     if mayRecruit then
       if entity.__module == 'Guy' then
         ---@cast entity Guy

@@ -30,6 +30,7 @@
 
 local Vector = require 'core.Vector'
 local abilities = require 'game.Ability'.abilities
+local Color = require 'Color'
 
 local Guy
 Guy = Class {
@@ -181,9 +182,10 @@ function Guy.makeGoodGuy(pos)
 
   return Guy.new {
     name = 'Good Guy',
-    team = 'neutral',
+    team = 'good',
     pixie = require 'Pixie'.new {
-      quad = tileset.quads.guy
+      quad = tileset.quads.guy,
+      color = Color.goodGuy,
     },
     pos = pos,
     tileset = tileset
