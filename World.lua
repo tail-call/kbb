@@ -88,13 +88,14 @@ function M.init(world)
   world.tileTypes = world.tileTypes or generateTiles(world.width, world.height)
   world.fogOfWar = world.fogOfWar or {}
 
-  local makeBufDumper = require 'core.Dump'.makeBufDumper
-  -- TODO: call setmetatable for return values
+  local Dump = require 'core.Dump'
+
   setmetatable(world.fogOfWar, {
-    dump = makeBufDumper('%.3f,')
+    dump = Dump.makeBase64Dumper('%.3f,')
   })
+
   setmetatable(world.tileTypes, {
-    dump = makeBufDumper('%q,')
+    dump = Dump.makeBase64Dumper('%q,')
   })
 
   ---@type World

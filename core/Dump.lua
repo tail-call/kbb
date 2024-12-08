@@ -151,15 +151,17 @@ local function dump(object)
   return buf:tostring()
 end
 
----Returns a function that will dump an array into a base64 encoded buffer
----@param format any
+---Returns a function that will dump an array into a base64 encoded buffer.
+---
+---`format` is something `string.format` may accept.
+---@param formatString string
 ---@return function
-local function makeBufDumper (format)
+local function makeBase64Dumper (formatString)
   return function(array)
     local buf = require 'string.buffer'.new()
     buf:put('return{')
     for _, word in ipairs(array) do
-      buf:put(string.format(format, word))
+      buf:put(string.format(formatString, word))
     end
 
     buf:put('}')
@@ -215,7 +217,7 @@ end
 
 return {
   dump = dump,
-  makeBufDumper = makeBufDumper,
+  makeBase64Dumper = makeBase64Dumper,
   loadFileWithIndex = loadFileWithIndex,
   makeLanguage = makeLanguage,
 }
