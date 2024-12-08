@@ -34,26 +34,6 @@ local BORDERS = {
       return (tx + 1) * TILE_WIDTH, ty * TILE_HEIGHT
     end,
   },
-  -- {
-  --   dir = Vector.dir.right,
-
-  --   p1 = function (tx, ty)
-  --     return (tx + 1) * TILE_WIDTH, ty * TILE_HEIGHT
-  --   end,
-  --   p2 = function (tx, ty)
-  --     return (tx + 1) * TILE_WIDTH, (ty + 1) * TILE_HEIGHT
-  --   end,
-  -- },
-  -- {
-  --   dir = Vector.dir.down,
-
-  --   p1 = function (tx, ty)
-  --     return tx * TILE_WIDTH, (ty + 1) * TILE_HEIGHT
-  --   end,
-  --   p2 = function (tx, ty)
-  --     return (tx + 1) * TILE_WIDTH, (ty + 1) * TILE_HEIGHT
-  --   end,
-  -- },
 }
 
 local MOCK_PIXIE = require 'Pixie'.new {
@@ -418,7 +398,7 @@ local function drawTerrain(observerPos, world, drawState, sky)
             b = 0.341
           end
 
-          withColor(r, g, b, 1.0, function ()
+          withColor(r * sky.r, g * sky.g, b * sky.b, 1.0, function ()
             love.graphics.line(p1x, p1y, p2x, p2y)
           end)
         end
@@ -501,13 +481,16 @@ local function drawMinimapAndConsoleMessages(
 
     -- Entities
     for _, entity in ipairs(entities) do
-      local color = { 0.5, 0.5, 0.5, 1 }
+      local color = Color.gray50
+
       if entity.__module == 'Guy' then
         ---@cast entity Guy
         color = entity.pixie.color
       end
+
       local pointX = entity.pos.x - 1 - offsetX
       local pointY = entity.pos.y - 1 - offsetY
+
       if pointX >= 0
         and pointX < MINIMAP_SIZE
         and pointY >= 0
@@ -686,12 +669,9 @@ local function drawGame(game, drawState, ui, ambientColor)
   -- Draw cursor
 
   local curX, curY = getCursorCoords()
-  local curDistance = 12
-  curX = math.min(playerPos.x + curDistance, curX)
-  curX = math.max(playerPos.x - curDistance, curX)
-  curY = math.min(playerPos.y + curDistance, curY)
-  curY = math.max(playerPos.y - curDistance, curY)
+
   do
+    curX, curY = game:effCursorPos(curX, curY)
 
     local cursorPos = { x = curX, y = curY }
     game:syncCursorPos(cursorPos)

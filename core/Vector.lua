@@ -107,4 +107,7 @@ function Vector.formatVector(v)
   return string.format('%sx %sy', v.x, v.y)
 end
 
+---@type core.Vector
+Vector.ZERO = { x = 0, y = 0 }
+
 return Vector

@@ -48,6 +48,9 @@ Major goals:
 
 ## Bugs
 
+ - [ ] BUG: Not all controls are visible in paint mode (like Z for zooming)
+ - [ ] BUG: Camera flies away to the corner of the world when you die
+ - [ ] BUG: Life bars are positioned weirdly a lot of times
  - [ ] BUG: Game crashes when saving game if a squad is not empty
  - [ ] BUG: Vision source shape has a L-shaped notch at the left edge
  - [ ] BUG: Friendly units won't fight enemies
@@ -102,11 +105,12 @@ Major goals:
 
 ## Game ideas
 
- - [ ] Logic is stored as *rules* in the *rulebook*
- - [ ] Player may redefine *rules* in the *editor*
+ - [ ] Player may redefine *rules* in the *rulebook*
+    - [ ] There's a *rulebook editor*
+    - [ ] Logic is stored as *rules* in the *rulebook*
  - [ ] Rules may be changed during the game by using special items
  - [ ] You gain *Power* when killing enemies and reaching objective
- - [ ] You spend *Power* to upgrade your character, upgrade other characters or recruit new characters
+ - [ ] You spend *Power* to upgrade your character, upgrade other characters or hire new characters
  - [ ] There are many characters in the world and you may *hire* any of them by spending *Power*
  - [ ] Free moving camera
  - [ ] Turning left or right takes an extra turn

@@ -12,6 +12,8 @@ local ruleBook = require 'ruleBook'.ruleBook
 local evalRule = require 'ruleBook'.evalRule
 local formatVector = require 'core.Vector'.formatVector
 
+local CURSOR_MAX_DISTANCE = 12
+
 --XXX To rulebook??
 local TILE_SPEEDS = {
   forest = 1/2,
@@ -66,6 +68,7 @@ local TILE_SPEEDS = {
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 ---@field isFrozen fun(self: Game, entity: Object2D): boolean Returns true if an entity is marked as frozen
 ---@field syncCursorPos fun(self: Game, vec: core.Vector) Records a new value to `self.cursorPos`.
+---@field effCursorPos fun(self: Game, x: number, y: number): number, number Effective cursor position. Used to implement a cursor bound to a certain distance in normal mode
 ---@field cursorColor fun(self: Game): Color Returns the game's cursor color.
 local Game = Class {
   ...,
@@ -154,6 +157,24 @@ local Game = Class {
       elseif self.mode == 'normal' then
         self.cursorPos = vec
       end
+    end,
+    effCursorPos = function (self, curX, curY)
+      local player = self.player
+
+      if not player then
+        return 0, 0
+      end
+
+      local playerPos = player.pos
+
+      if self.mode == 'normal' then
+        curX = math.min(playerPos.x + CURSOR_MAX_DISTANCE, curX)
+        curX = math.max(playerPos.x - CURSOR_MAX_DISTANCE, curX)
+        curY = math.min(playerPos.y + CURSOR_MAX_DISTANCE, curY)
+        curY = math.max(playerPos.y - CURSOR_MAX_DISTANCE, curY)
+      end
+
+      return curX, curY
     end,
     cursorColor = function (self)
       local Color = require 'Color'
