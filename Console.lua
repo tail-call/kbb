@@ -3,9 +3,9 @@
 ---@field __module "Console"
 ---@field messages ConsoleMessage[] List of displayed messages
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
-
 local Console = Class {
   ..., 
+  slots = {},
   ---@type Console
   index = {
     say = function (self, message)
