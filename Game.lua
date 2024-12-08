@@ -65,6 +65,8 @@ local TILE_SPEEDS = {
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 ---@field isFrozen fun(self: Game, entity: Object2D): boolean Returns true if an entity is marked as frozen
+---@field syncCursorPos fun(self: Game, vec: core.Vector) Records a new value to `self.cursorPos`.
+---@field cursorColor fun(self: Game): Color Returns the game's cursor color.
 local Game = Class {
   ...,
   slots = {
@@ -74,7 +76,7 @@ local Game = Class {
     '!resources',
     'painterTile',
   },
-  ----@type Game
+  ---@type Game
   index = {
     addPlayer = function (self, guy)
       if self.player ~= nil then
@@ -145,6 +147,24 @@ local Game = Class {
     end,
     isFrozen = function (self, entity)
       return self.frozenEntities[entity] or false
+    end,
+    syncCursorPos = function (self, vec)
+      if self.mode == 'paint' then
+        self.cursorPos = vec
+      elseif self.mode == 'normal' then
+        self.cursorPos = vec
+      end
+    end,
+    cursorColor = function (self)
+      local Color = require 'Color'
+
+      if self.mode == 'focus' then
+        return Color.cursorYellow
+      elseif self.mode == 'paint' then
+        return Color.cursorGreen
+      else
+        return Color.cursorWhite
+      end
     end,
   }
 }

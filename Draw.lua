@@ -1,18 +1,17 @@
-local Vector = require "core.Vector"
+--- Draw Module
+---
+--- For good performance, avoid creating tables during draw functions
+
+local Vector = require 'core.Vector'
+local Color = require 'Color'
+
+-- Constants
 
 local TILE_HEIGHT = 16
 local TILE_WIDTH = 16
-
--- Constants
 local MINIMAP_SIZE = 72
 local HIGHLIGHT_CIRCLE_RADIUS = 10
-
-local Color = {
-  cursorWhite = { 1, 1, 1, 0.8 },
-  cursorRed = { 1, 0, 0, 0.8 },
-  cursorYellow = { 1, 1, 0, 0.8 },
-  cursorGreen = { 0, 1, 0, 0.8 },
-}
+local COLLISION_NONE = { type = 'none' }
 
 local BORDERS = {
   {
@@ -606,7 +605,6 @@ local function drawGame(game, drawState, ui, ambientColor)
       ---@cast entity Guy
       local guyHealth = entity.stats.hp / entity.stats.maxHp
       withColor(1, guyHealth, guyHealth, 0.5, function ()
-
         if not game.squad.shouldFollow then
           love.graphics.setColor(0.3, 0.3, 0.4, 0.5)
         end
@@ -701,25 +699,19 @@ local function drawGame(game, drawState, ui, ambientColor)
   curY = math.min(playerPos.y + curDistance, curY)
   curY = math.max(playerPos.y - curDistance, curY)
   do
-    local cursorPos = { x = curX, y = curY }
-    local cursorColor = Color.cursorWhite
 
-    if game.mode == 'focus' then
-      cursorColor = Color.cursorYellow
-    elseif game.mode == 'paint' then
-      cursorColor = Color.cursorGreen
-      game.cursorPos = cursorPos
-    elseif game.mode == 'normal' then
-      game.cursorPos = cursorPos
-    end
+    local cursorPos = { x = curX, y = curY }
+    game:syncCursorPos(cursorPos)
 
     ---@type Guy.collision
     local collision
     if player then
       collision = game.guyDelegate.collider(game.cursorPos, player)
     else
-      collision = { type = 'none' }
+      collision = COLLISION_NONE
     end
+
+    local cursorColor = game:cursorColor()
 
     if collision.type == 'terrain' then
       cursorColor = Color.cursorRed
