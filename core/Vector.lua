@@ -9,8 +9,8 @@ local RIGHT = { x =  1, y =  0 }
 
 local Vector = Class {
   ...,
-  ---@type core.Vector
   index = {},
+  slots = { '!x', '!y' }
 }
 
 Vector.dir = {

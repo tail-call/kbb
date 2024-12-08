@@ -304,9 +304,7 @@ local function drawTerrain(observerPos, world, drawState, sky)
 
   local posX, posY = observerPos.x, observerPos.y
   local visionDistance = 21
-  local voidTile = parallaxTile(0, 48, -drawState.camera.x/2, -drawState.camera.y/2)
   local waterPhase = 16 * math.sin(drawState.waterTimer.value)
-  local waterTile = parallaxTile(48, 0, -waterPhase, waterPhase)
 
   local vec = { x = 0, y = 0 }
   for y = posY - visionDistance, posY + visionDistance do
@@ -316,7 +314,7 @@ local function drawTerrain(observerPos, world, drawState, sky)
 
       local fog = world:getFog(vec)
       local tileType = world:getTile(vec)
-      local tile = drawState.tileset.quads[tileType]
+      local tileQuad = drawState.tileset.quads[tileType]
 
       local function drawFragmentedTile(fragmentedTile)
         for _, fragment in ipairs(fragmentedTile) do
@@ -328,16 +326,24 @@ local function drawTerrain(observerPos, world, drawState, sky)
         end
       end
 
-      withColor(sky.r, sky.g, sky.b, fog, function ()
+      local function drawTile()
         if tileType == 'void' then
-          drawFragmentedTile(voidTile)
+          drawFragmentedTile(parallaxTile(
+            0, 48, -drawState.camera.x/2, -drawState.camera.y/2
+          ))
         elseif tileType == 'water' then
-          drawFragmentedTile(waterTile)
+          drawFragmentedTile(parallaxTile(
+            48, 0, -waterPhase, waterPhase
+          ))
         else
           love.graphics.draw(
-            drawState.tileset.tiles, tile, x * TILE_WIDTH, y * TILE_HEIGHT
+            drawState.tileset.tiles, tileQuad, x * TILE_WIDTH, y * TILE_HEIGHT
           )
         end
+      end
+        
+      withColor(sky.r, sky.g, sky.b, fog, function ()
+        drawTile()
       end)
     end
   end

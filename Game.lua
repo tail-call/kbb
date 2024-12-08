@@ -1,7 +1,42 @@
 ---@alias GameMode 'normal' | 'focus' | 'paint'
 
+
+local moveGuy = require 'Guy'.moveGuy
+local isPassable = require 'World'.isPassable
+local Vector = require 'core.Vector'
+local updateConsole = require 'Console'.updateConsole
+local isRecruitCircleActive = require 'RecruitCircle'.isRecruitCircleActive
+local isAFollower = require 'Squad'.isAFollower
+local revealVisionSourceFog = require 'World'.revealVisionSourceFog
+local ruleBook = require 'ruleBook'.ruleBook
+local evalRule = require 'ruleBook'.evalRule
+local formatVector = require 'core.Vector'.formatVector
+
+--XXX To rulebook??
+local TILE_SPEEDS = {
+  forest = 1/2,
+  void = 1/8,
+}
+
+--XXX Evaluate
+-- local Game = Class(function (C)
+--   C.slot { 'world', type = 'required' }
+--   C.slot { 'time',
+--     default = Class.constantly(12 * 60),
+--   }
+--   C.slot { 'stats',
+--     -- Works like 'default' if provided
+--     class = require 'GameStats',
+--   }
+--   C.index {
+--     doStuff = function (self)
+--       print('do stuff')
+--     end,
+--   }
+-- end)
+
 ---Game state
----@class Game
+---@class Game: core.class
 ---@field __module 'Game'
 ---# Properties
 ---@field world World Game world
@@ -30,40 +65,6 @@
 ---@field beginBattle fun(self: Game, attacker: Guy, defender: Guy) Starts a new battle
 ---@field setAlternatingKeyIndex fun(self: Game, index: number) Moves diagonal movement reader head to a new index
 ---@field isFrozen fun(self: Game, entity: Object2D): boolean Returns true if an entity is marked as frozen
-
-local moveGuy = require 'Guy'.moveGuy
-local isPassable = require 'World'.isPassable
-local Vector = require 'core.Vector'
-local updateConsole = require 'Console'.updateConsole
-local isRecruitCircleActive = require 'RecruitCircle'.isRecruitCircleActive
-local isAFollower = require 'Squad'.isAFollower
-local revealVisionSourceFog = require 'World'.revealVisionSourceFog
-local ruleBook = require 'ruleBook'.ruleBook
-local evalRule = require 'ruleBook'.evalRule
-
---XXX To rulebook??
-local TILE_SPEEDS = {
-  forest = 1/2,
-  void = 1/8,
-}
-
---XXX Evaluate
--- local Game = Class(function (C)
---   C.slot { 'world', type = 'required' }
---   C.slot { 'time',
---     default = Class.constantly(12 * 60),
---   }
---   C.slot { 'stats',
---     -- Works like 'default' if provided
---     class = require 'GameStats',
---   }
---   C.index {
---     doStuff = function (self)
---       print('do stuff')
---     end,
---   }
--- end)
-
 local Game = Class {
   ...,
   slots = {
@@ -73,7 +74,7 @@ local Game = Class {
     '!resources',
     'painterTile',
   },
-  ---@type Game
+  ----@type Game
   index = {
     addPlayer = function (self, guy)
       if self.player ~= nil then
@@ -277,7 +278,9 @@ end
 ---@param game Game
 function Game.endRecruiting(game)
   for _, entity in ipairs(game.entities) do
-    if Game.mayRecruit(game, entity) then
+    local mayRecruit = Game.mayRecruit(game, entity)
+    print("mayRecruit =", mayRecruit, "entity.pos =", formatVector(entity.pos))
+    if mayRecruit then
       if entity.__module == 'Guy' then
         ---@cast entity Guy
         game.squad:addToSquad(entity)
@@ -467,6 +470,7 @@ function Game.orderBuild(game)
 
   -- Is building on rock?
   if tile == 'rock' then
+    ---@diagnostic disable-next-line: missing-fields
     game.resources:add { stone = 1 }
     game.world:setTile(pos, 'sand')
   end
