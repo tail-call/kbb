@@ -1,5 +1,6 @@
 local buffer = require 'string.buffer'
 
+---@type Game
 local game = nil
 
 local output = ''
@@ -43,7 +44,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
     local chunk, compileErrorMessage = loadstring(savedPrompt, 'commandline')
     echo('lua>' .. savedPrompt)
     if chunk ~= nil then
-      setfenv(chunk, require 'Commands'.new {
+      local opts = {
         helpTable = dofile './data/help.lua',
         root = game,
         echo = echo,
@@ -59,7 +60,12 @@ OnKeyPressed(function (key, scancode, isrepeat)
             }
           )
         end,
-      })
+        noon = function ()
+          game.time = 12 * 60
+        end,
+      }
+
+      setfenv(chunk, require 'Commands'.new(opts))
       local isSuccess, errorMessage = pcall(chunk)
       if not isSuccess then
         echo(errorMessage)

@@ -3,6 +3,7 @@
 ---@field clear fun(...)
 ---@field scribe fun(text: string)
 ---@field root table
+---@field noon fun(...)
 ---@field global table
 ---@field helpTable table
 
@@ -14,6 +15,7 @@ local function new(opts)
   local global = opts.global or error('opts.global is required', 2)
   local clear = opts.clear or error('opts.clear is required', 2)
   local scribe = opts.scribe or error('opts.scribe is required', 2)
+  local noon = opts.noon or error('opts.noon is required', 2)
   local helpTable = opts.helpTable or error('opts.helpTable is required', 2)
 
   -- Will be populated later
@@ -64,6 +66,9 @@ local function new(opts)
     quit = function ()
       package.loaded['scene.menu'] = nil
       require 'scene.menu'.go('fromgame')
+    end,
+    noon = function ()
+      noon()
     end,
   }
 

@@ -10,7 +10,6 @@ local isAFollower = require 'Squad'.isAFollower
 local revealVisionSourceFog = require 'World'.revealVisionSourceFog
 local ruleBook = require 'ruleBook'.ruleBook
 local evalRule = require 'ruleBook'.evalRule
-local formatVector = require 'core.Vector'.formatVector
 
 local CURSOR_MAX_DISTANCE = 12
 

@@ -36,4 +36,8 @@ return {
     'Quits to the main menu',
     example = 'quit()',
   },
+  noon = {
+    'Sets time to 12:00',
+    example = 'noon()',
+  },
 }
