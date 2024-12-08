@@ -489,7 +489,6 @@ local function drawMinimapAndConsoleMessages(
       image:getHeight()
     )
 
-
     -- Overlay
     withColor(1, 1, 1, alpha, function ()
       love.graphics.draw(image, quad, 0, 0)
@@ -548,19 +547,13 @@ local function drawGame(game, drawState, ui, ambientColor)
   -- Setup camera
 
   local screenW, screenH = love.window.getMode()
-  screenW = screenW / drawState.windowScale
-  screenH = screenH / drawState.windowScale
-  do
-    local pos = {
-      x = 8 + drawState.camera.x,
-      y = 8 + drawState.camera.y
-    }
-    love.graphics.scale(drawState.camera.z)
-    love.graphics.translate(
-      math.floor(screenW / 2 / drawState.camera.z - pos.x),
-      math.floor(screenH / 2 / drawState.camera.z - pos.y)
-    )
-  end
+
+  local camera = drawState.camera
+  love.graphics.scale(camera.z)
+  love.graphics.translate(
+    math.floor(screenW / drawState.windowScale / 2 / camera.z - camera.x - 8),
+    math.floor(screenH / drawState.windowScale / 2 / camera.z - camera.y - 8)
+  )
 
   -- Draw visible terrain
 
