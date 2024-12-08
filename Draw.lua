@@ -1,3 +1,5 @@
+local Vector = require "core.Vector"
+
 local TILE_HEIGHT = 16
 local TILE_WIDTH = 16
 
@@ -10,6 +12,49 @@ local Color = {
   cursorRed = { 1, 0, 0, 0.8 },
   cursorYellow = { 1, 1, 0, 0.8 },
   cursorGreen = { 0, 1, 0, 0.8 },
+}
+
+local BORDERS = {
+  {
+    dir = Vector.dir.left,
+
+    p1 = function (tx, ty)
+      return tx * TILE_WIDTH, ty * TILE_HEIGHT
+    end,
+    p2 = function (tx, ty)
+      return tx * TILE_WIDTH, (ty + 1) * TILE_HEIGHT
+    end,
+  },
+  {
+    dir = Vector.dir.up,
+
+    p1 = function (tx, ty)
+      return tx * TILE_WIDTH, ty * TILE_HEIGHT
+    end,
+    p2 = function (tx, ty)
+      return (tx + 1) * TILE_WIDTH, ty * TILE_HEIGHT
+    end,
+  },
+  -- {
+  --   dir = Vector.dir.right,
+
+  --   p1 = function (tx, ty)
+  --     return (tx + 1) * TILE_WIDTH, ty * TILE_HEIGHT
+  --   end,
+  --   p2 = function (tx, ty)
+  --     return (tx + 1) * TILE_WIDTH, (ty + 1) * TILE_HEIGHT
+  --   end,
+  -- },
+  -- {
+  --   dir = Vector.dir.down,
+
+  --   p1 = function (tx, ty)
+  --     return tx * TILE_WIDTH, (ty + 1) * TILE_HEIGHT
+  --   end,
+  --   p2 = function (tx, ty)
+  --     return (tx + 1) * TILE_WIDTH, (ty + 1) * TILE_HEIGHT
+  --   end,
+  -- },
 }
 
 local MOCK_PIXIE = require 'Pixie'.new {
@@ -198,7 +243,7 @@ local function drawPixie(pixie)
     if pixie.isFloating then
       love.graphics.translate(0, -TILE_HEIGHT / 2)
     end
-    
+
     local r, g, b, a = unpack(pixie.color)
     withColor(r * ambR, g * ambG, b * ambB, a * ambA, function ()
       love.graphics.draw(pixie.texture, pixie.quad, 0, 0)
@@ -300,51 +345,85 @@ end
 ---@param drawState DrawState
 ---@param sky { r: number, b: number, g: number }
 local function drawTerrain(observerPos, world, drawState, sky)
-  local parallaxTile = require 'Tileset'.parallaxTile
 
   local posX, posY = observerPos.x, observerPos.y
   local visionDistance = 21
   local waterPhase = 16 * math.sin(drawState.waterTimer.value)
 
-  local vec = { x = 0, y = 0 }
-  for y = posY - visionDistance, posY + visionDistance do
-    for x = posX - visionDistance, posX + visionDistance do
-      vec.x = x
-      vec.y = y
+  local tpos = { x = 0, y = 0 }
+  for ty = posY - visionDistance, posY + visionDistance do
+    for tx = posX - visionDistance, posX + visionDistance do
+      tpos.x = tx
+      tpos.y = ty
 
-      local fog = world:getFog(vec)
-      local tileType = world:getTile(vec)
-      local tileQuad = drawState.tileset.quads[tileType]
+      ---@param tileQuad love.Quad
+      ---@param v core.Vector
+      local function drawTileQuad(tileQuad, v)
+        love.graphics.draw(
+          drawState.tileset.tiles, -- texture
+          tileQuad, -- quad
+          v.x * TILE_WIDTH, -- x
+          v.y * TILE_HEIGHT -- y
+        )
+      end
 
-      local function drawFragmentedTile(fragmentedTile)
-        for _, fragment in ipairs(fragmentedTile) do
+      local function drawParallaxTile(parallaxTile)
+        for _, fragment in ipairs(parallaxTile) do
           withTransform(fragment.transform, function ()
-            love.graphics.draw(
-              drawState.tileset.tiles, fragment.quad, x * TILE_WIDTH, y * TILE_HEIGHT
-            )
+            drawTileQuad(fragment.quad, tpos)
           end)
         end
       end
 
-      local function drawTile()
-        if tileType == 'void' then
-          drawFragmentedTile(parallaxTile(
+      ---@param type World.tile
+      local function drawTile(type)
+        local Tileset = require 'Tileset'
+        local tileQuad = drawState.tileset.quads[type]
+
+        if type == 'void' then
+          drawParallaxTile(Tileset.parallaxTile(
             0, 48, -drawState.camera.x/2, -drawState.camera.y/2
           ))
-        elseif tileType == 'water' then
-          drawFragmentedTile(parallaxTile(
+        elseif type == 'water' then
+          drawParallaxTile(Tileset.parallaxTile(
             48, 0, -waterPhase, waterPhase
           ))
         else
-          love.graphics.draw(
-            drawState.tileset.tiles, tileQuad, x * TILE_WIDTH, y * TILE_HEIGHT
-          )
+          drawTileQuad(tileQuad, tpos)
         end
       end
-        
-      withColor(sky.r, sky.g, sky.b, fog, function ()
-        drawTile()
+
+      local tileType = world:getTile(tpos)
+
+      withColor(sky.r, sky.g, sky.b, world:getFog(tpos), function ()
+        drawTile(tileType)
       end)
+
+      for _, border in ipairs(BORDERS) do
+        local neighborTileType = world:getTile(Vector.add(tpos, border.dir))
+
+        if tileType ~= neighborTileType then
+          local p1x, p1y = border.p1(tx, ty)
+          local p2x, p2y = border.p2(tx, ty)
+
+          local r = 0.1
+          local g = 0.2
+          local b = 0.2
+
+          if
+            (tileType == 'grass' and neighborTileType == 'sand')
+            or (tileType == 'sand' and neighborTileType == 'grass')
+          then
+            r = 0.694
+            g = 0.525
+            b = 0.341
+          end
+
+          withColor(r, g, b, 1.0, function ()
+            love.graphics.line(p1x, p1y, p2x, p2y)
+          end)
+        end
+      end
     end
   end
 end
@@ -664,7 +743,7 @@ local function drawGame(game, drawState, ui, ambientColor)
   local offsetX = playerPos.x - MINIMAP_SIZE / 2
   local offsetY = playerPos.y - MINIMAP_SIZE / 2
   local minimapAlpha = (game.mode == 'focus') and 1 or 0.25
-  
+
   drawMinimapAndConsoleMessages(
     minimapTransform,
     offsetX,

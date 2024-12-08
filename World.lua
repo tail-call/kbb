@@ -37,6 +37,7 @@ end
 
 local M = Class {
   ...,
+  slots = {},
   ---@type World.methods
   index = {
     revealFogOfWar = function (self, pos, value, dt)
