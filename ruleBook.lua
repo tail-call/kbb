@@ -71,6 +71,10 @@ end
 local ruleBook
 
 ruleBook = {
+  tileSpeeds = {
+    forest = 1/2,
+    void = 1/8,
+  },
   buildingCostWood = 5,
   scoresTable = {
     killedAnEnemy = 100,

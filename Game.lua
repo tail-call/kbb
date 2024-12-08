@@ -13,11 +13,6 @@ local evalRule = require 'ruleBook'.evalRule
 
 local CURSOR_MAX_DISTANCE = 12
 
---XXX To rulebook??
-local TILE_SPEEDS = {
-  forest = 1/2,
-  void = 1/8,
-}
 
 --XXX Evaluate
 -- local Game = Class(function (C)
@@ -457,7 +452,7 @@ function Game.updateGame(game, dt, movementDirections, visibility)
       return 1
     end
 
-    return TILE_SPEEDS[tile] or 1
+    return ruleBook.tileSpeeds[tile] or 1
   end
 
   for _, entity in ipairs(game.entities) do
