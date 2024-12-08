@@ -496,7 +496,10 @@ end
 
 ---@param game Game
 function Game.orderCollect(game)
-  maybeCollect(game, game.player)
+  if game.player then
+    maybeCollect(game, game.player)
+  end
+
   for guy in pairs(game.squad.followers) do
     maybeCollect(game, guy)
   end
