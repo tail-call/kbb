@@ -5,7 +5,7 @@
 ---@param predicate fun(item: T): boolean
 ---@return T | nil
 local function find(items, predicate)
-  for k, v in ipairs(items) do
+  for _, v in ipairs(items) do
     if predicate(v) then
       return v
     end
@@ -114,6 +114,20 @@ local function invert(items)
   return result
 end
 
+---@generic I, T, U
+---@param items { [I]: T }
+---@param value U
+---@return { [I]: U }
+local function fill(items, value)
+  local result = {}
+
+  for i, _ in ipairs(items) do
+    result[i] = value
+  end
+
+  return result
+end
+
 return {
   find = find,
   iclone = iclone,
@@ -125,4 +139,5 @@ return {
   weaken = weaken,
   maybeDrop = maybeDrop,
   invert = invert,
+  fill = fill,
 }

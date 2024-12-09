@@ -1,4 +1,4 @@
----@class game.GuyStats
+---@class game.GuyStats: core.class
 ---@field __module 'game.GuyStats'
 ---@field hp number Current health points
 ---@field maxHp number Maximum health points
@@ -8,9 +8,9 @@
 ---@field heal fun(self: game.GuyStats, amount: number) Heals a specified amount of damage
 ---@field setMaxHp fun(self: game.GuyStats, maxHp: number) Sets maximum health points and fully heals
 ---@field addMoves fun(self: game.GuyStats, amount: number) Adds moves
-
 local GuyStats = Class {
   ...,
+  slots = {},
   ---@type game.GuyStats
   index = {
     hurt = function (self, damage)
@@ -20,7 +20,7 @@ local GuyStats = Class {
       self.hp = math.min(self.hp + amount, self.maxHp)
     end,
     setMaxHp = function (self, maxHp)
-      self.hp = maxHp
+      -- self.hp = maxHp
       self.maxHp = maxHp
     end,
     addMoves = function (self, amount)

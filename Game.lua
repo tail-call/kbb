@@ -427,11 +427,17 @@ function Game.updateGame(game, dt, movementDirections, visibility)
         require 'Battle'.updateBattle(game, entity, dt, function (text)
           echo(game, text)
         end, function ()
+          local function becomeStronger(guy)
+            guy.stats:setMaxHp(guy.stats.maxHp + 2)
+          end
+
           if entity.attacker.stats.hp <= 0 then
+            becomeStronger(entity.defender)
             die(entity.attacker, game, entity)
           end
 
           if entity.defender.stats.hp <= 0 then
+            becomeStronger(entity.attacker)
             die(entity.defender, game,  entity)
           end
 
@@ -442,7 +448,6 @@ function Game.updateGame(game, dt, movementDirections, visibility)
     end
   end
 
-  --XXX To rulebook??
   ---Returns a speed factor that a guy should have on a specified tile
   ---@param guy Guy
   ---@param tile World.tile
@@ -536,6 +541,10 @@ end
 ---@param game Game
 function Game.orderSummon(game)
   local guy = require 'Guy'.makeGoodGuy(game.cursorPos)
+  if game.resources.pretzels <= 0 then
+    echo(game, 'Not enough pretzels.')
+    return
+  end
   game:addEntity(guy)
   game.squad:addToSquad(guy)
   echo(game, ('%s was summonned.'):format(guy.name))

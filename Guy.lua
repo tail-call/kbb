@@ -95,7 +95,6 @@ function Guy.moveGuy(guy, vec, delegate)
       return pos
     elseif collision.type == 'entity' then
       local entity = collision.entity
-      --- XXX This is game logic, must be in Game
       if entity ~= nil then
         if entity.__module == 'Building' then
           ---@cast entity Building
@@ -105,7 +104,8 @@ function Guy.moveGuy(guy, vec, delegate)
             return pos
           end
         elseif collision.entity.__module == 'HealingRune' then
-          guy.stats:heal(1)
+          ---@cast entity HealingRune
+          guy.stats:heal(entity.restoredHp)
           guy:move(pos)
         elseif collision.entity.__module == 'Guy' then
           local collisionEntity = collision.entity
