@@ -128,6 +128,39 @@ local function fill(items, value)
   return result
 end
 
+---@generic T 
+---@param items T[]
+---@return string
+local function stringifyArray(items)
+  if #items == 0 then
+    return '{}'
+  end
+
+  local result = {
+    put = function (self, x)
+      table.insert(self, x)
+    end,
+
+    join = function (self)
+      return table.concat(self)
+    end
+  }
+
+  result:put('{ ')
+
+  for i, item in ipairs(items) do
+    result:put(item)
+
+    if i < #items then
+      result:put(', ')
+    end
+  end
+
+  result:put(' }')
+
+  return result:join()
+end
+
 return {
   find = find,
   iclone = iclone,
@@ -140,4 +173,5 @@ return {
   maybeDrop = maybeDrop,
   invert = invert,
   fill = fill,
+  stringifyArray = stringifyArray,
 }

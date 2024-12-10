@@ -1,4 +1,5 @@
 local assert = require 'core.test'.assert
+local assertEq = require 'core.test'.assertEq
 local group = require 'core.test'.group
 local M = require 'core.table'
 
@@ -21,4 +22,11 @@ group('core.table/fill', function ()
   for _, x in ipairs(filled) do
     assert(x == fillValue)
   end
+end)
+
+group('core.table/stringifyArray', function ()
+  local input = { 5, 4, 3, 2, 1 }
+
+  assertEq(M.stringifyArray(input), '{ 5, 4, 3, 2, 1 }');
+  assertEq(M.stringifyArray {}, '{}');
 end)
