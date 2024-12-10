@@ -4,7 +4,12 @@ local assertEq = require 'core.test'.assertEq
 
 local Commands = require 'Commands'
 
+local INITIAL_TIME = 0
+local NOON = 1200
+
 group('Commands/new', function ()
+  local currentTime = INITIAL_TIME
+
   local echoes = {}
   local global = {}
   local root = {}
@@ -21,9 +26,6 @@ group('Commands/new', function ()
     }
   }
 
-  local currentTime = 0
-  local currentTimeExpected = 1200
-
   local clear = function ()
     echoes = {}
   end
@@ -33,11 +35,11 @@ group('Commands/new', function ()
   end
 
   local function noon ()
-    currentTime = currentTimeExpected
+    currentTime = NOON
   end
 
   local function spawnHealingRune ()
-    currentTime = currentTimeExpected
+    error("not implemented")
   end
 
   local env = Commands.new {
@@ -64,7 +66,7 @@ group('Commands/new', function ()
     assertEq(env.clear, clear)
   end
 
-  do --Check help commands
+  do -- Check help commands
     local function testHelp(item, sample, test)
       if not test then
         test = function (a, b)
@@ -83,4 +85,7 @@ group('Commands/new', function ()
     assert(not testHelp(env.scribe, 'random garbage'))
   end
 
+  assertEq(currentTime, INITIAL_TIME)
+  noon()
+  assertEq(currentTime, NOON)
 end)

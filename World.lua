@@ -1,18 +1,7 @@
----@class World: World.props, World.methods
+local fill = require 'core.table'.fill
+local calcVisionDistance = require 'VisionSource'.calcVisionDistance
+local isVisible = require 'VisionSource'.isVisible
 
----@class World.props
----@field image love.Image Minimap image
----@field width integer World's width in tiles
----@field height integer World's height in tiles
----@field revealedTilesCount number Number of tiles player had revealed
----@field tileTypes World.tile[] Tile types of each tile in the world
----@field fogOfWar number[] How visible is each tile in the world. Numbers from 0 to 1
-
----@class World.methods
----@field revealFogOfWar fun(self: World, pos: core.Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
----@field getTile fun(self: World, pos: core.Vector): World.tile Gets a tile at a specific position
----@field setTile fun(self: World, pos: core.Vector, tile: World.tile) Changes a tile at a specific position
----@field getFog fun(self: World, pos: core.Vector): number Gets a fog value at a specified position
 
 ---@alias World.tile
 ---| 'grass'
@@ -26,7 +15,8 @@
 ---| 'wall'
 
 local FOG_REVEAL_SPEED = 1
-local SQUARE_REVEAL_THRESHOLD = 0.5
+---If reveal value is at least this, the tile will count as revealed
+local FOG_REVEAL_THRESHOLD = 0.5
 
 ---@param world World
 ---@param v core.Vector
@@ -35,10 +25,22 @@ local function vectorToLinearIndex(world, v)
   return (v.y - 1) * world.width + v.x
 end
 
+---@class World: core.class
+---@field image love.Image Minimap image
+---@field width integer World's width in tiles
+---@field height integer World's height in tiles
+---@field revealedTilesCount number Number of tiles player had revealed
+---@field tileTypes World.tile[] Tile types of each tile in the world
+---@field fogOfWar number[] How visible is each tile in the world. Numbers from 0 to 1
+---@field revealFogOfWar fun(self: World, pos: core.Vector, value: number, dt: number) Partially reveals fog of war over sime time dt
+---@field getTile fun(self: World, pos: core.Vector): World.tile Gets a tile at a specific position
+---@field setTile fun(self: World, pos: core.Vector, tile: World.tile) Changes a tile at a specific position
+---@field getFog fun(self: World, pos: core.Vector): number Gets a fog value at a specified position
+---@field resetFog fun(self: World, value: number) Sets every cell of fog to a specified reveal value
 local M = Class {
   ...,
   slots = {},
-  ---@type World.methods
+  ---@type World
   index = {
     revealFogOfWar = function (self, pos, value, dt)
       local idx = vectorToLinearIndex(self, pos)
@@ -48,7 +50,7 @@ local M = Class {
         newValue = 1
       end
       self.fogOfWar[idx] = newValue
-      if oldValue < SQUARE_REVEAL_THRESHOLD and newValue > SQUARE_REVEAL_THRESHOLD then
+      if oldValue < FOG_REVEAL_THRESHOLD and newValue >= FOG_REVEAL_THRESHOLD then
         self.revealedTilesCount = self.revealedTilesCount + 1
       end
     end,
@@ -62,11 +64,20 @@ local M = Class {
     getFog = function (self, pos)
       return self.fogOfWar[vectorToLinearIndex(self, pos)] or 0
     end,
+    resetFog = function (self, value)
+      -- You think you could use:
+      --   require 'core.table'.fill(self.fogOfWar, value)
+      -- But actually it doesn't work, therefore this 2D-loop instead
+
+      for y = 0, self.height - 1 do
+        for x = 0, self.width - 1 do
+          local index = vectorToLinearIndex(self, { x = x, y = y })
+          self.fogOfWar[index] = value
+        end
+      end
+    end,
   },
 }
-
-local calcVisionDistance = require 'VisionSource'.calcVisionDistance
-local isVisible = require 'VisionSource'.isVisible
 
 local function generateTiles(width, height)
   local tileTypes = {}
@@ -126,15 +137,17 @@ end
 ---@param light number
 ---@param dt number
 function M.revealVisionSourceFog(world, visionSource, light, dt)
-  local pos = visionSource.pos
   local visionDistance = calcVisionDistance(visionSource, light)
-  local vd2 = visionDistance ^ 2
+  local pos = visionSource.pos
   local posX = pos.x
   local posY = pos.y
   local tmpVec = { x = 0, y = 0 }
+
   for y = posY - visionDistance, posY + visionDistance do
     for x = posX - visionDistance, posX + visionDistance do
+      local vd2 = visionDistance ^ 2
       local alpha = 1
+
       if isVisible(vd2, visionSource, tmpVec) then
         -- Neighbor based shading
         for dy = -1, 1 do
@@ -148,6 +161,7 @@ function M.revealVisionSourceFog(world, visionSource, light, dt)
       else
         alpha = 0
       end
+
       tmpVec.x, tmpVec.y = x, y
       world:revealFogOfWar(tmpVec, alpha, dt)
     end

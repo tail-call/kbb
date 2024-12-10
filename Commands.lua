@@ -75,6 +75,14 @@ local function new(opts)
     shr = function (restoredHp, rechargeTime)
       spawnHealingRune(restoredHp, rechargeTime)
     end,
+    resetfog = function (value)
+      local t = type(value)
+      if t ~= 'number' then
+        error(string.format('value must be a number, got %s instead', t))
+      end
+
+      env.o.world:resetFog(value)
+    end,
   }
 
   do -- Populate help pages
