@@ -33,7 +33,7 @@ local function skyColorAtTime(time)
 end
 
 Tooltip(function ()
-  if not game then
+  if not game or game.mode ~= 'paint' then
     return {}
   end
 
@@ -47,7 +47,7 @@ Tooltip(function ()
   local line2 = Vector.formatVector(game.cursorPos)
   local entity = {}
   -- Detect entities under cursor
-  for k, v in ipairs(game.entities) do
+  for _, v in ipairs(game.entities) do
     if Vector.equal(v.pos, game.cursorPos) then
       entity = v
     end
@@ -67,7 +67,7 @@ end)
 OnLoad(function (savefileName)
   if savefileName == '#back' then
     return
-  elseif savefileName == '#dontload' then
+  elseif savefileName == '#new' then
     game = require 'Game'.new {
       world = require 'World'.new(),
       resources = require 'Resources'.new(),

@@ -44,7 +44,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
   elseif scancode == 'n' then
     uiModel.extraText = '\nSTARTING NEW GAME...'
     afterDraw = function ()
-      require 'scene.game'.go('#dontload')
+      require 'scene.game'.go('#new')
     end
   elseif scancode == 'q' then
     uiModel.extraText = '\nQUITTING...'
