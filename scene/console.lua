@@ -46,7 +46,7 @@ OnKeyPressed(function (key, scancode, isrepeat)
     if chunk ~= nil then
       local opts = {
         helpTable = dofile './data/help.lua',
-        root = game,
+        root = game or {},
         echo = echo,
         global = Global,
         clear = function ()
