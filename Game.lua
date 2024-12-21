@@ -396,10 +396,14 @@ function Game.updateGame(game, dt, movementDirections, visibility)
   local visionSources = {{
     pos = game.player.pos,
     sight = 10
-  }, {
-    pos = game.cursorPos,
-    sight = math.max(2, game.recruitCircle.radius or 0),
   }}
+
+  if game.mode == 'paint' then
+    table.insert(visionSources, {
+      pos = game.cursorPos,
+      sight = 10
+    })
+  end
 
   for _,v in ipairs(visionSources) do
     revealVisionSourceFog(game.world, v, visibility, dt)
