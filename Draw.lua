@@ -383,8 +383,9 @@ local function drawTerrain(observerPos, world, drawState, sky)
       end
 
       local tileType = world:getTile(tpos)
+      local fog = world:getFog(tpos)
 
-      withColor(sky.r, sky.g, sky.b, world:getFog(tpos), function ()
+      withColor(sky.r, sky.g, sky.b, fog, function ()
         drawTile(tileType)
       end)
 
@@ -408,7 +409,7 @@ local function drawTerrain(observerPos, world, drawState, sky)
             b = 0.341
           end
 
-          withColor(r * sky.r, g * sky.g, b * sky.b, 1.0, function ()
+          withColor(r * sky.r, g * sky.g, b * sky.b, fog, function ()
             love.graphics.line(p1x, p1y, p2x, p2y)
           end)
         end
