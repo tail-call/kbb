@@ -49,7 +49,7 @@ Major goals:
 ## Bugs
 
  - [ ] BUG: Tile borders are visible under fog of war
- - [ ] BUG: Not all controls are visible in paint mode (like Z for zooming)
+ - [ ] BUG: Not all controls are visible in edit mode (like Z for zooming)
  - [ ] BUG: Camera flies away to the corner of the world when you die
  - [ ] BUG: Life bars are positioned weirdly a lot of times
  - [ ] BUG: Game crashes when saving game if a squad is not empty

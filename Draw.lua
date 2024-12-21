@@ -568,7 +568,7 @@ local function drawGame(game, drawState, ui, ambientColor)
   drawTerrain(playerPos, game.world, drawState, ambientColor)
 
   -- Draw patch highlight
-  if game.mode == 'paint' then
+  if game.mode == 'edit' then
     withColor(0, 0, 0, 1, function ()
       local patchWidth, patchHeight = 8 * TILE_WIDTH, 8 * TILE_HEIGHT
       local patch = require('World').patchAt(game.world, playerPos)

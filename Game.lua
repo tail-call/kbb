@@ -1,4 +1,4 @@
----@alias GameMode 'normal' | 'focus' | 'paint'
+---@alias GameMode 'normal' | 'focus' | 'edit'
 
 
 local moveGuy = require 'Guy'.moveGuy
@@ -49,7 +49,7 @@ local CURSOR_MAX_DISTANCE = 12
 ---@field console Console Bottom console
 ---@field recruitCircle RecruitCircle Circle thing used to recruit units
 ---@field frozenEntities { [Object2D]: true } Entities that should be not rendered and should not behave
----@field painterTile World.tile Current selected tile in paint mode
+---@field painterTile World.tile Current selected tile in edit mode
 ---# Methods
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field switchMode fun(self: Game) Switches to next mode
@@ -115,8 +115,8 @@ local Game = Class {
     switchMode = function (self)
       require 'sfx'.playBoop()
       if self.mode == 'normal' then
-        self.mode = 'paint'
-      elseif self.mode == 'paint' then
+        self.mode = 'edit'
+      elseif self.mode == 'edit' then
         self.mode = 'focus'
       else
         self.mode = 'normal'
@@ -147,7 +147,7 @@ local Game = Class {
       return self.frozenEntities[entity] or false
     end,
     syncCursorPos = function (self, vec)
-      if self.mode == 'paint' then
+      if self.mode == 'edit' then
         self.cursorPos = vec
       elseif self.mode == 'normal' then
         self.cursorPos = vec
@@ -176,7 +176,7 @@ local Game = Class {
 
       if self.mode == 'focus' then
         return Color.cursorYellow
-      elseif self.mode == 'paint' then
+      elseif self.mode == 'edit' then
         return Color.cursorGreen
       else
         return Color.cursorWhite
@@ -398,7 +398,7 @@ function Game.updateGame(game, dt, movementDirections, visibility)
     sight = 10
   }}
 
-  if game.mode == 'paint' then
+  if game.mode == 'edit' then
     table.insert(visionSources, {
       pos = game.cursorPos,
       sight = 10

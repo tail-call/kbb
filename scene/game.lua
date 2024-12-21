@@ -33,12 +33,12 @@ local function skyColorAtTime(time)
 end
 
 Tooltip(function ()
-  if not game or game.mode ~= 'paint' then
+  if not game or game.mode ~= 'edit' then
     return {}
   end
 
   local line1
-  if game.mode == 'paint' then
+  if game.mode == 'edit' then
     line1 = 'C=' .. game.painterTile
   else
     line1 = game.world:getTile(game.cursorPos) or '???'
@@ -104,7 +104,7 @@ OnUpdate(function (dt)
     end
   end
 
-  if game.mode == 'paint' then
+  if game.mode == 'edit' then
     if love.mouse.isDown(1) then
       require 'Game'.orderPaint(game)
     end
