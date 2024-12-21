@@ -437,6 +437,12 @@ local function drawPointerAndTooltips(drawState, tooltips)
     return
   end
 
+  local computedTooltips = tooltips()
+
+  if #computedTooltips == 0 then
+    return
+  end
+
   local tooltipTransform = love.math.newTransform()
     :translate(x + 10, y)
     :scale(2/3, 2/3)
@@ -446,9 +452,9 @@ local function drawPointerAndTooltips(drawState, tooltips)
       local width, height = 72, 72
       love.graphics.rectangle('fill', 0, 0, width, height)
     end)
-    love.graphics.print(tooltips()[1] or '')
-    love.graphics.print(tooltips()[2] or '', 0, 8)
-    love.graphics.print(tooltips()[3] or '', 0, 16)
+    for i = 1, 3 do
+      love.graphics.print(computedTooltips[i] or '', 0, (i - 1) * 8)
+    end
   end)
 end
 
