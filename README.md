@@ -46,7 +46,7 @@ Major goals:
   - [ ] You learn about Power.
   - [ ] You learn to summon new guys.
 - [ ] MVP editor
-- [ ] Show to people
+- [ ] Show to more people
 
 ## Bugs
 
@@ -210,6 +210,8 @@ Major goals:
  - [ ] Noisy texture details when zooming in
 
 ## Completed
+
+- [x] Show to people
 
  <!-- [-] Turning left or right takes an extra turn [cruel] -->
 
