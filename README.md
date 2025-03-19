@@ -106,6 +106,8 @@ Major goals:
 
 ## Game ideas
 
+ - [ ] Buy a plot of land from Lord to build a town.
+ - [ ] Party follows you in exploration modes, like in Ultima.
  - [ ] Permadeath: when a player character dies, it dies forever. Next
        unit becomes the leader.
  - [ ] Town mngmnt is an idle game proceeding while you explore.
