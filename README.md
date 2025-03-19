@@ -1,12 +1,14 @@
-# Annotations
+# Kobold Princess Simulator. Chapter I: Born of Mud, Born of Blood
+
+## Annotations
 
 See https://github.com/LuaLS/lua-language-server/wiki/Annotations
 
-# How do I run it?
+## How do I run it?
 
       ./run.lua
 
-# Plot
+## Plot
 
 You're a magical kobold princess. You lead your tribe to the prosperity.
 
@@ -14,13 +16,13 @@ You have psy abilities, so your cursor has FOV just like you do.
 
 Game is an editable image.
 
-# On deities
+## On deities
 
 - Zirnitra - a dragon, goddess of all kobolds.
 - Elbereth - elvish goddess. She scares away monsters, like kobolds. You get 
   damage if you walk over Elbereth's name.
 
-# On class system
+## On class system
 
 I decided `init()` should be a function in the class rather than method in the object.
 
@@ -28,11 +30,11 @@ A. Class is responsible for creating objects, so it should initialize them as we
 
 B. Methods are for user-defined code, not for the class system.
 
-# On rulebook system
+## On rulebook system
 
 I decided I will only use tables for rulebook rather than functions because I want to be able to serialize them and to make them tweaked from within the editor or the game.
 
-# Plan
+## Plan
 
 Major goals:
 
@@ -104,6 +106,18 @@ Major goals:
 
 ## Game ideas
 
+ - [ ] Permadeath: when a player character dies, it dies forever. Next
+       unit becomes the leader.
+ - [ ] Town mngmnt is an idle game proceeding while you explore.
+ - [ ] Combat screen for combat, explore screen for exploration,
+       dungeon screen for combat exploration! Also camp screen for camp.
+       Also space screen for space travel. And time screen for time travel.
+       And town screen for shopping and questing.
+ - [ ] Maximum party size is 50 (including you). More are possible in
+       Epic Battles.
+ - [ ] You can carry a tent to increase your party size by 5 and a
+       sleeping bag for a +1 increase.
+ - [ ] Free moving camera (for debug and town mngmnt)
  - [ ] Player may redefine *rules* in the *rulebook*
     - [ ] There's a *rulebook editor*
     - [ ] Logic is stored as *rules* in the *rulebook*
@@ -111,15 +125,11 @@ Major goals:
  - [ ] You gain *Power* when killing enemies and reaching objective
  - [ ] You spend *Power* to upgrade your character, upgrade other characters or hire new characters
  - [ ] There are many characters in the world and you may *hire* any of them by spending *Power*
- - [ ] Free moving camera
- - [ ] Turning left or right takes an extra turn
  - [ ] Corruption factor: as you collect resources, it goes up
  - [ ] As corruption factor grows, enemies will spawn
  - [ ] More powerful and plentiful enemies are spawned as corruption goes up
  - [ ] Appease kobold deities to lower corruption factor
  - [ ] Paint mode has primitive noise-based terrain generation tools
- - [ ] Guys are *lost* when are in the unexplored area
- - [ ] You can't recruit lost guys
  - [ ] Lost guys despawn after a while
  - [ ] Make fog be a noise rather than uniform color
  - [ ] Telefrags
@@ -135,7 +145,6 @@ Major goals:
  - [ ] Humans don't have fast diagonal movement
  - [ ] Notable characters system: building an inn creates a barkeeper, building a smithy creates a blacksmith
  - [ ] Hunger: kobolds need to eat twice per day, or they will grow weak and die
- - [ ] Permadeath: when a player character dies, it dies forever. Next unit becomes the leader
  - [ ] Workshop where foundations of buildings are made
  - [ ] Then unit carries wood to the site and builds the thing
  - [ ] A group of units must carry foundation to its place
@@ -201,6 +210,12 @@ Major goals:
  - [ ] Noisy texture details when zooming in
 
 ## Completed
+
+ <!-- [-] Turning left or right takes an extra turn [cruel] -->
+
+ <!-- These I considered when I thought all gameplay was to happen on a single screen -->
+ <!-- [-] You can't recruit lost guys -->
+ <!-- [-] Guys are *lost* when are in the unexplored area -->
 
  - [x] BUG: Tile borders are visible under fog of war
  - [x] Load from images and stuff
@@ -314,7 +329,7 @@ Major goals:
  - [x] ~~'lang/model'~~
  - [x] BUG: Friendly units won't fight enemies [Sun 8 Dec 2024]
 
-# Sources
+## Sources
 
 `cga8.png` font taken from here: https://www.seasip.info/VintagePC/cga.html
 
