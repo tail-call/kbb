@@ -207,13 +207,8 @@ local function makeGuyDelegate(game)
     beginBattle = function (attacker, defender)
       game:beginBattle(attacker, defender)
     end,
-    enterHouse = function (guy, building)
-      if guy.team ~= 'good' then
-        return 'shouldNotMove'
-      end
-      guy.stats:setMaxHp(guy.stats.maxHp + 1)
-      game:removeEntity(building, true)
-      return 'shouldMove'
+    enterHealingRune = function (guy, rune)
+      guy.stats:heal(rune.restoredHp)
     end,
     enterHouse = function (guy, building)
       if guy.team ~= 'good' then

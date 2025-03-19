@@ -12,7 +12,7 @@ local uiModel = {
 local ui = require 'ui.menu'(uiModel)
 
 OnLoad(function (kind)
-  local source = love.audio.newSource('music/title.xm', 'stream')
+  local source = love.audio.newSource('music/title.ogg', 'stream')
   source:play()
 end)
 
