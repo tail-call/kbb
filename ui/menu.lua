@@ -8,30 +8,30 @@
 local Model = Model
 
 local INTRO = [[
-                     
-                ( o o )
-                 " w "
+
 
                KOBOLD--+
                PRINCESS|
                SIMULATOR
 
-               chapter I
+                ( o o )
+                 " w "
+
+               Chapter I
+
+            " Born of Mud,
+             Born of Blood "
 
 
-               a game by
 
-                Engraze
+             
+ N) New World
 
-             N) New Game in
-                Empty World
+ L) Load World
+                          A game by
+ D) KoBolDOS                Engraze
 
-             L) Load World
-
-             D) KoBolDOS
-
-             Q) Quit Game
-]]
+ Q) Quit Game]]
 
 -- From <https://love2d.org/wiki/HSV_color>
 local function hsv(h, s, v)
@@ -62,8 +62,8 @@ return {
     Size('full', 'full'),
     function ()
       return INTRO
-        .. (Model.afterDraw and '' or '\n              Press a key')
-        .. ('\n      ' .. Model.extraText)
+        .. (Model.afterDraw and '' or '             Press a key')
+        .. ('\n\n ' .. Model.extraText)
     end,
     Background(function()
       return hsv(
