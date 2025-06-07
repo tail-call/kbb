@@ -40,7 +40,7 @@ end
 ---@param say fun(text: string)
 local function fight(game, attacker, defender, damageModifier, say)
   local attackerAction = require 'core.numeric'.weightedRandom(attacker.abilities)
-  local defenderAction = require 'core.numeric'.weightedRandom(attacker.abilities)
+  local defenderAction = require 'core.numeric'.weightedRandom(defender.abilities)
 
   local attackerEffect = attackerAction.ability.combat
   local defenderEffect = defenderAction.ability.defence
