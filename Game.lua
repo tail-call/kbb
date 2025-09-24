@@ -598,19 +598,16 @@ function Game.orderMove(game)
     return World.isPassable(game.world, pos)
   end
 
-  -- CORRECTED MOCK GRID CREATION:
-  -- This creates a mock grid that reports the correct width and height
-  -- to the aStar function without allocating a large table.
-  local mockGrid = {}
-  local mockRow = {}
-  setmetatable(mockRow, { __len = function() return game.world.width end })
-  mockGrid[1] = mockRow
-  setmetatable(mockGrid, { __len = function() return game.world.height end })
-
   local startNode = astar.createNode(startPos.x, startPos.y)
   local goalNode = astar.createNode(goalPos.x, goalPos.y)
 
-  local path, errorMessage = astar.aStar(mockGrid, startNode, goalNode, isWalkable)
+  local path, errorMessage = astar.aStar(
+    game.world.width,
+    game.world.height,
+    startNode,
+    goalNode,
+    isWalkable
+  )
 
   if path then
     -- The first node is the starting position, so we remove it.

@@ -49,12 +49,13 @@ end
 
 -- A* Pathfinding function.
 -- Takes the grid, start node, goal node, and a function to check if a node is walkable (returns true if walkable)
----@param grid AstarNode[][] Astar grid
+---@param maxX integer
+---@param maxY integer
 ---@param startNode AstarNode
 ---@param goalNode AstarNode
 ---@param isWalkable function
 ---@return AstarNode?, string?
-local function aStar(grid, startNode, goalNode, isWalkable)
+local function aStar(maxX, maxY, startNode, goalNode, isWalkable)
   if not isWalkable(startNode.x, startNode.y) or not isWalkable(goalNode.x, goalNode.y) then
     return nil, "Start and goal node must be walkable"
   end
@@ -98,7 +99,7 @@ local function aStar(grid, startNode, goalNode, isWalkable)
     for _, pos in ipairs(neighborPositions) do
       local x, y = pos.x, pos.y
       -- Check if the neighbor is within the grid bounds
-      if x >= 1 and x <= #grid[1] and y >= 1 and y <= #grid then
+      if x >= 1 and x <= maxX and y >= 1 and y <= maxY then
         -- Check if the neighbor is walkable
         if isWalkable(x, y) then
           table.insert(neighbors, createNode(x, y))

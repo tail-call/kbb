@@ -1,3 +1,5 @@
+if arg[2] == "debug" then require("lldebugger").start() end
+
 dofile 'Global.lua'
 dofile 'conf.lua'
 
