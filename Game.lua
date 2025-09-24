@@ -10,6 +10,8 @@ local isAFollower = require 'Squad'.isAFollower
 local revealVisionSourceFog = require 'World'.revealVisionSourceFog
 local ruleBook = require 'ruleBook'.ruleBook
 local evalRule = require 'ruleBook'.evalRule
+local astar = require 'core.astar'
+local World = require 'World'
 
 local CURSOR_MAX_DISTANCE = 12
 
@@ -420,6 +422,7 @@ function Game.updateGame(game, dt, movementDirections, visibility)
     -- Handle normal mode logic
 
     game:advanceClock(dt)
+
     for _, entity in ipairs(game.entities) do
       if entity.__module == 'Battle' then
         ---@cast entity Battle
@@ -461,13 +464,29 @@ function Game.updateGame(game, dt, movementDirections, visibility)
 
   for _, entity in ipairs(game.entities) do
     if entity.__module == 'Guy' then
-        ---@cast entity Guy
+      ---@cast entity Guy
+
+      -- TODO: path handling should likely be in the Guy module
+      if entity.path and #entity.path > 0 and entity.mayMove then
+        local nextPos = entity.path[1]
+        local direction = Vector.sub(nextPos, entity.pos)
+
+        local newPos = require('Guy').moveGuy(entity, direction, game.guyDelegate)
+
+        if Vector.equal(newPos, nextPos) then
+          table.remove(entity.path, 1)
+        else
+          entity.path = nil
+        end
+      end
+
       entity:update(
         dt * speedFactor(
           entity,
           game.world:getTile(entity.pos)
         )
       )
+
       if not game:isFrozen(entity) then
         entity:behave(game.guyDelegate)
       end
@@ -500,6 +519,7 @@ local function maybeCollect(game, guy)
     end
   end
 end
+
 
 ---@param game Game
 function Game.orderCollect(game)
@@ -559,6 +579,50 @@ end
 function Game.orderDismiss(game)
   dismissSquad(game)
   evalRule(ruleBook.onDismiss, game, game.player, game.world:getTile(game.player.pos), ruleBook)
+end
+
+---@param game Game
+function Game.orderMove(game)
+  if not game.player then return end
+
+  local startPos = game.player.pos
+  local goalPos = game.cursorPos
+
+  local function isWalkable(x, y)
+    local pos = {x = x, y = y}
+
+    if x < 1 or x > game.world.width or y < 1 or y > game.world.height then
+      return false
+    end
+
+    return World.isPassable(game.world, pos)
+  end
+
+  -- CORRECTED MOCK GRID CREATION:
+  -- This creates a mock grid that reports the correct width and height
+  -- to the aStar function without allocating a large table.
+  local mockGrid = {}
+  local mockRow = {}
+  setmetatable(mockRow, { __len = function() return game.world.width end })
+  mockGrid[1] = mockRow
+  setmetatable(mockGrid, { __len = function() return game.world.height end })
+
+  local startNode = astar.createNode(startPos.x, startPos.y)
+  local goalNode = astar.createNode(goalPos.x, goalPos.y)
+
+  local path, errorMessage = astar.aStar(mockGrid, startNode, goalNode, isWalkable)
+
+  if path then
+    -- The first node is the starting position, so we remove it.
+    table.remove(path, 1)
+    game.player.path = path
+  else
+    game.console:say(require 'ConsoleMessage'.new {
+      text = "Cannot find a path there.",
+      lifetime = 5
+    })
+    print("A* Error: " .. (errorMessage or "No path found"))
+  end
 end
 
 return Game

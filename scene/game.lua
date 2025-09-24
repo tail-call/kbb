@@ -2,6 +2,7 @@ local updateDrawState = require 'DrawState'.updateDrawState
 local Vector = require 'core.Vector'
 local updateGame = require 'Game'.updateGame
 local endRecruiting = require 'Game'.endRecruiting
+local orderMove = require 'Game'.orderMove
 
 ---@type Game
 local game
@@ -248,6 +249,8 @@ end)
 OnMouseReleased(function (x, y, button, presses)
   if button == 1 then
     endRecruiting(game)
+  elseif button == 2 then
+    orderMove(game)
   end
 end)
 

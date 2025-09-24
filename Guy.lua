@@ -11,6 +11,7 @@
 ---@field speed number Delay in seconds between moves
 ---@field abilities { ability: Ability, weight: number }[]
 ---@field behavior 'none' | 'wander'
+---@field path core.Vector[] Pathfinding path for movement
 ---# Methods
 ---@field move fun(self: Guy, pos: core.Vector) Changes guy's position
 ---@field warp fun(self: Guy, pos: core.Vector) Changes guy's position instantly
@@ -145,6 +146,9 @@ function Guy.init(guy)
   guy.mayMove = guy.mayMove or false
   guy.speed = guy.speed or 0.15
   guy.pos = guy.pos or { x = 0, y = 0 }
+
+  -- Add this line to store the path
+  guy.path = guy.path or nil
 
   guy.pixie:move(guy.pos)
   guy.pixie:playSpawnAnimation(guy.pos)
