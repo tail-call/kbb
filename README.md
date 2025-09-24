@@ -50,6 +50,10 @@ Major goals:
 
 ## Bugs
 
+ - [ ] BUG: Moving WASD while following a pathfinding path
+            will cause you to teleport back on the path when you stop
+ - [ ] BUG: Trying to pathfind an isolated grid square will cause
+            a hang
  - [ ] BUG: Not all controls are visible in edit mode (like Z for zooming)
  - [ ] BUG: Camera flies away to the corner of the world when you die
  - [ ] BUG: Life bars are positioned weirdly a lot of times
