@@ -1,18 +1,3 @@
----State of the renderer
----@class DrawState: core.Object
----@field __module 'DrawState'
----# Properties
----@field windowScale number Window scale
----@field tileset Tileset Tileset used for drawing
----@field camera core.Vector3 Camera position in the world
----@field cursorTimer core.Timer Cursor animation timer
----@field battleTimer core.Timer Battle animation timer
----@field waterTimer core.Timer Water animation timer
----# Methods
----@field setWindowScale fun(self: DrawState, windowScale: number) Changes window scale
----@field setCamera fun(self: DrawState, offset: core.Vector, z: number, magn: number)
----@field nextFont fun(self: DrawState)
-
 local lerp3 = require 'core.Vector3'.lerp3
 local VectorModule = require 'core.Vector'
 local updateTileset = require 'Tileset'.update
@@ -22,8 +7,24 @@ local SCREEN_HEIGHT = 200
 
 local CAMERA_LERP_SPEED = 10
 
+---State of the renderer
+---@class DrawState: core.class
+---@field __module 'DrawState'
+---# Properties
+---@field windowScale number Window scale
+---@field tileset Tileset Tileset used for drawing
+---@field camera core.Vector3 Camera position in the world
+---@field cursorTimer core.Timer Cursor animation timer
+---@field battleTimer core.Timer Battle animation timer
+---@field waterTimer core.Timer Water animation timer
+---@field isUsingBoldFont boolean Water animation timer
+---# Methods
+---@field setWindowScale fun(self: DrawState, windowScale: number) Changes window scale
+---@field setCamera fun(self: DrawState, offset: core.Vector, z: number, magn: number)
+---@field nextFont fun(self: DrawState)
 local DrawState = Class {
   ...,
+  slots = {},
   ---@type DrawState
   index = {
     setWindowScale = function (self, windowScale)
