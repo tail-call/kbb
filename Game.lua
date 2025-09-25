@@ -174,7 +174,7 @@ local Game = Class {
       return curX, curY
     end,
     cursorColor = function (self)
-      local Color = require 'Color'
+      local Color = require 'game.Color'
 
       if self.mode == 'focus' then
         return Color.cursorYellow

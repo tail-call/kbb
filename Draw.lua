@@ -3,7 +3,7 @@
 --- For good performance, avoid creating tables during draw functions
 
 local Vector = require 'core.Vector'
-local Color = require 'Color'
+local Color = require 'game.Color'
 
 -- Constants
 

@@ -32,7 +32,7 @@
 
 local Vector = require 'core.Vector'
 local abilities = require 'game.Ability'.abilities
-local Color = require 'Color'
+local Color = require 'game.Color'
 
 local Guy
 Guy = Class {
