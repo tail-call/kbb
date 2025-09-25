@@ -1,4 +1,7 @@
 ---A representation of a battle between units
+
+local BATTLE_ROUND_DURATION = 0.5
+
 ---@class Battle: Object2D
 ---@field __module "Battle"
 ---@field attacker Guy Who initiated the battle
@@ -7,13 +10,9 @@
 ---@field round number Current round number
 ---@field advanceTimer fun(self: Battle, dt: number) Makes battle timer go down
 ---@field beginNewRound fun(self: Battle) Reset round timer
-
-local BATTLE_ROUND_DURATION = 0.5
-
 local Battle = Class {
   ...,
   slots = { '!attacker', '!defender' },
-  ---@type Battle
   index = {
     advanceTimer = function (self, dt)
       self.timer = self.timer - dt

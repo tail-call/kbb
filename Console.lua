@@ -1,5 +1,5 @@
 ---Console for in-game messages
----@class Console: core.Object
+---@class Console: core.class
 ---@field __module "Console"
 ---@field messages ConsoleMessage[] List of displayed messages
 ---@field say fun(self: Console, message: ConsoleMessage) Displays a message
