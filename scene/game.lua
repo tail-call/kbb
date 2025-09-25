@@ -209,22 +209,38 @@ local commonKeyPressMap = Keymap {
   end,
 }
 
+local CONTROLS = {
+  SCALE1 = '1',
+  SCALE2 = '2',
+  SCALE3 = '3',
+  SCALE4 = '4',
+  COLLECT = 'c',
+  RESPAWN = 'h',
+  WONDER = 'e',
+  WARP = 't',
+}
+
 OnKeyPressed(function (key, scancode, isrepeat)
   commonKeyPressMap:handleScancode(scancode)
 
   if game.mode == 'focus' then
-    if require 'core.table'.has({ '1', '2', '3', '4' }, scancode) then
+    if require 'core.table'.has({
+      CONTROLS.SCALE1,
+      CONTROLS.SCALE2,
+      CONTROLS.SCALE3,
+      CONTROLS.SCALE4
+    }, scancode) then
       DrawState:setWindowScale(tonumber(scancode) or 1)
     end
   elseif game.mode == 'normal' then
-    if scancode == 'c' then
+    if scancode == CONTROLS.COLLECT then
       require 'Game'.orderCollect(game)
-    elseif scancode == 'h' then
+    elseif scancode == CONTROLS.RESPAWN then
       game:addPlayer(require 'Guy'.makeLeader(Global.leaderSpawnLocation))
-    elseif scancode == 'e' then
+    elseif scancode == CONTROLS.WONDER then
       -- local patch = require 'World'.patchAt(game.world, game.player.pos)
       -- require 'World'.randomizePatch(game.world, patch)
-    elseif scancode == 't' then
+    elseif scancode == CONTROLS.WARP then
       game.player:warp(game.cursorPos)
     end
   end
