@@ -62,7 +62,6 @@ Major goals:
  - [ ] BUG: Text objects are not passable
  - [ ] BUG: Text objects render over other objects
  - [ ] BUG: Game crashes when pressing any key in focus mode
- - [ ] BUG: Recruiting doesn't work
  - [ ] BUG: Life bars are concealed behind other entities
 
 ## Quality of life
@@ -224,7 +223,10 @@ Major goals:
  <!-- These I considered when I thought all gameplay was to happen on a single screen -->
  <!-- [-] You can't recruit lost guys -->
  <!-- [-] Guys are *lost* when are in the unexplored area -->
-
+ 
+ - [x] BUG: Game crashes when saving a game with an active squad.
+            Savefile is corrupted.
+ - [x] BUG: Recruiting doesn't work
  - [x] BUG: Tile borders are visible under fog of war
  - [x] Load from images and stuff
  - [x] Guys don't step on one another

@@ -6,10 +6,13 @@
 ---@field addToSquad fun(self: Squad, guy: Guy) Adds a guy to the squad
 ---@field startFollowing fun(self: Squad) Squad will begin following the player
 ---@field toggleFollow fun(self: Squad) Toggle follow mode for squad
+---@field numFollowers fun(self: Squad): integer Returns the number of followers in the squad
+---@field followerByIdx fun(self: Squad, idx: integer): Guy | nil Returns the number of followers in the squad
+
 
 local M = Class {
   ...,
-  ---@type Squad
+  slots = {},
   index = {
     removeFromSquad = function(self, guy)
       self.followers[guy] = nil
@@ -22,6 +25,23 @@ local M = Class {
     end,
     toggleFollow = function(self)
       self.shouldFollow = not self.shouldFollow
+    end,
+    numFollowers = function (self)
+      local count = 0
+      for _ in pairs(self.followers) do
+        count = count + 1
+      end
+      return count
+    end,
+    followerByIdx = function (self, idx)
+      local count = 1
+      for key, _ in pairs(self.followers) do
+        if idx == count then
+          return key
+        end
+        count = count + 1
+      end
+      return nil
     end,
   }
 }

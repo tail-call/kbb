@@ -31,43 +31,43 @@ SetModel {
   end,
   rightPanelText = function ()
     local game = Model.game
-    local header = '<- Tab ->\n\n'
+    local numFollowers = game.squad:numFollowers()
+    local idx = 1 + (Model.activeTab % (1 + numFollowers))
+    local header = ('<- Tab %d ->\n\n'):format(idx)
 
-    local idx = 1 + (Model.activeTab % 2)
+    local function formatGuy(guy)
+      return string.format(
+        ''
+          .. header
+          .. 'Name:\n %s\n'
+          .. 'Rank:\n Harmless\n'
+          .. 'Coords:\n %sX %sY\n'
+          .. 'HP:\n %s/%s\n'
+          .. 'Action:\n %.2f/%.2f\n'
+          .. 'Moves:\n  %s\n',
+        guy.name,
+        guy.pos.x,
+        guy.pos.y,
+        guy.stats.hp,
+        guy.stats.maxHp,
+        guy.timer,
+        guy.speed,
+        guy.stats.moves
+      )
+    end
 
     if idx == 1 then
       if not game.player then return 'Player\nis nil' end
 
-      local function f(guy)
-        return string.format(
-          ''
-            .. header
-            .. 'Name:\n %s\n'
-            .. 'Rank:\n Harmless\n'
-            .. 'Coords:\n %sX %sY\n'
-            .. 'HP:\n %s/%s\n'
-            .. 'Action:\n %.2f/%.2f\n'
-            .. 'Moves:\n  %s\n',
-          guy.name,
-          guy.pos.x,
-          guy.pos.y,
-          guy.stats.hp,
-          guy.stats.maxHp,
-          guy.timer,
-          guy.speed,
-          guy.stats.moves
-        )
+      return formatGuy(game.player)
+    else
+      local follower = game.squad:followerByIdx(idx - 1)
+      if follower then
+        return formatGuy(follower)
+      else
+        return header .. '\n<???>'
       end
-
-      return f(game.player)
-    elseif idx == 2 then
-      return ''
-        .. header
-        .. ' DEBUG\n'
-        .. string.format('mayMove %s\n', game.player.mayMove)
-        .. string.format('pos %s\n', formatVector(game.player.pos))
     end
-    return ''
   end,
   bottomPanelText = function ()
     local game = Model.game
