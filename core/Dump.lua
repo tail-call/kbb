@@ -65,7 +65,14 @@ local function emitTable(obj, childEmitter)
           customDump(obj)
         end)
       else
-        -- First dump all children
+        -- First dump all children that are keys
+        for k, _ in pairs(obj) do
+          if not shouldInline(k) then
+            emitTable(k, childEmitter)
+          end
+        end
+
+        -- Then dump all children that are values
         for _, v in pairs(obj) do
           if not shouldInline(v) then
             emitTable(v, childEmitter)
@@ -81,12 +88,13 @@ local function emitTable(obj, childEmitter)
           for k, v in pairs(obj) do
             ETypeCase(k) {
               'number', function ()
-                emit('['..k..']')
+                emit('[%s]', k)
               end,
               'table', function ()
-                error('tables as keys are not supported')
+                emit('[O[%d]]', childEmitter:idOfChild(k))
               end,
               nil, function ()
+                -- Note: this will fail for strings that aren't valid identifiers
                 emit(k)
               end,
             }
@@ -151,7 +159,7 @@ local function dump(object)
   return buf:tostring()
 end
 
----Returns a function that will dump an array into a base64 encoded buffer.
+--- Returns a function that will dump an array into a base64 encoded buffer.
 ---
 ---`format` is something `string.format` may accept.
 ---@param formatString string
