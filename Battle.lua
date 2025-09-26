@@ -87,7 +87,9 @@ function Battle.updateBattle(game, battle, dt, say, fightIsOver)
   battle:advanceTimer(dt)
   if battle.timer < 0 then
     fight(game, battle.attacker, battle.defender, 1, say)
-    if battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
+    if math.random() > 0.9 then
+      fightIsOver()
+    elseif battle.attacker.stats.hp > 0 and battle.defender.stats.hp > 0 then
       battle:beginNewRound()
     else
       fightIsOver()

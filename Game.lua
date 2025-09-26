@@ -56,7 +56,7 @@ local CURSOR_MAX_DISTANCE = 12
 ---@field advanceClock fun(self: Game, dt: number) Advances in-game clock
 ---@field switchMode fun(self: Game) Switches to next mode
 ---@field addEntity fun(self: Game, entity: Object2D) Adds an entity to the world
----@field removeEntity fun(self: Game, entity: Object2D, shouldGenerateEvent: boolean) Adds a building to the world
+---@field removeEntity fun(self: Game, entity: Object2D, shouldGenerateEvent: boolean) Removes an entity from the world
 ---@field addPlayer fun(self: Game, guy: Guy) Adds a controllable unit to the game
 ---@field nextMagnificationFactor fun(self: Game) Switches magnification factor to a different one
 ---@field setEntityFrozen fun(self: Game, entity: Object2D, state: boolean) Unfreezes a guy
@@ -373,11 +373,10 @@ end
 ---@param guy Guy
 ---@param game Game
 ---@param battle Battle
-local function die(guy, game, battle)
+local function die(guy, game)
   echo(game, ('%s dies with %s hp.'):format(guy.name, guy.stats.hp))
 
   game:removeEntity(guy, true)
-  game:removeEntity(battle, true)
 end
 
 ---@param game Game Game object
@@ -425,26 +424,30 @@ function Game.updateGame(game, dt, movementDirections, visibility)
 
     for _, entity in ipairs(game.entities) do
       if entity.__module == 'Battle' then
-        ---@cast entity Battle
-        require 'Battle'.updateBattle(game, entity, dt, function (text)
+        local battle = entity
+        ---@cast battle Battle
+
+        require 'Battle'.updateBattle(game, battle, dt, function (text)
           echo(game, text)
         end, function ()
           local function becomeStronger(guy)
             guy.stats:setMaxHp(guy.stats.maxHp + 2)
           end
-
-          if entity.attacker.stats.hp <= 0 then
-            becomeStronger(entity.defender)
-            die(entity.attacker, game, entity)
+ 
+          if battle.attacker.stats.hp <= 0 then
+            becomeStronger(battle.defender)
+            die(battle.attacker, game, battle)
           end
 
-          if entity.defender.stats.hp <= 0 then
-            becomeStronger(entity.attacker)
-            die(entity.defender, game,  entity)
+          if battle.defender.stats.hp <= 0 then
+            becomeStronger(battle.attacker)
+            die(battle.defender, game,  battle)
           end
 
-          game:setEntityFrozen(entity.attacker, false)
-          game:setEntityFrozen(entity.defender, false)
+          game:setEntityFrozen(battle.attacker, false)
+          game:setEntityFrozen(battle.defender, false)
+
+          game:removeEntity(battle, true)
         end)
       end
     end

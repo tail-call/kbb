@@ -46,8 +46,7 @@ SetModel {
           .. 'Coords:\n %sX %sY\n'
           .. 'HP:\n %s/%s\n'
           .. 'Action:\n %.2f/%.2f\n'
-          .. 'Moves:\n  %s\n'
-          .. 'Deaths:\n  %s\n',
+          .. 'Moves:\n  %s\n',
         game.player.name,
         game.player.pos.x,
         game.player.pos.y,
@@ -55,8 +54,7 @@ SetModel {
         game.player.stats.maxHp,
         game.player.timer,
         game.player.speed,
-        game.player.stats.moves,
-        game.stats.deathsCount
+        game.player.stats.moves
       )
     elseif idx == 2 then
       return ''
@@ -91,13 +89,15 @@ SetModel {
     elseif game.mode == 'edit' then
       controls = 'Space] focus\nLMB] paint\nC] change tile\n'
     end
+    local totalTiles = game.world.height * game.world.width
     return {
       WHITE_COLOR,
       string.format(
-        'Score: %d | Revealed: %d/%d %0.ffps\n',
+        'Score: %d | Revealed: %d/%d | Deaths: %d | %0.ffps\n',
         game.stats.score,
         game.world.revealedTilesCount,
-        game.world.height * game.world.width,
+        totalTiles,
+        game.stats.deathsCount,
         love.timer.getFPS()
       ),
       WHITE_COLOR,
