@@ -38,24 +38,28 @@ SetModel {
     if idx == 1 then
       if not game.player then return 'Player\nis nil' end
 
-      return string.format(
-        ''
-          .. header
-          .. 'Name:\n %s\n'
-          .. 'Rank:\n Harmless\n'
-          .. 'Coords:\n %sX %sY\n'
-          .. 'HP:\n %s/%s\n'
-          .. 'Action:\n %.2f/%.2f\n'
-          .. 'Moves:\n  %s\n',
-        game.player.name,
-        game.player.pos.x,
-        game.player.pos.y,
-        game.player.stats.hp,
-        game.player.stats.maxHp,
-        game.player.timer,
-        game.player.speed,
-        game.player.stats.moves
-      )
+      local function f(guy)
+        return string.format(
+          ''
+            .. header
+            .. 'Name:\n %s\n'
+            .. 'Rank:\n Harmless\n'
+            .. 'Coords:\n %sX %sY\n'
+            .. 'HP:\n %s/%s\n'
+            .. 'Action:\n %.2f/%.2f\n'
+            .. 'Moves:\n  %s\n',
+          guy.name,
+          guy.pos.x,
+          guy.pos.y,
+          guy.stats.hp,
+          guy.stats.maxHp,
+          guy.timer,
+          guy.speed,
+          guy.stats.moves
+        )
+      end
+
+      return f(game.player)
     elseif idx == 2 then
       return ''
         .. header

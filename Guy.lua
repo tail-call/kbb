@@ -159,6 +159,7 @@ function Guy.makeLeader(pos)
   local tileset = require 'Tileset'.getTileset()
 
   local guy = Guy.new {
+    name = 'Princess',
     pixie = require 'Pixie'.new {
       quad = tileset.quads.guy,
       color = { 1, 1, 0, 1 },
