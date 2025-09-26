@@ -83,6 +83,10 @@ local function new(opts)
 
       env.o.world:resetFog(value)
     end,
+    pretzels = function (n)
+      n = n or 1
+      env.o.resources:add { pretzels = n }
+    end
   }
 
   do -- Populate help pages
