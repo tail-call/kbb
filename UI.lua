@@ -1,6 +1,6 @@
 ---@class UI
 ---@field type 'none' | 'panel'
----@field transform (fun(drawState: DrawState): love.Transform)
+---@field transform (fun(drawState: DrawState): love.Transform) Transformation to be applied to the UI
 ---@field shouldDraw (fun(): boolean) | nil
 ---@field children UI[]
 
@@ -15,7 +15,7 @@
 ---@field type 'panel'
 ---@field w fun(drawState: DrawState): integer
 ---@field h fun(drawState: DrawState): integer
----@field background UIColor
+---@field background UIColor | fun(state: "hover" | "push" | "normal"): UIColor
 ---@field text fun(): string
 ---@field coloredText fun(): table
 

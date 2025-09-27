@@ -166,6 +166,14 @@ return {
     end,
     Size(24, 16),
     Text('FLY'),
-    Background(0.5, 0.2, 0.2, 1),
+    Background(function (state)
+      if state == "normal" then
+        return { r = 0.5, g = 0.2, b = 0.2, a = 1 }
+      elseif state == "hover" then
+        return { r = 0.9, g = 0.5, b = 0.5, a = 1 }
+      elseif state == "push" then
+        return { r = 0.2, g = 0.1, b = 0.1, a = 1 }
+      end
+    end),
   },
 }

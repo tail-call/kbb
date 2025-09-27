@@ -78,16 +78,31 @@ local function drawUI(drawState, ui)
 
   local transform = ui.transform(drawState)
   love.graphics.applyTransform(transform)
-
+  
   if ui.type == 'none' then
     ---@cast ui UI
   elseif ui.type == 'panel' then
     ---@cast ui PanelUI
+
+    local mouseX, mouseY = love.graphics.inverseTransformPoint(
+      love.mouse.getPosition()
+    )
+
+    local state = "normal"
+    if mouseX < ui.w(drawState) and mouseX >= 0 and mouseY < ui.h(drawState) and mouseY > 0 then
+      if love.mouse.isDown(1) then
+        state = "push"
+      else
+        state = "hover"
+      end
+    end
+
     local bg = (type(ui.background) == 'function')
-      and ui.background()
+      and ui.background(state)
       or ui.background
 
     local width, height = ui.w(drawState), ui.h(drawState)
+
     withColor(bg.r, bg.g, bg.b, bg.a, function ()
       love.graphics.rectangle('fill', 0, 0, width, height)
     end)
