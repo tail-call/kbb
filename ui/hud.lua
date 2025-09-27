@@ -117,6 +117,8 @@ SetModel {
   end,
 }
 
+local sidePanelWidth = 88
+
 return {
   Panel { -- Top panel
     transform = function () return Origin() end,
@@ -129,14 +131,14 @@ return {
     transform = function ()
       return Origin():translate(0, 8)
     end,
-    Size(88, 'full'),
+    Size(sidePanelWidth, 'full'),
     Text('Space] exit\n1,2,3,4] scale UI'),
     Background(0.5, 0.1, 0.5, 1),
   },
   Panel { -- Empty underlay for console
     shouldDraw = Model.shouldDrawFocusModeUI,
     transform = function (drawState)
-      return Origin():translate(88, FullHeight(drawState) - 60)
+      return Origin():translate(sidePanelWidth, FullHeight(drawState) - 60)
     end,
     Size(240, 52),
     Text(''),
@@ -144,11 +146,11 @@ return {
   },
   Panel { -- Right panel
     transform = function (drawState)
-      return Origin():translate(FullWidth(drawState) - 88, 8)
+      return Origin():translate(FullWidth(drawState) - sidePanelWidth, 8)
     end,
-    Size(88, 128),
+    Size(sidePanelWidth, 128),
     Model.rightPanelText,
-    Background(0, 0, 0, 0),
+    Background(0, 0, 0, 1),
   },
   Panel { -- Bottom panel
     transform = function (drawState)
@@ -157,5 +159,13 @@ return {
     Size('full', 8),
     Model.bottomPanelText,
     Background(0.5, 0.5, 0.5, 1),
+  },
+  Panel { -- Fly btn
+    transform = function (drawState)
+      return Origin():translate(16, FullHeight(drawState) - 24)
+    end,
+    Size(24, 16),
+    Text('FLY'),
+    Background(0.5, 0.2, 0.2, 1),
   },
 }
