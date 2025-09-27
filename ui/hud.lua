@@ -121,6 +121,16 @@ local sidePanelWidth = 88
 local btnColorNormal = { r = 0.5, g = 0.2, b = 0.2, a = 1 }
 local btnColorHover = { r = 0.9, g = 0.5, b = 0.5, a = 1 }
 local btnColorPush = { r = 0.2, g = 0.1, b = 0.1, a = 1 }
+local transparentColor = { r = 0, g = 0, b = 0, a = 0 }
+local panelHoverColor = { r = 0, g = 0, b = 0, a = 0.5 }
+
+local glassPanelBg = Background(function (state)
+  if state == "normal" then
+    return transparentColor
+  else
+    return panelHoverColor
+  end
+end)
 
 return {
   Panel { -- Top panel
@@ -153,7 +163,7 @@ return {
     end,
     Size(sidePanelWidth, 128),
     Model.rightPanelText,
-    Background(0, 0, 0, 1),
+    glassPanelBg,
   },
   Panel { -- Bottom panel
     transform = function (drawState)
