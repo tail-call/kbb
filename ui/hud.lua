@@ -118,6 +118,9 @@ SetModel {
 }
 
 local sidePanelWidth = 88
+local btnColorNormal = { r = 0.5, g = 0.2, b = 0.2, a = 1 }
+local btnColorHover = { r = 0.9, g = 0.5, b = 0.5, a = 1 }
+local btnColorPush = { r = 0.2, g = 0.1, b = 0.1, a = 1 }
 
 return {
   Panel { -- Top panel
@@ -168,11 +171,11 @@ return {
     Text('FLY'),
     Background(function (state)
       if state == "normal" then
-        return { r = 0.5, g = 0.2, b = 0.2, a = 1 }
+        return btnColorNormal
       elseif state == "hover" then
-        return { r = 0.9, g = 0.5, b = 0.5, a = 1 }
+        return btnColorHover
       elseif state == "push" then
-        return { r = 0.2, g = 0.1, b = 0.1, a = 1 }
+        return btnColorPush
       end
     end),
   },
