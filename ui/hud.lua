@@ -21,8 +21,6 @@ local Model = Model
 local WHITE_COLOR = { 1, 1, 1, 1 }
 local GRAY_COLOR = { 0.5, 0.5, 0.5, 1 }
 
-local formatVector = require 'core.Vector'.formatVector
-
 SetModel {
   prompt = '',
   activeTab = 0,

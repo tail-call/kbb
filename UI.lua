@@ -51,26 +51,38 @@ local function makePanel(bak)
 
   panel.type = 'panel'
   panel.transform = bak.transform
-  panel.w = bak[1][2] or function () return 0 end
-  panel.h = bak[1][3] or function () return 0 end
-  panel.background = { r = 0, g = 0, b = 0, a = 1 }
-  TypeCase(bak[3].fun) {
-    'function', function ()
-      panel.background = bak[3].fun
-    end,
-    nil, function ()
-      panel.background = bak[3]
-    end,
-  }
+  for _, v in ipairs(bak) do
+    TypeCase(v) {
+      'string', function ()
+        panel.text = v
+      end,
+      'table', function ()
+        local kind = v[1]
+        if kind == 'size' then
+          panel.w = v[2] or function () return 0 end
+          panel.h = v[3] or function () return 0 end
+        elseif kind == 'background' then
+          panel.background = { r = 0, g = 0, b = 0, a = 1 }
+          TypeCase(v.fun) {
+            'function', function ()
+              panel.background = v.fun
+            end,
+            nil, function ()
+              panel.background = v
+            end,
+          }
+        else
+          error(("Unsupported panel kind: %s"):format(kind))
+        end
+      end,
+      nil, function ()
+        panel.coloredText = v
+      end,
+    }
+  end
 
-  TypeCase(bak[2]) {
-    'string', function ()
-      panel.text = bak[2]
-    end,
-    nil, function ()
-      panel.coloredText = bak[2]
-    end,
-  }
+
+
 
   ---@cast panel PanelUI
   return panel
