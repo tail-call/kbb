@@ -132,6 +132,16 @@ local glassPanelBg = Background(function (state)
   end
 end)
 
+local buttonBg = Background(function (state)
+  if state == "normal" then
+    return btnColorNormal
+  elseif state == "hover" then
+    return btnColorHover
+  elseif state == "push" then
+    return btnColorPush
+  end
+end)
+
 return {
   Panel { -- Top panel
     transform = function () return Origin() end,
@@ -179,14 +189,9 @@ return {
     end,
     Size(24, 16),
     Text('FLY'),
-    Background(function (state)
-      if state == "normal" then
-        return btnColorNormal
-      elseif state == "hover" then
-        return btnColorHover
-      elseif state == "push" then
-        return btnColorPush
-      end
-    end),
+    buttonBg,
+    { 'action', fun = function ()
+      print('hi')
+    end }
   },
 }

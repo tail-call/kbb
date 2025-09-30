@@ -18,6 +18,7 @@
 ---@field background UIColor | fun(state: "hover" | "push" | "normal"): UIColor
 ---@field text fun(): string
 ---@field coloredText fun(): table
+---@field action (fun(): nil) | nil
 
 ---@class UIOptions
 ---@field shouldDraw (fun(): boolean) | nil
@@ -48,7 +49,8 @@ local function makePanel(bak)
   local panel = makeRoot({
     shouldDraw = bak.shouldDraw
   }, {})
-
+  
+  ---@cast panel PanelUI
   panel.type = 'panel'
   panel.transform = bak.transform
   for _, v in ipairs(bak) do
@@ -68,9 +70,13 @@ local function makePanel(bak)
               panel.background = v.fun
             end,
             nil, function ()
-              panel.background = v
+              panel.background = function ()
+                return v
+              end
             end,
           }
+        elseif kind == 'action' then
+          panel.action = v.fun
         else
           error(("Unsupported panel kind: %s"):format(kind))
         end

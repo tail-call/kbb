@@ -70,7 +70,6 @@ local function withLineWidth(lineWidth, cb)
   love.graphics.setLineWidth(xLineWidth)
 end
 
-
 ---@param drawState DrawState
 ---@param ui UI
 local function drawUI(drawState, ui)
@@ -89,17 +88,18 @@ local function drawUI(drawState, ui)
     )
 
     local state = "normal"
-    if mouseX < ui.w(drawState) and mouseX >= 0 and mouseY < ui.h(drawState) and mouseY > 0 then
-      if love.mouse.isDown(1) then
-        state = "push"
-      else
-        state = "hover"
+
+    if ui.action then
+      if mouseX < ui.w(drawState) and mouseX >= 0 and mouseY < ui.h(drawState) and mouseY > 0 then
+        if love.mouse.isDown(1) then
+          state = "push"
+        else
+          state = "hover"
+        end
       end
     end
 
-    local bg = (type(ui.background) == 'function')
-      and ui.background(state)
-      or ui.background
+    local bg = ui.background(state)
 
     local width, height = ui.w(drawState), ui.h(drawState)
 
