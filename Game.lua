@@ -292,6 +292,8 @@ end
 ---@param entity Object2D
 ---@return boolean
 function Game.mayRecruit(game, entity)
+  if not game.player then return false end
+
   if entity.__module ~= 'Guy' then return false end
 
   ---@cast entity Guy

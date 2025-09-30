@@ -212,7 +212,6 @@ local CONTROLS = {
   SCALE3 = '3',
   SCALE4 = '4',
   COLLECT = 'c',
-  RESPAWN = 'h',
   WONDER = 'e',
   WARP = 't',
 }
@@ -232,8 +231,6 @@ OnKeyPressed(function (key, scancode, isrepeat)
   elseif game.mode == 'normal' then
     if scancode == CONTROLS.COLLECT then
       require 'Game'.orderCollect(game)
-    elseif scancode == CONTROLS.RESPAWN then
-      game:addPlayer(require 'Guy'.makeLeader(Global.leaderSpawnLocation))
     elseif scancode == CONTROLS.WONDER then
       -- local patch = require 'World'.patchAt(game.world, game.player.pos)
       -- require 'World'.randomizePatch(game.world, patch)

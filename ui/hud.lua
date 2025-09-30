@@ -83,11 +83,11 @@ SetModel {
   topPanelText = function ()
     local game = Model.game
     local player = game.player
-    if not player then return 'Wow, you lose! Press H to revive' end
+    if not player then return 'Wow, you lose! Press RSPWN' end
 
     local controls = ''
     if game.mode == 'normal' then
-      controls = 'Space] edit\nLMB] recruit\nRMB] go\n8] save\nZ] zoom\nF] follow\nE] wonder\nQ] gather\nT] warp\nC] collect\nH] respawn\n'
+      controls = 'Space] edit\nLMB] recruit\nRMB] go\n8] save\nZ] zoom\nF] follow\nE] wonder\nQ] gather\nT] warp\nC] collect\n'
     elseif game.mode == 'edit' then
       controls = 'Space] focus\nLMB] paint\nC] change tile\n'
     end
@@ -189,13 +189,25 @@ return {
   },
   Panel { -- Fly btn
     transform = function (drawState)
-      return Origin():translate(16, FullHeight(drawState) - 24)
+      return Origin():translate(8, FullHeight(drawState) - 24)
     end,
     Size(24, 16),
     Text('FLY'),
     buttonBg,
     Action(function ()
       Model.game.player.pixie:setIsFloating(not Model.game.player.pixie.isFloating)
+    end),
+  },
+    Panel { -- Spn btn
+    transform = function (drawState)
+      return Origin():translate(40, FullHeight(drawState) - 24)
+      
+    end,
+    Size(24, 16),
+    Text('RES\nPWN'),
+    buttonBg,
+    Action(function ()
+      Model.game:addPlayer(require 'Guy'.makeLeader(Global.leaderSpawnLocation))
     end),
   },
 }
