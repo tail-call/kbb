@@ -201,9 +201,6 @@ local commonKeyPressMap = Keymap {
   ['b'] = function()
     require 'Game'.orderBuild(game)
   end,
-  ['x'] = function()
-    game.player.pixie:setIsFloating(not game.player.pixie.isFloating)
-  end,
   ['c'] = function()
     game.painterTile = selectNextTile()
   end,
@@ -251,7 +248,7 @@ end)
 ---@param button 1 | 2 | 3
 ---@param presses table
 OnMousePressed(function (x, y, button, presses)
-  if button == 1 then
+  if button == 1 and not DrawState.hitPanel then
     if game.mode == 'normal' then
       require 'Game'.beginRecruiting(game)
     end
@@ -264,6 +261,10 @@ end)
 ---@param presses table
 OnMouseReleased(function (x, y, button, presses)
   if button == 1 then
+    if DrawState.hitPanel then
+      DrawState.hitPanel.action()
+    end
+
     endRecruiting(game)
   elseif button == 2 then
     orderMove(game)

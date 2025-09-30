@@ -87,7 +87,7 @@ SetModel {
 
     local controls = ''
     if game.mode == 'normal' then
-      controls = 'Space] edit\nLMB] recruit\nRMB] go\n8] save\nZ] zoom\nF] follow\nE] wonder\nQ] gather\nT] warp\nC] collect\nX] fly\nH] respawn\n'
+      controls = 'Space] edit\nLMB] recruit\nRMB] go\n8] save\nZ] zoom\nF] follow\nE] wonder\nQ] gather\nT] warp\nC] collect\nH] respawn\n'
     elseif game.mode == 'edit' then
       controls = 'Space] focus\nLMB] paint\nC] change tile\n'
     end
@@ -195,7 +195,7 @@ return {
     Text('FLY'),
     buttonBg,
     Action(function ()
-      print('hi')
+      Model.game.player.pixie:setIsFloating(not Model.game.player.pixie.isFloating)
     end),
   },
 }

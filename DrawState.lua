@@ -18,10 +18,13 @@ local CAMERA_LERP_SPEED = 10
 ---@field battleTimer core.Timer Battle animation timer
 ---@field waterTimer core.Timer Water animation timer
 ---@field isUsingBoldFont boolean Water animation timer
+---@field hitPanel PanelUI | nil After rendering UI, which panel did we hit?
 ---# Methods
 ---@field setWindowScale fun(self: DrawState, windowScale: number) Changes window scale
 ---@field setCamera fun(self: DrawState, offset: core.Vector, z: number, magn: number)
 ---@field nextFont fun(self: DrawState)
+---@field setHitPanel fun(self: DrawState, hitPanel: PanelUI)
+---@field resetHitPanel fun(self: DrawState)
 local DrawState = Class {
   ...,
   slots = {},
@@ -48,6 +51,12 @@ local DrawState = Class {
           self.isUsingBoldFont
         )
       )
+    end,
+    setHitPanel = function (self, hitPanel)
+      self.hitPanel = hitPanel
+    end,
+    resetHitPanel = function (self)
+      self.hitPanel = nil
     end
   }
 }
@@ -69,6 +78,7 @@ function DrawState.init(obj)
   obj.waterTimer = obj.waterTimer or Timer {
     speed = 1/4,
   }
+  obj.hitPanel = nil
   obj:nextFont()
 end
 

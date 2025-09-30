@@ -96,6 +96,7 @@ local function drawUI(drawState, ui)
         else
           state = "hover"
         end
+        drawState:setHitPanel(ui)
       end
     end
 
@@ -731,14 +732,17 @@ local function drawGame(game, drawState, ui, ambientColor)
       cursorColor = Color.cursorRed
     end
 
-    local r, g, b, a = unpack(cursorColor)
-    withColor(r, g, b, a, function ()
-      drawCursor(drawState, game.cursorPos, game.mode, playerStats.moves)
-    end)
+    if not drawState.hitPanel then
+      local r, g, b, a = unpack(cursorColor)
+      withColor(r, g, b, a, function ()
+        drawCursor(drawState, game.cursorPos, game.mode, playerStats.moves)
+      end)
+    end
   end
 
   love.graphics.pop()
 
+  drawState:resetHitPanel()
   drawUI(drawState, ui)
 
   local minimapTransform = love.math.newTransform(
