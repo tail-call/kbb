@@ -142,6 +142,10 @@ local buttonBg = Background(function (state)
   end
 end)
 
+local function Action(fun)
+  return { 'action', fun = fun }
+end
+
 return {
   Panel { -- Top panel
     transform = function () return Origin() end,
@@ -190,8 +194,8 @@ return {
     Size(24, 16),
     Text('FLY'),
     buttonBg,
-    { 'action', fun = function ()
+    Action(function ()
       print('hi')
-    end }
+    end),
   },
 }
