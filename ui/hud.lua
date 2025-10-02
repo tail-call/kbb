@@ -146,7 +146,8 @@ local function Action(fun)
   return { 'action', fun = fun }
 end
 
-return {
+
+local hud = {
   Panel { -- Top panel
     transform = function () return Origin() end,
     Size('full', 8),
@@ -187,27 +188,34 @@ return {
     Model.bottomPanelText,
     Background(0.5, 0.5, 0.5, 1),
   },
-  Panel { -- Fly btn
-    transform = function (drawState)
-      return Origin():translate(8, FullHeight(drawState) - 24)
-    end,
-    Size(24, 16),
-    Text('FLY'),
-    buttonBg,
-    Action(function ()
+}
+
+local bottomButtons = {
+  {
+    label = 'FLY',
+    action = Action(function ()
+      Model.game.player.pixie:setIsFloating(not Model.game.player.pixie.isFloating)
+    end),
+  }, 
+  {
+    label = 'RES\nPWN',
+    action = Action(function ()
       Model.game.player.pixie:setIsFloating(not Model.game.player.pixie.isFloating)
     end),
   },
-    Panel { -- Spn btn
+}
+
+for i, button in ipairs(bottomButtons) do
+  table.insert(hud, Panel {
     transform = function (drawState)
-      return Origin():translate(40, FullHeight(drawState) - 24)
-      
+      return Origin():translate(8 + (i - 1) * 32, FullHeight(drawState) - 24)
     end,
     Size(24, 16),
-    Text('RES\nPWN'),
+    Text(button.label),
     buttonBg,
-    Action(function ()
-      Model.game:addPlayer(require 'Guy'.makeLeader(Global.leaderSpawnLocation))
-    end),
-  },
-}
+    button.action
+  })
+end
+
+
+return hud
