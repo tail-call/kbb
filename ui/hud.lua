@@ -161,7 +161,7 @@ local hud = {
     end,
     Size(sidePanelWidth, 'full'),
     Text('Space] exit\n1,2,3,4] scale UI'),
-    Background(0.5, 0.1, 0.5, 1),
+    Background(0.5, 0.1, 0.5, 0.5),
   },
   Panel { -- Empty underlay for console
     shouldDraw = Model.shouldDrawFocusModeUI,
@@ -172,7 +172,10 @@ local hud = {
     Text(''),
     Background(0.25, 0.25, 0.25, 1),
   },
-  Panel { -- Right panel
+  Panel { -- Right panel: character stats
+    shouldDraw = function ()
+      return Model.game.mode == 'normal'
+    end,
     transform = function (drawState)
       return Origin():translate(FullWidth(drawState) - sidePanelWidth, 8)
     end,
@@ -207,6 +210,9 @@ local bottomButtons = {
 
 for i, button in ipairs(bottomButtons) do
   table.insert(hud, Panel {
+    shouldDraw = function ()
+      return Model.game.mode == 'normal'
+    end,
     transform = function (drawState)
       return Origin():translate(8 + (i - 1) * 32, FullHeight(drawState) - 24)
     end,

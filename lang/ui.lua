@@ -1,4 +1,5 @@
 Panel = function (...) end
+---@return love.Transform
 Origin = function (...) end
 FullWidth = function (...) end
 Fixed = function (...) end

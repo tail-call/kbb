@@ -232,8 +232,8 @@ OnKeyPressed(function (key, scancode, isrepeat)
     if scancode == CONTROLS.COLLECT then
       require 'Game'.orderCollect(game)
     elseif scancode == CONTROLS.WONDER then
-      -- local patch = require 'World'.patchAt(game.world, game.player.pos)
-      -- require 'World'.randomizePatch(game.world, patch)
+      local patch = require 'World'.patchAt(game.world, game.player.pos)
+      require 'World'.randomizePatch(game.world, patch)
     elseif scancode == CONTROLS.WARP then
       game.player:warp(game.cursorPos)
     end
