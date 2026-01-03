@@ -7,6 +7,7 @@
 ---@field global table
 ---@field helpTable table
 ---@field spawnHealingRune fun(a: number, b: number)
+---@field spawnEntityAtCursor fun(spawner: fun(pos: core.Vector): Object2D)
 
 ---@param opts CommandsOptions
 ---@return table
@@ -18,6 +19,7 @@ local function new(opts)
   local scribe = opts.scribe or error('opts.scribe is required', 2)
   local noon = opts.noon or error('opts.noon is required', 2)
   local spawnHealingRune = opts.spawnHealingRune or error('opts.spawnHealingRune is required', 2)
+  local spawnEntityAtCursor = opts.spawnEntityAtCursor or error('opts.spawnEntityAtCursor is required', 2)
   local helpTable = opts.helpTable or error('opts.helpTable is required', 2)
 
   -- Will be populated later
@@ -74,6 +76,11 @@ local function new(opts)
     end,
     shr = function (restoredHp, rechargeTime)
       spawnHealingRune(restoredHp, rechargeTime)
+    end,
+    sslm = function ()
+      spawnEntityAtCursor(function (pos)
+        return require "Guy".makeSlime(pos)
+      end)
     end,
     resetfog = function (value)
       local t = type(value)

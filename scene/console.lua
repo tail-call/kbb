@@ -72,6 +72,9 @@ OnKeyPressed(function (key, scancode, isrepeat)
             }
           )
         end,
+        spawnEntityAtCursor = function (spawner)
+          game:addEntity(spawner(game.cursorPos))
+        end,
       }
 
       setfenv(chunk, require 'Commands'.new(opts))

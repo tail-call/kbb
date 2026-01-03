@@ -13,6 +13,7 @@
 ---@field cave love.Quad
 ---@field wall love.Quad
 ---@field pointer love.Quad
+---@field slime love.Quad
 ---@field waterFrames love.Quad[]
 
 ---@class Tileset
@@ -133,6 +134,7 @@ local function load()
       cave = tile(1, 3),
       wall = tile(2, 3),
       pointer = tile(4, 2),
+      slime = tile(4, 3),
       waterFrames = {
         tile(0, 1),
         tile(1, 1),

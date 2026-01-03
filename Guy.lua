@@ -209,11 +209,30 @@ function Guy.makeEvilGuy(pos)
   local guy = Guy.new {
     name = 'Evil Guy',
     team = 'evil',
-    speed = 0.5,
+    speed = 0.6,
     behavior = 'wander',
     pixie = require 'Pixie'.new {
       quad = tileset.quads.guy,
       color = { 1, 0, 0, 1 },
+    },
+    pos = pos,
+    tileset = tileset,
+  }
+  return guy
+end
+
+---@param pos core.Vector
+function Guy.makeSlime(pos)
+  local tileset = require 'Tileset'.getTileset()
+
+  local guy = Guy.new {
+    name = 'Slime',
+    team = 'evil',
+    speed = 0.8,
+    behavior = 'wander',
+    pixie = require 'Pixie'.new {
+      quad = tileset.quads.slime,
+      color = { 0.6, 0.6, 1, 1 },
     },
     pos = pos,
     tileset = tileset,
